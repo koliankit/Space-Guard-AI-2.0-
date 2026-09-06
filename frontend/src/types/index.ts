@@ -68,3 +68,16 @@ export interface MissionStatus {
   reject: number
   subsystems: SubsystemStatus[]
 }
+
+export interface MissionProfile {
+  id: string
+  name: string
+  code: string
+  targetOrbit: string
+  centre: string
+  lotsPrefix: string
+  description: string
+  highlightSubsystem: string
+  icon: string
+}
+

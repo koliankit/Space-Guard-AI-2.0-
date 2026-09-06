@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { sounds } from '../../utils/soundEffects'
 
 export type DashboardTab = 'wall' | 'telemetry' | 'matrix' | 'orbital' | 'subsystems' | 'report'
 
@@ -8,6 +9,8 @@ interface HeaderProps {
   onSelectTab: (tab: DashboardTab) => void
   totalComponents?: number
   rejectCount?: number
+  onOpenPitchModal?: () => void
+  activeMissionName?: string
 }
 
 export default function Header({
@@ -16,10 +19,13 @@ export default function Header({
   onSelectTab,
   totalComponents = 0,
   rejectCount = 0,
+  onOpenPitchModal,
+  activeMissionName = 'Gaganyaan H1 Crew Module',
 }: HeaderProps) {
   const [istTime, setIstTime] = useState('')
   const [utcTime, setUtcTime] = useState('')
   const [metSeconds, setMetSeconds] = useState(14820) // Simulated Mission Elapsed Time
+  const [soundOn, setSoundOn] = useState(() => sounds.isEnabled())
 
   useEffect(() => {
     const updateTimes = () => {
@@ -142,6 +148,53 @@ export default function Header({
               <span className="text-reject font-bold">{rejectCount} DEFECTS</span>
             </div>
           )}
+
+          {onOpenPitchModal && (
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playPing()
+                onOpenPitchModal()
+              }}
+              className="font-display text-xs uppercase tracking-wider px-3 py-1.5 rounded border border-[#FF9933] bg-[#FF9933]/20 text-[#FFB05C] hover:bg-[#FF9933] hover:text-black transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(255,153,51,0.35)] font-bold animate-pulse"
+              title="View Official ISRO Executive Proposal & Briefing Deck"
+            >
+              <span>📑</span> ISRO BRIEFING DECK
+            </button>
+          )}
+
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const newState = sounds.toggle()
+                setSoundOn(newState)
+                if (newState) sounds.playPing()
+              }}
+              className="hud-glass-interactive px-2 py-1 rounded border border-line text-muted hover:text-white text-[10px] flex items-center gap-1"
+              title="Toggle SpaceGuard Audio Feedback"
+            >
+              <span>{soundOn ? '🔊' : '🔇'}</span>
+              <span className="hidden sm:inline">{soundOn ? 'AUDIO' : 'MUTED'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playClick()
+                if (!document.fullscreenElement) {
+                  document.documentElement.requestFullscreen().catch(() => {})
+                } else {
+                  document.exitFullscreen().catch(() => {})
+                }
+              }}
+              className="hud-glass-interactive px-2 py-1 rounded border border-line text-muted hover:text-white text-[10px] flex items-center gap-1"
+              title="Toggle Fullscreen Auditorium Mode"
+            >
+              <span>⛶</span>
+              <span className="hidden sm:inline">AUDITORIUM</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -182,8 +235,12 @@ export default function Header({
           })}
         </div>
 
-        <div className="text-[10px] text-muted tracking-widest hidden lg:block">
-          SDSC SHAR MCC &bull; 13.7199&deg; N, 80.2304&deg; E &bull; LAUNCH PAD: SLP
+        <div className="flex items-center gap-3 text-[10px] text-muted tracking-widest hidden lg:flex">
+          <span className="px-2 py-0.5 rounded bg-cyan/15 border border-cyan/40 text-cyan font-bold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan led" />
+            MISSION: {activeMissionName}
+          </span>
+          <span>SDSC SHAR MCC &bull; 13.7199&deg; N, 80.2304&deg; E &bull; SLP</span>
         </div>
       </div>
     </header>

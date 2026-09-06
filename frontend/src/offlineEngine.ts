@@ -1,4 +1,51 @@
-import type { AnalyzeResult, ComponentOut, MissionStatus, Status, SubsystemStatus, UploadResult } from './types'
+import type { AnalyzeResult, ComponentOut, MissionProfile, MissionStatus, Status, SubsystemStatus, UploadResult } from './types'
+
+export const ISRO_MISSIONS: MissionProfile[] = [
+  {
+    id: 'GAGANYAAN',
+    name: 'Gaganyaan H1 Crew Module',
+    code: 'ISRO-GAGAN-H1',
+    targetOrbit: 'LEO 400 km • 51.6° Inc',
+    centre: 'URSC Bengaluru / HSFC',
+    lotsPrefix: 'GAGAN-LOT-2026',
+    description: 'Human-rated life-support avionics, radiation-hardened FPGA & ECLSS monitoring',
+    highlightSubsystem: 'FC',
+    icon: '🚀',
+  },
+  {
+    id: 'CHANDRAYAAN4',
+    name: 'Chandrayaan-4 Lunar Return',
+    code: 'ISRO-CH4-SAMPLE',
+    targetOrbit: 'Lunar Polar / Earth Return',
+    centre: 'URSC Bengaluru / VSSC',
+    lotsPrefix: 'CH4-LUNAR-LOT',
+    description: 'Cryogenic thruster drivers, Ka-band transponders & hazard avoidance sensors',
+    highlightSubsystem: 'CTL',
+    icon: '🌕',
+  },
+  {
+    id: 'ADITYAL1',
+    name: 'Aditya-L1 Solar Observatory',
+    code: 'ISRO-ADITYA-L1',
+    targetOrbit: 'Sun-Earth L1 Halo Orbit (1.5M km)',
+    centre: 'URSC / IIA Bengaluru',
+    lotsPrefix: 'ADITYA-L1-LOT',
+    description: 'Solar ultraviolet imaging detectors, plasma analyzers & magnetometers',
+    highlightSubsystem: 'SEN',
+    icon: '☀️',
+  },
+  {
+    id: 'NAVIC1K',
+    name: 'NavIC-1K Constellation',
+    code: 'ISRO-NAVIC-1K',
+    targetOrbit: 'Geostationary / Geosynchronous 36,000 km',
+    centre: 'SAC Ahmedabad / URSC',
+    lotsPrefix: 'NAVIC-LOT-GEO',
+    description: 'Space-grade Rubidium atomic frequency standards, high-power S/L5 amplifiers',
+    highlightSubsystem: 'COM',
+    icon: '🛰️',
+  },
+]
 
 export const SUBSYSTEMS: { key: string; name: string; pos: [number, number, number] }[] = [
   { key: 'PWR', name: 'Power System', pos: [0.55, 0.42, 0.62] },
@@ -32,13 +79,6 @@ const SUBSYSTEM_PART_TEMPLATES: Record<string, string[]> = {
   CTL: ['RWHEEL-111', 'TORQUER-112', 'VALVE-113', 'SERVO-114', 'ACTUAT-115'],
 }
 
-const LOTS = [
-  'ISRO-LOT-2026A-01', 'ISRO-LOT-2026A-02', 'ISRO-LOT-2026A-03',
-  'ISRO-LOT-2026B-01', 'ISRO-LOT-2026B-02', 'ISRO-LOT-2026B-03',
-  'ISRO-LOT-MIL883-01', 'ISRO-LOT-MIL883-02', 'ISRO-LOT-MIL883-03',
-  'ISRO-LOT-SPACE-01', 'ISRO-LOT-SPACE-02', 'ISRO-LOT-SPACE-03',
-]
-
 // Simple deterministic PRNG
 function createRng(seed = 42) {
   let s = seed
@@ -60,14 +100,30 @@ interface RawPart {
   ground_truth: number | null
 }
 
-export function generateRawISROParts(): RawPart[] {
+export function generateRawISROParts(missionId = 'GAGANYAAN'): RawPart[] {
+  const mission = ISRO_MISSIONS.find((m) => m.id === missionId) || ISRO_MISSIONS[0]
   const rng = createRng(42)
   const parts: RawPart[] = []
   const subKeys = Object.keys(SUBSYSTEM_PART_TEMPLATES)
   let counter = 1
 
-  for (let lotIdx = 0; lotIdx < LOTS.length; lotIdx++) {
-    const lot = LOTS[lotIdx]
+  const lots = [
+    `${mission.lotsPrefix}-01A`,
+    `${mission.lotsPrefix}-01B`,
+    `${mission.lotsPrefix}-02A`,
+    `${mission.lotsPrefix}-02B`,
+    `${mission.lotsPrefix}-03A`,
+    `${mission.lotsPrefix}-03B`,
+    `${mission.lotsPrefix}-04A`,
+    `${mission.lotsPrefix}-04B`,
+    `${mission.lotsPrefix}-MIL-01`,
+    `${mission.lotsPrefix}-MIL-02`,
+    `${mission.lotsPrefix}-QUAL-01`,
+    `${mission.lotsPrefix}-QUAL-02`,
+  ]
+
+  for (let lotIdx = 0; lotIdx < lots.length; lotIdx++) {
+    const lot = lots[lotIdx]
     const lotBaseV0 = 7.0 + (lotIdx % 4) * 2.5 + rng() * 1.5
     const count = 17 + Math.floor(rng() * 4)
 
@@ -75,7 +131,7 @@ export function generateRawISROParts(): RawPart[] {
       const sub = subKeys[counter % subKeys.length]
       const templates = SUBSYSTEM_PART_TEMPLATES[sub]
       const template = templates[Math.floor(counter / subKeys.length) % templates.length]
-      const compId = `ISRO-SAT-${sub}-${template}-${String(counter).padStart(3, '0')}`
+      const compId = `${mission.code}-${sub}-${template}-${String(counter).padStart(3, '0')}`
 
       const v0 = lotBaseV0 + (rng() - 0.5) * 1.4
       const normalSlope = 0.006 + rng() * 0.008
@@ -98,10 +154,10 @@ export function generateRawISROParts(): RawPart[] {
     }
   }
 
-  // Flagship Injected Demonstrator Parts
+  // Flagship Injected Demonstrator Parts for pitch demonstration
   parts.push({
-    component_id: 'COMP-FC-03',
-    lot_id: 'ISRO-LOT-2026A-01',
+    component_id: `${mission.code}-FC-FPGA-CRIT-01`,
+    lot_id: `${mission.lotsPrefix}-01A`,
     subsystem: 'FC',
     v0: 21.4,
     v24: 25.2,
@@ -112,8 +168,8 @@ export function generateRawISROParts(): RawPart[] {
   })
 
   parts.push({
-    component_id: 'ISRO-SAT-PWR-MOSFET-099',
-    lot_id: 'ISRO-LOT-2026A-02',
+    component_id: `${mission.code}-PWR-MOSFET-099`,
+    lot_id: `${mission.lotsPrefix}-01B`,
     subsystem: 'PWR',
     v0: 19.8,
     v24: 24.1,
@@ -124,8 +180,8 @@ export function generateRawISROParts(): RawPart[] {
   })
 
   parts.push({
-    component_id: 'ISRO-SAT-BAT-CELL-042',
-    lot_id: 'ISRO-LOT-2026B-01',
+    component_id: `${mission.code}-BAT-CELL-042`,
+    lot_id: `${mission.lotsPrefix}-02A`,
     subsystem: 'BAT',
     v0: 14.5,
     v24: 16.8,
@@ -136,20 +192,8 @@ export function generateRawISROParts(): RawPart[] {
   })
 
   parts.push({
-    component_id: 'COMP-PWR-01',
-    lot_id: 'ISRO-LOT-2026A-01',
-    subsystem: 'PWR',
-    v0: 12.0,
-    v24: 12.6,
-    v96: 13.9,
-    v168: 15.2,
-    limit_ua: 50,
-    ground_truth: 0,
-  })
-
-  parts.push({
-    component_id: 'COMP-COM-02',
-    lot_id: 'ISRO-LOT-2026B-02',
+    component_id: `${mission.code}-COM-TWTA-ANOM-02`,
+    lot_id: `${mission.lotsPrefix}-02B`,
     subsystem: 'COM',
     v0: 9.5,
     v24: 9.9,
@@ -160,8 +204,8 @@ export function generateRawISROParts(): RawPart[] {
   })
 
   parts.push({
-    component_id: 'ISRO-SAT-NAV-GYRO-088',
-    lot_id: 'ISRO-LOT-SPACE-01',
+    component_id: `${mission.code}-NAV-GYRO-DRIFT-88`,
+    lot_id: `${mission.lotsPrefix}-MIL-01`,
     subsystem: 'NAV',
     v0: 28.5,
     v24: 36.2,
@@ -271,9 +315,15 @@ class ClientISROEngine {
   private rawParts: RawPart[] = []
   private scoredParts: ComponentOut[] = []
   private analyzed = false
+  private activeMissionId = 'GAGANYAAN'
 
-  initDemo(): UploadResult {
-    this.rawParts = generateRawISROParts()
+  getActiveMission(): MissionProfile {
+    return ISRO_MISSIONS.find((m) => m.id === this.activeMissionId) || ISRO_MISSIONS[0]
+  }
+
+  initDemo(missionId = 'GAGANYAAN'): UploadResult {
+    this.activeMissionId = missionId
+    this.rawParts = generateRawISROParts(missionId)
     this.scoredParts = []
     this.analyzed = false
     this.currentBatchId++

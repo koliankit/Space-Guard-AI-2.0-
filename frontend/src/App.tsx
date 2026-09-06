@@ -19,6 +19,9 @@ import OrbitalTrackingView from './components/Views/OrbitalTrackingView'
 import SubsystemsView from './components/Views/SubsystemsView'
 import MissionReportView from './components/Views/MissionReportView'
 import MultiScreenWall from './components/Dashboard/MultiScreenWall'
+import ISROPitchModal from './components/Dashboard/ISROPitchModal'
+import { ISRO_MISSIONS } from './offlineEngine'
+import { sounds } from './utils/soundEffects'
 import { generateCertificatePdf } from './utils/pdfGenerator'
 import { generateExcelReport } from './utils/excelGenerator'
 import * as api from './api'
@@ -29,6 +32,11 @@ export default function App() {
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
   const [dataMetaText, setDataMetaText] = useState('No dataset loaded &mdash; upload a file or load ISRO flight batch.')
+
+  const [activeMissionId, setActiveMissionId] = useState<string>('GAGANYAAN')
+  const [pitchModalOpen, setPitchModalOpen] = useState(false)
+
+  const activeMission = ISRO_MISSIONS.find((m) => m.id === activeMissionId) || ISRO_MISSIONS[0]
 
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [mappingModal, setMappingModal] = useState<UploadResult | null>(null)
@@ -103,13 +111,22 @@ export default function App() {
     }
   }
 
-  async function handleDemo() {
+  async function handleSelectMission(mId: string) {
+    setActiveMissionId(mId)
+    const m = ISRO_MISSIONS.find((x) => x.id === mId) || ISRO_MISSIONS[0]
+    log(`Selected mission qualification profile: ${m.name} (${m.code}) \u2014 ${m.centre}.`, 'ok')
+    await handleDemo(mId)
+  }
+
+  async function handleDemo(missionIdOverride?: string) {
+    const mId = missionIdOverride || activeMissionId
+    const m = ISRO_MISSIONS.find((x) => x.id === mId) || ISRO_MISSIONS[0]
     try {
-      log('Requesting ISRO Spaceflight Telemetry Batch (MIL-STD-883 HTOL)...')
-      const result = await api.createDemoBatch()
+      log(`Requesting ${m.name} qualification batch (${m.code}) \u2014 MIL-STD-883 HTOL...`)
+      const result = await api.createDemoBatch(mId)
       setUploadMeta(result)
-      resetForNewBatch(result, 'ISRO Flight Telemetry batch')
-      log(`Acquired ${result.rows} space-grade components across ${result.lots} qualification lots.`, 'ok')
+      resetForNewBatch(result, `${m.name} [${m.code}] flight batch`)
+      log(`Acquired ${result.rows} space-grade components across ${result.lots} qualification lots (${m.targetOrbit}).`, 'ok')
       setTimeout(() => runScreening(result.batch_id), 500)
     } catch (e: any) {
       log('Could not load ISRO flight telemetry: ' + e.message, 'flag')
@@ -120,6 +137,18 @@ export default function App() {
   // Auto-initialize spaceflight telemetry on startup so dashboard is never empty
   useEffect(() => {
     handleDemo()
+  }, [])
+
+  // Keyboard shortcut listener for ISRO Briefing Deck (Press 'P')
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === 'p' || e.key === 'P') && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        sounds.playClick()
+        setPitchModalOpen((v) => !v)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   async function runScreening(idOverride?: number) {
@@ -148,6 +177,7 @@ export default function App() {
 
       if (result.top_flagged) {
         const worst = result.top_flagged
+        sounds.playAlert()
         log(`${worst.component_id} flagged \u2014 risk score ${worst.risk_score}/100.`, 'flag')
         log(`Risk scoring complete across ${ms.safe + ms.monitor + ms.reject} spaceflight components.`)
         log(`${worst.component_id} localized to ${worst.subsystem_name} subsystem.`)
@@ -156,6 +186,7 @@ export default function App() {
         setFocusKey(worst.subsystem)
         setTimeout(() => setAlertComponent(worst), 400)
       } else {
+        sounds.playSuccess()
         log('No component exceeded the anomaly threshold \u2014 spacecraft nominal.', 'ok')
       }
     } catch (e: any) {
@@ -241,6 +272,8 @@ export default function App() {
         onSelectTab={setActiveTab}
         totalComponents={allComponents.length > 0 ? allComponents.length : flaggedList.length}
         rejectCount={mission?.reject ?? 0}
+        onOpenPitchModal={() => setPitchModalOpen(true)}
+        activeMissionName={activeMission.name}
       />
       <UploadBar
         metaText={dataMetaText}
@@ -248,11 +281,13 @@ export default function App() {
         canReport={analysisRun}
         running={running}
         onFile={handleFile}
-        onDemo={handleDemo}
+        onDemo={() => handleDemo()}
         onRun={() => runScreening()}
         onReport={handleReport}
         onReportPdf={handleReportPdf}
         onReportExcel={handleReportExcel}
+        activeMissionId={activeMissionId}
+        onSelectMission={handleSelectMission}
       />
       <HealthBar
         health={mission?.mission_health ?? null}
@@ -380,6 +415,14 @@ export default function App() {
           }}
         />
       )}
+
+      <ISROPitchModal
+        isOpen={pitchModalOpen}
+        onClose={() => setPitchModalOpen(false)}
+        onSelectMission={handleSelectMission}
+        onRunScreening={() => runScreening()}
+        onOpenTab={setActiveTab}
+      />
     </div>
   )
 }

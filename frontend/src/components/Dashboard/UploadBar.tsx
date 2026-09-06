@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react'
+import { ISRO_MISSIONS } from '../../offlineEngine'
+import { sounds } from '../../utils/soundEffects'
 
 export default function UploadBar({
   metaText,
@@ -11,6 +13,8 @@ export default function UploadBar({
   onReport,
   onReportPdf,
   onReportExcel,
+  activeMissionId = 'GAGANYAAN',
+  onSelectMission,
 }: {
   metaText: string
   canRun: boolean
@@ -22,6 +26,8 @@ export default function UploadBar({
   onReport: () => void
   onReportPdf?: () => void
   onReportExcel?: () => void
+  activeMissionId?: string
+  onSelectMission?: (missionId: string) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
@@ -63,11 +69,41 @@ export default function UploadBar({
         />
       </div>
 
+      {/* Mission Profile Preset Selector */}
+      <div className="flex items-center gap-1 bg-[#040E1B] p-1 rounded border border-line">
+        <span className="text-[9.5px] text-muted uppercase font-bold px-1.5 hidden xl:inline">MISSION:</span>
+        {ISRO_MISSIONS.map((m) => {
+          const isSelected = activeMissionId === m.id
+          return (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => {
+                sounds.playClick()
+                onSelectMission?.(m.id)
+              }}
+              className={`text-xs px-2.5 py-1 rounded transition-all flex items-center gap-1 font-bold border ${
+                isSelected
+                  ? 'bg-cyan/20 border-cyan text-cyan shadow-neon-cyan'
+                  : 'border-transparent text-muted hover:text-white hover:bg-panel'
+              }`}
+              title={`${m.name} — ${m.description}`}
+            >
+              <span className="text-xs">{m.icon}</span>
+              <span className="font-display tracking-wider text-[10.5px]">{m.id}</span>
+            </button>
+          )
+        })}
+      </div>
+
       {/* Action Buttons: Blue Ingest CTA + Green AI Screening CTA + PDF Generation */}
       <button
         type="button"
-        className="font-display text-xs uppercase tracking-wider px-4 py-2 rounded border border-cyan bg-cyan/20 text-cyan font-bold shadow-neon-cyan hover:bg-cyan hover:text-black transition-all flex items-center gap-2"
-        onClick={onDemo}
+        className="font-display text-xs uppercase tracking-wider px-3.5 py-2 rounded border border-cyan bg-cyan/20 text-cyan font-bold shadow-neon-cyan hover:bg-cyan hover:text-black transition-all flex items-center gap-2"
+        onClick={() => {
+          sounds.playPing()
+          onDemo()
+        }}
         title="Load authentic ISRO spacecraft 168h burn-in telemetry dataset"
       >
         <span className="text-xs">&#9654;</span> LOAD ISRO FLIGHT BATCH
@@ -76,8 +112,11 @@ export default function UploadBar({
       <button
         type="button"
         disabled={!canRun || running}
-        className="font-display text-xs uppercase tracking-wider px-4 py-2 rounded border border-safe bg-safe/20 text-safe font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-safe hover:text-black transition-all flex items-center gap-2 shadow-neon-green"
-        onClick={onRun}
+        className="font-display text-xs uppercase tracking-wider px-3.5 py-2 rounded border border-safe bg-safe/20 text-safe font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-safe hover:text-black transition-all flex items-center gap-2 shadow-neon-green"
+        onClick={() => {
+          sounds.playPing()
+          onRun()
+        }}
         title="Execute real Isolation Forest and XGBoost latent drift screening algorithms"
       >
         <span className="text-xs">&#8635;</span> EXECUTE ISRO AI SCREENING
@@ -87,8 +126,11 @@ export default function UploadBar({
         <button
           type="button"
           disabled={!canReport}
-          className="font-display text-xs uppercase tracking-wider px-3.5 py-2 rounded border border-safe/80 bg-safe/15 text-safe font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-safe hover:text-black transition-all flex items-center gap-1.5 shadow-neon-green"
-          onClick={onReportPdf}
+          className="font-display text-xs uppercase tracking-wider px-3 py-2 rounded border border-safe/80 bg-safe/15 text-safe font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-safe hover:text-black transition-all flex items-center gap-1.5 shadow-neon-green"
+          onClick={() => {
+            sounds.playSuccess()
+            onReportPdf()
+          }}
           title="Download official ISRO flight clearance certification report in PDF format"
         >
           <span>&#8681;</span> CLEARANCE PDF
@@ -99,8 +141,11 @@ export default function UploadBar({
         <button
           type="button"
           disabled={!canReport}
-          className="font-display text-xs uppercase tracking-wider px-3.5 py-2 rounded border border-emerald-400/80 bg-emerald-500/15 text-emerald-400 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-emerald-500 hover:text-black transition-all flex items-center gap-1.5 shadow-[0_0_10px_rgba(52,211,153,0.35)]"
-          onClick={onReportExcel}
+          className="font-display text-xs uppercase tracking-wider px-3 py-2 rounded border border-emerald-400/80 bg-emerald-500/15 text-emerald-400 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-emerald-500 hover:text-black transition-all flex items-center gap-1.5 shadow-[0_0_10px_rgba(52,211,153,0.35)]"
+          onClick={() => {
+            sounds.playSuccess()
+            onReportExcel()
+          }}
           title="Download official ISRO flight screening ledger in Excel Spreadsheet (.CSV) format"
         >
           <span>&#8681;</span> EXCEL (.CSV)
@@ -111,7 +156,10 @@ export default function UploadBar({
         type="button"
         disabled={!canReport}
         className="font-mono text-[11px] uppercase tracking-wider px-3 py-2 rounded border border-line bg-panel text-muted disabled:opacity-30 disabled:cursor-not-allowed hover:border-cyan hover:text-white transition-all flex items-center gap-1.5"
-        onClick={onReport}
+        onClick={() => {
+          sounds.playClick()
+          onReport()
+        }}
         title="Download official ISRO flight clearance certification report in Markdown format"
       >
         <span>&#8681;</span> REPORT (.MD)

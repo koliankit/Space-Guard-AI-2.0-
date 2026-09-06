@@ -50,17 +50,21 @@ export async function uploadFile(file: File, columnMapping?: Record<string, stri
   return offlineISRO.initDemo()
 }
 
-export async function createDemoBatch(): Promise<UploadResult> {
+export async function createDemoBatch(missionId?: string): Promise<UploadResult> {
   if (await isBackendAvailable()) {
     try {
-      const res = await fetch(`${API_BASE}/api/demo`, { method: 'POST' })
+      const res = await fetch(`${API_BASE}/api/demo?mission=${encodeURIComponent(missionId || '')}`, { method: 'POST' })
       return await asJson(res)
     } catch (e) {
       console.warn('Backend /api/demo failed, engaging standalone ISRO telemetry engine:', e)
       backendReachable = false
     }
   }
-  return offlineISRO.initDemo()
+  return offlineISRO.initDemo(missionId)
+}
+
+export function getActiveMission() {
+  return offlineISRO.getActiveMission()
 }
 
 export async function analyzeBatch(batchId: number): Promise<AnalyzeResult> {
