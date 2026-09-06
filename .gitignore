@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.db
+backend/spaceguard.db
+
+node_modules/
+dist/
+.env
+.env.local
+*.tsbuildinfo
+.DS_Store
+verify_ui.js

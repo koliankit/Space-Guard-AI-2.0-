@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background:
+    radial-gradient(ellipse 1200px 700px at 50% -10%, #0C2444 0%, transparent 65%),
+    linear-gradient(180deg, #060B14 0%, #081120 100%);
+  color: #E2E8F0;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #1B355A; border-radius: 3px; border: 1px solid rgba(0, 240, 255, 0.25); }
+::-webkit-scrollbar-thumb:hover { background: #00F0FF; box-shadow: 0 0 10px #00F0FF; }
+::-webkit-scrollbar-track { background: #060B14; }
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes pulsedot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(1.15); } }
+@keyframes modalin { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.led { animation: blink 2.2s infinite; }
+.dot-pulse { animation: pulsedot 1s infinite; }
+.modal-anim { animation: modalin .2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Cyber Deep Space Grid Overlay */
+.grid-overlay {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .28;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, .04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, .04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Subtle CRT Scanline overlay */
+.scanlines {
+  position: relative;
+}
+.scanlines::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(10, 16, 26, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* Cyber Tactical Glassmorphism */
+.hud-glass {
+  background: rgba(9, 21, 38, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(27, 50, 82, 0.85);
+}
+
+.hud-glass-interactive {
+  background: rgba(11, 25, 46, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 60, 98, 0.8);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-glass-interactive:hover {
+  background: rgba(14, 34, 64, 0.95);
+  border-color: rgba(0, 240, 255, 0.75);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+}
+
+.hud-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Tactical Reticle Corners - Blue / Cyan default */
+.reticle-corner {
+  position: relative;
+}
+.reticle-corner::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px;
+  width: 7px; height: 7px;
+  border-top: 2px solid #00F0FF;
+  border-left: 2px solid #00F0FF;
+  filter: drop-shadow(0 0 4px #00F0FF);
+}
+.reticle-corner::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; right: -1px;
+  width: 7px; height: 7px;
+  border-bottom: 2px solid #00F0FF;
+  border-right: 2px solid #00F0FF;
+  filter: drop-shadow(0 0 4px #00F0FF);
+}
+
+/* Reticle Corners - Green (Safe) */
+.reticle-corner-green::before {
+  border-top: 2px solid #00FF87;
+  border-left: 2px solid #00FF87;
+  filter: drop-shadow(0 0 4px #00FF87);
+}
+.reticle-corner-green::after {
+  border-bottom: 2px solid #00FF87;
+  border-right: 2px solid #00FF87;
+  filter: drop-shadow(0 0 4px #00FF87);
+}
+
+/* Reticle Corners - Red (Reject / Alert) */
+.reticle-corner-red::before {
+  border-top: 2px solid #FF334B;
+  border-left: 2px solid #FF334B;
+  filter: drop-shadow(0 0 4px #FF334B);
+}
+.reticle-corner-red::after {
+  border-bottom: 2px solid #FF334B;
+  border-right: 2px solid #FF334B;
+  filter: drop-shadow(0 0 4px #FF334B);
+}
+
+@keyframes radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.radar-spinner {
+  animation: radar-sweep 4s linear infinite;
+}
+
+/* Tri-Color Text Glows */
+.text-glow-blue {
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.85);
+}
+.text-glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.85);
+}
+.text-glow-green {
+  text-shadow: 0 0 10px rgba(0, 255, 135, 0.85);
+}
+.text-glow-red {
+  text-shadow: 0 0 12px rgba(255, 51, 75, 0.85);
+}
+.text-glow-lime {
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.85);
+}
+
