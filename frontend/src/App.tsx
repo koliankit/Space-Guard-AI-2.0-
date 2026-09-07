@@ -49,6 +49,8 @@ export default function App() {
   const [selected, setSelected] = useState<ComponentOut | null>(null)
   const [focusKey, setFocusKey] = useState<string | null>(null)
   const [alertComponent, setAlertComponent] = useState<ComponentOut | null>(null)
+  const [quarantineToast, setQuarantineToast] = useState<ComponentOut | null>(null)
+  const [modalTimerId, setModalTimerId] = useState<any>(null)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [filterMode, setFilterMode] = useState('ALL')
@@ -64,6 +66,9 @@ export default function App() {
   }
 
   function resetForNewBatch(result: { batch_id: number; rows: number; valid: number; missing: number; lots: number }, label: string) {
+    if (modalTimerId) clearTimeout(modalTimerId)
+    setQuarantineToast(null)
+    setAlertComponent(null)
     setBatchId(result.batch_id)
     setAnalysisRun(false)
     setMission(null)
@@ -73,7 +78,7 @@ export default function App() {
     setFocusKey(null)
     setAudit([])
     setDataMetaText(
-      `${label} loaded &mdash; <b style="color:#00FF87">${result.valid}</b> components across <b style="color:#00F0FF">${result.lots}</b> lots.`,
+      `${label} loaded &mdash; <b style="color:#10B981">${result.valid}</b> components across <b style="color:#00F0FF">${result.lots}</b> lots.`,
     )
     log(`Flight dataset uploaded \u2014 ${result.rows} components parsed.`)
     log(`${result.valid} components validated across ${result.lots} qualification lots (${result.missing} rows skipped).`, 'ok')
@@ -127,7 +132,7 @@ export default function App() {
       setUploadMeta(result)
       resetForNewBatch(result, `${m.name} [${m.code}] flight batch`)
       log(`Acquired ${result.rows} space-grade components across ${result.lots} qualification lots (${m.targetOrbit}).`, 'ok')
-      setTimeout(() => runScreening(result.batch_id), 500)
+      setTimeout(() => runScreening(result.batch_id), 600)
     } catch (e: any) {
       log('Could not load ISRO flight telemetry: ' + e.message, 'flag')
       alert('Could not load ISRO flight telemetry: ' + e.message)
@@ -184,7 +189,14 @@ export default function App() {
         log(`REJECT decision generated for ${worst.component_id} &bull; Quarantine initiated.`, 'flag')
         setSelected(worst)
         setFocusKey(worst.subsystem)
-        setTimeout(() => setAlertComponent(worst), 400)
+        
+        // Show non-blocking prominent banner first so user views the dashboard
+        setQuarantineToast(worst)
+        // Delayed alert modal so it does NOT appear simultaneously and ambush the user
+        const t = setTimeout(() => {
+          setAlertComponent(worst)
+        }, 4000)
+        setModalTimerId(t)
       } else {
         sounds.playSuccess()
         log('No component exceeded the anomaly threshold \u2014 spacecraft nominal.', 'ok')
@@ -296,6 +308,44 @@ export default function App() {
         reject={mission?.reject ?? null}
       />
 
+      {/* Non-Blocking Critical Anomaly Alert Banner (Appears first before full modal) */}
+      {quarantineToast && !alertComponent && (
+        <div className="bg-rose-500/15 border-b border-rose-500/60 px-5 py-2 flex items-center justify-between gap-3 text-xs font-mono text-white animate-modalin shadow-alert-glow z-30">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 led" />
+            <span className="font-bold text-rose-400 uppercase tracking-wider">
+              CRITICAL ANOMALY IDENTIFIED:
+            </span>
+            <span>
+              Part <b className="text-white font-bold">{quarantineToast.component_id}</b> in <b className="text-cyan">[{quarantineToast.subsystem}] {quarantineToast.subsystem_name}</b> has Risk Score <b className="text-rose-400">{quarantineToast.risk_score}/100</b> ({quarantineToast.v168.toFixed(1)} &micro;A drift).
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (modalTimerId) clearTimeout(modalTimerId)
+                setAlertComponent(quarantineToast)
+              }}
+              className="px-3 py-1 rounded bg-rose-500 text-black font-black uppercase tracking-wider text-[11px] hover:bg-rose-400 transition-all shadow-md flex items-center gap-1"
+            >
+              <span>&#9888;</span> REVIEW DEFECT PROTOCOL
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (modalTimerId) clearTimeout(modalTimerId)
+                setQuarantineToast(null)
+              }}
+              className="px-2 py-1 rounded text-slate-400 hover:text-white text-xs hover:bg-white/10 transition-colors"
+              title="Dismiss Banner"
+            >
+              &#10005;
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Global AI Screening Overlay */}
       {running && <PipelineOverlay onDone={onPipelineDone} />}
 
@@ -314,10 +364,10 @@ export default function App() {
 
       {activeTab === 'telemetry' && (
         <>
-          <div className="grid grid-cols-[280px_1fr_320px] gap-px bg-line border-b border-line lg:grid-cols-[280px_1fr_320px] max-lg:grid-cols-1 flex-1">
+          <div className="grid grid-cols-[290px_1fr_320px] gap-3 p-3 bg-[#060913] flex-1 max-xl:grid-cols-1">
             <ComponentMonitor
               subsystems={subsystems}
-              components={flaggedList}
+              components={allComponents.length > 0 ? allComponents : flaggedList}
               analysisRun={analysisRun}
               selectedId={selected?.component_id ?? null}
               onSelectSubsystem={selectSubsystem}
@@ -332,11 +382,18 @@ export default function App() {
               }}
             />
 
-            <div className="flex flex-col">
-              <div className="relative h-[480px] bg-[radial-gradient(ellipse_at_50%_40%,#0C203E_0%,#060B14_85%)] border-b border-line overflow-hidden">
-                <SatelliteScene subsystems={subsystems} onSelect={selectSubsystem} focusKey={focusKey} />
+            <div className="flex flex-col gap-3">
+              <div className="relative h-[440px] rounded-xl border border-slate-800 bg-[radial-gradient(ellipse_at_50%_40%,#0C203E_0%,#060B14_85%)] overflow-hidden shadow-lg">
+                <SatelliteScene
+                  subsystems={subsystems}
+                  onSelect={selectSubsystem}
+                  focusKey={focusKey}
+                  selectedComponent={selected}
+                />
               </div>
-              <ComparePanel component={selected} />
+              <div className="rounded-xl border border-slate-800 bg-[#090F1E] overflow-hidden shadow-md">
+                <TelemetryChart component={selected} />
+              </div>
               <SatelliteEquipmentBoard
                 subsystems={subsystems}
                 components={allComponents.length > 0 ? allComponents : flaggedList}
@@ -347,18 +404,10 @@ export default function App() {
               />
             </div>
 
-            <IntelligencePanel component={selected} />
-          </div>
-
-          <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-px bg-line border-b border-line max-lg:grid-cols-1">
-            <TelemetryChart component={selected} />
-            <DataQuality
-              rows={uploadMeta?.rows ?? null}
-              valid={uploadMeta?.valid ?? null}
-              missing={uploadMeta?.missing ?? null}
-              lots={uploadMeta?.lots ?? null}
-            />
-            <MissionMap critical={(mission?.reject ?? 0) > 0} />
+            <div className="flex flex-col gap-3">
+              <IntelligencePanel component={selected} />
+              <ComparePanel component={selected} />
+            </div>
           </div>
         </>
       )}
@@ -412,6 +461,7 @@ export default function App() {
           onAcknowledge={() => {
             setFocusKey(alertComponent.subsystem)
             setAlertComponent(null)
+            setQuarantineToast(null)
           }}
         />
       )}

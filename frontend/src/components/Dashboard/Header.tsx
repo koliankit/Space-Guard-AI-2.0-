@@ -72,80 +72,56 @@ export default function Header({
   ]
 
   return (
-    <header className="border-b border-line bg-gradient-to-b from-[#041A0B] to-[#010A04] relative z-20 font-mono">
-      {/* Top Banner: Official ISRO SDSC SHAR Sriharikota Header */}
-      <div className="flex flex-wrap items-center justify-between px-6 py-2.5 border-b border-line/60 gap-3">
+    <header className="border-b border-slate-800 bg-[#080E1C] relative z-20 font-mono">
+      {/* Top Banner: Official ISRO SDSC SHAR Header */}
+      <div className="flex flex-wrap items-center justify-between px-5 py-2.5 border-b border-slate-800/80 gap-3">
         {/* Official ISRO Title & Mission Crest */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded border border-cyan/80 flex flex-col items-center justify-center text-cyan bg-[#062612] shadow-neon-cyan font-display font-black text-xs tracking-tighter">
+          <div className="w-9 h-9 rounded-lg border border-cyan/60 flex flex-col items-center justify-center text-cyan bg-[#0B1528] font-display font-black text-xs tracking-tighter shadow-sm">
             <span>ISRO</span>
-            <span className="text-[7px] text-safe font-mono tracking-widest">SHAR</span>
+            <span className="text-[7px] text-emerald-400 font-mono tracking-widest">SHAR</span>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="m-0 text-sm font-display font-black tracking-widest text-slate-100 text-glow-green uppercase">
-                भारतीय अंतरिक्ष अनुसंधान संगठन &bull; <span className="text-cyan">ISRO</span>
+              <h1 className="m-0 text-xs font-display font-black tracking-widest text-white uppercase">
+                SPACEGUARD AI &bull; <span className="text-cyan">ISRO SDSC SHAR</span>
               </h1>
-              <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-cyan/15 text-cyan border border-cyan/40 font-bold">
-                SDSC SHAR SRIHARIKOTA
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan/15 text-cyan border border-cyan/30 font-bold">
+                MCC SRIHARIKOTA
               </span>
             </div>
-            <div className="text-[10.5px] font-mono text-slate-300 tracking-wider uppercase flex flex-wrap items-center gap-2 mt-0.5">
-              <span className="font-bold text-white">MISSION CONTROL CENTRE (MCC)</span>
-              <span className="text-line">&bull;</span>
-              <span className="text-slate-400">Range Operations Directorate</span>
-              <span className="text-line">&bull;</span>
-              <span className="text-safe font-bold">MIL-STD-883 HTOL</span>
+            <div className="text-[10px] text-slate-400 tracking-wider uppercase flex items-center gap-2 mt-0.5">
+              <span>MIL-STD-883 Method 1005 HTOL Reliability Engine</span>
             </div>
           </div>
         </div>
 
-        {/* Live Synchronized Mission Timers (IST / UTC / MET) */}
+        {/* Live Synchronized Mission Timers & Telemetry Cues */}
         <div className="flex items-center gap-2 text-xs">
-          <div className="hud-glass px-2.5 py-1 rounded border border-line flex flex-col items-center">
-            <span className="text-[8px] text-muted uppercase tracking-wider">IST (SRIHARIKOTA)</span>
+          <div className="hud-glass px-2.5 py-1 rounded border border-slate-800 flex items-center gap-2">
+            <span className="text-[9px] text-slate-400 uppercase">IST:</span>
             <span className="font-bold text-cyan text-[11px]">{istTime || '16:15:00'}</span>
           </div>
-          <div className="hud-glass px-2.5 py-1 rounded border border-line flex flex-col items-center">
-            <span className="text-[8px] text-muted uppercase tracking-wider">UTC TIME</span>
-            <span className="font-bold text-slate-200 text-[11px]">{utcTime || '10:45:00'}</span>
+          <div className="hud-glass px-2.5 py-1 rounded border border-emerald-500/30 bg-emerald-500/10 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 led" />
+            <span className="text-[9px] text-emerald-400 uppercase">MET:</span>
+            <span className="font-bold text-emerald-400 text-[11px]">{formatMet(metSeconds)}</span>
           </div>
-          <div className="hud-glass px-2.5 py-1 rounded border border-safe/40 bg-safe/10 flex flex-col items-center">
-            <span className="text-[8px] text-safe uppercase tracking-wider">MISSION ELAPSED</span>
-            <span className="font-bold text-safe text-[11px]">{formatMet(metSeconds)}</span>
-          </div>
-        </div>
-
-        {/* Live Status Indicators: Range Safety, AI Screening, DSN Uplink */}
-        <div className="flex gap-2 font-mono text-[10.5px] text-muted items-center">
-          <div className="flex items-center gap-1.5 hud-glass px-2.5 py-1 rounded border border-line">
-            <span className="w-1.5 h-1.5 rounded-full bg-safe shadow-[0_0_8px_#39FF14] led" />
-            <span className="text-slate-200">RANGE:</span>
-            <span className="text-safe font-bold">ARMED</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 hud-glass px-2.5 py-1 rounded border border-line">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan shadow-[0_0_8px_#39FF14] led" />
-            <span className="text-slate-200">AI DETECTOR:</span>
-            <span className="text-cyan font-bold">ACTIVE</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 hud-glass px-2.5 py-1 rounded border border-line">
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                streamActive ? 'bg-safe shadow-[0_0_8px_#39FF14] led' : 'bg-dim'
-              }`}
-            />
-            <span className="text-slate-200">DSN:</span>
-            <span className={streamActive ? 'text-safe font-bold' : 'text-muted'}>
+          <div className="hud-glass px-2.5 py-1 rounded border border-slate-800 flex items-center gap-2 hidden md:flex">
+            <span className={`w-1.5 h-1.5 rounded-full ${streamActive ? 'bg-cyan led' : 'bg-slate-500'}`} />
+            <span className="text-[9px] text-slate-400">DSN:</span>
+            <span className={streamActive ? 'text-cyan font-bold text-[10px]' : 'text-slate-500 text-[10px]'}>
               {streamActive ? 'LOCKED' : 'STANDBY'}
             </span>
           </div>
+        </div>
 
+        {/* Action Buttons & Audio */}
+        <div className="flex items-center gap-2 font-mono text-[10.5px]">
           {rejectCount > 0 && (
-            <div className="flex items-center gap-1.5 bg-reject/15 border border-reject px-2.5 py-1 rounded shadow-alert-glow">
-              <span className="w-1.5 h-1.5 rounded-full bg-reject led" />
-              <span className="text-reject font-bold">{rejectCount} DEFECTS</span>
+            <div className="flex items-center gap-1.5 bg-rose-500/20 border border-rose-500/60 px-2.5 py-1 rounded text-rose-400 font-bold shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 led" />
+              <span>{rejectCount} QUARANTINED</span>
             </div>
           )}
 
@@ -156,14 +132,14 @@ export default function Header({
                 sounds.playPing()
                 onOpenPitchModal()
               }}
-              className="font-display text-xs uppercase tracking-wider px-3 py-1.5 rounded border border-[#FF9933] bg-[#FF9933]/20 text-[#FFB05C] hover:bg-[#FF9933] hover:text-black transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(255,153,51,0.35)] font-bold animate-pulse"
-              title="View Official ISRO Executive Proposal & Briefing Deck"
+              className="font-display text-[11px] uppercase tracking-wider px-2.5 py-1 rounded border border-amber-500/60 bg-amber-500/15 text-amber-300 hover:bg-amber-500 hover:text-black transition-all flex items-center gap-1.5 font-bold"
+              title="View Official ISRO Briefing Deck (Press 'P')"
             >
-              <span>📑</span> ISRO BRIEFING DECK
+              <span>📑</span> BRIEFING DECK
             </button>
           )}
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => {
@@ -171,11 +147,10 @@ export default function Header({
                 setSoundOn(newState)
                 if (newState) sounds.playPing()
               }}
-              className="hud-glass-interactive px-2 py-1 rounded border border-line text-muted hover:text-white text-[10px] flex items-center gap-1"
-              title="Toggle SpaceGuard Audio Feedback"
+              className="hud-glass px-2 py-1 rounded border border-slate-800 text-slate-400 hover:text-white text-[10px] flex items-center gap-1 transition-colors"
+              title="Toggle Audio Feedback"
             >
               <span>{soundOn ? '🔊' : '🔇'}</span>
-              <span className="hidden sm:inline">{soundOn ? 'AUDIO' : 'MUTED'}</span>
             </button>
 
             <button
@@ -188,21 +163,20 @@ export default function Header({
                   document.exitFullscreen().catch(() => {})
                 }
               }}
-              className="hud-glass-interactive px-2 py-1 rounded border border-line text-muted hover:text-white text-[10px] flex items-center gap-1"
-              title="Toggle Fullscreen Auditorium Mode"
+              className="hud-glass px-2 py-1 rounded border border-slate-800 text-slate-400 hover:text-white text-[10px] flex items-center gap-1 transition-colors"
+              title="Toggle Fullscreen"
             >
               <span>⛶</span>
-              <span className="hidden sm:inline">AUDITORIUM</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Secondary Navigation Bar */}
-      <div className="flex items-center justify-between px-6 py-1.5 bg-[#021408] border-t border-line/40 overflow-x-auto">
+      {/* Secondary Navigation Bar: High Visual Clarity of Active Tab */}
+      <div className="flex items-center justify-between px-5 py-1.5 bg-[#050A15] border-t border-slate-800/60 overflow-x-auto">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-muted uppercase tracking-wider font-bold mr-2 hidden md:inline">
-            MCC CONSOLE:
+          <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold mr-1.5 hidden md:inline">
+            CONSOLE:
           </span>
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id
@@ -211,22 +185,22 @@ export default function Header({
                 key={tab.id}
                 type="button"
                 onClick={() => onSelectTab(tab.id)}
-                className={`font-mono text-[11px] px-3.5 py-1.5 rounded transition-all flex items-center gap-1.5 border ${
+                className={`font-mono text-[11px] px-3 py-1 rounded-md transition-all flex items-center gap-1.5 border ${
                   isActive
-                    ? 'bg-cyan/15 border-cyan text-cyan shadow-neon-cyan font-bold'
-                    : 'hud-glass-interactive border-line/70 text-muted hover:text-white hover:border-line'
+                    ? 'bg-cyan/20 border-cyan text-cyan font-bold shadow-neon-cyan'
+                    : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/50'
                 }`}
               >
-                {tab.icon && <span>{tab.icon}</span>}
-                <span className={`text-[9px] ${isActive ? 'text-cyan' : 'text-dim'}`}>[{tab.tag}]</span>
+                {tab.icon && <span className="text-xs">{tab.icon}</span>}
+                <span className={`text-[9px] ${isActive ? 'text-cyan font-bold' : 'text-slate-500'}`}>[{tab.tag}]</span>
                 <span>{tab.label}</span>
                 {tab.id === 'matrix' && totalComponents > 0 && (
-                  <span className={`text-[9px] px-1 rounded ${isActive ? 'bg-cyan text-black font-bold' : 'bg-line text-muted'}`}>
+                  <span className={`text-[9px] px-1 rounded ${isActive ? 'bg-cyan text-black font-bold' : 'bg-slate-800 text-slate-400'}`}>
                     {totalComponents}
                   </span>
                 )}
                 {tab.id === 'report' && rejectCount > 0 && (
-                  <span className="text-[9px] px-1 rounded bg-reject text-white font-bold">
+                  <span className="text-[9px] px-1 rounded bg-rose-500 text-white font-bold">
                     !
                   </span>
                 )}
@@ -235,12 +209,11 @@ export default function Header({
           })}
         </div>
 
-        <div className="flex items-center gap-3 text-[10px] text-muted tracking-widest hidden lg:flex">
-          <span className="px-2 py-0.5 rounded bg-cyan/15 border border-cyan/40 text-cyan font-bold flex items-center gap-1">
+        <div className="flex items-center gap-3 text-[10px] text-slate-400 tracking-wider hidden lg:flex">
+          <span className="px-2 py-0.5 rounded bg-cyan/15 border border-cyan/30 text-cyan font-bold flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan led" />
             MISSION: {activeMissionName}
           </span>
-          <span>SDSC SHAR MCC &bull; 13.7199&deg; N, 80.2304&deg; E &bull; SLP</span>
         </div>
       </div>
     </header>

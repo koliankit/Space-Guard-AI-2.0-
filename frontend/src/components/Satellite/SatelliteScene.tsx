@@ -324,14 +324,18 @@ function EarthBackground() {
   )
 }
 
+import type { ComponentOut, SubsystemStatus } from '../../types'
+
 export default function SatelliteScene({
   subsystems,
   onSelect,
   focusKey,
+  selectedComponent,
 }: {
   subsystems: SubsystemStatus[]
   onSelect: (key: string) => void
   focusKey: string | null
+  selectedComponent?: ComponentOut | null
 }) {
   const controlsRef = useRef<any>(null)
   const [isAutoRotate, setIsAutoRotate] = useState(true)
@@ -341,19 +345,22 @@ export default function SatelliteScene({
   const [cameraPreset, setCameraPreset] = useState<'iso' | 'nadir' | 'solar' | 'hga' | 'propulsion'>('iso')
   const [isTransitioning, setIsTransitioning] = useState(false)
 
+  // Subsystem key to focus: explicit focusKey or subsystem of selected component
+  const effectiveFocusKey = focusKey || selectedComponent?.subsystem || null
+
   // Target position when focusing on a specific subsystem
   const targetPos = useMemo(() => {
-    if (!focusKey) return null
-    const sub = subsystems.find((s) => s.key === focusKey)
+    if (!effectiveFocusKey) return null
+    const sub = subsystems.find((s) => s.key === effectiveFocusKey)
     return sub ? (sub.position as [number, number, number]) : null
-  }, [focusKey, subsystems])
+  }, [effectiveFocusKey, subsystems])
 
-  // Trigger smooth transition when focusKey or preset changes
+  // Trigger smooth transition when focusKey, selectedComponent or preset changes
   useEffect(() => {
-    if (focusKey) {
+    if (effectiveFocusKey) {
       setIsTransitioning(true)
     }
-  }, [focusKey])
+  }, [effectiveFocusKey])
 
   const handleSelectSubsystem = useCallback(
     (key: string) => {
@@ -435,8 +442,9 @@ export default function SatelliteScene({
       {/* Telemetry Mission Control HUD Overlay */}
       <SatelliteHUD
         subsystems={subsystems}
-        selectedKey={focusKey}
+        selectedKey={effectiveFocusKey}
         hoveredKey={hoveredKey}
+        selectedComponent={selectedComponent}
         isAutoRotate={isAutoRotate}
         isExploded={isExploded}
         isXray={isXray}
@@ -487,7 +495,7 @@ export default function SatelliteScene({
         {/* Detailed Modular Spacecraft */}
         <SpacecraftModel
           subsystems={subsystems}
-          selectedKey={focusKey}
+          selectedKey={effectiveFocusKey}
           hoveredKey={hoveredKey}
           explodedOffset={isExploded ? 1.0 : 0.0}
           isXray={isXray}

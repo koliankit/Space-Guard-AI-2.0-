@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react'
-import type { SubsystemStatus } from '../../types'
+import type { ComponentOut, SubsystemStatus } from '../../types'
 
 const STATUS_COLOR: Record<string, string> = {
-  safe: '#00FF87',
-  monitor: '#FFB020',
-  reject: '#FF334B',
-  idle: '#1B3557',
+  safe: '#10B981',
+  monitor: '#F59E0B',
+  reject: '#EF4444',
+  idle: '#38BDF8',
 }
 
 interface SatelliteHUDProps {
   subsystems: SubsystemStatus[]
   selectedKey: string | null
   hoveredKey: string | null
+  selectedComponent?: ComponentOut | null
   isAutoRotate: boolean
   isExploded: boolean
   isXray: boolean
@@ -32,6 +33,7 @@ export default function SatelliteHUD({
   subsystems,
   selectedKey,
   hoveredKey,
+  selectedComponent,
   isAutoRotate,
   isExploded,
   isXray,
@@ -48,15 +50,14 @@ export default function SatelliteHUD({
   onDeselect,
 }: SatelliteHUDProps) {
   const [activePreset, setActivePreset] = useState<'iso' | 'nadir' | 'solar' | 'hga' | 'propulsion'>('iso')
-  const [equalizerBars, setEqualizerBars] = useState<number[]>(Array(24).fill(20))
+  const [equalizerBars, setEqualizerBars] = useState<number[]>(Array(16).fill(20))
 
-  // Simulate animated live telemetry frequency spectrum bars
   useEffect(() => {
     const interval = setInterval(() => {
       setEqualizerBars(
-        Array.from({ length: 24 }, () => Math.floor(15 + Math.random() * 70))
+        Array.from({ length: 16 }, () => Math.floor(15 + Math.random() * 70))
       )
-    }, 180)
+    }, 220)
     return () => clearInterval(interval)
   }, [])
 
@@ -68,105 +69,68 @@ export default function SatelliteHUD({
     onSetCameraPreset(preset)
   }
 
-  // Circular gauge component
-  const renderCircleGauge = (label: string, pct: number, color: string) => {
-    const radius = 20
-    const circ = 2 * Math.PI * radius
-    const strokeDashoffset = circ - (pct / 100) * circ
-    return (
-      <div className="flex flex-col items-center justify-center p-0.5">
-        <div className="relative w-10 h-10 flex items-center justify-center">
-          <svg className="w-10 h-10 -rotate-90" viewBox="0 0 48 48">
-            <circle cx="24" cy="24" r={radius} fill="transparent" stroke="#0C2B33" strokeWidth="2.5" />
-            <circle
-              cx="24"
-              cy="24"
-              r={radius}
-              fill="transparent"
-              stroke={color}
-              strokeWidth="3"
-              strokeDasharray={circ}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              style={{ filter: `drop-shadow(0 0 4px ${color})` }}
-            />
-          </svg>
-          <span className="absolute font-display font-bold text-[10px] text-white" style={{ color }}>
-            {pct}%
-          </span>
-        </div>
-        <span className="font-mono text-[8px] uppercase tracking-wider text-muted mt-0.5">{label}</span>
-      </div>
-    )
-  }
-
   return (
-    <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-3 select-none overflow-hidden">
-      {/* Central Circular Radar Reticle (Pointer-events none) */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
-        <div className="relative w-[340px] h-[340px] rounded-full border border-accent/35 flex items-center justify-center">
-          <div className="w-[260px] h-[260px] rounded-full border border-dashed border-accent/25 flex items-center justify-center" />
-          <div className="absolute w-[180px] h-[180px] rounded-full border border-accent/20" />
-          <div className="absolute top-0 bottom-0 w-px bg-accent/20" />
-          <div className="absolute left-0 right-0 h-px bg-accent/20" />
-          <div className="absolute inset-0 rounded-full radar-spinner border-t-2 border-accent/60 pointer-events-none" />
-          <span className="absolute top-1 font-mono text-[8px] text-accent font-bold">000&deg;</span>
-          <span className="absolute right-1 font-mono text-[8px] text-accent font-bold">090&deg;</span>
-          <span className="absolute bottom-1 font-mono text-[8px] text-accent font-bold">180&deg;</span>
-          <span className="absolute left-1 font-mono text-[8px] text-accent font-bold">270&deg;</span>
+    <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-3 select-none overflow-hidden font-mono">
+      {/* Central Circular Radar Reticle (Subtle) */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+        <div className="relative w-[300px] h-[300px] rounded-full border border-cyan/30 flex items-center justify-center">
+          <div className="w-[200px] h-[200px] rounded-full border border-dashed border-cyan/20 flex items-center justify-center" />
+          <div className="absolute top-0 bottom-0 w-px bg-cyan/15" />
+          <div className="absolute left-0 right-0 h-px bg-cyan/15" />
+          <div className="absolute inset-0 rounded-full radar-spinner border-t border-cyan/50 pointer-events-none" />
         </div>
       </div>
 
-      {/* --- Top Bar: Viewport Actions, Rotation Controls & Telemetry Dials --- */}
-      <div className="flex items-start justify-between gap-2 relative z-20">
-        {/* Left: Viewport Controls with Manual Rotation Pad */}
-        <div className="flex flex-wrap items-center gap-1.5 pointer-events-auto">
+      {/* --- Top Bar: Controls & Presets --- */}
+      <div className="flex flex-wrap items-center justify-between gap-2 relative z-20">
+        {/* Left: Viewport Orbit & Camera Controls */}
+        <div className="flex items-center gap-1.5 pointer-events-auto">
           {/* Auto-Rotate Toggle */}
           <button
             type="button"
             onClick={onToggleRotate}
-            className={`font-mono text-[10.5px] px-2.5 py-1 rounded border transition-all flex items-center gap-1.5 ${
+            className={`text-[10px] px-2 py-1 rounded border transition-all flex items-center gap-1.5 ${
               isAutoRotate
-                ? 'bg-accent/20 border-accent text-accent shadow-neon-green font-bold'
-                : 'hud-glass-interactive border-line text-muted hover:text-white'
+                ? 'bg-cyan/20 border-cyan text-cyan font-bold shadow-neon-cyan'
+                : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
             }`}
-            title="Toggle Automatic Satellite Orbit Rotation"
+            title="Toggle Automatic Orbit Rotation"
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotate ? 'bg-accent dot-pulse' : 'bg-muted'}`} />
-            {isAutoRotate ? 'AUTOROTATE: ON' : 'PAUSED'}
+            <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotate ? 'bg-cyan dot-pulse' : 'bg-slate-500'}`} />
+            {isAutoRotate ? 'ROTATING' : 'PAUSED'}
           </button>
 
-          {/* Manual Directional Rotation Buttons */}
-          <div className="flex items-center gap-0.5 bg-bg/70 border border-line rounded p-0.5 backdrop-blur-sm">
+          {/* Directional Pad */}
+          <div className="flex items-center gap-0.5 hud-glass rounded p-0.5 border border-slate-700/80">
             <button
               type="button"
               onClick={onRotateLeft}
-              className="px-2 py-0.5 font-mono text-xs text-muted hover:text-accent hover:bg-accent/15 rounded transition-all"
-              title="Rotate Satellite Left (Orbit Left)"
+              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-cyan rounded transition-colors"
+              title="Rotate Left"
             >
-              &#8634; LEFT
+              &#8634;
             </button>
             <button
               type="button"
               onClick={onRotateRight}
-              className="px-2 py-0.5 font-mono text-xs text-muted hover:text-accent hover:bg-accent/15 rounded transition-all"
-              title="Rotate Satellite Right (Orbit Right)"
+              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-cyan rounded transition-colors"
+              title="Rotate Right"
             >
-              RIGHT &#8635;
+              &#8635;
             </button>
             <button
               type="button"
               onClick={onTiltUp}
-              className="px-1.5 py-0.5 font-mono text-xs text-muted hover:text-accent hover:bg-accent/15 rounded transition-all"
-              title="Tilt Camera Up"
+              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-cyan rounded transition-colors"
+              title="Tilt Up"
             >
               &#9650;
             </button>
             <button
               type="button"
               onClick={onTiltDown}
-              className="px-1.5 py-0.5 font-mono text-xs text-muted hover:text-accent hover:bg-accent/15 rounded transition-all"
-              title="Tilt Camera Down"
+              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-cyan rounded transition-colors"
+              title="Tilt Down"
             >
               &#9660;
             </button>
@@ -176,278 +140,193 @@ export default function SatelliteHUD({
           <button
             type="button"
             onClick={onToggleExploded}
-            className={`font-mono text-[10.5px] px-2.5 py-1 rounded border transition-all flex items-center gap-1.5 ${
+            className={`text-[10px] px-2 py-1 rounded border transition-all ${
               isExploded
-                ? 'bg-lime/20 border-lime text-lime shadow-neon-lime font-bold'
-                : 'hud-glass-interactive border-line text-muted hover:text-white'
+                ? 'bg-amber-500/20 border-amber-400 text-amber-300 font-bold'
+                : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
             }`}
-            title="Explode 3D Subsystems Outward for Internal Equipment Inspection"
+            title="Explode 3D Subsystems Outward"
           >
-            &#10022; EXPLODED {isExploded ? 'ACTIVE' : 'OFF'}
+            &#10022; {isExploded ? 'EXPLODED' : 'EXPLODE'}
           </button>
 
           {/* X-Ray Mode */}
           <button
             type="button"
             onClick={onToggleXray}
-            className={`font-mono text-[10.5px] px-2.5 py-1 rounded border transition-all flex items-center gap-1.5 ${
+            className={`text-[10px] px-2 py-1 rounded border transition-all ${
               isXray
-                ? 'bg-accent/20 border-accent text-white shadow-neon-green font-bold'
-                : 'hud-glass-interactive border-line text-muted hover:text-white'
+                ? 'bg-cyan/20 border-cyan text-white font-bold'
+                : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
             }`}
-            title="X-Ray Structural Mode: Translucent Outer Thermal Skin"
+            title="X-Ray Translucent Skin"
           >
-            &#9671; X-RAY {isXray ? 'ON' : 'OFF'}
+            &#9671; {isXray ? 'X-RAY ON' : 'X-RAY'}
           </button>
 
-          {/* Reset View */}
+          {/* Reset */}
           <button
             type="button"
             onClick={onResetView}
-            className="hud-glass-interactive border-line text-muted hover:text-accent font-mono text-[10.5px] px-2 py-1 rounded border"
-            title="Reset Orbit Camera Angle & Distance"
+            className="hud-glass border-slate-700 text-slate-400 hover:text-cyan text-[10px] px-2 py-1 rounded border"
+            title="Reset Camera"
           >
-            &#8630; RESET
+            &#8630;
           </button>
         </div>
 
-        {/* Center-Top: Scanning Header Label + Mouse Interaction Hint */}
-        <div className="flex flex-col items-center gap-0.5">
-          <div className="hud-glass px-3.5 py-0.5 rounded border border-accent/40 text-center font-display font-bold text-xs tracking-widest text-accent text-glow-green">
-            &lt; 3D SATELLITE DIGITAL TWIN &gt;
-          </div>
-          <div className="font-mono text-[8.5px] text-muted tracking-wider bg-bg/80 px-2 py-0.5 rounded border border-line/60">
-            DRAG MOUSE TO ROTATE 360&deg; &bull; SCROLL TO ZOOM &bull; CLICK ANY PART TO INSPECT
-          </div>
-        </div>
-
-        {/* Right: Technical Telemetry & Circular Metric Dials */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <div className="hud-glass px-2 py-0.5 rounded border border-line flex gap-2">
-            {renderCircleGauge('PWR', 98, '#00F0FF')}
-            {renderCircleGauge('SOLAR', 100, '#00FF87')}
-            {renderCircleGauge('AOCS', 99, '#00F0FF')}
-            {renderCircleGauge('THM', 45, '#FFB020')}
-          </div>
-
-          <div className="hud-glass px-2.5 py-1 rounded border border-line text-right font-mono text-[10px]">
-            <div className="flex items-center gap-1.5 justify-end text-accent font-bold font-display tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent led" />
-              ORBITAL TELEMETRY
-            </div>
-            <div className="text-muted text-[9px] mt-0.5">
-              ALT: <span className="text-white font-bold">520.4 KM</span> &bull; VEL: <span className="text-white font-bold">7.61 KM/S</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* --- Tactical Subsystem Callouts (Left & Right Flanks) & Center Inspector --- */}
-      <div className="flex items-center justify-between w-full pointer-events-none px-2">
-        {/* Left Callouts */}
-        <div className="flex flex-col gap-1.5 font-mono text-[10px] pointer-events-auto max-w-[190px]">
-          <div
-            onClick={() => onSelectSubsystem('FC')}
-            className={`cursor-pointer hud-glass px-2.5 py-1 rounded border transition-all ${
-              currentKey === 'FC' ? 'border-accent shadow-neon-green text-accent font-bold bg-accent/15' : 'border-line text-muted hover:text-white'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-accent font-display font-bold">[FC]</span>
-              <span className="text-[9px] text-muted">&gt;&gt;&gt;</span>
-            </div>
-            <div className="text-[9.5px] text-slate-200">FLIGHT COMPUTER</div>
-            <div className="text-[8.5px] text-dim">RAD-HARDENED OBC</div>
-          </div>
-
-          <div
-            onClick={() => onSelectSubsystem('PWR')}
-            className={`cursor-pointer hud-glass px-2.5 py-1 rounded border transition-all ${
-              currentKey === 'PWR' ? 'border-accent shadow-neon-green text-accent font-bold bg-accent/15' : 'border-line text-muted hover:text-white'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-accent font-display font-bold">[PWR]</span>
-              <span className="text-[9px] text-muted">&gt;&gt;&gt;</span>
-            </div>
-            <div className="text-[9.5px] text-slate-200">POWER SYSTEM</div>
-            <div className="text-[8.5px] text-dim">PCDU REGULATOR</div>
-          </div>
-
-          <div
-            onClick={() => onSelectSubsystem('BAT')}
-            className={`cursor-pointer hud-glass px-2.5 py-1 rounded border transition-all ${
-              currentKey === 'BAT' ? 'border-accent shadow-neon-green text-accent font-bold bg-accent/15' : 'border-line text-muted hover:text-white'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-accent font-display font-bold">[BAT]</span>
-              <span className="text-[9px] text-muted">&gt;&gt;&gt;</span>
-            </div>
-            <div className="text-[9.5px] text-slate-200">BATTERY MODULE</div>
-            <div className="text-[8.5px] text-dim">LI-ION 8-CELL PACK</div>
-          </div>
-        </div>
-
-        {/* Center: Selected Subsystem Tactical Inspector Card */}
-        {activeSubsystem && (
-          <div className="hud-glass border border-accent/60 rounded-lg p-3 max-w-sm pointer-events-auto shadow-neon-green backdrop-blur-md animate-modalin reticle-corner relative">
-            {/* Close / Deselect Button */}
-            {onDeselect && (
-              <button
-                type="button"
-                onClick={onDeselect}
-                className="absolute top-2 right-2 text-muted hover:text-white font-mono text-xs w-5 h-5 flex items-center justify-center rounded hover:bg-white/10"
-                title="Deselect Subsystem"
-              >
-                &#10005;
-              </button>
-            )}
-
-            <div className="flex items-center justify-between gap-3 pb-1.5 border-b border-line pr-5">
-              <div className="flex items-center gap-2">
-                <span
-                  className="w-2.5 h-2.5 rounded-full"
-                  style={{
-                    backgroundColor: STATUS_COLOR[activeSubsystem.status],
-                    boxShadow: `0 0 10px ${STATUS_COLOR[activeSubsystem.status]}`,
-                  }}
-                />
-                <span className="font-display font-bold text-sm tracking-wider text-white">
-                  {activeSubsystem.name}
-                </span>
-                <span className="font-mono text-[10px] bg-accent/20 text-accent font-bold px-1.5 py-0.5 rounded border border-accent/40">
-                  {activeSubsystem.key}
-                </span>
-              </div>
-              <span
-                className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded"
-                style={{
-                  backgroundColor: `${STATUS_COLOR[activeSubsystem.status]}20`,
-                  color: STATUS_COLOR[activeSubsystem.status],
-                  border: `1px solid ${STATUS_COLOR[activeSubsystem.status]}60`,
-                }}
-              >
-                {activeSubsystem.status}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 mt-2 font-mono text-[10px]">
-              <div className="bg-bg/80 p-1.5 rounded border border-line">
-                <div className="text-muted text-[8.5px]">COMPONENTS</div>
-                <div className="text-white font-bold text-xs">{activeSubsystem.count}</div>
-              </div>
-              <div className="bg-bg/80 p-1.5 rounded border border-line">
-                <div className="text-muted text-[8.5px]">AVG RISK</div>
-                <div className="text-accent font-bold text-xs">
-                  {Math.round(activeSubsystem.avg_risk)}/100
-                </div>
-              </div>
-              <div className="bg-bg/80 p-1.5 rounded border border-line">
-                <div className="text-muted text-[8.5px]">TOP FLAG</div>
-                <div className="text-white font-bold text-[10px] truncate" title={activeSubsystem.top_component ?? 'Nominal'}>
-                  {activeSubsystem.top_component ?? 'NONE'}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Right Callouts */}
-        <div className="flex flex-col gap-1.5 font-mono text-[10px] pointer-events-auto max-w-[190px] text-right">
-          <div
-            onClick={() => onSelectSubsystem('SOLAR')}
-            className={`cursor-pointer hud-glass px-2.5 py-1 rounded border transition-all ${
-              currentKey === 'SOLAR' ? 'border-accent shadow-neon-green text-accent font-bold bg-accent/15' : 'border-line text-muted hover:text-white'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[9px] text-muted">&lt;&lt;&lt;</span>
-              <span className="text-accent font-display font-bold">[SOLAR]</span>
-            </div>
-            <div className="text-[9.5px] text-emerald-100">SOLAR WINGS</div>
-            <div className="text-[8.5px] text-dim">DUAL ARTICULATED ARRAY</div>
-          </div>
-
-          <div
-            onClick={() => onSelectSubsystem('COM')}
-            className={`cursor-pointer hud-glass px-2.5 py-1 rounded border transition-all ${
-              currentKey === 'COM' ? 'border-accent shadow-neon-green text-accent font-bold bg-accent/15' : 'border-line text-muted hover:text-white'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[9px] text-muted">&lt;&lt;&lt;</span>
-              <span className="text-accent font-display font-bold">[COM]</span>
-            </div>
-            <div className="text-[9.5px] text-emerald-100">COMMUNICATIONS</div>
-            <div className="text-[8.5px] text-dim">HGA DISH &amp; S/X-BAND</div>
-          </div>
-
-          <div
-            onClick={() => onSelectSubsystem('NAV')}
-            className={`cursor-pointer hud-glass px-2.5 py-1 rounded border transition-all ${
-              currentKey === 'NAV' ? 'border-accent shadow-neon-green text-accent font-bold bg-accent/15' : 'border-line text-muted hover:text-white'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[9px] text-muted">&lt;&lt;&lt;</span>
-              <span className="text-accent font-display font-bold">[NAV]</span>
-            </div>
-            <div className="text-[9.5px] text-emerald-100">NAVIGATION AOCS</div>
-            <div className="text-[8.5px] text-dim">STAR TRACKERS &amp; IMU</div>
-          </div>
-        </div>
-      </div>
-
-      {/* --- Bottom Bar: Equalizer Frequency Spectrum + Camera Presets + Subsystem Quick Pills --- */}
-      <div className="flex flex-col gap-2 relative z-20">
-        {/* Equalizer Frequency Telemetry Bar Meter */}
-        <div className="flex items-end justify-center gap-1 h-6 px-4 pointer-events-none">
-          {equalizerBars.map((val, idx) => (
-            <div
-              key={idx}
-              className="w-1.5 rounded-t transition-all duration-150"
-              style={{
-                height: `${val}%`,
-                backgroundColor: idx % 3 === 0 ? '#00FF87' : idx % 3 === 1 ? '#00F0FF' : '#38BDF8',
-                boxShadow: `0 0 6px ${idx % 3 === 0 ? '#00FF87' : '#00F0FF'}`,
-                opacity: 0.85,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Camera Preset Selector */}
-        <div className="flex items-center gap-1.5 justify-center pointer-events-auto">
-          <span className="font-mono text-[9px] text-muted tracking-wider uppercase mr-1">VIEW:</span>
+        {/* Right: Camera Presets */}
+        <div className="flex items-center gap-1 pointer-events-auto">
           {(
             [
-              { id: 'iso', label: 'ISOMETRIC' },
-              { id: 'nadir', label: 'NADIR / OPTICAL' },
-              { id: 'solar', label: 'SOLAR WINGS' },
-              { id: 'hga', label: 'HGA DISH' },
-              { id: 'propulsion', label: 'PROPULSION' },
+              { id: 'iso', label: 'ISO' },
+              { id: 'nadir', label: 'NADIR' },
+              { id: 'solar', label: 'SOLAR' },
+              { id: 'hga', label: 'HGA' },
+              { id: 'propulsion', label: 'PROP' },
             ] as const
           ).map((preset) => (
             <button
               key={preset.id}
               type="button"
               onClick={() => handlePreset(preset.id)}
-              className={`font-mono text-[10px] px-2.5 py-0.5 rounded border transition-all ${
+              className={`text-[9.5px] px-2 py-0.5 rounded border transition-all ${
                 activePreset === preset.id
-                  ? 'bg-accent/20 border-accent text-accent font-bold shadow-neon-green'
-                  : 'hud-glass border-line text-muted hover:text-white'
+                  ? 'bg-cyan/20 border-cyan text-cyan font-bold shadow-neon-cyan'
+                  : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
               }`}
             >
               {preset.label}
             </button>
           ))}
         </div>
+      </div>
+
+      {/* --- Center: TARGET COMPONENT HUD CARD (When Component Available) --- */}
+      <div className="flex items-start justify-between w-full pointer-events-none my-auto">
+        {/* Active Selected Component Telemetry Overlay */}
+        {selectedComponent ? (
+          <div className="hud-glass border border-cyan/50 rounded-lg p-3 max-w-sm pointer-events-auto shadow-neon-cyan backdrop-blur-md animate-modalin reticle-corner">
+            <div className="flex items-center justify-between border-b border-slate-700/60 pb-1.5 mb-2 gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan led" />
+                <span className="text-[10px] uppercase font-display font-bold tracking-wider text-cyan">
+                  TARGET COMPONENT IN 3D
+                </span>
+              </div>
+              <span
+                className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                  selectedComponent.status === 'reject'
+                    ? 'bg-rose-500/20 text-rose-400 border-rose-500/50'
+                    : selectedComponent.status === 'monitor'
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/50'
+                    : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
+                }`}
+              >
+                {selectedComponent.status.toUpperCase()}
+              </span>
+            </div>
+
+            <div className="text-base font-bold text-white tracking-wide mb-1">
+              {selectedComponent.component_id}
+            </div>
+
+            <div className="text-[10px] text-cyan mb-2 font-medium">
+              Subsystem: <b className="text-white">[{selectedComponent.subsystem}]</b> {selectedComponent.subsystem_name} &bull; Lot: {selectedComponent.lot_id}
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5 text-[10px] bg-[#071120]/80 p-2 rounded border border-slate-800 mb-2">
+              <div>
+                <span className="text-slate-400 text-[9px] block">168h Leakage:</span>
+                <b className={selectedComponent.status === 'reject' ? 'text-rose-400' : 'text-slate-100'}>
+                  {selectedComponent.v168.toFixed(2)} &micro;A
+                </b>
+                <span className="text-[8.5px] text-slate-500 ml-1">/ {selectedComponent.limit_ua.toFixed(0)} &micro;A</span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[9px] block">Risk Score:</span>
+                <b className={`text-sm ${selectedComponent.risk_score >= 70 ? 'text-rose-400' : selectedComponent.risk_score >= 35 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                  {selectedComponent.risk_score} <span className="text-[9px] text-slate-400">/ 100</span>
+                </b>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[9px] block">Drift Trend:</span>
+                <span className={selectedComponent.drift168 > 0 ? 'text-amber-400 font-semibold' : 'text-slate-300'}>
+                  {selectedComponent.drift168 > 0 ? '+' : ''}{selectedComponent.drift168.toFixed(2)} &micro;A ({selectedComponent.pct_drift.toFixed(1)}%)
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[9px] block">Future +96h:</span>
+                <b className="text-amber-300 font-semibold">{selectedComponent.predicted_future.toFixed(2)} &micro;A</b>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onSelectSubsystem(selectedComponent.subsystem)}
+              className="w-full text-[10px] font-display font-bold uppercase tracking-wider py-1 px-2 rounded bg-cyan/15 border border-cyan/40 text-cyan hover:bg-cyan hover:text-black transition-all flex items-center justify-center gap-1.5 shadow-neon-cyan"
+            >
+              <span>&#8982;</span> LOCK &amp; FOCUS [{selectedComponent.subsystem}] IN 3D
+            </button>
+          </div>
+        ) : (
+          <div className="hud-glass px-2.5 py-1.5 rounded border border-slate-700/60 text-[10px] text-slate-400 pointer-events-auto flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan/60" />
+            <span>Select any component from the ledger to target on 3D spacecraft twin.</span>
+          </div>
+        )}
+
+        {/* Selected Subsystem Inspector Card (if different or specifically clicked) */}
+        {activeSubsystem && (!selectedComponent || selectedComponent.subsystem !== activeSubsystem.key) && (
+          <div className="hud-glass border border-slate-700 rounded-lg p-2.5 max-w-xs pointer-events-auto shadow-md relative animate-modalin">
+            {onDeselect && (
+              <button
+                type="button"
+                onClick={onDeselect}
+                className="absolute top-1.5 right-1.5 text-slate-400 hover:text-white text-xs w-4 h-4 flex items-center justify-center"
+              >
+                &#10005;
+              </button>
+            )}
+            <div className="flex items-center gap-2 pb-1 border-b border-slate-700/60 mb-1.5 pr-4">
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: STATUS_COLOR[activeSubsystem.status] }}
+              />
+              <span className="font-bold text-xs text-white truncate">{activeSubsystem.name}</span>
+              <span className="text-[9px] px-1 rounded bg-slate-800 text-cyan">[{activeSubsystem.key}]</span>
+            </div>
+            <div className="grid grid-cols-2 gap-1 text-[9.5px]">
+              <div>Components: <b className="text-white">{activeSubsystem.count}</b></div>
+              <div>Avg Risk: <b className="text-cyan">{Math.round(activeSubsystem.avg_risk)}/100</b></div>
+              <div className="col-span-2 text-slate-400 truncate">
+                Top Flag: <b className="text-white">{activeSubsystem.top_component ?? 'Nominal'}</b>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* --- Bottom Bar: Telemetry Equalizer + Subsystem Pills --- */}
+      <div className="flex flex-col gap-1.5 relative z-20">
+        {/* Equalizer Telemetry Signal Bar (Compact) */}
+        <div className="flex items-end justify-center gap-0.5 h-3 pointer-events-none opacity-60">
+          {equalizerBars.map((val, idx) => (
+            <div
+              key={idx}
+              className="w-1 rounded-t transition-all duration-200"
+              style={{
+                height: `${val}%`,
+                backgroundColor: idx % 2 === 0 ? '#00F0FF' : '#10B981',
+              }}
+            />
+          ))}
+        </div>
 
         {/* Subsystems Carousel / Quick Target Pills */}
         {subsystems.length > 0 && (
-          <div className="flex items-center gap-1 overflow-x-auto py-1 px-2 hud-glass rounded-lg border border-line pointer-events-auto max-w-full">
-            <span className="font-mono text-[9px] text-accent tracking-wider uppercase px-1 whitespace-nowrap font-bold">
+          <div className="flex items-center gap-1 overflow-x-auto py-1 px-2 hud-glass rounded-lg border border-slate-800 pointer-events-auto max-w-full">
+            <span className="text-[8.5px] text-cyan tracking-wider uppercase px-1 whitespace-nowrap font-bold">
               SUBSYSTEMS:
             </span>
             {subsystems.map((sub) => {
@@ -458,19 +337,19 @@ export default function SatelliteHUD({
                   key={sub.key}
                   type="button"
                   onClick={() => onSelectSubsystem(sub.key)}
-                  className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono whitespace-nowrap transition-all border ${
+                  className={`flex items-center gap-1 px-2 py-0.5 rounded text-[9.5px] whitespace-nowrap transition-all border ${
                     isCurr
-                      ? 'bg-accent/20 border-accent text-white font-bold shadow-neon-green'
-                      : 'border-transparent text-muted hover:text-white hover:bg-white/5'
+                      ? 'bg-cyan/20 border-cyan text-white font-bold shadow-neon-cyan'
+                      : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <span
                     className="w-1.5 h-1.5 rounded-full"
-                    style={{ backgroundColor: dotColor, boxShadow: `0 0 6px ${dotColor}` }}
+                    style={{ backgroundColor: dotColor }}
                   />
                   <span>{sub.key}</span>
                   {sub.status === 'reject' && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-reject led" />
+                    <span className="w-1 h-1 rounded-full bg-rose-500" />
                   )}
                 </button>
               )

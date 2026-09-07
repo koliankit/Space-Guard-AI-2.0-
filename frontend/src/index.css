@@ -49,35 +49,35 @@ body {
   opacity: 0.35;
 }
 
-/* Cyber Tactical Glassmorphism */
+/* Aerospace Precision Glassmorphism */
 .hud-glass {
-  background: rgba(9, 21, 38, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(27, 50, 82, 0.85);
+  background: rgba(13, 21, 39, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .hud-glass-interactive {
-  background: rgba(11, 25, 46, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(30, 60, 98, 0.8);
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.14);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hud-glass-interactive:hover {
-  background: rgba(14, 34, 64, 0.95);
-  border-color: rgba(0, 240, 255, 0.75);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+  background: rgba(22, 36, 65, 0.9);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .hud-tag {
   font-family: 'Share Tech Mono', monospace;
   font-size: 9.5px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-/* Tactical Reticle Corners - Blue / Cyan default */
+/* Tactical Reticle Corners - Subtler Precision */
 .reticle-corner {
   position: relative;
 }
@@ -85,43 +85,37 @@ body {
   content: '';
   position: absolute;
   top: -1px; left: -1px;
-  width: 7px; height: 7px;
-  border-top: 2px solid #00F0FF;
-  border-left: 2px solid #00F0FF;
-  filter: drop-shadow(0 0 4px #00F0FF);
+  width: 6px; height: 6px;
+  border-top: 1.5px solid #00F0FF;
+  border-left: 1.5px solid #00F0FF;
 }
 .reticle-corner::after {
   content: '';
   position: absolute;
   bottom: -1px; right: -1px;
-  width: 7px; height: 7px;
-  border-bottom: 2px solid #00F0FF;
-  border-right: 2px solid #00F0FF;
-  filter: drop-shadow(0 0 4px #00F0FF);
+  width: 6px; height: 6px;
+  border-bottom: 1.5px solid #00F0FF;
+  border-right: 1.5px solid #00F0FF;
 }
 
 /* Reticle Corners - Green (Safe) */
 .reticle-corner-green::before {
-  border-top: 2px solid #00FF87;
-  border-left: 2px solid #00FF87;
-  filter: drop-shadow(0 0 4px #00FF87);
+  border-top: 1.5px solid #10B981;
+  border-left: 1.5px solid #10B981;
 }
 .reticle-corner-green::after {
-  border-bottom: 2px solid #00FF87;
-  border-right: 2px solid #00FF87;
-  filter: drop-shadow(0 0 4px #00FF87);
+  border-bottom: 1.5px solid #10B981;
+  border-right: 1.5px solid #10B981;
 }
 
 /* Reticle Corners - Red (Reject / Alert) */
 .reticle-corner-red::before {
-  border-top: 2px solid #FF334B;
-  border-left: 2px solid #FF334B;
-  filter: drop-shadow(0 0 4px #FF334B);
+  border-top: 2px solid #EF4444;
+  border-left: 2px solid #EF4444;
 }
 .reticle-corner-red::after {
-  border-bottom: 2px solid #FF334B;
-  border-right: 2px solid #FF334B;
-  filter: drop-shadow(0 0 4px #FF334B);
+  border-bottom: 2px solid #EF4444;
+  border-right: 2px solid #EF4444;
 }
 
 @keyframes radar-sweep {
@@ -133,20 +127,25 @@ body {
   animation: radar-sweep 4s linear infinite;
 }
 
-/* Tri-Color Text Glows */
-.text-glow-blue {
-  text-shadow: 0 0 10px rgba(56, 189, 248, 0.85);
-}
+/* Controlled Aerospace Text & Badge Accents */
 .text-glow-cyan {
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.85);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }
 .text-glow-green {
-  text-shadow: 0 0 10px rgba(0, 255, 135, 0.85);
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 .text-glow-red {
-  text-shadow: 0 0 12px rgba(255, 51, 75, 0.85);
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
-.text-glow-lime {
-  text-shadow: 0 0 10px rgba(57, 255, 20, 0.85);
+
+/* Soft Neon Shadow Utilities */
+.shadow-neon-cyan {
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
+}
+.shadow-neon-green {
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+}
+.shadow-alert-glow {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import type { ComponentOut, MissionStatus, SubsystemStatus } from '../../types'
 import SatelliteScene from '../Satellite/SatelliteScene'
 import TelemetryChart from '../Charts/TelemetryChart'
@@ -16,12 +16,17 @@ interface MultiScreenWallProps {
 }
 
 const DEFAULT_SUBSYSTEMS: SubsystemStatus[] = [
-  { key: 'PWR', name: 'Power System (PCDU)', position: [-2.5, 0, 0], count: 48, status: 'safe', avg_risk: 12, top_component: 'PWR-REG-104' },
-  { key: 'FC', name: 'Flight Computer (OBC)', position: [0, 0.5, 0], count: 52, status: 'reject', avg_risk: 84, top_component: 'FC-ASIC-088' },
-  { key: 'COMM', name: 'S/X Band RF Transponder', position: [0, -1.2, 0], count: 36, status: 'safe', avg_risk: 18, top_component: 'COMM-PA-302' },
-  { key: 'AOCS', name: 'Attitude & Orbit Control', position: [0, 0, -1.5], count: 40, status: 'safe', avg_risk: 22, top_component: 'AOCS-GYRO-012' },
-  { key: 'TCS', name: 'Thermal Control System', position: [1.8, 0, 0], count: 24, status: 'safe', avg_risk: 14, top_component: 'TCS-SENS-401' },
-  { key: 'PL', name: 'Payload Instruments', position: [0, 1.5, 0], count: 32, status: 'safe', avg_risk: 16, top_component: 'PL-IMG-502' },
+  { key: 'PWR', name: 'Power System', position: [0.55, 0.42, 0.62], count: 48, status: 'safe', avg_risk: 12, top_component: 'PWR-MOSFET-401' },
+  { key: 'BAT', name: 'Battery Module', position: [0.55, -0.42, 0.62], count: 24, status: 'safe', avg_risk: 14, top_component: 'BAT-CELL-101' },
+  { key: 'SOLAR', name: 'Solar Array', position: [2.55, 0.0, 0.0], count: 32, status: 'safe', avg_risk: 8, top_component: 'SOLAR-CELL-202' },
+  { key: 'FC', name: 'Flight Computer', position: [0.55, 0.55, -0.20], count: 52, status: 'reject', avg_risk: 84, top_component: 'FC-ASIC-088' },
+  { key: 'COM', name: 'Communication Module', position: [-0.20, 0.62, 0.55], count: 36, status: 'safe', avg_risk: 18, top_component: 'COM-LNA-501' },
+  { key: 'TEL', name: 'Telemetry Module', position: [-0.20, 0.62, -0.55], count: 28, status: 'safe', avg_risk: 15, top_component: 'TEL-ENCODER-603' },
+  { key: 'NAV', name: 'Navigation Unit', position: [0.0, 0.10, 0.95], count: 40, status: 'safe', avg_risk: 22, top_component: 'NAV-GYRO-701' },
+  { key: 'THM', name: 'Thermal Control', position: [0.0, 0.0, -0.85], count: 24, status: 'safe', avg_risk: 14, top_component: 'THM-HEATER-801' },
+  { key: 'SEN', name: 'Sensor Module', position: [-0.75, 0.30, 0.40], count: 30, status: 'safe', avg_risk: 16, top_component: 'SEN-MAG-901' },
+  { key: 'PAY', name: 'Payload Instruments', position: [-0.85, -0.30, -0.10], count: 32, status: 'safe', avg_risk: 16, top_component: 'PAY-CCD-001' },
+  { key: 'CTL', name: 'Control Electronics', position: [0.75, -0.55, -0.30], count: 26, status: 'safe', avg_risk: 19, top_component: 'CTL-RWHEEL-111' },
 ]
 
 export default function MultiScreenWall({
@@ -31,131 +36,131 @@ export default function MultiScreenWall({
   onSelectComponent,
   onSelectSubsystem,
   focusKey,
-  running,
 }: MultiScreenWallProps) {
   const rejected = components.filter((c) => c.status === 'reject')
   const monitored = components.filter((c) => c.status === 'monitor')
   const safe = components.filter((c) => c.status === 'safe')
   const [activeScreenTab, setActiveScreenTab] = useState<'all' | '1' | '2' | '3' | '4'>('all')
+  const [showSchematics, setShowSchematics] = useState(false)
 
   const subsystems: SubsystemStatus[] = mission?.subsystems ?? DEFAULT_SUBSYSTEMS
 
   return (
-    <div className="flex flex-col flex-1 bg-[#010A04] text-slate-100 font-mono select-none overflow-x-auto min-h-[calc(100vh-140px)]">
+    <div className="flex flex-col flex-1 bg-[#060913] text-slate-100 font-mono select-none overflow-x-auto min-h-[calc(100vh-140px)]">
       {/* Wall Header Banner: ISRO Sriharikota Mission Control Display Wall */}
-      <div className="bg-[#041A0B] border-b-2 border-line px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+      <div className="bg-[#090F1E] border-b border-slate-800 px-5 py-2 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-cyan/15 border border-cyan/40 text-cyan text-[11px] font-display font-black tracking-widest uppercase">
             <span className="w-2 h-2 rounded-full bg-cyan led" />
-            SDSC SHAR // MCC PANORAMIC VIDEO WALL
+            SDSC SHAR // MCC PANORAMIC 2x2 COMMAND WALL
           </div>
           <span className="text-slate-400 text-xs hidden md:inline">
-            Sriharikota Range Operations Directorate &bull; Launch Control Centre (LCC)
+            Range Operations Directorate &bull; Launch Control Centre (LCC)
           </span>
         </div>
 
         {/* Live Synchronized MCC Status Banner */}
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-[#062612] border border-line">
-            <span className="w-1.5 h-1.5 rounded-full bg-safe led" />
-            <span className="text-muted text-[10px]">RANGE SAFETY:</span>
-            <span className="text-safe font-bold text-[11px]">ARMED &bull; GREEN</span>
+        <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-[#0D1527] border border-slate-800">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 led" />
+            <span className="text-slate-400 text-[10px]">RANGE:</span>
+            <span className="text-emerald-400 font-bold text-[11px]">ARMED &bull; GREEN</span>
           </div>
-          <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-[#062612] border border-line">
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-[#0D1527] border border-slate-800">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan led" />
-            <span className="text-muted text-[10px]">DOWNLINK:</span>
+            <span className="text-slate-400 text-[10px]">DOWNLINK:</span>
             <span className="text-cyan font-bold text-[11px]">ISTRAC S/X LOCKED</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-slate-400 text-[10px]">BAY SELECT:</span>
+          <div className="flex items-center gap-1 bg-[#0D1527] p-0.5 rounded border border-slate-800">
+            <span className="text-slate-400 text-[10px] px-1.5">BAY:</span>
             {(['all', '1', '2', '3', '4'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setActiveScreenTab(mode)}
                 className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all border ${
                   activeScreenTab === mode
-                    ? 'bg-cyan text-bg border-cyan shadow-neon-cyan'
-                    : 'bg-[#062612] text-slate-300 border-line hover:border-cyan/50'
+                    ? 'bg-cyan text-black border-cyan font-black'
+                    : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800'
                 }`}
               >
-                {mode === 'all' ? 'QUAD WALL' : `SCR ${mode}`}
+                {mode === 'all' ? '2x2 QUAD' : `SCR ${mode}`}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Panoramic Multi-Screen Command Wall Grid */}
-      <div className="p-3 flex-1 flex flex-col gap-3">
+      {/* Panoramic Multi-Screen Command Wall Grid - Spacious 2x2 Layout */}
+      <div className="p-4 flex-1 flex flex-col gap-4">
         <div
-          className={`grid gap-3 flex-1 ${
+          className={`grid gap-4 flex-1 ${
             activeScreenTab === 'all'
-              ? 'grid-cols-1 xl:grid-cols-4 lg:grid-cols-2'
+              ? 'grid-cols-1 lg:grid-cols-2'
               : 'grid-cols-1'
           }`}
         >
           {/* ================= SCREEN 01: FLIGHT DYNAMICS & RANGE SAFETY ================= */}
           {(activeScreenTab === 'all' || activeScreenTab === '1') && (
-            <div className="flex flex-col rounded-lg bg-[#021408] border-2 border-[#0F4D22] shadow-panel overflow-hidden">
+            <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[460px]">
               {/* Bezel Top Bar */}
-              <div className="bg-[#062612] border-b border-[#0F4D22] px-3 py-1.5 flex items-center justify-between">
+              <div className="bg-[#0D162B] border-b border-slate-800 px-4 py-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="px-1.5 py-0.5 rounded bg-cyan/20 text-cyan text-[9.5px] font-bold border border-cyan/40">
+                  <span className="px-1.5 py-0.5 rounded bg-cyan/20 text-cyan text-[10px] font-bold border border-cyan/40">
                     SCREEN 01
                   </span>
-                  <span className="text-[11px] font-display font-black text-white tracking-wider">
+                  <span className="text-xs font-display font-black text-white tracking-wider">
                     RANGE SAFETY &amp; ORBIT DYNAMICS
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[9px] text-muted">
-                  <span className="w-1.5 h-1.5 rounded-full bg-safe led" />
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 led" />
                   <span className="text-cyan font-bold">RSO CONSOLE</span>
                 </div>
               </div>
 
               {/* Screen Content */}
-              <div className="p-2.5 flex-1 flex flex-col gap-2.5">
+              <div className="p-3 flex-1 flex flex-col gap-3">
                 {/* Orbit Telemetry Strip */}
-                <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
-                  <div className="p-1.5 rounded bg-[#031709] border border-line">
-                    <div className="text-[9px] text-muted uppercase">Altitude</div>
-                    <div className="text-sm font-bold text-cyan font-mono">520.4 KM</div>
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="p-2 rounded-lg bg-[#070D1A] border border-slate-800/80">
+                    <div className="text-[9px] text-slate-400 uppercase tracking-wider">Altitude</div>
+                    <div className="text-base font-bold text-cyan font-mono">520.4 KM</div>
                   </div>
-                  <div className="p-1.5 rounded bg-[#031709] border border-line">
-                    <div className="text-[9px] text-muted uppercase">Velocity</div>
-                    <div className="text-sm font-bold text-safe font-mono">7.61 KM/S</div>
+                  <div className="p-2 rounded-lg bg-[#070D1A] border border-slate-800/80">
+                    <div className="text-[9px] text-slate-400 uppercase tracking-wider">Velocity</div>
+                    <div className="text-base font-bold text-emerald-400 font-mono">7.61 KM/S</div>
                   </div>
-                  <div className="p-1.5 rounded bg-[#031709] border border-line">
-                    <div className="text-[9px] text-muted uppercase">Inclination</div>
-                    <div className="text-sm font-bold text-slate-100 font-mono">97.42&deg;</div>
+                  <div className="p-2 rounded-lg bg-[#070D1A] border border-slate-800/80">
+                    <div className="text-[9px] text-slate-400 uppercase tracking-wider">Inclination</div>
+                    <div className="text-base font-bold text-slate-100 font-mono">97.42&deg;</div>
                   </div>
                 </div>
 
                 {/* Radar Map */}
-                <div className="rounded border border-line overflow-hidden bg-[#021408] h-[220px]">
+                <div className="rounded-lg border border-slate-800 overflow-hidden bg-[#070D1A] flex-1 min-h-[220px]">
                   <MissionMap critical={rejected.length > 0} />
                 </div>
 
                 {/* Ground Tracking Network */}
-                <div className="p-2 rounded bg-[#041F0C] border border-line text-[10px]">
-                  <div className="flex justify-between items-center text-cyan font-bold uppercase mb-1">
+                <div className="p-2.5 rounded-lg bg-[#070D1A] border border-slate-800 text-[10px]">
+                  <div className="flex justify-between items-center text-cyan font-bold uppercase mb-1.5">
                     <span>ISTRAC Ground Stations</span>
-                    <span className="text-safe">5 OF 5 TRACKING</span>
+                    <span className="text-emerald-400">5 OF 5 TRACKING LOCKED</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-1 text-[9px] text-slate-300">
-                    <div className="flex justify-between">
+                  <div className="grid grid-cols-2 gap-1.5 text-[9.5px] text-slate-300">
+                    <div className="flex justify-between bg-slate-900/50 p-1 rounded">
                       <span>SHAR (SRIHARIKOTA):</span>
-                      <span className="text-safe font-bold">AZ: 142&deg; EL: 68&deg;</span>
+                      <span className="text-emerald-400 font-bold">AZ: 142&deg; EL: 68&deg;</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between bg-slate-900/50 p-1 rounded">
                       <span>PORT BLAIR:</span>
-                      <span className="text-safe font-bold">AZ: 210&deg; EL: 44&deg;</span>
+                      <span className="text-emerald-400 font-bold">AZ: 210&deg; EL: 44&deg;</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between bg-slate-900/50 p-1 rounded">
                       <span>BRUNEI STATION:</span>
-                      <span className="text-safe font-bold">AZ: 098&deg; EL: 52&deg;</span>
+                      <span className="text-emerald-400 font-bold">AZ: 098&deg; EL: 52&deg;</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between bg-slate-900/50 p-1 rounded">
                       <span>BIAK (INDONESIA):</span>
                       <span className="text-cyan font-bold">AZ: 045&deg; EL: 31&deg;</span>
                     </div>
@@ -164,7 +169,7 @@ export default function MultiScreenWall({
               </div>
 
               {/* Bezel Bottom Status */}
-              <div className="bg-[#041A0B] border-t border-line px-3 py-1 text-[9px] text-slate-400 flex justify-between">
+              <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-1.5 text-[10px] text-slate-400 flex justify-between">
                 <span>FEED: PRIMARY RADAR TEL-1</span>
                 <span className="text-cyan">DOPPLER LOCK: +14.2 kHz</span>
               </div>
@@ -173,140 +178,143 @@ export default function MultiScreenWall({
 
           {/* ================= SCREEN 02: 3D SPACECRAFT DIGITAL TWIN ================= */}
           {(activeScreenTab === 'all' || activeScreenTab === '2') && (
-            <div className="flex flex-col rounded-lg bg-[#021408] border-2 border-[#0F4D22] shadow-panel overflow-hidden">
+            <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[460px]">
               {/* Bezel Top Bar */}
-              <div className="bg-[#062612] border-b border-[#0F4D22] px-3 py-1.5 flex items-center justify-between">
+              <div className="bg-[#0D162B] border-b border-slate-800 px-4 py-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="px-1.5 py-0.5 rounded bg-cyan/20 text-cyan text-[9.5px] font-bold border border-cyan/40">
+                  <span className="px-1.5 py-0.5 rounded bg-cyan/20 text-cyan text-[10px] font-bold border border-cyan/40">
                     SCREEN 02
                   </span>
-                  <span className="text-[11px] font-display font-black text-white tracking-wider">
+                  <span className="text-xs font-display font-black text-white tracking-wider">
                     SPACECRAFT 3D DIGITAL TWIN &amp; AOCS
                   </span>
+                  {selected && (
+                    <span className={`px-2 py-0.5 rounded text-[9.5px] font-mono font-bold border ${
+                      selected.status === 'reject'
+                        ? 'bg-rose-500/20 text-rose-400 border-rose-500/50'
+                        : selected.status === 'monitor'
+                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/50'
+                        : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
+                    }`}>
+                      TARGET: {selected.component_id} [{selected.subsystem}]
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-center gap-1.5 text-[9px] text-muted">
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan led" />
                   <span className="text-cyan font-bold">VEHICLE CONSOLE</span>
                 </div>
               </div>
 
               {/* Screen Content */}
-              <div className="p-2.5 flex-1 flex flex-col gap-2.5">
-                {/* 3D Viewport */}
-                <div className="relative h-[250px] rounded border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0C203E_0%,#060B14_85%)] overflow-hidden">
+              <div className="p-3 flex-1 flex flex-col gap-3">
+                {/* 3D Viewport with Target Component HUD */}
+                <div className="relative flex-1 min-h-[290px] rounded-lg border border-slate-800 bg-[radial-gradient(ellipse_at_50%_40%,#0C203E_0%,#060B14_85%)] overflow-hidden">
                   <SatelliteScene
                     subsystems={subsystems}
                     onSelect={onSelectSubsystem}
                     focusKey={focusKey}
+                    selectedComponent={selected}
                   />
-                  {/* Overlay HUD indicators */}
-                  <div className="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none">
-                    <div className="px-2 py-0.5 rounded bg-[#021408]/80 border border-cyan/40 text-[9px] text-cyan font-bold">
-                      AOCS: 3-AXIS STABILIZED
-                    </div>
-                    <div className="px-2 py-0.5 rounded bg-[#021408]/80 border border-safe/40 text-[9px] text-safe font-bold">
-                      SOLAR WING: SUN-TRACKING 99.4%
-                    </div>
-                  </div>
                 </div>
 
                 {/* Subsystem Quick Selector Cards */}
-                <div className="grid grid-cols-3 gap-1 text-[9px]">
-                  {subsystems.map((s) => (
+                <div className="grid grid-cols-4 gap-1.5 text-[9.5px]">
+                  {subsystems.slice(0, 8).map((s) => (
                     <button
                       key={s.key}
                       onClick={() => onSelectSubsystem(s.key)}
                       className={`p-1.5 rounded border text-left transition-all ${
-                        focusKey === s.key
+                        focusKey === s.key || selected?.subsystem === s.key
                           ? 'bg-cyan/20 border-cyan text-white shadow-neon-cyan'
                           : s.status === 'reject'
-                          ? 'bg-reject/10 border-reject text-reject'
-                          : 'bg-[#041F0C] border-line text-slate-300 hover:border-cyan/40'
+                          ? 'bg-rose-500/15 border-rose-500/50 text-rose-400'
+                          : 'bg-[#070D1A] border-slate-800 text-slate-300 hover:border-slate-700'
                       }`}
                     >
                       <div className="font-bold flex justify-between">
                         <span>[{s.key}]</span>
-                        <span className={s.status === 'reject' ? 'text-reject' : 'text-safe'}>
+                        <span className={s.status === 'reject' ? 'text-rose-400 font-black' : 'text-emerald-400'}>
                           {Math.max(0, 100 - Math.round(s.avg_risk))}%
                         </span>
                       </div>
-                      <div className="truncate text-[8px] text-muted">{s.name}</div>
+                      <div className="truncate text-[8.5px] text-slate-400">{s.name}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Bezel Bottom Status */}
-              <div className="bg-[#041A0B] border-t border-line px-3 py-1 text-[9px] text-slate-400 flex justify-between">
+              <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-1.5 text-[10px] text-slate-400 flex justify-between">
                 <span>ATTITUDE: P: +0.02&deg; | R: -0.01&deg; | Y: +0.04&deg;</span>
-                <span className="text-safe">BUS VOLTAGE: 28.12V</span>
+                <span className="text-emerald-400">BUS VOLTAGE: 28.12V NOMINAL</span>
               </div>
             </div>
           )}
 
           {/* ================= SCREEN 03: HTOL SILICON OSCILLOSCOPE ================= */}
           {(activeScreenTab === 'all' || activeScreenTab === '3') && (
-            <div className="flex flex-col rounded-lg bg-[#021408] border-2 border-[#0F4D22] shadow-panel overflow-hidden">
+            <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[460px]">
               {/* Bezel Top Bar */}
-              <div className="bg-[#062612] border-b border-[#0F4D22] px-3 py-1.5 flex items-center justify-between">
+              <div className="bg-[#0D162B] border-b border-slate-800 px-4 py-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="px-1.5 py-0.5 rounded bg-cyan/20 text-cyan text-[9.5px] font-bold border border-cyan/40">
+                  <span className="px-1.5 py-0.5 rounded bg-cyan/20 text-cyan text-[10px] font-bold border border-cyan/40">
                     SCREEN 03
                   </span>
-                  <span className="text-[11px] font-display font-black text-white tracking-wider">
+                  <span className="text-xs font-display font-black text-white tracking-wider">
                     HTOL 168H SILICON TELEMETRY &amp; DRIFT
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[9px] text-muted">
-                  <span className="w-1.5 h-1.5 rounded-full bg-reject led" />
-                  <span className="text-reject font-bold">AI SCREENING</span>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 led" />
+                  <span className="text-rose-400 font-bold">AI SCREENING</span>
                 </div>
               </div>
 
               {/* Screen Content */}
-              <div className="p-2.5 flex-1 flex flex-col gap-2.5">
+              <div className="p-3 flex-1 flex flex-col gap-3">
                 {/* Oscilloscope Panel */}
-                <div className="rounded border border-line bg-[#021408] overflow-hidden">
+                <div className="rounded-lg border border-slate-800 bg-[#070D1A] overflow-hidden flex-1 min-h-[220px]">
                   <TelemetryChart component={selected} />
                 </div>
 
                 {/* Selected Component Quick Stats */}
                 {selected ? (
-                  <div className="p-2 rounded bg-[#041F0C] border border-line text-[10px] space-y-1">
+                  <div className="p-2.5 rounded-lg bg-[#070D1A] border border-slate-800 text-[10px] space-y-1.5">
                     <div className="flex justify-between items-center font-bold">
-                      <span className="text-white">{selected.component_id}</span>
+                      <span className="text-white text-xs">{selected.component_id}</span>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                        className={`px-2 py-0.5 rounded text-[9.5px] font-bold ${
                           selected.status === 'reject'
-                            ? 'bg-reject/20 text-reject border border-reject'
+                            ? 'bg-rose-500/20 text-rose-400 border border-rose-500/50'
                             : selected.status === 'monitor'
-                            ? 'bg-monitor/20 text-monitor border border-monitor'
-                            : 'bg-safe/20 text-safe border border-safe'
+                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
+                            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
                         }`}
                       >
                         {selected.status.toUpperCase()} (RISK: {selected.risk_score}/100)
                       </span>
                     </div>
-                    <div className="grid grid-cols-4 gap-1 text-[9px] text-slate-300">
+                    <div className="grid grid-cols-4 gap-2 text-[9.5px] text-slate-300 bg-slate-900/60 p-1.5 rounded">
                       <div>0h: <b className="text-slate-100">{selected.v0.toFixed(1)}&mu;A</b></div>
                       <div>24h: <b className="text-slate-100">{selected.v24.toFixed(1)}&mu;A</b></div>
                       <div>96h: <b className="text-slate-100">{selected.v96 != null ? selected.v96.toFixed(1) : '-'}&mu;A</b></div>
-                      <div>168h: <b className="text-reject">{selected.v168.toFixed(1)}&mu;A</b></div>
+                      <div>168h: <b className="text-rose-400">{selected.v168.toFixed(1)}&mu;A</b></div>
                     </div>
-                    <div className="text-[9px] text-muted pt-1 border-t border-line/60 flex justify-between">
+                    <div className="text-[9.5px] text-slate-400 pt-1 border-t border-slate-800 flex justify-between">
                       <span>Lot z-Score: <b className="text-cyan">{selected.z168 > 0 ? '+' : ''}{selected.z168.toFixed(2)}&sigma;</b></span>
-                      <span>Extrapolated (+96h): <b className="text-reject">{selected.predicted_future.toFixed(1)}&mu;A</b></span>
+                      <span>Extrapolated (+96h): <b className="text-rose-400">{selected.predicted_future.toFixed(1)}&mu;A</b></span>
                     </div>
                   </div>
                 ) : (
-                  <div className="p-3 text-center text-xs text-muted bg-[#041F0C] rounded border border-line">
-                    Select a component from the matrix or 3D view to inspect oscilloscope telemetry.
+                  <div className="p-4 text-center text-xs text-slate-400 bg-[#070D1A] rounded-lg border border-slate-800">
+                    Select a component from the anomaly ledger or 3D view to inspect oscilloscope telemetry.
                   </div>
                 )}
               </div>
 
               {/* Bezel Bottom Status */}
-              <div className="bg-[#041A0B] border-t border-line px-3 py-1 text-[9px] text-slate-400 flex justify-between">
+              <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-1.5 text-[10px] text-slate-400 flex justify-between">
                 <span>SAMPLING: 24-BIT SIGMA-DELTA ADC</span>
                 <span className="text-cyan">OVEN TEMP: 125.0&deg;C CONSTANT</span>
               </div>
@@ -315,57 +323,57 @@ export default function MultiScreenWall({
 
           {/* ================= SCREEN 04: SCREENING LEDGER & DEFECT QUARANTINE ================= */}
           {(activeScreenTab === 'all' || activeScreenTab === '4') && (
-            <div className="flex flex-col rounded-lg bg-[#021408] border-2 border-[#0F4D22] shadow-panel overflow-hidden">
+            <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[460px]">
               {/* Bezel Top Bar */}
-              <div className="bg-[#062612] border-b border-[#0F4D22] px-3 py-1.5 flex items-center justify-between">
+              <div className="bg-[#0D162B] border-b border-slate-800 px-4 py-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="px-1.5 py-0.5 rounded bg-cyan/20 text-cyan text-[9.5px] font-bold border border-cyan/40">
+                  <span className="px-1.5 py-0.5 rounded bg-cyan/20 text-cyan text-[10px] font-bold border border-cyan/40">
                     SCREEN 04
                   </span>
-                  <span className="text-[11px] font-display font-black text-white tracking-wider">
+                  <span className="text-xs font-display font-black text-white tracking-wider">
                     ANOMALY LEDGER &amp; QUARANTINE
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[9px] text-muted">
-                  <span className="w-1.5 h-1.5 rounded-full bg-safe led" />
-                  <span className="text-safe font-bold">MD CONSOLE</span>
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 led" />
+                  <span className="text-emerald-400 font-bold">MD CONSOLE</span>
                 </div>
               </div>
 
               {/* Screen Content */}
-              <div className="p-2.5 flex-1 flex flex-col gap-2.5 overflow-hidden">
+              <div className="p-3 flex-1 flex flex-col gap-3 overflow-hidden">
                 {/* Metrics Summary Strip */}
-                <div className="grid grid-cols-3 gap-1 text-center text-xs">
-                  <div className="p-1 rounded bg-[#031709] border border-line">
-                    <div className="text-[9px] text-muted">SAFE</div>
-                    <div className="text-sm font-bold text-safe">{safe.length}</div>
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="p-2 rounded-lg bg-[#070D1A] border border-slate-800">
+                    <div className="text-[9px] text-slate-400">SAFE</div>
+                    <div className="text-base font-bold text-emerald-400">{safe.length}</div>
                   </div>
-                  <div className="p-1 rounded bg-[#031709] border border-line">
-                    <div className="text-[9px] text-muted">MONITOR</div>
-                    <div className="text-sm font-bold text-monitor">{monitored.length}</div>
+                  <div className="p-2 rounded-lg bg-[#070D1A] border border-slate-800">
+                    <div className="text-[9px] text-slate-400">MONITOR</div>
+                    <div className="text-base font-bold text-amber-400">{monitored.length}</div>
                   </div>
-                  <div className="p-1 rounded bg-[#031709] border border-line">
-                    <div className="text-[9px] text-muted">QUARANTINE</div>
-                    <div className="text-sm font-bold text-reject">{rejected.length}</div>
+                  <div className="p-2 rounded-lg bg-[#070D1A] border border-slate-800">
+                    <div className="text-[9px] text-slate-400">QUARANTINE</div>
+                    <div className="text-base font-bold text-rose-400">{rejected.length}</div>
                   </div>
                 </div>
 
                 {/* Quarantined Anomaly Ledger Table */}
-                <div className="flex-1 overflow-y-auto rounded border border-line bg-[#021408] max-h-[260px]">
+                <div className="flex-1 overflow-y-auto rounded-lg border border-slate-800 bg-[#070D1A] max-h-[220px]">
                   <table className="w-full text-left text-[10px] font-mono border-collapse">
-                    <thead className="bg-[#062612] text-[8.5px] uppercase text-slate-400 sticky top-0 border-b border-line">
+                    <thead className="bg-[#0D162B] text-[8.5px] uppercase text-slate-400 sticky top-0 border-b border-slate-800">
                       <tr>
-                        <th className="py-1 px-2">Part ID</th>
-                        <th className="py-1 px-2">Sub</th>
-                        <th className="py-1 px-2">168h</th>
-                        <th className="py-1 px-2">z-Score</th>
-                        <th className="py-1 px-2">Risk</th>
+                        <th className="py-1.5 px-2.5">Part ID</th>
+                        <th className="py-1.5 px-2">Sub</th>
+                        <th className="py-1.5 px-2">168h</th>
+                        <th className="py-1.5 px-2">z-Score</th>
+                        <th className="py-1.5 px-2">Risk</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-line/40">
+                    <tbody className="divide-y divide-slate-800/60">
                       {rejected.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="text-center py-4 text-slate-400 text-xs">
+                          <td colSpan={5} className="text-center py-6 text-slate-400 text-xs">
                             No quarantined defects. All nominal.
                           </td>
                         </tr>
@@ -376,15 +384,15 @@ export default function MultiScreenWall({
                           onClick={() => onSelectComponent(c.component_id)}
                           className={`cursor-pointer transition-colors ${
                             selected?.component_id === c.component_id
-                              ? 'bg-reject/25 text-white'
-                              : 'hover:bg-reject/10'
+                              ? 'bg-rose-500/20 text-white font-bold'
+                              : 'hover:bg-slate-800/40 text-slate-200'
                           }`}
                         >
-                          <td className="py-1 px-2 font-bold text-slate-100">{c.component_id}</td>
-                          <td className="py-1 px-2 text-cyan font-bold">[{c.subsystem}]</td>
-                          <td className="py-1 px-2 text-reject font-bold">{c.v168.toFixed(1)}&mu;A</td>
-                          <td className="py-1 px-2 text-reject font-bold">{c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;</td>
-                          <td className="py-1 px-2 text-reject font-bold">{c.risk_score}</td>
+                          <td className="py-1.5 px-2.5 font-bold text-white">{c.component_id}</td>
+                          <td className="py-1.5 px-2 text-cyan font-bold">[{c.subsystem}]</td>
+                          <td className="py-1.5 px-2 text-rose-400 font-bold">{c.v168.toFixed(1)}&mu;A</td>
+                          <td className="py-1.5 px-2 text-rose-400 font-bold">{c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;</td>
+                          <td className="py-1.5 px-2 text-rose-400 font-bold">{c.risk_score}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -393,41 +401,49 @@ export default function MultiScreenWall({
 
                 {/* Critical Quarantine Alert Box */}
                 {rejected.length > 0 && (
-                  <div className="p-2 rounded bg-reject/10 border border-reject text-[9.5px] space-y-1">
-                    <div className="text-reject font-bold uppercase flex items-center gap-1">
-                      <span>&#9888;</span> QUARANTINE PROTOCOL ENGAGED ({rejected.length} SILICON DEFECTS)
+                  <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/40 text-[9.5px] space-y-1">
+                    <div className="text-rose-400 font-bold uppercase flex items-center gap-1.5">
+                      <span>&#9888;</span> QUARANTINE PROTOCOL ENGAGED ({rejected.length} DEFECTS)
                     </div>
-                    <div className="text-slate-200">
+                    <div className="text-slate-300">
                       Root cause: Non-linear oxide trap breakdown identified in lot{' '}
-                      <b className="text-white">{rejected[0].lot_id}</b>. RCA required prior to stage integration.
+                      <b className="text-white">{rejected[0].lot_id}</b>. Click any row above to inspect in 3D.
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Bezel Bottom Status */}
-              <div className="bg-[#041A0B] border-t border-line px-3 py-1 text-[9px] text-slate-400 flex justify-between">
+              <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-1.5 text-[10px] text-slate-400 flex justify-between">
                 <span>CLEARANCE: CONDITIONAL QUARANTINE</span>
-                <span className="text-safe">MISSION DIRECTOR: GO FOR HTOL-2</span>
+                <span className="text-emerald-400">MISSION DIRECTOR: GO FOR HTOL-2</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Embedded Spacecraft Bus & HTOL Circuit Diagram Bar at bottom of Multi-Screen Wall */}
-        <div className="bg-[#041A0B] rounded-lg border border-line p-3">
-          <div className="flex items-center justify-between mb-2">
+        {/* Collapsible Spacecraft Bus & HTOL Circuit Diagram Tray */}
+        <div className="bg-[#090F1E] rounded-xl border border-slate-800 p-3.5">
+          <button
+            type="button"
+            onClick={() => setShowSchematics((v) => !v)}
+            className="w-full flex items-center justify-between text-left cursor-pointer"
+          >
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-cyan led" />
               <span className="text-xs font-display font-black text-cyan tracking-wider uppercase">
                 ISRO SDSC SHAR COMPONENT ARCHITECTURE &amp; HTOL TELEMETRY DAQ SCHEMATICS
               </span>
             </div>
-            <span className="text-[10px] text-muted">
-              MIL-STD-883 METHOD 1005 TEST HARNESS
+            <span className="text-[10px] text-slate-400 font-mono hover:text-white transition-colors">
+              {showSchematics ? '[-] HIDE SCHEMATICS' : '[+] EXPAND MIL-STD-883 TEST HARNESS'}
             </span>
-          </div>
-          <ComponentDiagram type="all" />
+          </button>
+          {showSchematics && (
+            <div className="mt-3 pt-3 border-t border-slate-800">
+              <ComponentDiagram type="all" />
+            </div>
+          )}
         </div>
       </div>
     </div>
