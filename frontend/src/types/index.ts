@@ -14,22 +14,62 @@ export interface UploadResult {
   missing_fields?: string[]
 }
 
+export type AnomalyCategory =
+  | 'normal_within_spec'
+  | 'abnormal_within_spec'
+  | 'approaching_limit'
+  | 'predicted_exceedance'
+  | 'outside_spec'
+
+export type DriftTrend =
+  | 'ACCELERATING POSITIVE DRIFT'
+  | 'LINEAR POSITIVE DRIFT'
+  | 'NOMINAL / STABLE'
+  | 'NEGATIVE DRIFT'
+
+export type DriftClassification =
+  | 'SAFE FUTURE TREND'
+  | 'MONITOR FUTURE TREND'
+  | 'PREDICTED LIMIT EXCEEDANCE'
+
+export interface EvaluationMetrics {
+  has_ground_truth: boolean
+  precision?: number
+  recall?: number
+  f1?: number
+  fpr?: number
+  fnr?: number
+  mae_drift: number
+  rmse_drift: number
+  mean_error_pct: number
+}
+
 export interface ComponentOut {
   component_id: string
   lot_id: string
   subsystem: string
   subsystem_name: string
+  parameter?: string
   v0: number
   v24: number
   v96: number | null
   v168: number
   limit_ua: number
+  lot_mean?: number
+  lot_std?: number
+  lot_pct_dev?: number
   ground_truth: number | null
   slope: number
   drift168: number
   pct_drift: number
+  drift_rate_early?: number
+  drift_trend?: DriftTrend
+  drift_classification?: DriftClassification
   predicted168_from_early: number
+  prediction_error_168?: number
   predicted_future: number
+  margin_168?: number
+  margin_future?: number
   z168: number
   z_slope: number
   iso_score: number
@@ -37,6 +77,7 @@ export interface ComponentOut {
   risk_score: number
   status: Status
   traditional_decision: 'PASS' | 'FAIL'
+  anomaly_category?: AnomalyCategory
   reason: string
 }
 
@@ -47,6 +88,7 @@ export interface AnalyzeResult {
   reject: number
   mission_health: number
   ml_meta: Record<string, unknown> | null
+  evaluation_metrics?: EvaluationMetrics
   top_flagged: ComponentOut | null
 }
 

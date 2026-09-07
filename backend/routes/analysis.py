@@ -29,7 +29,7 @@ def analyze_batch(batch_id: int, db: Session = Depends(get_db)):
         "limit": r.limit_ua, "ground_truth": r.ground_truth,
     } for r in rows])
 
-    result_df, ml_meta = run_pipeline(df)
+    result_df, ml_meta, eval_metrics = run_pipeline(df)
     persist_components(db, batch, result_df)
 
     batch.analyzed = True
@@ -49,19 +49,34 @@ def analyze_batch(batch_id: int, db: Session = Depends(get_db)):
         top_flagged = {
             "component_id": top["component_id"], "lot_id": top["lot_id"],
             "subsystem": top["subsystem"], "subsystem_name": NAME_BY_KEY.get(top["subsystem"], top["subsystem"]),
+            "parameter": top.get("parameter", "Leakage Current (µA)"),
             "v0": top["v0"], "v24": top["v24"], "v96": (None if pd.isna(top.get("v96")) else top["v96"]),
             "v168": top["v168"], "limit_ua": top["limit"],
+            "lot_mean": (None if pd.isna(top.get("lot_mean")) else float(top["lot_mean"])),
+            "lot_std": (None if pd.isna(top.get("lot_std")) else float(top["lot_std"])),
+            "lot_pct_dev": (None if pd.isna(top.get("lot_pct_dev")) else float(top["lot_pct_dev"])),
             "slope": top["slope"], "drift168": top["drift168"], "pct_drift": top["pct_drift"],
-            "predicted168_from_early": top["predicted168_from_early"], "predicted_future": top["predicted_future"],
+            "drift_rate_early": (None if pd.isna(top.get("drift_rate_early")) else float(top["drift_rate_early"])),
+            "drift_trend": top.get("drift_trend"),
+            "drift_classification": top.get("drift_classification"),
+            "predicted168_from_early": top["predicted168_from_early"],
+            "prediction_error_168": (None if pd.isna(top.get("prediction_error_168")) else float(top["prediction_error_168"])),
+            "predicted_future": top["predicted_future"],
+            "margin_168": (None if pd.isna(top.get("margin_168")) else float(top["margin_168"])),
+            "margin_future": (None if pd.isna(top.get("margin_future")) else float(top["margin_future"])),
             "z168": top["z168"], "z_slope": top["z_slope"], "iso_score": top["iso_score"],
             "ml_prob": (None if "ml_prob" not in top or pd.isna(top.get("ml_prob")) else top["ml_prob"]),
             "risk_score": int(top["risk_score"]), "status": top["status"],
-            "traditional_decision": top["traditional_decision"], "reason": top["reason"],
+            "traditional_decision": top["traditional_decision"],
+            "anomaly_category": top.get("anomaly_category"),
+            "reason": top["reason"],
             "ground_truth": (None if pd.isna(top.get("ground_truth")) else top["ground_truth"]),
         }
 
     return {
         "batch_id": batch_id, "safe": safe, "monitor": monitor, "reject": reject,
         "mission_health": max(0, min(100, mission_health)),
-        "ml_meta": ml_meta, "top_flagged": top_flagged,
+        "ml_meta": ml_meta,
+        "evaluation_metrics": eval_metrics,
+        "top_flagged": top_flagged,
     }

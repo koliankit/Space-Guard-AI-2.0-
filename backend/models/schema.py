@@ -24,17 +24,27 @@ class ComponentOut(BaseModel):
     lot_id: str
     subsystem: str
     subsystem_name: str
+    parameter: Optional[str] = "Leakage Current (µA)"
     v0: float
     v24: float
     v96: Optional[float] = None
     v168: float
     limit_ua: float
+    lot_mean: Optional[float] = None
+    lot_std: Optional[float] = None
+    lot_pct_dev: Optional[float] = None
     ground_truth: Optional[float] = None
     slope: float
     drift168: float
     pct_drift: float
+    drift_rate_early: Optional[float] = None
+    drift_trend: Optional[str] = None
+    drift_classification: Optional[str] = None
     predicted168_from_early: float
+    prediction_error_168: Optional[float] = None
     predicted_future: float
+    margin_168: Optional[float] = None
+    margin_future: Optional[float] = None
     z168: float
     z_slope: float
     iso_score: float
@@ -42,6 +52,7 @@ class ComponentOut(BaseModel):
     risk_score: int
     status: str
     traditional_decision: str
+    anomaly_category: Optional[str] = None
     reason: str
 
     class Config:
@@ -55,6 +66,7 @@ class AnalyzeResponse(BaseModel):
     reject: int
     mission_health: int
     ml_meta: Optional[Dict[str, Any]] = None
+    evaluation_metrics: Optional[Dict[str, Any]] = None
     top_flagged: Optional[ComponentOut] = None
 
 

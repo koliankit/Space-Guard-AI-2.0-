@@ -235,7 +235,7 @@ export default function SatelliteHUD({
               Subsystem: <b className="text-white">[{selectedComponent.subsystem}]</b> {selectedComponent.subsystem_name} &bull; Lot: {selectedComponent.lot_id}
             </div>
 
-            <div className="grid grid-cols-2 gap-1.5 text-[10px] bg-[#071120]/80 p-2 rounded border border-slate-800 mb-2">
+            <div className="grid grid-cols-2 gap-2 text-[10px] mb-2.5">
               <div>
                 <span className="text-slate-400 text-[9px] block">168h Leakage:</span>
                 <b className={selectedComponent.status === 'reject' ? 'text-rose-400' : 'text-slate-100'}>
@@ -244,20 +244,20 @@ export default function SatelliteHUD({
                 <span className="text-[8.5px] text-slate-500 ml-1">/ {selectedComponent.limit_ua.toFixed(0)} &micro;A</span>
               </div>
               <div>
-                <span className="text-slate-400 text-[9px] block">Risk Score:</span>
-                <b className={`text-sm ${selectedComponent.risk_score >= 70 ? 'text-rose-400' : selectedComponent.risk_score >= 35 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                  {selectedComponent.risk_score} <span className="text-[9px] text-slate-400">/ 100</span>
+                <span className="text-slate-400 text-[9px] block">Lot Mean &amp; z-Score:</span>
+                <b className={Math.abs(selectedComponent.z168) >= 2.5 ? 'text-rose-400' : Math.abs(selectedComponent.z168) >= 1.8 ? 'text-amber-400' : 'text-slate-200'}>
+                  {selectedComponent.lot_mean != null ? `${selectedComponent.lot_mean.toFixed(1)} µA` : '--'} ({selectedComponent.z168 > 0 ? '+' : ''}{selectedComponent.z168.toFixed(2)}&sigma;)
                 </b>
               </div>
               <div>
-                <span className="text-slate-400 text-[9px] block">Drift Trend:</span>
-                <span className={selectedComponent.drift168 > 0 ? 'text-amber-400 font-semibold' : 'text-slate-300'}>
-                  {selectedComponent.drift168 > 0 ? '+' : ''}{selectedComponent.drift168.toFixed(2)} &micro;A ({selectedComponent.pct_drift.toFixed(1)}%)
-                </span>
+                <span className="text-slate-400 text-[9px] block">Early Pred 168h:</span>
+                <b className="text-cyan font-semibold">{selectedComponent.predicted168_from_early.toFixed(2)} &micro;A</b>
               </div>
               <div>
-                <span className="text-slate-400 text-[9px] block">Future +96h:</span>
-                <b className="text-amber-300 font-semibold">{selectedComponent.predicted_future.toFixed(2)} &micro;A</b>
+                <span className="text-slate-400 text-[9px] block">Future +96h (264h):</span>
+                <b className={selectedComponent.predicted_future > selectedComponent.limit_ua ? 'text-rose-400 font-bold' : 'text-amber-300 font-semibold'}>
+                  {selectedComponent.predicted_future.toFixed(2)} &micro;A
+                </b>
               </div>
             </div>
 

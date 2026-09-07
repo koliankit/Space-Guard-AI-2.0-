@@ -31,19 +31,29 @@ class ComponentRecord(Base):
     component_id = Column(String, index=True)
     lot_id = Column(String, index=True)
     subsystem = Column(String, index=True, nullable=True)
+    parameter = Column(String, default="Leakage Current (µA)", nullable=True)
 
     v0 = Column(Float)
     v24 = Column(Float)
     v96 = Column(Float, nullable=True)
     v168 = Column(Float)
     limit_ua = Column(Float)
+    lot_mean = Column(Float, nullable=True)
+    lot_std = Column(Float, nullable=True)
+    lot_pct_dev = Column(Float, nullable=True)
     ground_truth = Column(Float, nullable=True)
 
     slope = Column(Float, nullable=True)
     drift168 = Column(Float, nullable=True)
     pct_drift = Column(Float, nullable=True)
+    drift_rate_early = Column(Float, nullable=True)
+    drift_trend = Column(String, nullable=True)
+    drift_classification = Column(String, nullable=True)
     predicted168_from_early = Column(Float, nullable=True)
+    prediction_error_168 = Column(Float, nullable=True)
     predicted_future = Column(Float, nullable=True)
+    margin_168 = Column(Float, nullable=True)
+    margin_future = Column(Float, nullable=True)
 
     z168 = Column(Float, nullable=True)
     z_slope = Column(Float, nullable=True)
@@ -53,6 +63,7 @@ class ComponentRecord(Base):
     risk_score = Column(Integer, nullable=True)
     status = Column(String, nullable=True)  # safe | monitor | reject
     traditional_decision = Column(String, nullable=True)  # PASS | FAIL
+    anomaly_category = Column(String, nullable=True)
     reason = Column(String, nullable=True)
 
     batch = relationship("Batch", back_populates="components")

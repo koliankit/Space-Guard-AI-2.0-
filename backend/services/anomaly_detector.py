@@ -31,12 +31,15 @@ except ImportError:
     from sklearn.ensemble import GradientBoostingClassifier
     _HAS_XGB = False
 
-FEATURE_COLS = ["z168", "z_slope", "pct_drift"]
+FEATURE_COLS = ["z168", "z_slope", "lot_pct_dev"]
 
 
 def run_isolation_forest(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    X = df[FEATURE_COLS].to_numpy()
+    feature_cols = [c for c in FEATURE_COLS if c in df.columns]
+    if len(feature_cols) < 2:
+        feature_cols = ["z168", "z_slope"]
+    X = df[feature_cols].to_numpy()
     if len(df) < 8:
         # too few points for a meaningful forest — fall back to a neutral score
         df["iso_score"] = 0.0
@@ -51,6 +54,64 @@ def run_isolation_forest(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def compute_evaluation_metrics(df: pd.DataFrame) -> dict:
+    """
+    Computes real metrics for anomaly detection (if ground_truth present)
+    and for 168h drift prediction (MAE, RMSE, error %).
+    """
+    metrics = {
+        "has_ground_truth": False,
+        "mae_drift": 0.0,
+        "rmse_drift": 0.0,
+        "mean_error_pct": 0.0,
+    }
+
+    # Drift prediction metrics across all components
+    if "prediction_error_168" in df.columns:
+        errors = df["prediction_error_168"].dropna()
+        if len(errors) > 0:
+            metrics["mae_drift"] = round(float(errors.mean()), 3)
+            metrics["rmse_drift"] = round(float(np.sqrt((errors ** 2).mean())), 3)
+            v168_vals = df.loc[errors.index, "v168"]
+            valid = v168_vals > 0
+            if valid.sum() > 0:
+                pcts = (errors[valid] / v168_vals[valid]) * 100.0
+                metrics["mean_error_pct"] = round(float(pcts.mean()), 2)
+
+    # Classification metrics (ground truth)
+    if "ground_truth" in df.columns and "status" in df.columns:
+        labeled = df["ground_truth"].notna()
+        if labeled.sum() >= 5:
+            y_true = df.loc[labeled, "ground_truth"].astype(int)
+            y_pred = (df.loc[labeled, "status"] == "reject").astype(int)
+
+            tp = int(((y_true == 1) & (y_pred == 1)).sum())
+            fp = int(((y_true == 0) & (y_pred == 1)).sum())
+            tn = int(((y_true == 0) & (y_pred == 0)).sum())
+            fn = int(((y_true == 1) & (y_pred == 0)).sum())
+
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+            f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+            fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
+            fnr = fn / (fn + tp) if (fn + tp) > 0 else 0.0
+
+            metrics.update({
+                "has_ground_truth": True,
+                "precision": round(float(precision), 3),
+                "recall": round(float(recall), 3),
+                "f1": round(float(f1), 3),
+                "fpr": round(float(fpr), 3),
+                "fnr": round(float(fnr), 3),
+                "tp": tp,
+                "fp": fp,
+                "tn": tn,
+                "fn": fn,
+            })
+
+    return metrics
+
+
 def run_supervised_if_labeled(df: pd.DataFrame):
     """
     Returns (df_with_ml_prob_or_None, model_meta).
@@ -63,7 +124,8 @@ def run_supervised_if_labeled(df: pd.DataFrame):
     if labeled.sum() < 20 or y.nunique() < 2:
         return df, None  # not enough signal to train responsibly
 
-    X = df.loc[labeled, FEATURE_COLS].to_numpy()
+    feature_cols = [c for c in FEATURE_COLS if c in df.columns]
+    X = df.loc[labeled, feature_cols].to_numpy()
     if _HAS_XGB:
         model = XGBClassifier(
             n_estimators=150, max_depth=3, learning_rate=0.1,
@@ -74,7 +136,7 @@ def run_supervised_if_labeled(df: pd.DataFrame):
         model = GradientBoostingClassifier(n_estimators=150, max_depth=3, random_state=42)
     model.fit(X, y)
 
-    probs = model.predict_proba(df[FEATURE_COLS].to_numpy())[:, 1]
+    probs = model.predict_proba(df[feature_cols].to_numpy())[:, 1]
     df = df.copy()
     df["ml_prob"] = probs
 
@@ -84,7 +146,7 @@ def run_supervised_if_labeled(df: pd.DataFrame):
         "model": "XGBoost" if _HAS_XGB else "GradientBoostingClassifier (xgboost not installed, used as fallback)",
         "n_labeled": int(labeled.sum()),
         "feature_importance": (
-            {f: float(v) for f, v in zip(FEATURE_COLS, importances)} if importances is not None else None
+            {f: float(v) for f, v in zip(feature_cols, importances)} if importances is not None else None
         ),
         "caveat": "Trained and scored on the same uploaded batch (no held-out split) — indicative for a "
                   "hackathon-scale demo, not a validated production model.",

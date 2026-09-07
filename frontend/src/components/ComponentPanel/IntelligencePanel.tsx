@@ -1,18 +1,31 @@
 import type { ComponentOut } from '../../types'
 
-function Row({ k, v, highlight, isAlert }: { k: string; v: string; highlight?: boolean; isAlert?: boolean }) {
+function Row({
+  k,
+  v,
+  highlight,
+  isAlert,
+  sub,
+}: {
+  k: string
+  v: string
+  highlight?: boolean
+  isAlert?: boolean
+  sub?: string
+}) {
   const valueColor = highlight
     ? isAlert
-      ? 'text-reject text-glow-red'
-      : 'text-safe text-glow-green'
+      ? 'text-rose-400 font-bold text-glow-red'
+      : 'text-emerald-400 font-bold text-glow-green'
     : 'text-slate-100'
 
   return (
-    <div className="flex justify-between py-1.5 border-b border-dashed border-line/70 text-xs gap-2 font-mono">
-      <span className="text-muted">{k}</span>
-      <span className={`text-right font-bold ${valueColor}`}>
-        {v}
-      </span>
+    <div className="flex items-center justify-between py-1.5 border-b border-dashed border-slate-800 text-xs font-mono gap-2">
+      <span className="text-slate-400">{k}</span>
+      <div className="text-right">
+        <span className={`font-bold ${valueColor}`}>{v}</span>
+        {sub && <span className="text-[9.5px] text-slate-500 block">{sub}</span>}
+      </div>
     </div>
   )
 }
@@ -20,14 +33,14 @@ function Row({ k, v, highlight, isAlert }: { k: string; v: string; highlight?: b
 export default function IntelligencePanel({ component }: { component: ComponentOut | null }) {
   if (!component) {
     return (
-      <div className="bg-panel p-4 border-l border-line flex flex-col justify-center items-center text-center">
+      <div className="bg-[#090F1E] p-4 rounded-xl border border-slate-800 flex flex-col justify-center items-center text-center">
         <h3 className="m-0 mb-3 text-[11px] font-display tracking-widest uppercase text-cyan text-glow-cyan flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-cyan led" />
           Component Intelligence
         </h3>
-        <div className="text-muted text-xs font-mono leading-relaxed py-6 px-3 border border-dashed border-line/60 rounded max-w-xs">
+        <div className="text-slate-400 text-xs font-mono leading-relaxed py-6 px-3 border border-dashed border-slate-800 rounded-lg max-w-xs">
           [ TARGET ACQUISITION ]<br />
-          Select a component on the 3D Satellite or Component Monitor to run AI diagnostic telemetry.
+          Select any component on the 3D Satellite or screening matrix to inspect dynamic lot-relative telemetry.
         </div>
       </div>
     )
@@ -35,22 +48,23 @@ export default function IntelligencePanel({ component }: { component: ComponentO
 
   const isReject = component.status === 'reject'
   const isMonitor = component.status === 'monitor'
+  const isAbnormalInSpec = component.traditional_decision === 'PASS' && component.status !== 'safe'
 
   return (
-    <div className="bg-panel p-4 border-l border-line flex flex-col h-full overflow-y-auto">
+    <div className="bg-[#090F1E] p-4 rounded-xl border border-slate-800 flex flex-col h-full overflow-y-auto font-mono">
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-line mb-3">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-3">
         <h3 className="m-0 text-[11px] font-display tracking-widest uppercase text-cyan text-glow-cyan flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-cyan led" />
-          AI Diagnostic Intelligence
+          SIH26170 Intelligence Panel
         </h3>
         <span
           className={`font-mono text-[9.5px] uppercase font-bold px-2 py-0.5 rounded border ${
             isReject
-              ? 'bg-reject/20 text-reject border-reject/40'
+              ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
               : isMonitor
-              ? 'bg-monitor/20 text-monitor border-monitor/40'
-              : 'bg-safe/20 text-safe border-safe/40'
+              ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+              : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
           }`}
         >
           {component.status.toUpperCase()}
@@ -58,53 +72,121 @@ export default function IntelligencePanel({ component }: { component: ComponentO
       </div>
 
       {/* Target Component Identifier Card */}
-      <div className="bg-[#061224] p-3 rounded border border-line mb-3.5 reticle-corner">
+      <div className="bg-[#060D1A] p-3 rounded-lg border border-slate-800 mb-3">
         <div className="flex items-baseline justify-between">
-          <div className="font-mono text-lg font-bold text-cyan text-glow-cyan">
+          <div className="text-base font-bold text-white tracking-wide">
             {component.component_id}
           </div>
-          <div className="font-mono text-xs text-muted">
-            LOT: <span className="text-white font-bold">{component.lot_id}</span>
+          <div className="text-[10px] text-slate-400">
+            LOT: <span className="text-cyan font-bold">{component.lot_id}</span>
           </div>
         </div>
-        <div className="text-[11px] font-mono text-safe mt-0.5 font-semibold">
-          {component.subsystem_name} &bull; [{component.subsystem}]
+        <div className="text-[11px] text-emerald-400 mt-0.5 font-semibold flex items-center justify-between">
+          <span>{component.subsystem_name} &bull; [{component.subsystem}]</span>
+          <span className="text-[10px] text-slate-400 uppercase font-mono">{component.parameter || 'Leakage Current (µA)'}</span>
         </div>
       </div>
 
-      {/* Dynamic Telemetry Metrics Table */}
-      <div className="space-y-0.5 mb-3.5">
-        <Row k="Parameter" v="Leakage Current (µA)" />
-        <Row k="Current Reading (168h)" v={`${component.v168.toFixed(2)} µA`} highlight isAlert={isReject} />
-        <Row k="Datasheet Limit" v={`${component.limit_ua.toFixed(0)} µA`} />
-        <Row
-          k="Lot Anomaly (z-score)"
-          v={`${component.z168 > 0 ? '+' : ''}${component.z168.toFixed(2)}σ`}
-          highlight={Math.abs(component.z168) > 2.5}
-          isAlert={isReject}
-        />
-        <Row k="Drift Rate (slope)" v={`${component.slope.toFixed(4)} µA/hr`} />
-        <Row k="Percent Drift (pct_drift)" v={`${component.pct_drift.toFixed(1)}%`} />
-        <Row k="Isolation Forest Score" v={`${component.iso_score.toFixed(1)} / 100`} />
-        {component.ml_prob != null && (
-          <Row k="ML Defect Probability" v={`${(component.ml_prob * 100).toFixed(1)}%`} highlight isAlert={isReject} />
+      {/* Traditional vs AI Verdict Comparison Box */}
+      <div className="mb-3 p-2.5 rounded-lg bg-[#0A1428] border border-cyan/30 text-[10.5px] space-y-1">
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Traditional Spec Check:</span>
+          <b className={`px-1.5 py-0.2 rounded font-mono ${component.traditional_decision === 'PASS' ? 'text-emerald-400 bg-emerald-500/15' : 'text-rose-400 bg-rose-500/15'}`}>
+            {component.traditional_decision} (&le; {component.limit_ua} µA)
+          </b>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">AI Lot-Relative Verdict:</span>
+          <b className={`px-1.5 py-0.2 rounded font-mono ${isReject ? 'text-rose-400 bg-rose-500/15' : isMonitor ? 'text-amber-400 bg-amber-500/15' : 'text-emerald-400 bg-emerald-500/15'}`}>
+            {component.status.toUpperCase()} ({component.anomaly_category ? component.anomaly_category.replace(/_/g, ' ') : 'screened'})
+          </b>
+        </div>
+        {isAbnormalInSpec && (
+          <div className="pt-1 text-[10px] text-purple-300 font-bold border-t border-slate-800/80">
+            &#9888; LATENT DEFECT: Passes fixed datasheet limit, but abnormal relative to lot peers.
+          </div>
         )}
-        <Row k="Projected (+96h future)" v={`${component.predicted_future.toFixed(2)} µA`} />
-        <Row k="Composite Risk Score" v={`${component.risk_score} / 100`} highlight isAlert={isReject} />
       </div>
 
-      {/* AI Diagnostic Reasoning Box */}
-      <div className="mt-auto pt-3 border-t border-line">
-        <div className="text-[10px] font-mono uppercase text-muted tracking-wider mb-1.5 flex items-center gap-1.5">
-          <span className="text-cyan font-bold">&gt;&gt;</span> AI Analysis Rationale:
+      {/* Burn-In Measurements (0h, 24h, 96h, 168h) */}
+      <div className="mb-3 p-2.5 rounded-lg bg-[#060D1A] border border-slate-800">
+        <div className="text-[10px] text-slate-400 uppercase font-bold mb-1.5 flex items-center justify-between">
+          <span>HTOL BURN-IN READINGS</span>
+          <span className="text-cyan text-[9px]">METHOD 1005</span>
+        </div>
+        <div className="grid grid-cols-4 gap-1.5 text-center">
+          <div className="bg-[#091122] p-1.5 rounded border border-slate-800">
+            <div className="text-[9px] text-slate-400">0h</div>
+            <div className="text-white font-bold text-xs">{component.v0.toFixed(2)}</div>
+          </div>
+          <div className="bg-[#091122] p-1.5 rounded border border-slate-800">
+            <div className="text-[9px] text-slate-400">24h</div>
+            <div className="text-white font-bold text-xs">{component.v24.toFixed(2)}</div>
+          </div>
+          <div className="bg-[#091122] p-1.5 rounded border border-slate-800">
+            <div className="text-[9px] text-slate-400">96h</div>
+            <div className="text-white font-bold text-xs">{component.v96 != null ? component.v96.toFixed(2) : '--'}</div>
+          </div>
+          <div className="bg-[#091122] p-1.5 rounded border border-slate-800">
+            <div className="text-[9px] text-slate-400">168h</div>
+            <div className={`font-bold text-xs ${isReject ? 'text-rose-400' : 'text-cyan'}`}>{component.v168.toFixed(2)}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Dynamic Telemetry Metrics Table (Section 7 SIH26170 Requirement) */}
+      <div className="space-y-0.5 mb-3.5">
+        <Row k="Specification Limit" v={`${component.limit_ua.toFixed(0)} µA`} />
+        <Row
+          k="Lot Average (µ)"
+          v={component.lot_mean != null ? `${component.lot_mean.toFixed(2)} µA` : '--'}
+          sub={component.lot_pct_dev != null ? `${component.lot_pct_dev > 0 ? '+' : ''}${component.lot_pct_dev.toFixed(1)}% vs lot mean` : undefined}
+        />
+        <Row
+          k="Lot z-Score"
+          v={`${component.z168 > 0 ? '+' : ''}${component.z168.toFixed(2)}σ`}
+          highlight={Math.abs(component.z168) >= 2.0}
+          isAlert={Math.abs(component.z168) >= 3.0}
+        />
+        <Row k="Anomaly Score" v={`${component.iso_score.toFixed(1)} / 100`} />
+        <Row
+          k="Drift Rate (slope)"
+          v={`${component.slope.toFixed(4)} µA/hr`}
+          sub={component.drift_trend || 'NOMINAL'}
+        />
+        <Row
+          k="Predicted 168h (from 0h+24h)"
+          v={`${component.predicted168_from_early.toFixed(2)} µA`}
+          sub={component.prediction_error_168 != null ? `Error: ±${component.prediction_error_168.toFixed(2)} µA` : undefined}
+        />
+        <Row
+          k="Projected Future (264h)"
+          v={`${component.predicted_future.toFixed(2)} µA`}
+          highlight={component.predicted_future > component.limit_ua}
+          isAlert={component.predicted_future > component.limit_ua}
+          sub={component.margin_future != null ? `Safety Margin: ${component.margin_future.toFixed(2)} µA` : undefined}
+        />
+        <Row
+          k="Risk Score"
+          v={`${component.risk_score} / 100`}
+          highlight
+          isAlert={isReject}
+          sub={component.risk_score >= 75 ? 'QUARANTINE THRESHOLD EXCEEDED' : component.risk_score >= 40 ? 'ACTIVE MONITORING' : 'FLIGHT READY'}
+        />
+      </div>
+
+      {/* WHY THIS COMPONENT WAS FLAGGED (Section 7 SIH26170 Requirement) */}
+      <div className="mt-auto pt-3 border-t border-slate-800">
+        <div className="text-[10px] font-mono uppercase text-slate-400 tracking-wider mb-1.5 flex items-center gap-1.5">
+          <span className="text-cyan font-bold">&gt;&gt;</span> WHY THIS COMPONENT WAS FLAGGED:
         </div>
         <div
-          className={`p-2.5 rounded border text-[11px] font-mono leading-relaxed ${
+          className={`p-3 rounded-lg border text-[11px] font-mono leading-relaxed ${
             isReject
-              ? 'bg-reject/10 border-reject/40 text-rose-200'
+              ? 'bg-rose-500/10 border-rose-500/40 text-rose-200'
               : isMonitor
-              ? 'bg-monitor/10 border-monitor/40 text-amber-200'
-              : 'bg-safe/10 border-safe/40 text-emerald-200'
+              ? 'bg-amber-500/10 border-amber-500/40 text-amber-200'
+              : 'bg-emerald-500/10 border-emerald-500/40 text-emerald-200'
           }`}
         >
           {component.reason}

@@ -457,34 +457,33 @@ export function generateScreeningReportPdf(
   p2 += 'BT /F1 7.5 Tf 0.75 0.85 0.95 rg 30 792 Td (In-situ 24-Bit Sigma-Delta Picoammeter Parametric Measurements under 125 deg C Burn-In Stress) Tj ET\n'
   p2 += 'BT /F4 7.5 Tf 1 0.25 0.30 rg 30 776 Td (DISPOSITION PROTOCOL: IMMEDIATE BUS ISOLATION & SECONDARY REDUNDANT SWITCHOVER) Tj ET\n'
 
-  // Table 2: Quarantined Components (Up to 12 items)
+  // Table 2: Quarantined Components (Up to 10 items)
   p2 += 'q 0.12 0.05 0.08 rg 18 740 559 18 re f 0.45 0.15 0.20 RG 1 w 18 740 559 18 re S Q\n'
   p2 += 'BT /F2 6.5 Tf 1 1 1 rg 24 745 Td (PART ID) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 85 745 Td (SUBSYSTEM) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 135 745 Td (LOT ID) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 180 745 Td (0h) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 215 745 Td (24h) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 250 745 Td (96h) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 285 745 Td (168h) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 330 745 Td (DRIFT %) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 390 745 Td (z-SCORE) Tj ET\n'
+  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 85 745 Td (SUB) Tj ET\n'
+  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 125 745 Td (LOT ID) Tj ET\n'
+  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 190 745 Td (168h) Tj ET\n'
+  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 230 745 Td (LIMIT) Tj ET\n'
+  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 270 745 Td (LOT MEAN) Tj ET\n'
+  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 330 745 Td (z-SCORE) Tj ET\n'
+  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 385 745 Td (PRED 168h) Tj ET\n'
   p2 += 'BT /F2 6.5 Tf 1 1 1 rg 450 745 Td (RISK) Tj ET\n'
-  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 505 745 Td (DISPOSITION) Tj ET\n'
+  p2 += 'BT /F2 6.5 Tf 1 1 1 rg 495 745 Td (DISPOSITION) Tj ET\n'
 
   let p2RejY = 724
   for (const c of rejected.slice(0, 10)) {
+    const lotM = c.lot_mean != null ? `${c.lot_mean.toFixed(1)} uA` : '--'
     p2 += `q 0.04 0.08 0.15 rg 18 ${p2RejY - 3} 559 15 re f 0.15 0.15 0.25 RG 0.5 w 18 ${p2RejY - 3} 559 15 re S Q\n`
-    p2 += `BT /F4 6.5 Tf 1 1 1 rg 24 ${p2RejY} Td (${esc(c.component_id)}) Tj ET\n`
+    p2 += `BT /F4 6.5 Tf 1 1 1 rg 24 ${p2RejY} Td (${esc(c.component_id.slice(0, 14))}) Tj ET\n`
     p2 += `BT /F2 6.5 Tf 0 0.94 1 rg 85 ${p2RejY} Td ([${esc(c.subsystem)}]) Tj ET\n`
-    p2 += `BT /F1 6.5 Tf 0.7 0.8 0.9 rg 135 ${p2RejY} Td (${esc(c.lot_id)}) Tj ET\n`
-    p2 += `BT /F1 6.5 Tf 0.8 0.8 0.8 rg 180 ${p2RejY} Td (${c.v0.toFixed(1)}) Tj ET\n`
-    p2 += `BT /F1 6.5 Tf 0.8 0.8 0.8 rg 215 ${p2RejY} Td (${c.v24.toFixed(1)}) Tj ET\n`
-    p2 += `BT /F1 6.5 Tf 0.8 0.8 0.8 rg 250 ${p2RejY} Td (${c.v96 != null ? c.v96.toFixed(1) : '-'}) Tj ET\n`
-    p2 += `BT /F4 6.5 Tf 1 0.20 0.30 rg 285 ${p2RejY} Td (${c.v168.toFixed(1)}) Tj ET\n`
-    p2 += `BT /F4 6.5 Tf 1 0.20 0.30 rg 330 ${p2RejY} Td (${c.pct_drift > 0 ? '+' : ''}${c.pct_drift.toFixed(1)}%) Tj ET\n`
-    p2 += `BT /F4 6.5 Tf 1 0.20 0.30 rg 390 ${p2RejY} Td (${c.z168 > 0 ? '+' : ''}${c.z168.toFixed(2)}) Tj ET\n`
+    p2 += `BT /F1 6.5 Tf 0.7 0.8 0.9 rg 125 ${p2RejY} Td (${esc(c.lot_id.slice(0, 14))}) Tj ET\n`
+    p2 += `BT /F4 6.5 Tf 1 0.20 0.30 rg 190 ${p2RejY} Td (${c.v168.toFixed(1)} uA) Tj ET\n`
+    p2 += `BT /F1 6.5 Tf 0.8 0.8 0.8 rg 230 ${p2RejY} Td (${c.limit_ua.toFixed(0)} uA) Tj ET\n`
+    p2 += `BT /F1 6.5 Tf 0.7 0.8 0.9 rg 270 ${p2RejY} Td (${lotM}) Tj ET\n`
+    p2 += `BT /F4 6.5 Tf 1 0.20 0.30 rg 330 ${p2RejY} Td (${c.z168 > 0 ? '+' : ''}${c.z168.toFixed(2)}s) Tj ET\n`
+    p2 += `BT /F4 6.5 Tf 0 0.94 1 rg 385 ${p2RejY} Td (${c.predicted168_from_early.toFixed(1)} uA) Tj ET\n`
     p2 += `BT /F4 6.5 Tf 1 0.20 0.30 rg 450 ${p2RejY} Td (${Math.round(c.risk_score)}) Tj ET\n`
-    p2 += `BT /F2 6 Tf 1 0.20 0.30 rg 505 ${p2RejY} Td (QUARANTINE) Tj ET\n`
+    p2 += `BT /F2 6 Tf 1 0.20 0.30 rg 495 ${p2RejY} Td (QUARANTINE) Tj ET\n`
     p2RejY -= 15
   }
 

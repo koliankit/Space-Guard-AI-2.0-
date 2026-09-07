@@ -366,35 +366,52 @@ export default function MultiScreenWall({
                         <th className="py-1.5 px-2.5">Part ID</th>
                         <th className="py-1.5 px-2">Sub</th>
                         <th className="py-1.5 px-2">168h</th>
+                        <th className="py-1.5 px-2">Lot &mu;</th>
                         <th className="py-1.5 px-2">z-Score</th>
+                        <th className="py-1.5 px-2">Spec vs AI</th>
                         <th className="py-1.5 px-2">Risk</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
                       {rejected.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="text-center py-6 text-slate-400 text-xs">
+                          <td colSpan={7} className="text-center py-6 text-slate-400 text-xs">
                             No quarantined defects. All nominal.
                           </td>
                         </tr>
                       )}
-                      {rejected.map((c) => (
-                        <tr
-                          key={c.component_id}
-                          onClick={() => onSelectComponent(c.component_id)}
-                          className={`cursor-pointer transition-colors ${
-                            selected?.component_id === c.component_id
-                              ? 'bg-rose-500/20 text-white font-bold'
-                              : 'hover:bg-slate-800/40 text-slate-200'
-                          }`}
-                        >
-                          <td className="py-1.5 px-2.5 font-bold text-white">{c.component_id}</td>
-                          <td className="py-1.5 px-2 text-cyan font-bold">[{c.subsystem}]</td>
-                          <td className="py-1.5 px-2 text-rose-400 font-bold">{c.v168.toFixed(1)}&mu;A</td>
-                          <td className="py-1.5 px-2 text-rose-400 font-bold">{c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;</td>
-                          <td className="py-1.5 px-2 text-rose-400 font-bold">{c.risk_score}</td>
-                        </tr>
-                      ))}
+                      {rejected.map((c) => {
+                        const isAbnormalInSpec = c.traditional_decision === 'PASS'
+                        return (
+                          <tr
+                            key={c.component_id}
+                            onClick={() => onSelectComponent(c.component_id)}
+                            className={`cursor-pointer transition-colors ${
+                              selected?.component_id === c.component_id
+                                ? 'bg-rose-500/20 text-white font-bold'
+                                : 'hover:bg-slate-800/40 text-slate-200'
+                            }`}
+                          >
+                            <td className="py-1.5 px-2.5 font-bold text-white">{c.component_id}</td>
+                            <td className="py-1.5 px-2 text-cyan font-bold">[{c.subsystem}]</td>
+                            <td className="py-1.5 px-2 text-rose-400 font-bold">{c.v168.toFixed(1)}&mu;A</td>
+                            <td className="py-1.5 px-2 text-slate-300">{c.lot_mean != null ? `${c.lot_mean.toFixed(1)}` : '--'}</td>
+                            <td className="py-1.5 px-2 text-rose-400 font-bold">{c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;</td>
+                            <td className="py-1.5 px-2 whitespace-nowrap">
+                              {isAbnormalInSpec ? (
+                                <span className="px-1.5 py-0.5 rounded text-[8.5px] bg-purple-500/20 text-purple-300 border border-purple-400/40 font-bold">
+                                  PASS Spec &bull; REJECT AI
+                                </span>
+                              ) : (
+                                <span className="px-1.5 py-0.5 rounded text-[8.5px] bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold">
+                                  FAIL SPEC
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-1.5 px-2 text-rose-400 font-bold">{c.risk_score}</td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -406,8 +423,7 @@ export default function MultiScreenWall({
                       <span>&#9888;</span> QUARANTINE PROTOCOL ENGAGED ({rejected.length} DEFECTS)
                     </div>
                     <div className="text-slate-300">
-                      Root cause: Non-linear oxide trap breakdown identified in lot{' '}
-                      <b className="text-white">{rejected[0].lot_id}</b>. Click any row above to inspect in 3D.
+                      Root cause: Latent oxide degradation &amp; lot-relative drift anomaly identified. Components remain within fixed datasheet limits (&le;50&mu;A) but drift abnormal relative to lot peers. Click any row above to inspect in 3D.
                     </div>
                   </div>
                 )}

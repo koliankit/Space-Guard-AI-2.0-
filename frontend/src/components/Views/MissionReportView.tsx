@@ -182,17 +182,19 @@ export default function MissionReportView({
                   <th className="py-2.5 px-3">Lot ID</th>
                   <th className="py-2.5 px-3">0h Initial</th>
                   <th className="py-2.5 px-3">168h Burn-In</th>
+                  <th className="py-2.5 px-3">Lot Mean</th>
                   <th className="py-2.5 px-3">Drift &Delta;%</th>
                   <th className="py-2.5 px-3">Datasheet Limit</th>
+                  <th className="py-2.5 px-3">Early Pred 168h</th>
                   <th className="py-2.5 px-3">Lot z-Score</th>
                   <th className="py-2.5 px-3">Risk Score</th>
-                  <th className="py-2.5 px-3">Disposition</th>
+                  <th className="py-2.5 px-3">Category / Disposition</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line/40">
                 {rejected.length === 0 && (
                   <tr>
-                    <td colSpan={10} className="py-6 text-center text-slate-400">
+                    <td colSpan={12} className="py-6 text-center text-slate-400">
                       No components quarantined. Spacecraft hardware is 100% nominal.
                     </td>
                   </tr>
@@ -204,15 +206,21 @@ export default function MissionReportView({
                     <td className="py-2 px-3 text-slate-400">{c.lot_id}</td>
                     <td className="py-2 px-3 text-slate-300">{c.v0.toFixed(2)} &#956;A</td>
                     <td className="py-2 px-3 text-reject font-bold">{c.v168.toFixed(2)} &#956;A</td>
+                    <td className="py-2 px-3 text-cyan">{c.lot_mean != null ? `${c.lot_mean.toFixed(2)} µA` : '-'}</td>
                     <td className="py-2 px-3 text-reject font-bold">
                       {c.pct_drift > 0 ? '+' : ''}{c.pct_drift.toFixed(1)}%
                     </td>
                     <td className="py-2 px-3 text-slate-400">{c.limit_ua.toFixed(0)} &#956;A</td>
+                    <td className="py-2 px-3 text-amber-300 font-bold">{c.predicted168_from_early != null ? `${c.predicted168_from_early.toFixed(2)} µA` : '-'}</td>
                     <td className="py-2 px-3 text-reject font-bold">
                       {c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;
                     </td>
                     <td className="py-2 px-3 text-reject font-bold">{c.risk_score} / 100</td>
-                    <td className="py-2 px-3 text-reject font-bold uppercase">QUARANTINE / RCA</td>
+                    <td className="py-2 px-3">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-reject/20 text-reject border border-reject/40 font-bold block uppercase whitespace-nowrap">
+                        {c.anomaly_category ? c.anomaly_category.replace(/_/g, ' ') : 'QUARANTINE / RCA'}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>

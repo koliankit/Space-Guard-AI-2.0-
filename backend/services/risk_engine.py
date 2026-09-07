@@ -1,7 +1,8 @@
 """
-Combines the robust z-scores, isolation-forest score, and (if available)
-the supervised defect probability into a single 0-100 risk score and a
-SAFE / MONITOR / REJECT screening decision, plus a human-readable reason.
+SIH26170 Risk Engine & Explainable AI Module:
+Combines fixed-limit status, lot-relative z-scores, percentage deviation,
+early drift rate (0h+24h), projected future margin, and unsupervised anomaly
+score into an explainable 0-100 risk score and flight screening verdict.
 """
 import numpy as np
 import pandas as pd
@@ -12,38 +13,102 @@ Z_MONITOR = 2.0
 
 def score_and_decide(df: pd.DataFrame, has_ml: bool) -> pd.DataFrame:
     df = df.copy()
-    z_max = np.maximum(df["z168"].abs(), df["z_slope"].abs())
-    proximity = np.clip(df["predicted_future"] / df["limit"], 0, 1.3) / 1.3
 
-    if has_ml and "ml_prob" in df.columns:
-        risk = (z_max / 4.0) * 45 + proximity * 25 + df["ml_prob"] * 30
+    # Feature factors
+    z_max = np.maximum(df["z168"].abs(), df["z_slope"].abs())
+    s_limit = np.clip(df["v168"] / df["limit"], 0.0, 1.5)
+    s_z = np.clip(z_max / 4.0, 0.0, 1.0)
+    s_future = np.clip(df["predicted_future"] / df["limit"], 0.0, 1.5)
+    s_iso = np.clip(df.get("iso_score", 0.0) / 100.0, 0.0, 1.0)
+
+    # Multi-factor composite risk formula (0-100)
+    if has_ml and "ml_prob" in df.columns and df["ml_prob"].notna().any():
+        risk = (
+            s_z * 35.0
+            + s_future * 25.0
+            + s_iso * 15.0
+            + s_limit * 10.0
+            + df["ml_prob"].fillna(0.0) * 15.0
+        ) * 100.0 / 100.0
     else:
-        risk = (z_max / 4.0) * 68 + proximity * 32
+        risk = (
+            s_z * 40.0
+            + s_future * 30.0
+            + s_iso * 18.0
+            + s_limit * 12.0
+        )
+
+    # If exceeding static limit, risk is minimum 90
+    static_fail = df["v168"] > df["limit"]
+    risk = np.where(static_fail, np.maximum(92.0, 90.0 + (df["v168"] - df["limit"]) / df["limit"] * 20.0), risk)
     df["risk_score"] = risk.clip(0, 100).round().astype(int)
 
-    df["traditional_decision"] = np.where(df["v168"] > df["limit"], "FAIL", "PASS")
+    df["traditional_decision"] = np.where(static_fail, "FAIL", "PASS")
 
-    statuses, reasons = [], []
+    statuses = []
+    anomaly_categories = []
+    reasons = []
+
     for i, row in df.iterrows():
+        v168 = row["v168"]
+        limit = row["limit"]
+        lot_mean = row.get("lot_mean", v168)
+        z168 = row["z168"]
+        slope = row["slope"]
+        pred_future = row["predicted_future"]
         zm = z_max.iloc[i]
-        if row["v168"] > row["limit"]:
-            statuses.append("reject")
-            reasons.append(
-                f"168h reading ({row['v168']:.2f}\u00b5A) exceeds the datasheet limit ({row['limit']:.0f}\u00b5A)."
+        r_score = df["risk_score"].iloc[i]
+
+        # 5 Anomaly Categories:
+        if v168 > limit:
+            cat = "outside_spec"
+            status = "reject"
+            reason = (
+                f"Static datasheet limit violation: 168h leakage ({v168:.2f} µA) exceeds specification threshold "
+                f"({limit:.0f} µA) by +{(v168 - limit):.2f} µA. Traditional: FAIL. Immediate quarantine required."
             )
-        elif zm > Z_REJECT or row["predicted_future"] > row["limit"]:
-            statuses.append("reject")
-            reasons.append(
-                f"Within the datasheet limit but {abs(row['z168']):.1f}\u03c3 from its lot's baseline, and its "
-                f"drift rate is projected to reach {row['predicted_future']:.1f}\u00b5A \u2014 a latent defect a "
-                f"fixed-limit check alone would miss."
+        elif pred_future > limit:
+            cat = "predicted_exceedance"
+            status = "reject"
+            reason = (
+                f"Within datasheet limit ({v168:.2f} µA < {limit:.0f} µA) but {abs(z168):.1f}σ above lot average "
+                f"({lot_mean:.2f} µA). Measured drift rate (+{slope:.4f} µA/hr) projects 264h leakage to {pred_future:.2f} µA, "
+                f"exceeding the safety threshold. Latent dielectric breakdown detected."
             )
-        elif zm >= Z_MONITOR or df["risk_score"].iloc[i] >= 40:
-            statuses.append("monitor")
-            reasons.append(f"{abs(row['z168']):.1f}\u03c3 from its lot's baseline \u2014 trending abnormal, not yet over threshold.")
+        elif zm >= Z_REJECT or r_score >= 75:
+            cat = "abnormal_within_spec"
+            status = "reject"
+            reason = (
+                f"PASS by specification ({v168:.2f} µA < {limit:.0f} µA) but ABNORMAL RELATIVE TO LOT: component is "
+                f"{abs(z168):.1f}σ from lot mean ({lot_mean:.2f} µA). Peer deviation indicates abnormal degradation rate."
+            )
+        elif v168 > 0.80 * limit or pred_future > 0.90 * limit:
+            cat = "approaching_limit"
+            status = "monitor"
+            reason = (
+                f"Approaching specification limit: reading ({v168:.2f} µA) is within 20% of datasheet limit ({limit:.0f} µA). "
+                f"{abs(z168):.1f}σ from lot baseline ({lot_mean:.2f} µA). Scheduled for active in-flight telemetry monitoring."
+            )
+        elif zm >= Z_MONITOR or r_score >= 40:
+            cat = "abnormal_within_spec"
+            status = "monitor"
+            reason = (
+                f"PASS by specification but trending abnormal: {abs(z168):.1f}σ deviation from lot mean ({lot_mean:.2f} µA). "
+                f"Drift slope (+{slope:.4f} µA/hr) exceeds normal lot baseline; flagged for monitoring."
+            )
         else:
-            statuses.append("safe")
-            reasons.append(f"Within {abs(row['z168']):.1f}\u03c3 of its lot's baseline; drift rate normal.")
+            cat = "normal_within_spec"
+            status = "safe"
+            reason = (
+                f"Normal and within specification: reading ({v168:.2f} µA) is within nominal lot distribution "
+                f"({abs(z168):.1f}σ from lot mean {lot_mean:.2f} µA). Drift rate is stable; component flight-ready."
+            )
+
+        statuses.append(status)
+        anomaly_categories.append(cat)
+        reasons.append(reason)
+
     df["status"] = statuses
+    df["anomaly_category"] = anomaly_categories
     df["reason"] = reasons
     return df

@@ -47,7 +47,13 @@ export async function uploadFile(file: File, columnMapping?: Record<string, stri
       backendReachable = false
     }
   }
-  return offlineISRO.initDemo()
+  try {
+    const text = await file.text()
+    return offlineISRO.loadCSVText(text)
+  } catch (err) {
+    console.warn('Failed to parse CSV locally, falling back to demo batch:', err)
+    return offlineISRO.initDemo()
+  }
 }
 
 export async function createDemoBatch(missionId?: string): Promise<UploadResult> {
