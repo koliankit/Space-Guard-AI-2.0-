@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import * as THREE from 'three'
-import type { SubsystemStatus } from '../../types'
+import type { ComponentOut, SubsystemStatus } from '../../types'
 
 import SolarWings from './SolarWings'
 import AntennaArray from './AntennaArray'
@@ -324,7 +324,6 @@ function EarthBackground() {
   )
 }
 
-import type { ComponentOut, SubsystemStatus } from '../../types'
 
 export default function SatelliteScene({
   subsystems,
