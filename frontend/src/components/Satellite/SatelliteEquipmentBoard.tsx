@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { ComponentOut, SubsystemStatus } from '../../types'
+import ComponentDeepDiveAnalysis from './ComponentDeepDiveAnalysis'
 
 interface SatelliteEquipmentBoardProps {
   subsystems: SubsystemStatus[]
@@ -49,6 +50,16 @@ export default function SatelliteEquipmentBoard({
     if (!focusKey) return components.slice(0, 48)
     return components.filter((c) => c.subsystem === focusKey)
   }, [components, focusKey])
+
+  // Active component for Cause, Reason, Satellite Impact & Improvement Deep Dive
+  const activeComponent = useMemo(() => {
+    if (selectedComponent) return selectedComponent
+    const rej = displayedComponents.find((c) => c.status === 'reject')
+    if (rej) return rej
+    const mon = displayedComponents.find((c) => c.status === 'monitor')
+    if (mon) return mon
+    return displayedComponents[0] || null
+  }, [selectedComponent, displayedComponents])
 
   // Lifecycle buckets
   const operationalList = useMemo(
@@ -289,6 +300,19 @@ export default function SatelliteEquipmentBoard({
               })}
             </div>
           )}
+
+          {/* Diagnostic Deep-Dive (Cause, Reason, Satellite Impact & Improvement) */}
+          {activeComponent && (
+            <div className="mt-4 pt-3 border-t border-slate-800">
+              <ComponentDeepDiveAnalysis
+                component={activeComponent}
+                onIsolateBus={handleToggleIsolate}
+                onFailover={handleToggleFailover}
+                isIsolated={Boolean(isolatedBuses[activeComponent.component_id])}
+                isFailover={Boolean(failovers[activeComponent.component_id])}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -475,6 +499,19 @@ export default function SatelliteEquipmentBoard({
               )}
             </div>
           </div>
+
+          {/* Diagnostic Deep-Dive in Lifecycle View */}
+          {activeComponent && (
+            <div className="mt-4 pt-3 border-t border-slate-800 col-span-1 lg:col-span-3">
+              <ComponentDeepDiveAnalysis
+                component={activeComponent}
+                onIsolateBus={handleToggleIsolate}
+                onFailover={handleToggleFailover}
+                isIsolated={Boolean(isolatedBuses[activeComponent.component_id])}
+                isFailover={Boolean(failovers[activeComponent.component_id])}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
