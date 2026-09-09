@@ -127,19 +127,7 @@ export default function Header({
             </div>
           )}
 
-          {onOpenIngestModal && (
-            <button
-              type="button"
-              onClick={() => {
-                sounds.playPing()
-                onOpenIngestModal()
-              }}
-              className="text-[11.5px] font-medium px-3 py-1.5 rounded-md border border-sky-500/50 bg-sky-500/15 text-sky-300 hover:bg-sky-500 hover:text-white transition-all flex items-center gap-1.5"
-              title="Upload CSV Telemetry or Select Flight Batch"
-            >
-              <span>📁</span> Ingest CSV Data
-            </button>
-          )}
+
 
           {onOpenPitchModal && (
             <button
