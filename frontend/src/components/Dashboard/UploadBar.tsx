@@ -15,6 +15,7 @@ export default function UploadBar({
   onReportExcel,
   activeMissionId = 'GAGANYAAN',
   onSelectMission,
+  onOpenIngestModal,
 }: {
   metaText: string
   canRun: boolean
@@ -28,6 +29,7 @@ export default function UploadBar({
   onReportExcel?: () => void
   activeMissionId?: string
   onSelectMission?: (missionId: string) => void
+  onOpenIngestModal?: () => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
@@ -46,7 +48,13 @@ export default function UploadBar({
                 ? 'border-cyan bg-cyan/15 text-white shadow-neon-cyan'
                 : 'border-slate-700 bg-[#070D1A] text-slate-400 hover:border-cyan hover:text-white'
             }`}
-            onClick={() => inputRef.current?.click()}
+            onClick={() => {
+              if (onOpenIngestModal) {
+                onOpenIngestModal()
+              } else {
+                inputRef.current?.click()
+              }
+            }}
             onDragOver={(e) => {
               e.preventDefault()
               setDrag(true)

@@ -5,7 +5,7 @@ import HealthBar from './components/Dashboard/HealthBar'
 import MappingModal from './components/Dashboard/MappingModal'
 import PipelineOverlay from './components/Dashboard/PipelineOverlay'
 import AuditLog, { type AuditEntry } from './components/Dashboard/AuditLog'
-import CriticalAlertModal from './components/Alerts/CriticalAlertModal'
+import DataIngestModal from './components/Dashboard/DataIngestModal'
 import ComponentMonitor from './components/ComponentPanel/ComponentMonitor'
 import IntelligencePanel from './components/ComponentPanel/IntelligencePanel'
 import ComparePanel from './components/Charts/ComparePanel'
@@ -35,6 +35,7 @@ export default function App() {
 
   const [activeMissionId, setActiveMissionId] = useState<string>('GAGANYAAN')
   const [pitchModalOpen, setPitchModalOpen] = useState(false)
+  const [ingestModalOpen, setIngestModalOpen] = useState(true)
 
   const activeMission = ISRO_MISSIONS.find((m) => m.id === activeMissionId) || ISRO_MISSIONS[0]
 
@@ -123,7 +124,7 @@ export default function App() {
     await handleDemo(mId)
   }
 
-  async function handleDemo(missionIdOverride?: string) {
+  async function handleDemo(missionIdOverride?: string, autoScreen = false) {
     const mId = missionIdOverride || activeMissionId
     const m = ISRO_MISSIONS.find((x) => x.id === mId) || ISRO_MISSIONS[0]
     try {
@@ -132,16 +133,18 @@ export default function App() {
       setUploadMeta(result)
       resetForNewBatch(result, `${m.name} [${m.code}] flight batch`)
       log(`Acquired ${result.rows} space-grade components across ${result.lots} qualification lots (${m.targetOrbit}).`, 'ok')
-      setTimeout(() => runScreening(result.batch_id), 600)
+      if (autoScreen) {
+        setTimeout(() => runScreening(result.batch_id), 600)
+      }
     } catch (e: any) {
       log('Could not load ISRO flight telemetry: ' + e.message, 'flag')
       alert('Could not load ISRO flight telemetry: ' + e.message)
     }
   }
 
-  // Auto-initialize spaceflight telemetry on startup so dashboard is never empty
+  // On initial website load, open the Data Ingestion / CSV Upload window
   useEffect(() => {
-    handleDemo()
+    setIngestModalOpen(true)
   }, [])
 
   // Keyboard shortcut listener for ISRO Briefing Deck (Press 'P')
@@ -280,6 +283,7 @@ export default function App() {
         totalComponents={allComponents.length > 0 ? allComponents.length : flaggedList.length}
         rejectCount={mission?.reject ?? 0}
         onOpenPitchModal={() => setPitchModalOpen(true)}
+        onOpenIngestModal={() => setIngestModalOpen(true)}
         activeMissionName={activeMission.name}
       />
       <UploadBar
@@ -295,13 +299,18 @@ export default function App() {
         onReportExcel={handleReportExcel}
         activeMissionId={activeMissionId}
         onSelectMission={handleSelectMission}
+        onOpenIngestModal={() => setIngestModalOpen(true)}
       />
-      <HealthBar
-        health={mission?.mission_health ?? null}
-        safe={mission?.safe ?? null}
-        monitor={mission?.monitor ?? null}
-        reject={mission?.reject ?? null}
-      />
+
+      {/* Horizontal Health Metrics Bar — only appears after data has been loaded and screened */}
+      {analysisRun && mission && (
+        <HealthBar
+          health={mission?.mission_health ?? null}
+          safe={mission?.safe ?? null}
+          monitor={mission?.monitor ?? null}
+          reject={mission?.reject ?? null}
+        />
+      )}
 
       {/* Non-Blocking Critical Anomaly Alert Banner (Appears first before full modal) */}
       {quarantineToast && !alertComponent && (
@@ -442,6 +451,20 @@ export default function App() {
       )}
 
 
+
+      <DataIngestModal
+        isOpen={ingestModalOpen}
+        onClose={() => setIngestModalOpen(false)}
+        onUploadFile={(file) => {
+          setIngestModalOpen(false)
+          handleFile(file)
+        }}
+        onSelectMission={(mId) => {
+          setIngestModalOpen(false)
+          handleSelectMission(mId)
+        }}
+        activeMissionId={activeMissionId}
+      />
 
       <ISROPitchModal
         isOpen={pitchModalOpen}

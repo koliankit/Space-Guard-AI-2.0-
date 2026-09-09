@@ -10,6 +10,7 @@ interface HeaderProps {
   totalComponents?: number
   rejectCount?: number
   onOpenPitchModal?: () => void
+  onOpenIngestModal?: () => void
   activeMissionName?: string
 }
 
@@ -20,6 +21,7 @@ export default function Header({
   totalComponents = 0,
   rejectCount = 0,
   onOpenPitchModal,
+  onOpenIngestModal,
   activeMissionName = 'Gaganyaan H1 Crew Module',
 }: HeaderProps) {
   const [istTime, setIstTime] = useState('')
@@ -123,6 +125,20 @@ export default function Header({
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 led" />
               <span>{rejectCount} QUARANTINED</span>
             </div>
+          )}
+
+          {onOpenIngestModal && (
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playPing()
+                onOpenIngestModal()
+              }}
+              className="font-display text-[11px] uppercase tracking-wider px-2.5 py-1 rounded border border-cyan/60 bg-cyan/15 text-cyan hover:bg-cyan hover:text-black transition-all flex items-center gap-1.5 font-bold shadow-neon-cyan"
+              title="Upload CSV Telemetry or Select Flight Batch"
+            >
+              <span>📁</span> UPLOAD CSV / INGEST
+            </button>
           )}
 
           {onOpenPitchModal && (
