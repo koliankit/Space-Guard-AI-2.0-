@@ -134,51 +134,51 @@ export default function ComponentDeepDiveAnalysis({
   const risk = Math.round(component.risk_score || (isReject ? 84 : isMonitor ? 48 : 12))
 
   return (
-    <div className="bg-[#050B17] border border-cyan/40 rounded-xl p-4 shadow-2xl font-mono text-xs select-none animate-fade-in flex flex-col gap-4">
+    <div className="bg-[#0B1120] border border-slate-700/80 rounded-xl p-5 font-sans text-xs select-none animate-fade-in flex flex-col gap-4 shadow-lg">
       {/* --- Section Header: Component Identity & Status Badges --- */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800 bg-[#081226]/80 -m-4 p-4 mb-0 rounded-t-xl">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-800 bg-[#0F172A] -m-5 p-5 mb-0 rounded-t-xl">
+        <div className="flex items-center gap-3.5">
           <span
-            className={`w-3 h-3 rounded-full ${
-              isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400 led' : 'bg-emerald-400 led'
+            className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${
+              isReject ? 'bg-rose-500' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
             }`}
           />
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-display font-black text-sm text-white tracking-wider">
+            <div className="flex items-center gap-2.5">
+              <span className="font-mono font-bold text-base text-white tracking-tight">
                 {component.component_id}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-cyan/20 text-cyan border border-cyan/40 font-bold">
+              <span className="text-[11px] px-2.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-medium">
                 [{component.subsystem}] {component.subsystem_name}
               </span>
             </div>
-            <div className="text-[10px] text-slate-400 mt-0.5">
-              QUALIFICATION LOT: <b className="text-white">{component.lot_id}</b> &bull; PARAMETER:{' '}
-              <span className="text-emerald-400 font-semibold">{component.parameter || 'Leakage Current (µA)'}</span>
+            <div className="text-[11px] text-slate-400 mt-1">
+              Qualification Lot: <span className="font-mono text-slate-200 font-semibold">{component.lot_id}</span> &bull; Telemetry Parameter:{' '}
+              <span className="text-slate-300 font-medium">{component.parameter || 'Leakage Current (µA)'}</span>
             </div>
           </div>
         </div>
 
-        {/* Status Badges */}
-        <div className="flex items-center gap-2">
+        {/* Status Badges & Screening Risk */}
+        <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="text-[9px] text-slate-400 uppercase">SCREENING RISK</div>
+            <div className="text-[10px] text-slate-400 uppercase font-medium tracking-wider">AI Screening Risk</div>
             <div
-              className={`font-mono text-sm font-black ${
-                risk > 60 ? 'text-rose-400 text-glow-red' : risk > 35 ? 'text-amber-400' : 'text-emerald-400'
+              className={`font-mono text-xl font-extrabold ${
+                risk > 60 ? 'text-rose-400' : risk > 35 ? 'text-amber-400' : 'text-emerald-400'
               }`}
             >
-              {risk} / 100
+              {risk} <span className="text-xs font-normal text-slate-500">/ 100</span>
             </div>
           </div>
 
           <span
-            className={`text-xs font-black uppercase px-2.5 py-1 rounded border tracking-wider ${
+            className={`text-xs font-bold uppercase px-3 py-1.5 rounded-md border tracking-wide ${
               isReject
-                ? 'bg-rose-500/20 text-rose-400 border-rose-500/60 shadow-alert-glow'
+                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                 : isMonitor
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/60'
-                : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
             }`}
           >
             {component.status.toUpperCase()}
@@ -186,98 +186,102 @@ export default function ComponentDeepDiveAnalysis({
         </div>
       </div>
 
-      {/* --- Title Bar: Diagnostic Deep-Dive Overview --- */}
-      <div className="flex items-center justify-between text-[11px] text-slate-300 bg-[#09152E] px-3 py-1.5 rounded border border-slate-800">
-        <span className="text-cyan font-bold tracking-wider uppercase flex items-center gap-2">
-          <span>&#9881;</span> ENGINEERING ROOT CAUSE, SATELLITE IMPACT &amp; MITIGATION ANALYSIS
+      {/* --- Section Subtitle Bar --- */}
+      <div className="flex items-center justify-between text-xs text-slate-300 bg-[#070D1A] px-3.5 py-2 rounded-lg border border-slate-800">
+        <span className="text-slate-200 font-semibold tracking-wide flex items-center gap-2">
+          <span>📋</span> Engineering Root Cause, Telemetry Justification &amp; Corrective Disposition
         </span>
-        <span className="text-slate-400 text-[10px]">
+        <span className="text-slate-400 text-[11px] font-mono">
           MIL-STD-883 HTOL 168H &bull; RELIABILITY ASSURANCE
         </span>
       </div>
 
-      {/* --- 4 Core Information Grid Cards --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {/* ================= CARD 1: ROOT CAUSE ================= */}
-        <div className="p-3.5 rounded-lg bg-[#081224] border border-rose-500/30 flex flex-col justify-between gap-2 shadow-sm">
+      {/* --- 4 Distinct Information Sections --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* ================= SECTION 1: PHYSICAL ROOT CAUSE ================= */}
+        <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col justify-between gap-3">
           <div>
-            <div className="flex items-center justify-between pb-1.5 border-b border-rose-500/20 mb-2">
-              <div className="flex items-center gap-2 text-rose-400 font-bold text-xs">
-                <span className="w-2 h-2 rounded-full bg-rose-500 led" />
-                <span>1. ROOT CAUSE OF ANOMALY / REJECTION</span>
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
+              <div className="flex items-center gap-2 text-slate-100 font-semibold text-xs">
+                <span className="w-2 h-2 rounded-full bg-rose-500" />
+                <span>1. Physical Failure Root Cause</span>
               </div>
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 uppercase">
-                SILICON PHYSICS
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 uppercase font-medium">
+                Physics of Failure
               </span>
             </div>
 
-            <p className="text-[11px] text-slate-200 leading-relaxed mb-2 font-medium">
+            <p className="text-xs text-slate-300 leading-relaxed mb-3">
               {domain.cause}
             </p>
 
-            <div className="text-[10px] text-slate-400 bg-black/40 p-2 rounded border border-slate-800/80 leading-relaxed">
-              <b className="text-slate-300 block mb-0.5">Physical Failure Mechanism:</b>
+            <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed">
+              <span className="text-slate-400 font-semibold block mb-1">Underlying Degradation Mechanism:</span>
               {domain.mechanism}
             </div>
           </div>
 
-          <div className="text-[9.5px] text-rose-300/80 pt-1 border-t border-slate-800/60 flex items-center justify-between">
-            <span>Thermal Activation Energy: <b>Ea = 0.72 eV</b></span>
-            <span>Junction Temp: <b>Tj = 125°C</b></span>
+          <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800/80 flex items-center justify-between font-mono">
+            <span>Thermal Activation: <b className="text-slate-200">Ea = 0.72 eV</b></span>
+            <span>Junction Temp: <b className="text-slate-200">Tj = 125°C</b></span>
           </div>
         </div>
 
-        {/* ================= CARD 2: REASON & ML JUSTIFICATION ================= */}
-        <div className="p-3.5 rounded-lg bg-[#081224] border border-cyan/30 flex flex-col justify-between gap-2 shadow-sm">
+        {/* ================= SECTION 2: AI METRICS & DATA JUSTIFICATION ================= */}
+        <div className="p-4 rounded-xl bg-[#0A1020] border border-slate-700/80 flex flex-col justify-between gap-3">
           <div>
-            <div className="flex items-center justify-between pb-1.5 border-b border-cyan/20 mb-2">
-              <div className="flex items-center gap-2 text-cyan font-bold text-xs">
-                <span className="w-2 h-2 rounded-full bg-cyan led" />
-                <span>2. REASON &amp; AI SCREENING JUSTIFICATION</span>
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
+              <div className="flex items-center gap-2 text-slate-100 font-semibold text-xs">
+                <span className="w-2 h-2 rounded-full bg-sky-400" />
+                <span>2. AI Screening &amp; Telemetry Data</span>
               </div>
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan/15 text-cyan border border-cyan/30 uppercase">
-                LOT-RELATIVE
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 uppercase font-medium">
+                Cohort Analytics
               </span>
             </div>
 
-            {/* Metrics Breakdown Grid */}
-            <div className="grid grid-cols-2 gap-1.5 mb-2.5 text-[10px]">
-              <div className="bg-[#050D1D] p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[9px]">Lot-Relative z-Score:</span>
-                <b className={`text-xs ${Math.abs(parseFloat(zScore)) > 2.5 ? 'text-rose-400' : 'text-amber-400'}`}>
+            {/* Metrics Breakdown Grid with LARGE READABLE NUMBERS */}
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800">
+                <span className="text-slate-400 block text-[10px] uppercase font-medium">Lot z-Score</span>
+                <div className={`font-mono text-lg font-bold mt-0.5 ${Math.abs(parseFloat(zScore)) > 2.5 ? 'text-rose-400' : 'text-amber-400'}`}>
                   {parseFloat(zScore) > 0 ? '+' : ''}{zScore}&sigma;
-                </b>
-                <span className="text-slate-500 text-[8.5px] block mt-0.5">Diverges from cohort baseline</span>
+                </div>
+                <span className="text-slate-500 text-[9.5px] block mt-0.5">Divergence from lot median</span>
               </div>
 
-              <div className="bg-[#050D1D] p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[9px]">168h Drift Extrapolation:</span>
-                <b className="text-xs text-rose-400">+{driftPct}%</b>
-                <span className="text-slate-500 text-[8.5px] block mt-0.5">From 0h baseline reading</span>
+              <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800">
+                <span className="text-slate-400 block text-[10px] uppercase font-medium">168h Drift Extrapolation</span>
+                <div className="font-mono text-lg font-bold text-rose-400 mt-0.5">
+                  +{driftPct}%
+                </div>
+                <span className="text-slate-500 text-[9.5px] block mt-0.5">From 0h baseline burn-in</span>
               </div>
 
-              <div className="bg-[#050D1D] p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[9px]">Measured 168h Value:</span>
-                <b className="text-xs text-white">{v168} &micro;A</b>
-                <span className="text-slate-500 text-[8.5px] block mt-0.5">Datasheet Limit: {limit} &micro;A</span>
+              <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800">
+                <span className="text-slate-400 block text-[10px] uppercase font-medium">Measured 168h Value</span>
+                <div className="font-mono text-lg font-bold text-white mt-0.5">
+                  {v168} <span className="text-xs font-normal text-slate-400">&micro;A</span>
+                </div>
+                <span className="text-slate-500 text-[9.5px] block mt-0.5">Datasheet limit: {limit} &micro;A</span>
               </div>
 
-              <div className="bg-[#050D1D] p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[9px]">Projected Future (264h):</span>
-                <b className={`text-xs ${parseFloat(predFuture) > parseFloat(limit) ? 'text-rose-400 font-black' : 'text-amber-300'}`}>
-                  {predFuture} &micro;A
-                </b>
-                <span className="text-slate-500 text-[8.5px] block mt-0.5">
+              <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800">
+                <span className="text-slate-400 block text-[10px] uppercase font-medium">Projected Future (264h)</span>
+                <div className={`font-mono text-lg font-bold mt-0.5 ${parseFloat(predFuture) > parseFloat(limit) ? 'text-rose-400' : 'text-amber-300'}`}>
+                  {predFuture} <span className="text-xs font-normal text-slate-400">&micro;A</span>
+                </div>
+                <span className="text-slate-500 text-[9.5px] block mt-0.5">
                   {parseFloat(predFuture) > parseFloat(limit) ? '⚠️ In-Flight Limit Breach' : 'Within margin'}
                 </span>
               </div>
             </div>
 
-            <div className="text-[10px] text-slate-300 bg-black/40 p-2 rounded border border-slate-800/80">
-              <b className="text-cyan">Decision Rationale: </b>
+            <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed">
+              <span className="text-sky-400 font-semibold">Decision Justification: </span>
               {component.traditional_decision === 'PASS' && isReject ? (
                 <span>
-                  Component passes traditional static limit ({v168} &micro;A &le; {limit} &micro;A), but exhibits abnormal parametric drift relative to lot median (<b className="text-rose-400">+{zScore}&sigma;</b>), indicating latent defect.
+                  Component passes traditional static limit ({v168} &micro;A &le; {limit} &micro;A), but exhibits abnormal parametric drift relative to lot median (<b className="text-rose-400 font-mono">+{zScore}&sigma;</b>), indicating latent defect.
                 </span>
               ) : (
                 <span>
@@ -287,66 +291,66 @@ export default function ComponentDeepDiveAnalysis({
             </div>
           </div>
 
-          <div className="text-[9.5px] text-cyan pt-1 border-t border-slate-800/60 flex items-center justify-between">
-            <span>Traditional: <b className="text-white">{component.traditional_decision}</b></span>
-            <span>AI Model: <b className="text-emerald-400">Isolation Forest + Robust MAD</b></span>
+          <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800/80 flex items-center justify-between font-mono">
+            <span>Datasheet Decision: <b className="text-slate-200">{component.traditional_decision}</b></span>
+            <span>AI Model: <b className="text-slate-200">Isolation Forest + MAD</b></span>
           </div>
         </div>
 
-        {/* ================= CARD 3: SATELLITE & MISSION IMPACT ================= */}
-        <div className="p-3.5 rounded-lg bg-[#081224] border border-amber-500/30 flex flex-col justify-between gap-2 shadow-sm">
+        {/* ================= SECTION 3: SATELLITE MISSION IMPACT ================= */}
+        <div className="p-4 rounded-xl bg-[#121420] border border-slate-700/80 flex flex-col justify-between gap-3">
           <div>
-            <div className="flex items-center justify-between pb-1.5 border-b border-amber-500/20 mb-2">
-              <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
-                <span className="w-2 h-2 rounded-full bg-amber-400 led" />
-                <span>3. IMPACT ON SATELLITE &amp; MISSION</span>
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
+              <div className="flex items-center gap-2 text-slate-100 font-semibold text-xs">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span>3. Spacecraft &amp; Orbit Mission Impact</span>
               </div>
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase">
-                SYSTEM HAZARD
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase font-medium">
+                System Hazard
               </span>
             </div>
 
-            <p className="text-[11px] text-slate-200 leading-relaxed mb-2 font-medium">
+            <p className="text-xs text-slate-300 leading-relaxed mb-3">
               {domain.satelliteImpact}
             </p>
 
-            <div className="text-[10px] text-slate-400 bg-black/40 p-2 rounded border border-slate-800/80 leading-relaxed">
-              <b className="text-amber-300 block mb-0.5">Worst-Case Orbit Mission Consequence:</b>
+            <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed">
+              <span className="text-amber-300 font-semibold block mb-1">Worst-Case Orbit Mission Consequence:</span>
               {domain.missionConsequence}
             </div>
           </div>
 
-          <div className="text-[9.5px] text-amber-300/90 pt-1 border-t border-slate-800/60 flex items-center justify-between">
+          <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800/80 flex items-center justify-between font-mono">
             <span>Criticality Level: <b className="text-rose-400">CRITICAL SINGLE POINT</b></span>
             <span>FMEA Severity: <b className="text-amber-300">CATEGORY I (CATASTROPHIC)</b></span>
           </div>
         </div>
 
-        {/* ================= CARD 4: IMPROVEMENT & CORRECTIVE ACTIONS ================= */}
-        <div className="p-3.5 rounded-lg bg-[#081224] border border-emerald-500/30 flex flex-col justify-between gap-2 shadow-sm">
+        {/* ================= SECTION 4: IMPROVEMENT & MITIGATION ================= */}
+        <div className="p-4 rounded-xl bg-[#0D1824] border border-slate-700/80 flex flex-col justify-between gap-3">
           <div>
-            <div className="flex items-center justify-between pb-1.5 border-b border-emerald-500/20 mb-2">
-              <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 led" />
-                <span>4. ENGINEERING IMPROVEMENT &amp; MITIGATION PROTOCOL</span>
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
+              <div className="flex items-center gap-2 text-slate-100 font-semibold text-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>4. Engineering Improvement &amp; Mitigation</span>
               </div>
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 uppercase">
-                DISPOSITION
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 uppercase font-medium">
+                Disposition
               </span>
             </div>
 
-            <p className="text-[11px] text-slate-200 leading-relaxed mb-2 font-medium">
+            <p className="text-xs text-slate-300 leading-relaxed mb-3">
               {domain.improvement}
             </p>
 
-            <div className="text-[10px] text-slate-400 bg-black/40 p-2 rounded border border-slate-800/80 leading-relaxed mb-3">
-              <b className="text-emerald-400 block mb-0.5">Immediate Spacecraft Failover Mitigation:</b>
+            <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed mb-3">
+              <span className="text-emerald-400 font-semibold block mb-1">Immediate Spacecraft Failover Protocol:</span>
               {domain.mitigation}
             </div>
           </div>
 
-          {/* Interactive Mitigation Command Buttons */}
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-800/60">
+          {/* Interactive Mitigation Action Buttons */}
+          <div className="flex items-center gap-2.5 pt-2 border-t border-slate-800/80">
             {onIsolateBus && (
               <button
                 type="button"
@@ -354,13 +358,13 @@ export default function ComponentDeepDiveAnalysis({
                   sounds.playPing()
                   onIsolateBus(component.component_id)
                 }}
-                className={`flex-1 py-1.5 px-2 rounded text-[10px] font-bold transition-all border flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all border flex items-center justify-center gap-2 ${
                   isIsolated
-                    ? 'bg-rose-500/30 text-rose-300 border-rose-500 shadow-alert-glow font-black'
-                    : 'bg-rose-500/15 text-rose-400 border-rose-500/40 hover:bg-rose-500 hover:text-black'
+                    ? 'bg-rose-500 text-white border-rose-600 font-bold'
+                    : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500 hover:text-white'
                 }`}
               >
-                <span>⚡</span> {isIsolated ? '✓ BUS ISOLATED' : 'ISOLATE POWER BUS'}
+                <span>⚡</span> {isIsolated ? '✓ Power Bus Isolated' : 'Isolate Power Bus'}
               </button>
             )}
 
@@ -371,13 +375,13 @@ export default function ComponentDeepDiveAnalysis({
                   sounds.playSuccess()
                   onFailover(component.component_id)
                 }}
-                className={`flex-1 py-1.5 px-2 rounded text-[10px] font-bold transition-all border flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all border flex items-center justify-center gap-2 ${
                   isFailover
-                    ? 'bg-cyan/30 text-cyan border-cyan shadow-neon-cyan font-black'
-                    : 'bg-cyan/15 text-cyan border-cyan/40 hover:bg-cyan hover:text-black'
+                    ? 'bg-sky-600 text-white border-sky-500 font-bold'
+                    : 'bg-sky-500/15 text-sky-300 border-sky-500/30 hover:bg-sky-600 hover:text-white'
                 }`}
               >
-                <span>🔄</span> {isFailover ? '✓ SPARE UNIT B ACTIVE' : 'ENGAGE COLD SPARE B'}
+                <span>🔄</span> {isFailover ? '✓ Cold Spare B Active' : 'Engage Cold Spare B'}
               </button>
             )}
           </div>

@@ -61,49 +61,39 @@ export default function DataIngestModal({
   const currentMission = ISRO_MISSIONS.find((m) => m.id === selectedPreset) || ISRO_MISSIONS[0]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in select-none font-mono">
-      <div className="relative w-full max-w-2xl bg-[#090F1E] border border-cyan/50 rounded-xl shadow-2xl shadow-cyan/20 overflow-hidden">
-        {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800 bg-[#0D162B]">
-          <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan led" />
-            <span className="font-display font-black text-xs tracking-wider text-white uppercase">
-              STEP 01 // DATA INGESTION WINDOW
-            </span>
-            <span className="px-2 py-0.5 rounded bg-cyan/15 text-cyan text-[10px] font-bold border border-cyan/30">
-              ISRO SDSC SHAR
-            </span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in font-sans">
+      <div className="relative w-full max-w-xl bg-[#0F172A] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+        {/* Simple Clean Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-[#0B1120]">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-sky-400" />
+              <h2 className="text-sm font-bold text-white tracking-wide uppercase">
+                Data Ingestion &bull; SpaceGuard AI
+              </h2>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Satish Dhawan Space Centre SHAR &bull; Component Screening
+            </p>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-xs"
-            title="Close Window"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-sm"
+            title="Close"
           >
-            &#10005;
+            ✕
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 flex flex-col gap-5 max-h-[80vh] overflow-y-auto">
-          {/* Subtitle / Instructions */}
-          <div className="text-xs text-slate-300 leading-relaxed">
-            <p className="mb-1 text-slate-400">
-              Welcome to <b className="text-white">SpaceGuard AI</b> Mission Reliability System. To initiate qualification screening, first ingest a component burn-in dataset.
-            </p>
-            <p className="text-[11px] text-cyan/90">
-              Upload your custom burn-in CSV datasheet, or select an authentic ISRO qualification flight batch below:
-            </p>
-          </div>
-
-          {/* ================= SECTION A: DRAG & DROP CSV ================= */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-cyan font-bold tracking-wider uppercase">
-                &gt;&gt; OPTION 1: UPLOAD CUSTOM CSV DATASHEET
-              </span>
-              <span className="text-[10px] text-slate-500">FORMAT: .CSV, .TSV</span>
+        <div className="p-6 flex flex-col gap-6 max-h-[80vh] overflow-y-auto">
+          {/* Method 1: Upload CSV */}
+          <div>
+            <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>1. Upload Burn-In CSV File</span>
+              <span className="text-[10px] text-slate-400 font-normal">Accepted: .csv, .tsv</span>
             </div>
 
             <div
@@ -112,23 +102,20 @@ export default function DataIngestModal({
               onDragOver={handleDrag}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`p-6 rounded-xl border-2 border-dashed text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-3 ${
+              className={`p-6 rounded-xl border-2 border-dashed text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 ${
                 dragActive
-                  ? 'border-cyan bg-cyan/15 shadow-neon-cyan scale-[1.01]'
-                  : 'border-slate-700 bg-[#060B16] hover:border-cyan/60 hover:bg-[#070E1E]'
+                  ? 'border-sky-400 bg-sky-500/10'
+                  : 'border-slate-700 bg-[#0A0F1E] hover:border-slate-500 hover:bg-[#0D152A]'
               }`}
             >
-              <div className="w-12 h-12 rounded-full bg-cyan/10 border border-cyan/40 flex items-center justify-center text-cyan text-xl">
-                &#8681;
+              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-sky-400 text-lg">
+                📄
               </div>
-
-              <div>
-                <div className="text-sm font-bold text-white mb-1">
-                  Drag &amp; Drop your Burn-In Telemetry CSV file here
-                </div>
-                <div className="text-xs text-slate-400">
-                  or <span className="text-cyan underline font-bold">browse from your computer</span>
-                </div>
+              <div className="text-sm font-medium text-white">
+                Drag and drop your telemetry CSV here
+              </div>
+              <div className="text-xs text-slate-400">
+                or <span className="text-sky-400 font-semibold underline">browse file from device</span>
               </div>
 
               <input
@@ -139,36 +126,26 @@ export default function DataIngestModal({
                 className="hidden"
               />
 
-              {/* Supported Columns Pill Strip */}
-              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2 border-t border-slate-800/80 text-[9.5px] text-slate-400">
-                <span className="text-slate-500 font-bold">DETECTED COLUMNS:</span>
-                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">component_id</span>
-                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">lot_id</span>
-                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">0h / 24h / 168h</span>
-                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-500">limit_ua (opt)</span>
-                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-500">ground_truth (opt)</span>
+              <div className="text-[11px] text-slate-400 mt-1">
+                Required columns: <code className="text-slate-300 font-mono">component_id, lot_id, 0h, 24h, 168h</code>
               </div>
             </div>
           </div>
 
-          {/* Divider */}
+          {/* Clean Divider */}
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-slate-800" />
-            <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase">OR</span>
+            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">OR</span>
             <div className="flex-1 h-px bg-slate-800" />
           </div>
 
-          {/* ================= SECTION B: SELECT ISRO FLIGHT MISSION ================= */}
-          <div className="flex flex-col gap-2.5">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-cyan font-bold tracking-wider uppercase">
-                &gt;&gt; OPTION 2: LOAD ISRO FLIGHT TELEMETRY BATCH
-              </span>
-              <span className="text-[10px] text-emerald-400 font-bold">READY TO INGEST</span>
+          {/* Method 2: Select ISRO Mission */}
+          <div>
+            <div className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+              2. Load Authentic ISRO Mission Telemetry
             </div>
 
-            {/* Mission Grid */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 mb-3">
               {ISRO_MISSIONS.map((m) => {
                 const isSelected = selectedPreset === m.id
                 return (
@@ -179,54 +156,48 @@ export default function DataIngestModal({
                       sounds.playClick()
                       setSelectedPreset(m.id)
                     }}
-                    className={`p-2.5 rounded-lg border text-left transition-all flex flex-col gap-1 ${
+                    className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1 ${
                       isSelected
-                        ? 'bg-cyan/20 border-cyan text-white shadow-neon-cyan'
-                        : 'bg-[#060B16] border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-[#080F1F]'
+                        ? 'bg-sky-950/40 border-sky-400 text-white shadow-sm'
+                        : 'bg-[#0A0F1E] border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-[#0E172E]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 font-bold text-xs">
+                      <div className="flex items-center gap-1.5 font-semibold text-xs text-white">
                         <span>{m.icon}</span>
-                        <span className="tracking-wide text-white">{m.name}</span>
+                        <span>{m.name}</span>
                       </div>
-                      <span className={`text-[9px] px-1 rounded font-mono ${
-                        isSelected ? 'bg-cyan text-black font-black' : 'bg-slate-800 text-slate-400'
-                      }`}>
-                        {m.code}
-                      </span>
                     </div>
                     <div className="text-[10px] text-slate-400 truncate">
                       {m.description}
                     </div>
-                    <div className="text-[9px] text-slate-500">
-                      ORBIT: <span className="text-slate-300">{m.targetOrbit}</span> &bull; {m.centre}
+                    <div className="text-[9px] text-slate-400 font-mono">
+                      {m.targetOrbit} &bull; {m.centre}
                     </div>
                   </button>
                 )
               })}
             </div>
 
-            {/* Load Selected Mission Button */}
             <button
               type="button"
               onClick={handleLoadMission}
-              className="mt-1 w-full py-2.5 px-4 rounded-lg bg-cyan/20 border border-cyan/60 text-cyan hover:bg-cyan hover:text-black font-display text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-neon-cyan"
+              className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs transition-colors flex items-center justify-center gap-2 shadow-sm"
             >
-              <span>&#9654;</span> INGEST &amp; LOAD {currentMission.name.toUpperCase()} DATASET
+              <span>Load {currentMission.name} Telemetry Dataset &rarr;</span>
             </button>
           </div>
         </div>
 
         {/* Modal Footer */}
-        <div className="px-5 py-2.5 border-t border-slate-800 bg-[#070D1A] flex items-center justify-between text-[10px] text-slate-500">
-          <span>MIL-STD-883 Method 1005 HTOL Reliability Assurance</span>
+        <div className="px-6 py-3 border-t border-slate-800 bg-[#0B1120] flex items-center justify-between text-xs text-slate-400">
+          <span>MIL-STD-883 Method 1005 Compliant</span>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white underline"
+            className="text-slate-400 hover:text-white underline text-xs"
           >
-            Explore Dashboard First &rarr;
+            Skip to Dashboard
           </button>
         </div>
       </div>
