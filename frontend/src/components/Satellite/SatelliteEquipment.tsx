@@ -1,8 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Html } from '@react-three/drei'
 import * as THREE from 'three'
-import type { SubsystemStatus } from '../../types'
+import type { ComponentOut, SubsystemStatus } from '../../types'
 
 const STATUS_COLOR: Record<string, string> = {
   safe: '#00FF87',
@@ -17,6 +16,7 @@ interface EquipmentModuleProps {
   isHovered: boolean
   explodedOffset: number
   isXray: boolean
+  selectedComponent?: ComponentOut | null
   onSelect: (key: string) => void
   onHover: (key: string | null) => void
 }
@@ -27,6 +27,7 @@ export default function SatelliteEquipment({
   isHovered,
   explodedOffset,
   isXray,
+  selectedComponent,
   onSelect,
   onHover,
 }: EquipmentModuleProps) {
@@ -35,8 +36,17 @@ export default function SatelliteEquipment({
   const bracketRef = useRef<THREE.Group>(null)
   const basePos = subsystem.position as [number, number, number]
 
-  const color = STATUS_COLOR[subsystem.status] ?? STATUS_COLOR.idle
-  const isReject = subsystem.status === 'reject'
+  const isTargetComponent = Boolean(selectedComponent && subsystem.key === selectedComponent.subsystem)
+  const effectiveStatus = isTargetComponent && selectedComponent
+    ? (selectedComponent.status === 'reject' || selectedComponent.behavioral_health === 'CRITICAL'
+        ? 'reject'
+        : selectedComponent.status === 'monitor' || selectedComponent.behavioral_health === 'DEGRADING'
+        ? 'monitor'
+        : 'safe')
+    : subsystem.status
+
+  const color = STATUS_COLOR[effectiveStatus] ?? STATUS_COLOR.idle
+  const isReject = effectiveStatus === 'reject'
 
   // Animate pulse on selection or warning status
   useFrame(({ clock }) => {
@@ -510,36 +520,7 @@ export default function SatelliteEquipment({
         </group>
       )}
 
-      {/* Dynamic 3D Equipment Label (visible on hover or when selected) */}
-      {(isHovered || isSelected) && (
-        <Html position={[0, 0.42, 0]} center distanceFactor={7} style={{ pointerEvents: 'none' }}>
-          <div className="hud-glass px-2.5 py-1 rounded-md text-center shadow-lg border border-accent/60 whitespace-nowrap animate-fade-in backdrop-blur-md">
-            <div className="flex items-center gap-1.5 justify-center">
-              <span
-                className="w-2 h-2 rounded-full inline-block"
-                style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }}
-              />
-              <span className="font-display font-bold text-xs tracking-wider text-slate-100">
-                {subsystem.name}
-              </span>
-              <span className="font-mono text-[9px] text-accent font-bold px-1.5 py-0.5 rounded bg-accent/20 border border-accent/40">
-                {subsystem.key}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 justify-center text-[9px] font-mono text-muted mt-0.5">
-              <span>{subsystem.count} parts</span>
-              <span>&bull;</span>
-              <span style={{ color }} className="font-bold">{subsystem.status.toUpperCase()}</span>
-              {subsystem.avg_risk > 0 && (
-                <>
-                  <span>&bull;</span>
-                  <span className="text-slate-200">Risk {Math.round(subsystem.avg_risk)}</span>
-                </>
-              )}
-            </div>
-          </div>
-        </Html>
-      )}
+
     </group>
   )
 }
