@@ -45,15 +45,18 @@ class ComponentOut(BaseModel):
     predicted_future: float
     margin_168: Optional[float] = None
     margin_future: Optional[float] = None
+    future_limit_breach: Optional[bool] = False
     z168: float
     z_slope: float
     iso_score: float
     ml_prob: Optional[float] = None
     risk_score: int
     status: str
+    behavioral_health: Optional[str] = "NORMAL"
     traditional_decision: str
     anomaly_category: Optional[str] = None
     reason: str
+    explanation_points: Optional[List[str]] = None
 
     class Config:
         from_attributes = True

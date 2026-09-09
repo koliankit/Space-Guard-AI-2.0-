@@ -15,8 +15,8 @@ from routes import upload, analysis, components, mission, report, demo
 
 app = FastAPI(
     title="SPACEGUARD AI",
-    description="AI-driven anomaly detection for spacecraft component burn-in & screening.",
-    version="1.0.0",
+    description="AI detects abnormal component behavior, predicts future degradation, explains the risk, and localizes the exact component on the spacecraft.",
+    version="2.0.0",
 )
 
 # In production, replace "*" with your deployed frontend's exact origin.

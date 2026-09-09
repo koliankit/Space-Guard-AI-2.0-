@@ -190,13 +190,8 @@ export default function App() {
         setSelected(worst)
         setFocusKey(worst.subsystem)
         
-        // Show non-blocking prominent banner first so user views the dashboard
+        // Show non-blocking prominent banner
         setQuarantineToast(worst)
-        // Delayed alert modal so it does NOT appear simultaneously and ambush the user
-        const t = setTimeout(() => {
-          setAlertComponent(worst)
-        }, 4000)
-        setModalTimerId(t)
       } else {
         sounds.playSuccess()
         log('No component exceeded the anomaly threshold \u2014 spacecraft nominal.', 'ok')
@@ -321,16 +316,7 @@ export default function App() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (modalTimerId) clearTimeout(modalTimerId)
-                setAlertComponent(quarantineToast)
-              }}
-              className="px-3 py-1 rounded bg-rose-500 text-black font-black uppercase tracking-wider text-[11px] hover:bg-rose-400 transition-all shadow-md flex items-center gap-1"
-            >
-              <span>&#9888;</span> REVIEW DEFECT PROTOCOL
-            </button>
+
             <button
               type="button"
               onClick={() => {
@@ -455,16 +441,7 @@ export default function App() {
         />
       )}
 
-      {alertComponent && (
-        <CriticalAlertModal
-          component={alertComponent}
-          onAcknowledge={() => {
-            setFocusKey(alertComponent.subsystem)
-            setAlertComponent(null)
-            setQuarantineToast(null)
-          }}
-        />
-      )}
+
 
       <ISROPitchModal
         isOpen={pitchModalOpen}

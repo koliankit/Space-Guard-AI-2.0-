@@ -14,7 +14,7 @@ export default function ScreeningMatrixView({
   onFocusIn3D,
   selectedId,
 }: ScreeningMatrixViewProps) {
-  const [filterMode, setFilterMode] = useState<'ALL' | 'reject' | 'monitor' | 'safe' | 'abnormal_within_spec'>('ALL')
+  const [filterMode, setFilterMode] = useState<'ALL' | 'reject' | 'monitor' | 'safe' | 'abnormal_within_spec' | 'degrading'>('ALL')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'risk' | 'z168' | 'slope' | 'v168' | 'id' | 'pred168'>('risk')
   const [sortAsc, setSortAsc] = useState(false)
@@ -26,6 +26,9 @@ export default function ScreeningMatrixView({
       reject: components.filter((c) => c.status === 'reject').length,
       monitor: components.filter((c) => c.status === 'monitor').length,
       safe: components.filter((c) => c.status === 'safe').length,
+      degrading: components.filter(
+        (c) => c.behavioral_health === 'DEGRADING' || c.drift_trend === 'ACCELERATING POSITIVE DRIFT'
+      ).length,
       abnormal_within_spec: components.filter(
         (c) => c.anomaly_category === 'abnormal_within_spec' || (c.traditional_decision === 'PASS' && c.status !== 'safe'),
       ).length,
@@ -50,9 +53,9 @@ export default function ScreeningMatrixView({
       const f1 = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0
       const fpr = fp + tn > 0 ? fp / (fp + tn) : 0
       const fnr = fn + tp > 0 ? fn / (fn + tp) : 0
-      return { hasGt: true, precision, recall, f1, fpr, fnr, mae, rmse, count: labeled.length }
+      return { hasGt: true, precision, recall, f1, fpr, fnr, mae, rmse, count: labeled.length, status_message: undefined as string | undefined }
     }
-    return { hasGt: false, mae, rmse, count: components.length }
+    return { hasGt: false, mae, rmse, count: components.length, status_message: 'Evaluation pending dataset • Unsupervised lot-relative screening active' }
   }, [components])
 
   // Filter & Search
@@ -61,6 +64,8 @@ export default function ScreeningMatrixView({
       let matchesFilter = true
       if (filterMode === 'abnormal_within_spec') {
         matchesFilter = c.anomaly_category === 'abnormal_within_spec' || (c.traditional_decision === 'PASS' && c.status !== 'safe')
+      } else if (filterMode === 'degrading') {
+        matchesFilter = c.behavioral_health === 'DEGRADING' || c.drift_trend === 'ACCELERATING POSITIVE DRIFT'
       } else if (filterMode !== 'ALL') {
         matchesFilter = c.status === filterMode
       }
@@ -206,11 +211,11 @@ export default function ScreeningMatrixView({
               SIH26170 ARCHITECTURE
             </span>
             <span className="font-bold text-white text-xs">
-              AI-Assisted Decision-Support Layer for Aerospace Component Screening
+              AI detects abnormal component behavior, predicts future degradation, explains the risk, and localizes the exact component on the spacecraft.
             </span>
           </div>
           <span className="text-[10px] text-amber-400 font-semibold">
-            &bull; Augments established aerospace screening &amp; QA &bull; WITHIN SPEC &ne; ALWAYS HEALTHY
+            &bull; Augments established aerospace screening &bull; WITHIN LIMIT &ne; ALWAYS HEALTHY
           </span>
         </div>
 
@@ -229,13 +234,13 @@ export default function ScreeningMatrixView({
 
           <div className="p-2.5 rounded-lg bg-[#061B24] border border-cyan/40">
             <div className="text-[10px] font-bold text-cyan uppercase mb-1 flex items-center gap-1">
-              <span className="text-emerald-400">&#10003;</span> SPACEGUARD AI MULTI-STAGE LAYER:
+              <span className="text-emerald-400">&#10003;</span> SPACEGUARD AI DECISION-SUPPORT LAYER:
             </div>
             <div className="font-mono text-cyan">
-              Measurement &rarr; <b className="text-white">Lot Behavior Baseline</b> &rarr; <b className="text-white">Anomaly Detection</b> &rarr; <b className="text-white">Drift Prediction</b> &rarr; <b className="text-rose-300">Explainable Decision</b>
+              Detect &rarr; <b className="text-white">Understand</b> &rarr; <b className="text-white">Predict (168h)</b> &rarr; <b className="text-white">Localize (3D)</b> &rarr; <b className="text-rose-300">Decide</b>
             </div>
             <div className="text-[10px] text-slate-300 mt-1">
-              Catches latent silicon gate-oxide degradation, peer outliers, and projects orbital mission failure before flight integration.
+              Domain-specific integration of Z-score, Isolation Forest, and regression into an aerospace predictive screening pipeline to catch latent escapes.
             </div>
           </div>
         </div>
@@ -249,7 +254,7 @@ export default function ScreeningMatrixView({
               AI ENGINE METRICS
             </span>
             <span className="text-slate-400 text-xs">
-              0h+24h &rarr; 168h Drift Extrapolation:
+              0h+24h &rarr; 168h Extrapolation:
             </span>
             <span className="text-white font-bold">
               MAE: <span className="text-cyan font-mono">{metrics.mae.toFixed(3)} µA</span> &bull; RMSE: <span className="text-cyan font-mono">{metrics.rmse.toFixed(3)} µA</span>
@@ -263,13 +268,15 @@ export default function ScreeningMatrixView({
                 <span className="text-slate-600">|</span>
                 <span className="text-slate-400">Recall: <b className="text-emerald-400">{(metrics.recall! * 100).toFixed(1)}%</b></span>
                 <span className="text-slate-600">|</span>
-                <span className="text-slate-400">F1-Score: <b className="text-cyan">{(metrics.f1! * 100).toFixed(1)}%</b></span>
+                <span className="text-slate-400" title="False Negative Rate - Critical metric for zero-defect space screening">
+                  FNR (Escapes): <b className={((1 - (metrics.recall ?? 1)) * 100) > 0 ? 'text-rose-400' : 'text-emerald-400'}>{((1 - (metrics.recall ?? 1)) * 100).toFixed(1)}%</b>
+                </span>
                 <span className="text-slate-600">|</span>
-                <span className="text-slate-400">FPR: <b className="text-amber-400">{(metrics.fpr! * 100).toFixed(1)}%</b></span>
+                <span className="text-slate-400">F1: <b className="text-cyan">{(metrics.f1! * 100).toFixed(1)}%</b></span>
               </div>
             ) : (
               <span className="text-[10px] text-slate-400 italic">
-                Ground truth defect labels unavailable for this dataset &bull; Unsupervised lot-relative screening active
+                {metrics.status_message || 'Evaluation pending dataset • Unsupervised lot-relative screening active'}
               </span>
             )}
           </div>
@@ -303,6 +310,17 @@ export default function ScreeningMatrixView({
           </button>
           <button
             type="button"
+            onClick={() => setFilterMode('degrading')}
+            className={`text-xs px-3 py-1 rounded border transition-all ${
+              filterMode === 'degrading'
+                ? 'bg-orange-500/25 border-orange-500 text-orange-400 font-bold'
+                : 'hud-glass border-slate-800 text-orange-400/80 hover:text-orange-400'
+            }`}
+          >
+            &#9650; DEGRADING [{counts.degrading}]
+          </button>
+          <button
+            type="button"
             onClick={() => setFilterMode('monitor')}
             className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'monitor'
@@ -331,9 +349,9 @@ export default function ScreeningMatrixView({
                 ? 'bg-purple-500/25 border-purple-400 text-purple-300 font-bold shadow-sm'
                 : 'hud-glass border-slate-800 text-purple-400/80 hover:text-purple-300'
             }`}
-            title="Components that PASS fixed datasheet limit but are ABNORMAL relative to lot peers (The Core SIH26170 Innovation)"
+            title="Components that PASS fixed datasheet limit but are ABNORMAL relative to lot peers (Latent Defects)"
           >
-            &#9881; WITHIN SPEC &bull; ABNORMAL LOT DRIFT [{counts.abnormal_within_spec}]
+            &#9881; WITHIN LIMIT &bull; ABNORMAL DRIFT [{counts.abnormal_within_spec}]
           </button>
         </div>
 
@@ -363,7 +381,7 @@ export default function ScreeningMatrixView({
         <table className="w-full text-left text-[11px] font-mono border-collapse">
           <thead className="sticky top-0 bg-[#0B1528] border-b border-slate-800 z-10 text-[10px] uppercase text-slate-400 tracking-wider">
             <tr>
-              <th className="py-2.5 px-3">AI Status</th>
+              <th className="py-2.5 px-3">AI Verdict &amp; Health</th>
               <th className="py-2.5 px-3">Traditional vs AI</th>
               <th
                 className="py-2.5 px-3 cursor-pointer hover:text-cyan"
@@ -465,24 +483,38 @@ export default function ScreeningMatrixView({
                         : 'hover:bg-slate-800/40'
                     }`}
                   >
-                    {/* Status badge */}
+                    {/* Status badge & Behavioral Health */}
                     <td className="py-2 px-3 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold ${
-                          isReject
-                            ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
-                            : isMonitor
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                        }`}
-                      >
+                      <div className="flex flex-col gap-1 items-start">
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
+                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold ${
+                            isReject
+                              ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                              : isMonitor
+                              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
                           }`}
-                        />
-                        {c.status.toUpperCase()}
-                      </span>
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
+                            }`}
+                          />
+                          {c.status.toUpperCase()}
+                        </span>
+                        {c.behavioral_health && (
+                          <span className={`text-[8.5px] font-bold tracking-wider px-1 py-0.5 rounded ${
+                            c.behavioral_health === 'CRITICAL' ? 'text-rose-300 bg-rose-950/50 border border-rose-800/60' :
+                            c.behavioral_health === 'DEGRADING' ? 'text-orange-300 bg-orange-950/50 border border-orange-800/60' :
+                            c.behavioral_health === 'MONITOR' ? 'text-amber-300 bg-amber-950/50 border border-amber-800/60' :
+                            'text-emerald-300 bg-emerald-950/50 border border-emerald-800/60'
+                          }`}>
+                            {c.behavioral_health === 'CRITICAL' ? '🔴 CRITICAL' :
+                             c.behavioral_health === 'DEGRADING' ? '🟠 DEGRADING' :
+                             c.behavioral_health === 'MONITOR' ? '🟡 MONITOR' : '🟢 NORMAL'}
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Traditional vs AI Verdict */}
@@ -546,8 +578,17 @@ export default function ScreeningMatrixView({
                     </td>
 
                     {/* Projected future */}
-                    <td className={`py-2 px-3 ${c.predicted_future > c.limit_ua ? 'text-rose-400 font-bold' : 'text-slate-300'}`}>
-                      {c.predicted_future.toFixed(2)}
+                    <td className="py-2 px-3">
+                      <div className="flex flex-col">
+                        <span className={`font-mono ${c.future_limit_breach || c.predicted_future > c.limit_ua ? 'text-rose-400 font-bold' : 'text-slate-300'}`}>
+                          {c.predicted_future.toFixed(2)}
+                        </span>
+                        {(c.future_limit_breach || c.predicted_future > c.limit_ua) && (
+                          <span className="text-[8px] text-rose-400 font-bold tracking-tight">
+                            &gt; LIMIT BREACH
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Composite risk */}

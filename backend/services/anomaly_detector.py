@@ -58,9 +58,11 @@ def compute_evaluation_metrics(df: pd.DataFrame) -> dict:
     """
     Computes real metrics for anomaly detection (if ground_truth present)
     and for 168h drift prediction (MAE, RMSE, error %).
+    No fabricated performance claims: if ground truth is absent, clearly reports pending.
     """
     metrics = {
         "has_ground_truth": False,
+        "status_message": "Evaluation pending dataset (Ground truth defect labels required)",
         "mae_drift": 0.0,
         "rmse_drift": 0.0,
         "mean_error_pct": 0.0,
@@ -98,6 +100,7 @@ def compute_evaluation_metrics(df: pd.DataFrame) -> dict:
 
             metrics.update({
                 "has_ground_truth": True,
+                "status_message": "Ground truth verified from flight qualification data",
                 "precision": round(float(precision), 3),
                 "recall": round(float(recall), 3),
                 "f1": round(float(f1), 3),

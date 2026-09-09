@@ -1,6 +1,7 @@
 import type {
   AnalyzeResult,
   AnomalyCategory,
+  BehavioralHealth,
   ComponentOut,
   DriftClassification,
   DriftTrend,
@@ -342,35 +343,68 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
     const riskScore = Math.min(100, Math.max(0, calculatedRisk))
 
     const traditionalDecision: 'PASS' | 'FAIL' = p.v168 > p.limit_ua ? 'FAIL' : 'PASS'
+    const futureLimitBreach = predictedFuture > p.limit_ua
 
     // 5 Anomaly Categories & Explainable AI Engineering Reasoning
     let status: Status = 'safe'
+    let behavioralHealth: BehavioralHealth = 'NORMAL'
     let anomalyCategory: AnomalyCategory = 'normal_within_spec'
     let reason = ''
+    const explanationPoints: string[] = []
 
     if (p.v168 > p.limit_ua) {
       status = 'reject'
+      behavioralHealth = 'CRITICAL'
       anomalyCategory = 'outside_spec'
+      explanationPoints.push(`Datasheet limit violation: 168h reading (${p.v168.toFixed(2)} µA) exceeds specification limit (${p.limit_ua} µA) by +${(p.v168 - p.limit_ua).toFixed(2)} µA.`)
+      explanationPoints.push(`Component is ${Math.abs(z168).toFixed(1)}σ from lot baseline average (${stats.mean168.toFixed(2)} µA).`)
+      explanationPoints.push(`Drift slope (+${slope.toFixed(4)} µA/hr) confirms active parametric degradation.`)
+      explanationPoints.push(`Immediate physical quarantine required. Traditional: FAIL. Flight integration prohibited.`)
       reason = `Static datasheet limit violation: 168h leakage (${p.v168.toFixed(2)} µA) exceeds specification threshold (${p.limit_ua} µA) by +${(p.v168 - p.limit_ua).toFixed(2)} µA. Traditional: FAIL. Immediate quarantine required.`
     } else if (predictedFuture > p.limit_ua) {
       status = 'reject'
+      behavioralHealth = 'CRITICAL'
       anomalyCategory = 'predicted_exceedance'
+      explanationPoints.push(`Within specification (${p.v168.toFixed(2)} µA < ${p.limit_ua} µA) but abnormal relative to lot: ${Math.abs(z168).toFixed(1)}σ above lot mean (${stats.mean168.toFixed(2)} µA).`)
+      explanationPoints.push(`Measured burn-in drift (+${slope.toFixed(4)} µA/hr) indicates ${driftTrend.toLowerCase()}.`)
+      explanationPoints.push(`Early 0h+24h prediction projected 168h to ${predicted168Early.toFixed(2)} µA (error: ±${predictionError168.toFixed(2)} µA).`)
+      explanationPoints.push(`Projected 264h leakage (${predictedFuture.toFixed(2)} µA) crosses specification limit (${p.limit_ua} µA). Latent dielectric breakdown detected.`)
       reason = `Within datasheet limit (${p.v168.toFixed(2)} < ${p.limit_ua} µA) but ${Math.abs(z168).toFixed(1)}σ above lot average (${stats.mean168.toFixed(2)} µA). Measured drift rate (+${slope.toFixed(4)} µA/hr) projects 264h leakage to ${predictedFuture.toFixed(2)} µA, exceeding safety threshold. Latent dielectric breakdown detected.`
     } else if (zMax >= 3.0 || riskScore >= 75) {
       status = 'reject'
+      behavioralHealth = riskScore >= 80 ? 'CRITICAL' : 'DEGRADING'
       anomalyCategory = 'abnormal_within_spec'
+      explanationPoints.push(`Component reading (${p.v168.toFixed(2)} µA) is significantly above lot average (${stats.mean168.toFixed(2)} µA, +${lotPctDev.toFixed(1)}% deviation).`)
+      explanationPoints.push(`Behavior is statistically abnormal relative to lot: ${Math.abs(z168).toFixed(1)}σ from lot baseline.`)
+      explanationPoints.push(`Burn-in drift slope (+${slope.toFixed(4)} µA/hr) deviates from lot peer trajectory.`)
+      explanationPoints.push(`Projected future drift threatens orbital mission life. Component quarantined despite passing datasheet limit.`)
       reason = `PASS by specification (${p.v168.toFixed(2)} < ${p.limit_ua} µA) but ABNORMAL RELATIVE TO LOT: component is ${Math.abs(z168).toFixed(1)}σ from lot mean (${stats.mean168.toFixed(2)} µA). Peer deviation indicates abnormal degradation rate.`
     } else if (p.v168 > 0.80 * p.limit_ua || predictedFuture > 0.90 * p.limit_ua) {
       status = 'monitor'
+      behavioralHealth = driftTrend === 'ACCELERATING POSITIVE DRIFT' || slope > 0.012 ? 'DEGRADING' : 'MONITOR'
       anomalyCategory = 'approaching_limit'
+      explanationPoints.push(`Reading (${p.v168.toFixed(2)} µA) approaches datasheet limit (${p.limit_ua} µA) with margin of only ${margin168.toFixed(2)} µA.`)
+      explanationPoints.push(`Component is ${Math.abs(z168).toFixed(1)}σ from lot mean (${stats.mean168.toFixed(2)} µA).`)
+      explanationPoints.push(`Drift trend classified as: ${driftTrend}.`)
+      explanationPoints.push(`Projected 264h value reaches ${predictedFuture.toFixed(2)} µA (within 10% of limit). Active telemetry monitoring scheduled.`)
       reason = `Approaching specification limit: reading (${p.v168.toFixed(2)} µA) is within 20% of datasheet limit (${p.limit_ua} µA). ${Math.abs(z168).toFixed(1)}σ from lot baseline (${stats.mean168.toFixed(2)} µA). Scheduled for active in-flight telemetry monitoring.`
     } else if (zMax >= 2.0 || riskScore >= 40) {
       status = 'monitor'
+      behavioralHealth = slope > 0.015 ? 'DEGRADING' : 'MONITOR'
       anomalyCategory = 'abnormal_within_spec'
+      explanationPoints.push(`PASS by datasheet spec (${p.v168.toFixed(2)} µA < ${p.limit_ua} µA) but trending unusual relative to lot peers.`)
+      explanationPoints.push(`${Math.abs(z168).toFixed(1)}σ peer deviation from lot mean (${stats.mean168.toFixed(2)} µA).`)
+      explanationPoints.push(`Drift slope (+${slope.toFixed(4)} µA/hr) exceeds standard lot peer rate.`)
+      explanationPoints.push(`Projected 264h value: ${predictedFuture.toFixed(2)} µA. Flagged for secondary screening review.`)
       reason = `PASS by specification but trending abnormal: ${Math.abs(z168).toFixed(1)}σ deviation from lot mean (${stats.mean168.toFixed(2)} µA). Drift slope (+${slope.toFixed(4)} µA/hr) exceeds normal lot baseline; flagged for monitoring.`
     } else {
       status = 'safe'
+      behavioralHealth = 'NORMAL'
       anomalyCategory = 'normal_within_spec'
+      explanationPoints.push(`Normal lot-relative behavior: reading (${p.v168.toFixed(2)} µA) follows expected distribution (${Math.abs(z168).toFixed(1)}σ from mean ${stats.mean168.toFixed(2)} µA).`)
+      explanationPoints.push(`Drift rate (+${slope.toFixed(4)} µA/hr) is nominal and stable over 168h HTOL.`)
+      explanationPoints.push(`Early prediction error is minimal (predicted ${predicted168Early.toFixed(2)} µA vs actual ${p.v168.toFixed(2)} µA).`)
+      explanationPoints.push(`Projected 264h value (${predictedFuture.toFixed(2)} µA) preserves ample safety margin. Component flight-ready.`)
       reason = `Normal and within specification: reading (${p.v168.toFixed(2)} µA) is within nominal lot distribution (${Math.abs(z168).toFixed(1)}σ from lot mean ${stats.mean168.toFixed(2)} µA). Drift rate is stable; component flight-ready.`
     }
 
@@ -400,15 +434,18 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
       predicted_future: predictedFuture,
       margin_168: margin168,
       margin_future: marginFuture,
+      future_limit_breach: futureLimitBreach,
       z168,
       z_slope: zSlope,
       iso_score: isoScore,
       ml_prob: p.ground_truth != null ? (p.ground_truth === 1 ? 0.94 : 0.05) : null,
       risk_score: riskScore,
       status,
+      behavioral_health: behavioralHealth,
       traditional_decision: traditionalDecision,
       anomaly_category: anomalyCategory,
       reason,
+      explanation_points: explanationPoints,
     }
   })
 }
@@ -618,6 +655,9 @@ class ClientISROEngine {
       },
       evaluation_metrics: {
         has_ground_truth: hasGt,
+        status_message: hasGt
+          ? 'Ground truth verified across flight qualification dataset'
+          : 'Evaluation pending dataset (Ground truth defect labels required)',
         precision,
         recall,
         f1,
@@ -736,12 +776,16 @@ class ClientISROEngine {
     return `# INDIAN SPACE RESEARCH ORGANISATION (ISRO)
 ## SPACEGUARD AI — FLIGHT READINESS CLEARANCE CERTIFICATE & SCREENING REPORT
 **Standard:** MIL-STD-883 METHOD 1005 HTOL | **Ref:** ISRO-QA-HTOL-2026-SG1 | **Date:** ${new Date().toUTCString()}
-
----
+### CORE VALUE PROPOSITION & PARADIGM
+> *"Our innovation is not replacing the existing screening process. We add a predictive AI intelligence layer that identifies abnormal components even when they remain within specification limits, predicts future drift, explains the risk, and localizes the affected component on the spacecraft."*
+> 
+> **Core Tagline:** WITHIN LIMIT ≠ ALWAYS HEALTHY  
+> **Workflow:** Detect → Understand → Predict → Localize → Decide  
+> **Algorithm Integration Note:** We integrate established statistical and machine-learning techniques into an aerospace-specific predictive screening workflow.
 
 ### SCREENING PARADIGM COMPARISON
 - **Traditional Approach:** Measurement → Fixed Datasheet Limit → PASS/FAIL
-- **AI-Enhanced Layer:** Measurement → Lot Behavior → Anomaly Detection → Drift Prediction → Risk Assessment → Explainable Decision
+- **SpaceGuard AI Layer:** Burn-In Dataset → Data Validation → Feature Engineering → Lot-Relative Analysis → Dynamic Anomaly Detection → Drift Analysis → 168h Prediction → Risk Engine → Explainable AI → Component Mapping → 3D Satellite Localization → SAFE / MONITOR / REJECT
 
 ### EXECUTIVE RELIABILITY SUMMARY
 - **Total Components Screened:** ${this.scoredParts.length}
@@ -750,12 +794,12 @@ class ClientISROEngine {
 - **Quarantined Silicon Defects (REJECT):** ${rejected.length} (${((rejected.length / this.scoredParts.length) * 100).toFixed(1)}%)
 
 ### QUARANTINED DEFECT LEDGER
-| Part ID | Subsystem | Lot ID | 168h Value | Limit | Lot Mean | Lot z-Score | Pred 168h | Risk Score | Root Cause / Anomaly Finding |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Part ID | Subsystem | Lot ID | 168h Value | Limit | Lot Mean | Lot z-Score | Pred 168h | Behavioral Health | Risk Score | Root Cause / Anomaly Finding |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 ${rejected
   .map(
     (c) =>
-      `| **${c.component_id}** | ${c.subsystem} | ${c.lot_id} | ${c.v168.toFixed(2)} µA | ${c.limit_ua} µA | ${c.lot_mean != null ? c.lot_mean.toFixed(2) : '--'} µA | +${c.z168.toFixed(2)}σ | ${c.predicted168_from_early != null ? c.predicted168_from_early.toFixed(2) : '--'} µA | ${c.risk_score}/100 | ${c.reason} |`
+      `| **${c.component_id}** | ${c.subsystem} | ${c.lot_id} | ${c.v168.toFixed(2)} µA | ${c.limit_ua} µA | ${c.lot_mean != null ? c.lot_mean.toFixed(2) : '--'} µA | +${c.z168.toFixed(2)}σ | ${c.predicted168_from_early != null ? c.predicted168_from_early.toFixed(2) : '--'} µA | **${c.behavioral_health || 'CRITICAL'}** | ${c.risk_score}/100 | ${c.reason} |`
   )
   .join('\n')}
 

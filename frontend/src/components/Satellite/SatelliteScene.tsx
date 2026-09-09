@@ -87,6 +87,7 @@ function SpacecraftModel({
   hoveredKey,
   explodedOffset,
   isXray,
+  selectedComponent,
   onSelect,
   onHover,
 }: {
@@ -95,6 +96,7 @@ function SpacecraftModel({
   hoveredKey: string | null
   explodedOffset: number
   isXray: boolean
+  selectedComponent?: ComponentOut | null
   onSelect: (key: string) => void
   onHover: (key: string | null) => void
 }) {
@@ -241,6 +243,7 @@ function SpacecraftModel({
           isHovered={s.key === hoveredKey}
           explodedOffset={explodedOffset}
           isXray={isXray}
+          selectedComponent={selectedComponent}
           onSelect={onSelect}
           onHover={onHover}
         />
@@ -498,6 +501,7 @@ export default function SatelliteScene({
           hoveredKey={hoveredKey}
           explodedOffset={isExploded ? 1.0 : 0.0}
           isXray={isXray}
+          selectedComponent={selectedComponent}
           onSelect={handleSelectSubsystem}
           onHover={setHoveredKey}
         />

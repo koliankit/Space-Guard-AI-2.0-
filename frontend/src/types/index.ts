@@ -32,6 +32,8 @@ export type DriftClassification =
   | 'MONITOR FUTURE TREND'
   | 'PREDICTED LIMIT EXCEEDANCE'
 
+export type BehavioralHealth = 'NORMAL' | 'MONITOR' | 'DEGRADING' | 'CRITICAL'
+
 export interface EvaluationMetrics {
   has_ground_truth: boolean
   precision?: number
@@ -42,6 +44,7 @@ export interface EvaluationMetrics {
   mae_drift: number
   rmse_drift: number
   mean_error_pct: number
+  status_message?: string
 }
 
 export interface ComponentOut {
@@ -70,15 +73,18 @@ export interface ComponentOut {
   predicted_future: number
   margin_168?: number
   margin_future?: number
+  future_limit_breach?: boolean
   z168: number
   z_slope: number
   iso_score: number
   ml_prob: number | null
   risk_score: number
   status: Status
+  behavioral_health?: BehavioralHealth
   traditional_decision: 'PASS' | 'FAIL'
   anomaly_category?: AnomalyCategory
   reason: string
+  explanation_points?: string[]
 }
 
 export interface AnalyzeResult {

@@ -54,6 +54,7 @@ class ComponentRecord(Base):
     predicted_future = Column(Float, nullable=True)
     margin_168 = Column(Float, nullable=True)
     margin_future = Column(Float, nullable=True)
+    future_limit_breach = Column(Boolean, default=False)
 
     z168 = Column(Float, nullable=True)
     z_slope = Column(Float, nullable=True)
@@ -62,6 +63,7 @@ class ComponentRecord(Base):
 
     risk_score = Column(Integer, nullable=True)
     status = Column(String, nullable=True)  # safe | monitor | reject
+    behavioral_health = Column(String, default="NORMAL", nullable=True)  # NORMAL | MONITOR | DEGRADING | CRITICAL
     traditional_decision = Column(String, nullable=True)  # PASS | FAIL
     anomaly_category = Column(String, nullable=True)
     reason = Column(String, nullable=True)

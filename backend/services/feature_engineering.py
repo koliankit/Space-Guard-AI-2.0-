@@ -35,6 +35,7 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     # Distance from specification limit
     df["margin_168"] = df["limit"] - df["v168"]
     df["margin_future"] = df["limit"] - df["predicted_future"]
+    df["future_limit_breach"] = df["predicted_future"] > df["limit"]
 
     # Classify trend direction
     trends = []

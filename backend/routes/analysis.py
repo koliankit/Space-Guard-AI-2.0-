@@ -64,12 +64,15 @@ def analyze_batch(batch_id: int, db: Session = Depends(get_db)):
             "predicted_future": top["predicted_future"],
             "margin_168": (None if pd.isna(top.get("margin_168")) else float(top["margin_168"])),
             "margin_future": (None if pd.isna(top.get("margin_future")) else float(top["margin_future"])),
+            "future_limit_breach": bool(top.get("future_limit_breach", False)),
             "z168": top["z168"], "z_slope": top["z_slope"], "iso_score": top["iso_score"],
             "ml_prob": (None if "ml_prob" not in top or pd.isna(top.get("ml_prob")) else top["ml_prob"]),
             "risk_score": int(top["risk_score"]), "status": top["status"],
+            "behavioral_health": top.get("behavioral_health", "NORMAL"),
             "traditional_decision": top["traditional_decision"],
             "anomaly_category": top.get("anomaly_category"),
             "reason": top["reason"],
+            "explanation_points": top.get("explanation_points"),
             "ground_truth": (None if pd.isna(top.get("ground_truth")) else top["ground_truth"]),
         }
 
