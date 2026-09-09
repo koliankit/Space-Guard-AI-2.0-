@@ -120,12 +120,7 @@ export default function Header({
 
         {/* Action Buttons & Audio */}
         <div className="flex items-center gap-2 text-xs">
-          {rejectCount > 0 && (
-            <div className="flex items-center gap-1.5 bg-rose-500/15 border border-rose-500/40 px-2.5 py-1 rounded-md text-rose-300 font-medium text-[11px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
-              <span>{rejectCount} Quarantined</span>
-            </div>
-          )}
+
 
 
 
