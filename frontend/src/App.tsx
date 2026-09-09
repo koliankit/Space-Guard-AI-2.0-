@@ -13,6 +13,7 @@ import TelemetryChart from './components/Charts/TelemetryChart'
 import DataQuality from './components/Charts/DataQuality'
 import MissionMap from './components/MissionMap/MissionMap'
 import SatelliteScene from './components/Satellite/SatelliteScene'
+import AIRecommendationSystem from './components/Satellite/AIRecommendationSystem'
 import SatelliteEquipmentBoard from './components/Satellite/SatelliteEquipmentBoard'
 import ScreeningMatrixView from './components/Views/ScreeningMatrixView'
 import OrbitalTrackingView from './components/Views/OrbitalTrackingView'
@@ -389,6 +390,15 @@ export default function App() {
               <div className="rounded-xl border border-slate-800 bg-[#090F1E] overflow-hidden shadow-md">
                 <TelemetryChart component={selected} />
               </div>
+              <AIRecommendationSystem
+                component={selected || flaggedList.find((c) => c.status === 'reject') || flaggedList[0] || allComponents[0] || null}
+                onIsolateBus={(id) => {
+                  log(`PCDU Power Bus isolation executed for component ${id}.`, 'flag')
+                }}
+                onFailover={(id) => {
+                  log(`Cold standby failover initiated for component ${id}.`, 'ok')
+                }}
+              />
               <SatelliteEquipmentBoard
                 subsystems={subsystems}
                 components={allComponents.length > 0 ? allComponents : flaggedList}
