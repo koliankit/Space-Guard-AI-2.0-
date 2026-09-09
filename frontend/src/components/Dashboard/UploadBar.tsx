@@ -202,12 +202,12 @@ export default function UploadBar({
       </div>
 
       {/* Dataset Status Ticker */}
-      <div className="mt-2 pt-1.5 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-400/80" />
-          <span dangerouslySetInnerHTML={{ __html: metaText }} />
+      <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between gap-3 text-sm md:text-[15px] text-slate-200">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className="w-2.5 h-2.5 rounded-full bg-sky-400 led flex-shrink-0" />
+          <div className="flex items-center gap-1.5 flex-wrap text-sm md:text-[15px] leading-snug" dangerouslySetInnerHTML={{ __html: metaText }} />
         </div>
-        <span className="text-slate-500 text-[10px] uppercase font-mono tracking-wider">
+        <span className="text-slate-400 text-[11px] uppercase font-mono tracking-wider bg-[#070D1A] px-2.5 py-1 rounded-md border border-slate-800 whitespace-nowrap hidden lg:inline-block">
           MIL-STD-883 HTOL 168H RELIABILITY SPEC
         </span>
       </div>

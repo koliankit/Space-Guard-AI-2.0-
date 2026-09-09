@@ -32,7 +32,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('wall')
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
-  const [dataMetaText, setDataMetaText] = useState('No dataset loaded &mdash; upload a file or load ISRO flight batch.')
+  const [dataMetaText, setDataMetaText] = useState(
+    '<span class="text-slate-300 font-medium text-sm md:text-base">No dataset loaded &mdash; upload a file or load ISRO flight batch.</span>'
+  )
 
   const [activeMissionId, setActiveMissionId] = useState<string>('GAGANYAAN')
   const [pitchModalOpen, setPitchModalOpen] = useState(false)
@@ -80,7 +82,7 @@ export default function App() {
     setFocusKey(null)
     setAudit([])
     setDataMetaText(
-      `${label} loaded &mdash; <b style="color:#10B981">${result.valid}</b> components across <b style="color:#00F0FF">${result.lots}</b> lots.`,
+      `<span class="font-bold text-white text-sm md:text-base tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-extrabold text-base md:text-lg text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-md border border-emerald-500/40 leading-none shadow-sm mx-0.5">${result.valid}</span> <span class="text-slate-100 font-semibold text-sm md:text-base">components across</span> <span class="inline-flex items-center font-mono font-extrabold text-sky-400 text-base md:text-lg bg-sky-500/15 px-2.5 py-0.5 rounded-md border border-sky-500/40 leading-none shadow-sm mx-0.5">${result.lots}</span> <span class="text-slate-100 font-semibold text-sm md:text-base">lots.</span>`
     )
     log(`Flight dataset uploaded \u2014 ${result.rows} components parsed.`)
     log(`${result.valid} components validated across ${result.lots} qualification lots (${result.missing} rows skipped).`, 'ok')
