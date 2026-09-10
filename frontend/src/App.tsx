@@ -412,25 +412,27 @@ export default function App() {
 
           {/* Main Telemetry & Mission Intelligence Flow - Fills all available space, eliminates empty voids */}
           <div className="flex-1 min-w-0 flex flex-col gap-4 w-full">
-            {/* Top Row: 3D Interactive Satellite + Intelligence & Comparison Panels side-by-side */}
-            <div className="grid grid-cols-1 2xl:grid-cols-[1.35fr_1fr] xl:grid-cols-[1.2fr_1fr] gap-4">
-              <div className="relative h-[480px] rounded-xl border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle">
-                <SatelliteScene
-                  subsystems={subsystems}
-                  onSelect={selectSubsystem}
-                  focusKey={focusKey}
-                  selectedComponent={selected}
-                />
+            {/* Top Row: 3D Interactive Satellite + Telemetry Waveform Graph on Left & Intelligence Panels on Right */}
+            <div className="grid grid-cols-1 2xl:grid-cols-[1.35fr_1fr] xl:grid-cols-[1.25fr_1fr] gap-4 items-start">
+              <div className="flex flex-col gap-4">
+                <div className="relative h-[430px] md:h-[450px] rounded-xl border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle">
+                  <SatelliteScene
+                    subsystems={subsystems}
+                    onSelect={selectSubsystem}
+                    focusKey={focusKey}
+                    selectedComponent={selected}
+                  />
+                </div>
+                {/* Waveform Graph shifted to upper side, directly below SatelliteScene to utilize empty space */}
+                <div className="rounded-xl border border-line bg-[#091120] overflow-hidden shadow-panel-subtle w-full">
+                  <TelemetryChart component={selected} />
+                </div>
               </div>
+
               <div className="flex flex-col gap-3.5">
                 <IntelligencePanel component={selected} />
                 <ComparePanel component={selected} />
               </div>
-            </div>
-
-            {/* Enriched Telemetry Oscilloscope Waveform Display (Full Width) */}
-            <div className="rounded-xl border border-line bg-[#091120] overflow-hidden shadow-panel-subtle w-full">
-              <TelemetryChart component={selected} />
             </div>
 
             {/* AI Prescriptive Actions & Root Cause Analysis (Full Width) */}
