@@ -191,8 +191,8 @@ export default function ISROPitchModal({
                   </p>
                 </div>
 
-                <div className="bg-[#0A1322] p-4 rounded border border-telemetry-steel/40">
-                  <div className="text-[11px] font-bold text-telemetry-steel uppercase mb-1">ENGINE 03</div>
+                <div className="bg-[#0A1322] p-4 rounded border border-white/20">
+                  <div className="text-[11px] font-bold text-white uppercase mb-1">ENGINE 03</div>
                   <div className="text-white font-bold text-sm mb-2">Lot-Relative Robust Z-Score</div>
                   <p className="text-slate-300 text-xs leading-relaxed">
                     Calculates distribution deviations against specific wafer and package fabrication lots (&sigma; &gt; 3.0), eliminating inter-batch manufacturing variances from distorting individual part health scores.
@@ -235,13 +235,13 @@ export default function ISROPitchModal({
                   <div className="text-[10.5px] text-slate-300 uppercase tracking-wider mt-1">Time Reduction</div>
                   <div className="text-[9px] text-muted">From weeks to seconds</div>
                 </div>
-                <div className="bg-[#0A1424] p-4 rounded border border-telemetry-steel/40">
-                  <div className="text-2xl sm:text-3xl font-bold font-display text-telemetry-steel">0%</div>
+                <div className="bg-[#0A1424] p-4 rounded border border-white/20">
+                  <div className="text-2xl sm:text-3xl font-bold font-display text-white">0%</div>
                   <div className="text-[10.5px] text-slate-300 uppercase tracking-wider mt-1">Escaped Defects</div>
                   <div className="text-[9px] text-muted">Zero latent escapes to integration</div>
                 </div>
-                <div className="bg-[#0A1424] p-4 rounded border border-telemetry-cyan/40">
-                  <div className="text-2xl sm:text-3xl font-bold font-display text-telemetry-cyan">99.4%</div>
+                <div className="bg-[#0A1424] p-4 rounded border border-white/20">
+                  <div className="text-2xl sm:text-3xl font-bold font-display text-white">99.4%</div>
                   <div className="text-[10.5px] text-slate-300 uppercase tracking-wider mt-1">Audit Confidence</div>
                   <div className="text-[9px] text-muted">Statistically verifiable models</div>
                 </div>
@@ -298,7 +298,7 @@ export default function ISROPitchModal({
                   </span>
                 </div>
                 <div className="p-3.5 rounded bg-[#070E1A] border border-line">
-                  <b className="text-telemetry-steel block mb-1">Flexible Ingestion Pipeline</b>
+                  <b className="text-white block mb-1">Flexible Ingestion Pipeline</b>
                   <span className="text-slate-300 leading-relaxed">
                     Smart auto-mapping accepts telemetry logs from ATE (Automatic Test Equipment), LabVIEW, Keithley instruments, and custom CSV schemas.
                   </span>

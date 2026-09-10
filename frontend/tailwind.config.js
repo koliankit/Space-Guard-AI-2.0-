@@ -29,17 +29,17 @@ export default {
           gold: '#F59E0B',
         },
 
-        // Aerospace Telemetry Slate (replaces toy electric cyan)
+        // Aerospace Telemetry White & High-Contrast Accents (replaces blue)
         telemetry: {
-          slate: '#38A3FF',
-          steel: '#2563EB',
-          dark: '#1E3A8A',
-          muted: '#64748B',
+          slate: '#FFFFFF',
+          steel: '#F8FAFC',
+          dark: '#E2E8F0',
+          muted: '#94A3B8',
         },
-        cyan: '#38A3FF',
-        blue: '#2563EB',
+        cyan: '#FFFFFF',
+        blue: '#F8FAFC',
         accent: '#F59E0B',
-        'blue-deep': '#1E3A8A',
+        'blue-deep': '#334155',
 
         // Clean Nominal / Flight Safe (Subdued Sage & Crisp Jade)
         safe: '#10B981',

@@ -46,8 +46,8 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
           <span className="text-slate-200 font-semibold">Component Current (&#956;A)</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-1 rounded-full bg-[#38A3FF] shadow-[0_0_6px_rgba(56,163,255,0.5)]" />
-          <span className="text-[#38A3FF]">Lot Baseline</span>
+          <span className="inline-block w-2.5 h-1 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.6)]" />
+          <span className="text-white font-semibold">Lot Baseline</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-2.5 h-0.5 bg-rose-500 shadow-[0_0_4px_rgba(239,68,68,0.5)]" />
@@ -100,8 +100,8 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
             <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="busGradSteel" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#38A3FF" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#38A3FF" stopOpacity="0" />
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -135,13 +135,13 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
         <polyline points={busPts1} fill="none" stroke="#10B981" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 6px rgba(16,185,129,0.5))' }} />
 
         {/* Channel 2: Solar Array Output Waveform */}
-        <polyline points={busPts2} fill="none" stroke="#38A3FF" strokeWidth="1.8" strokeDasharray="3 2" style={{ filter: 'drop-shadow(0 0 5px rgba(56,163,255,0.4))' }} />
+        <polyline points={busPts2} fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeDasharray="3 2" style={{ filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.5))' }} />
 
         {/* Telemetry Status Header */}
         <text x={padL + 8} y={padT + 14} className="fill-emerald-400 text-[9.5px] font-mono font-bold tracking-wider">
           &bull; CH1: 28.4V BUS (NOMINAL)
         </text>
-        <text x={padL + 160} y={padT + 14} className="fill-[#38A3FF] text-[9.5px] font-mono font-bold tracking-wider">
+        <text x={padL + 160} y={padT + 14} className="fill-white text-[9.5px] font-mono font-bold tracking-wider">
           &bull; CH2: 14.2A SOLAR
         </text>
         <text x={padL + 280} y={padT + 14} className="fill-amber-400 text-[9.5px] font-mono font-bold tracking-wider">
@@ -243,8 +243,8 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
         </linearGradient>
 
         <linearGradient id="spec-gradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#38A3FF" stopOpacity="0.85" />
-          <stop offset="100%" stopColor="#1E3A8A" stopOpacity="0.2" />
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#64748B" stopOpacity="0.2" />
         </linearGradient>
       </defs>
 
@@ -299,15 +299,15 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
       {/* Gradient Under-curve Fill */}
       {areaD && <path d={areaD} fill="url(#neon-area-gradient)" />}
 
-      {/* Secondary Lot Baseline Waveform in Steel Blue */}
+      {/* Secondary Lot Baseline Waveform in Crisp White */}
       {baselineCurve && (
         <path
           d={baselineCurve}
           fill="none"
-          stroke="#38A3FF"
+          stroke="#FFFFFF"
           strokeWidth={1.8}
           filter="url(#glow-steel)"
-          opacity={0.8}
+          opacity={0.85}
         />
       )}
 

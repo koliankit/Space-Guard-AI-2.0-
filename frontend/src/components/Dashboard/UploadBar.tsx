@@ -218,7 +218,7 @@ export default function UploadBar({
       {/* Dataset Status Ticker with interactive Lot-Wise Inspector */}
       <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between gap-3 text-sm md:text-[15px] text-slate-200">
         <div className="flex items-center gap-2.5 flex-wrap">
-          <span className="w-2.5 h-2.5 rounded-full bg-sky-400 led flex-shrink-0" />
+          <span className="w-2.5 h-2.5 rounded-full bg-white led flex-shrink-0" />
           <div
             className="flex items-center gap-1.5 flex-wrap text-sm md:text-[15px] leading-snug cursor-pointer select-none"
             onClick={(e) => {
@@ -244,7 +244,7 @@ export default function UploadBar({
                 sounds.playClick()
                 onOpenLotsModal()
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-bold bg-sky-500/15 hover:bg-sky-500/30 text-sky-300 hover:text-white px-2.5 py-0.5 rounded-md border border-sky-500/40 hover:border-sky-400 transition-all shadow-sm cursor-pointer ml-1 group"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-bold bg-white/10 hover:bg-white/20 text-white hover:text-white px-2.5 py-0.5 rounded-md border border-white/20 hover:border-white/40 transition-all shadow-sm cursor-pointer ml-1 group"
               title="Open dedicated Lot-Wise Classification Window"
             >
               <span>📦</span>

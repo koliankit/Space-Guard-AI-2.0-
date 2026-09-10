@@ -156,8 +156,8 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
               <stop offset="100%" stopColor={willBreach ? '#ef4444' : '#f59e0b'} stopOpacity="0.22" />
             </linearGradient>
             <linearGradient id="flightZoneGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#38a3ff" stopOpacity="0.03" />
-              <stop offset="100%" stopColor="#38a3ff" stopOpacity="0.08" />
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.03" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.07" />
             </linearGradient>
             <pattern id="gridPatternB" width="30" height="20" patternUnits="userSpaceOnUse">
               <path d="M 30 0 L 0 0 0 20" fill="none" stroke="#162238" strokeWidth="0.5" strokeOpacity="0.7" />
@@ -178,7 +178,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           <text
             x={toX(168) + 8}
             y={padT + 14}
-            fill="#38a3ff"
+            fill="#ffffff"
             fontSize="8"
             fontFamily="Rajdhani, sans-serif"
             fontWeight="bold"
@@ -228,7 +228,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                   y1={padT}
                   x2={xPos}
                   y2={H - padB}
-                  stroke={h === 168 ? '#38a3ff' : h === activeHorizon ? '#f59e0b' : '#162238'}
+                  stroke={h === 168 ? '#ffffff' : h === activeHorizon ? '#f59e0b' : '#162238'}
                   strokeDasharray={h >= 168 ? '3 3' : undefined}
                   strokeWidth={h >= 168 ? 1 : 0.5}
                   strokeOpacity={h >= 168 ? 0.7 : 0.5}
@@ -237,7 +237,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                   x={xPos}
                   y={H - padB + 14}
                   textAnchor="middle"
-                  fill={h === 168 ? '#38a3ff' : h === activeHorizon ? '#f59e0b' : '#64748b'}
+                  fill={h === 168 ? '#ffffff' : h === activeHorizon ? '#f59e0b' : '#64748b'}
                   fontSize="9"
                   fontFamily="monospace"
                   fontWeight={h >= 168 ? 'bold' : 'normal'}
@@ -254,7 +254,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
             x={toX(168)}
             y={H - padB + 26}
             textAnchor="middle"
-            fill="#38bdf8"
+            fill="#ffffff"
             fontSize="7.5"
             fontFamily="monospace"
           >
@@ -286,7 +286,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           <path
             d={measuredPathD}
             fill="none"
-            stroke="#38a3ff"
+            stroke="#ffffff"
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -313,7 +313,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                 onMouseEnter={() => setHoveredPoint({ hour: p.h, val: p.v, label: p.label })}
                 onMouseLeave={() => setHoveredPoint(null)}
               >
-                <circle cx={cx} cy={cy} r="4" fill="#0284c7" stroke="#38a3ff" strokeWidth="1.5" />
+                <circle cx={cx} cy={cy} r="4" fill="#0f172a" stroke="#ffffff" strokeWidth="1.5" />
                 <circle cx={cx} cy={cy} r="1.5" fill="#ffffff" />
               </g>
             )

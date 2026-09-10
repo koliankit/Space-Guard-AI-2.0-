@@ -145,7 +145,7 @@ export default function PropulsionDeck({
       {(isSelected || isHovered) && (
         <group ref={plumeRef} position={[0, -0.58, 0]} rotation={[Math.PI, 0, 0]}>
           <coneGeometry args={[0.16, 0.38, 16]} />
-          <meshBasicMaterial color="#38A3FF" transparent opacity={0.65} />
+          <meshBasicMaterial color="#FFFFFF" transparent opacity={0.65} />
         </group>
       )}
 

@@ -105,8 +105,8 @@ export default function SatelliteEquipmentBoard({
     <div className="bg-[#0B1120] border border-slate-800 rounded-xl flex flex-col font-sans text-xs select-none shadow-md overflow-hidden">
       {/* Action Notification Toast */}
       {actionNotif && (
-        <div className="bg-sky-500/15 border-b border-sky-500/40 px-4 py-2 text-center text-sky-300 text-xs font-semibold animate-fade-in flex items-center justify-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-400" />
+        <div className="bg-white/10 border-b border-white/20 px-4 py-2 text-center text-white text-xs font-semibold animate-fade-in flex items-center justify-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-white" />
           <span dangerouslySetInnerHTML={{ __html: actionNotif }} />
         </div>
       )}
@@ -114,16 +114,16 @@ export default function SatelliteEquipmentBoard({
       {/* Top Header Bar */}
       <div className="px-4 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-[#0F172A]">
         <div className="flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-sky-400" />
+          <span className="w-2.5 h-2.5 rounded-full bg-white" />
           <h3 className="m-0 font-bold text-xs tracking-wide uppercase text-white">
             Spacecraft Subsystem Hardware &amp; Command Console
           </h3>
           {filterCategory === 'lot' ? (
-            <span className="font-mono text-[11px] text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded border border-sky-500/30 font-medium">
+            <span className="font-mono text-[11px] text-white bg-white/10 px-2.5 py-0.5 rounded border border-white/20 font-medium">
               LOT CLASSIFICATION: {selectedLot || 'ALL FLIGHT LOTS'}
             </span>
           ) : activeSub ? (
-            <span className="font-mono text-[11px] text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded border border-sky-500/30 font-medium">
+            <span className="font-mono text-[11px] text-white bg-white/10 px-2.5 py-0.5 rounded border border-white/20 font-medium">
               FILTER: [{activeSub.key}] {activeSub.name}
             </span>
           ) : (
@@ -140,7 +140,7 @@ export default function SatelliteEquipmentBoard({
             onClick={() => setViewMode('components')}
             className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${
               viewMode === 'components'
-                ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                ? 'bg-white text-slate-900 font-bold shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -151,7 +151,7 @@ export default function SatelliteEquipmentBoard({
             onClick={() => setViewMode('lifecycle')}
             className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 ${
               viewMode === 'lifecycle'
-                ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                ? 'bg-white text-slate-900 font-bold shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -174,7 +174,7 @@ export default function SatelliteEquipmentBoard({
             onClick={() => setFilterCategory('subsystem')}
             className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
               filterCategory === 'subsystem'
-                ? 'bg-sky-600 text-white shadow-sm'
+                ? 'bg-white text-slate-900 shadow-sm font-bold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -185,7 +185,7 @@ export default function SatelliteEquipmentBoard({
             onClick={() => setFilterCategory('lot')}
             className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
               filterCategory === 'lot'
-                ? 'bg-sky-600 text-white shadow-sm'
+                ? 'bg-white text-slate-900 shadow-sm font-bold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -200,7 +200,7 @@ export default function SatelliteEquipmentBoard({
               onClick={() => onSelectSubsystem('')}
               className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
                 !focusKey
-                  ? 'bg-sky-600 border-sky-500 text-white font-semibold'
+                  ? 'bg-white border-white text-slate-900 font-bold'
                   : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
@@ -213,7 +213,7 @@ export default function SatelliteEquipmentBoard({
                 onClick={() => onSelectSubsystem(s.key)}
                 className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap flex items-center gap-1.5 text-[11px] font-medium border ${
                   focusKey === s.key
-                    ? 'bg-sky-600 border-sky-500 text-white font-semibold'
+                    ? 'bg-white border-white text-slate-900 font-bold'
                     : s.status === 'reject'
                     ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
                     : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
@@ -235,7 +235,7 @@ export default function SatelliteEquipmentBoard({
               onClick={() => setSelectedLot(null)}
               className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
                 !selectedLot
-                  ? 'bg-sky-600 border-sky-500 text-white font-semibold'
+                  ? 'bg-white border-white text-slate-900 font-bold'
                   : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
@@ -248,7 +248,7 @@ export default function SatelliteEquipmentBoard({
                 onClick={() => setSelectedLot(lot.lot_id === selectedLot ? null : lot.lot_id)}
                 className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap flex items-center gap-1.5 text-[11px] font-mono border ${
                   selectedLot === lot.lot_id
-                    ? 'bg-sky-600 border-sky-500 text-white font-bold shadow-sm'
+                    ? 'bg-white border-white text-slate-900 font-bold shadow-sm'
                     : lot.status === 'reject'
                     ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
                     : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
@@ -290,7 +290,7 @@ export default function SatelliteEquipmentBoard({
                     onClick={() => onSelectComponent(c.component_id)}
                     className={`p-3 rounded-lg border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                       isSelected
-                        ? 'bg-sky-500/10 border-sky-500 shadow-md'
+                        ? 'bg-white/10 border-white shadow-md ring-1 ring-white/30'
                         : isIsolated
                         ? 'bg-rose-500/5 border-rose-500/40 opacity-75'
                         : 'bg-[#0F172A] border-slate-800 hover:border-slate-700 hover:bg-[#131D33]'
@@ -367,7 +367,7 @@ export default function SatelliteEquipmentBoard({
                           </span>
                         )}
                         {isFailover && (
-                          <span className="text-sky-300 font-medium text-[9px] px-1.5 py-0.5 rounded bg-sky-500/20 border border-sky-500/40 ml-1">
+                          <span className="text-white font-medium text-[9px] px-1.5 py-0.5 rounded bg-white/15 border border-white/30 ml-1">
                             Spare B Active
                           </span>
                         )}
@@ -382,7 +382,7 @@ export default function SatelliteEquipmentBoard({
                           e.stopPropagation()
                           onSelectComponent(c.component_id)
                         }}
-                        className="text-sky-400 hover:text-white font-medium text-[10px] hover:underline"
+                        className="text-slate-200 hover:text-white font-medium text-[10px] hover:underline"
                       >
                         Inspect &rarr;
                       </button>
@@ -578,8 +578,8 @@ export default function SatelliteEquipmentBoard({
                           onClick={() => handleToggleFailover(item.component_id)}
                           className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border ${
                             isFailover
-                              ? 'bg-sky-600 text-white border-sky-500 font-bold'
-                              : 'bg-sky-500/15 text-sky-300 border-sky-500/30 hover:bg-sky-600 hover:text-white'
+                              ? 'bg-slate-700 text-white border-white/40 font-bold'
+                              : 'bg-white/10 text-white border-white/20 hover:bg-slate-700 hover:text-white'
                           }`}
                         >
                           {isFailover ? '✓ Spare B Active' : 'Failover Spare'}

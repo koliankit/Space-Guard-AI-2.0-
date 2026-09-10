@@ -232,10 +232,10 @@ export default function ComponentDeepDiveAnalysis({
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
               <div className="flex items-center gap-2 text-slate-100 font-semibold text-xs">
-                <span className="w-2 h-2 rounded-full bg-sky-400" />
+                <span className="w-2 h-2 rounded-full bg-white" />
                 <span>2. AI Screening &amp; Telemetry Data</span>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 uppercase font-medium">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white border border-white/20 uppercase font-medium">
                 Cohort Analytics
               </span>
             </div>
@@ -278,7 +278,7 @@ export default function ComponentDeepDiveAnalysis({
             </div>
 
             <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed">
-              <span className="text-sky-400 font-semibold">Decision Justification: </span>
+              <span className="text-white font-semibold">Decision Justification: </span>
               {component.traditional_decision === 'PASS' && isReject ? (
                 <span>
                   Component passes traditional static limit ({v168} &micro;A &le; {limit} &micro;A), but exhibits abnormal parametric drift relative to lot median (<b className="text-rose-400 font-mono">+{zScore}&sigma;</b>), indicating latent defect.
@@ -377,8 +377,8 @@ export default function ComponentDeepDiveAnalysis({
                 }}
                 className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all border flex items-center justify-center gap-2 ${
                   isFailover
-                    ? 'bg-sky-600 text-white border-sky-500 font-bold'
-                    : 'bg-sky-500/15 text-sky-300 border-sky-500/30 hover:bg-sky-600 hover:text-white'
+                    ? 'bg-slate-700 text-white border-white/40 font-bold'
+                    : 'bg-white/10 text-white border-white/20 hover:bg-slate-700 hover:text-white'
                 }`}
               >
                 <span>🔄</span> {isFailover ? '✓ Cold Spare B Active' : 'Engage Cold Spare B'}

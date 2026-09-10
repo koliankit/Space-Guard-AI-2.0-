@@ -29,8 +29,8 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
     return (
       <div className="bg-[#071120] border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-mono font-bold text-sky-400 flex items-center gap-1.5 text-[11px] uppercase">
-            <span className="w-2 h-2 rounded-full bg-sky-400 led" />
+          <span className="font-mono font-bold text-white flex items-center gap-1.5 text-[11px] uppercase">
+            <span className="w-2 h-2 rounded-full bg-white led" />
             Module A &bull; Parametric Waveform Telemetry
           </span>
           <span className="text-[10px] text-slate-400 font-mono">CHANNEL: 24-BIT SIGMA-DELTA ADC</span>
@@ -159,8 +159,8 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
             </linearGradient>
 
             <linearGradient id="lot-band-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#38A3FF" stopOpacity="0.1" />
-              <stop offset="100%" stopColor="#38A3FF" stopOpacity="0.02" />
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.02" />
             </linearGradient>
 
             <filter id="glow-a" x="-20%" y="-20%" width="140%" height="140%">
@@ -225,7 +225,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
               width={xFor(stageH) - xFor(0)}
               height={Math.max(0, yFor(bandLow) - yFor(bandHigh))}
               fill="url(#lot-band-grad)"
-              stroke="#38A3FF"
+              stroke="#FFFFFF"
               strokeOpacity="0.25"
               strokeDasharray="3 3"
             />
@@ -250,15 +250,15 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
             SPEC LIMIT ({limitVal}&mu;A)
           </text>
 
-          {/* Lot Norm Baseline Trace (Steel Blue line) */}
+          {/* Lot Norm Baseline Trace (Crisp White dashed line) */}
           {baselinePts.length > 1 && (
             <path
               d={baselineCurve}
               fill="none"
-              stroke="#38A3FF"
+              stroke="#FFFFFF"
               strokeWidth={1.4}
               strokeDasharray="3 2"
-              opacity={0.8}
+              opacity={0.85}
             />
           )}
 
@@ -337,8 +337,8 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
             <span className="font-semibold text-white">Component Measured</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-0.5 bg-blue-400 border-t border-dashed border-blue-400" />
-            <span className="text-blue-300 font-medium">Lot Norm Mean ({lotMean.toFixed(1)}&mu;A)</span>
+            <span className="inline-block w-2.5 h-0.5 bg-white border-t border-dashed border-white" />
+            <span className="text-slate-100 font-medium">Lot Norm Mean ({lotMean.toFixed(1)}&mu;A)</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block w-2.5 h-0.5 bg-rose-500" />

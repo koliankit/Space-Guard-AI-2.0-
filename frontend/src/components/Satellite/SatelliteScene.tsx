@@ -129,7 +129,7 @@ function SpacecraftModel({
     () =>
       new THREE.MeshStandardMaterial({
         color: '#0f172a',
-        emissive: '#1E3A8A',
+        emissive: '#334155',
         emissiveIntensity: 0.08,
         metalness: 0.88,
         roughness: 0.25,
@@ -169,7 +169,7 @@ function SpacecraftModel({
       />
       <lineSegments geometry={busEdges}>
         <lineBasicMaterial
-          color={isPaySelected ? '#F59E0B' : '#38A3FF'}
+          color={isPaySelected ? '#F59E0B' : '#FFFFFF'}
           transparent
           opacity={isPaySelected ? 0.95 : isXray ? 0.85 : 0.5}
         />
@@ -267,7 +267,7 @@ function HologramFloor() {
         <mesh key={i} rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[r - 0.015, r, 64]} />
           <meshBasicMaterial
-            color={i % 2 === 0 ? '#F59E0B' : '#38A3FF'}
+            color={i % 2 === 0 ? '#F59E0B' : '#FFFFFF'}
             transparent
             opacity={0.25 - i * 0.04}
             side={THREE.DoubleSide}
@@ -313,13 +313,13 @@ function EarthBackground() {
         />
       </mesh>
 
-      {/* Atmospheric Steel Blue Rim Glow Haze */}
+      {/* Atmospheric Rim Glow Haze */}
       <mesh>
         <sphereGeometry args={[21.4, 48, 48]} />
         <meshBasicMaterial
-          color="#38A3FF"
+          color="#FFFFFF"
           transparent
-          opacity={0.18}
+          opacity={0.15}
           side={THREE.BackSide}
         />
       </mesh>
@@ -479,8 +479,8 @@ export default function SatelliteScene({
         {/* Primary Sunlight (High contrast, sharp specular) */}
         <directionalLight position={[6, 8, 4]} intensity={2.8} color="#fffbf0" />
 
-        {/* Earth Albedo Bounce Light (Steel blue reflection from below) */}
-        <directionalLight position={[-3, -6, 2]} intensity={1.1} color="#38A3FF" />
+        {/* Earth Albedo Bounce Light (Crisp ambient reflection from below) */}
+        <directionalLight position={[-3, -6, 2]} intensity={0.9} color="#E2E8F0" />
 
         {/* ISRO Telemetry Amber Solar Specular Light */}
         <pointLight position={[-5, 2, -4]} intensity={0.8} color="#F59E0B" />

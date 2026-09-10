@@ -337,7 +337,7 @@ export default function AIRecommendationSystem({
       {/* ================= HEADER BANNER ================= */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-800 bg-[#0F172A] -m-5 p-5 mb-0 rounded-t-xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 text-lg shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white text-lg shadow-sm">
             <span>🤖</span>
           </div>
           <div>
@@ -345,7 +345,7 @@ export default function AIRecommendationSystem({
               <h3 className="m-0 text-sm font-bold text-white tracking-wide uppercase">
                 AI Prescriptive Recommendation System
               </h3>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 font-semibold">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white border border-white/20 font-semibold">
                 Autonomous Mission Assurance
               </span>
             </div>
@@ -359,7 +359,7 @@ export default function AIRecommendationSystem({
         <div className="flex items-center gap-3">
           <div className="text-right">
             <div className="text-[10px] text-slate-400 uppercase font-medium">Model Confidence</div>
-            <div className="font-mono text-sm font-extrabold text-sky-400">
+            <div className="font-mono text-sm font-extrabold text-white">
               {confidenceScore}% <span className="text-[10px] font-normal text-slate-400 font-sans">Ensemble ML</span>
             </div>
           </div>
@@ -445,7 +445,7 @@ export default function AIRecommendationSystem({
           onClick={() => setActiveTab('actions')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
             activeTab === 'actions'
-              ? 'bg-sky-600 text-white font-semibold shadow-sm'
+              ? 'bg-white text-slate-900 font-bold shadow-sm'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
           }`}
         >
@@ -457,7 +457,7 @@ export default function AIRecommendationSystem({
           onClick={() => setActiveTab('measures')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
             activeTab === 'measures'
-              ? 'bg-sky-600 text-white font-semibold shadow-sm'
+              ? 'bg-white text-slate-900 font-bold shadow-sm'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
           }`}
         >
@@ -469,7 +469,7 @@ export default function AIRecommendationSystem({
           onClick={() => setActiveTab('manufacturing')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
             activeTab === 'manufacturing'
-              ? 'bg-sky-600 text-white font-semibold shadow-sm'
+              ? 'bg-white text-slate-900 font-bold shadow-sm'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
           }`}
         >
@@ -496,7 +496,7 @@ export default function AIRecommendationSystem({
                         ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
                         : act.urgency === 'PREVENTATIVE'
                         ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                        : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                        : 'bg-white/15 text-white border border-white/30'
                     }`}
                   >
                     {act.urgency}
@@ -545,7 +545,7 @@ export default function AIRecommendationSystem({
                 className="p-3.5 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-2"
               >
                 <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5">
+                  <span className="w-5 h-5 rounded-full bg-white/15 text-white flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5">
                     {idx + 1}
                   </span>
                   <p className="text-xs text-slate-300 leading-relaxed">
@@ -554,7 +554,7 @@ export default function AIRecommendationSystem({
                 </div>
                 <div className="text-[10px] text-slate-500 font-mono pt-1.5 border-t border-slate-800/80 flex justify-between">
                   <span>Status: Active</span>
-                  <span className="text-sky-400">Enforced</span>
+                  <span className="text-white font-semibold">Enforced</span>
                 </div>
               </div>
             ))}
@@ -569,7 +569,7 @@ export default function AIRecommendationSystem({
             <span className="text-xs font-bold text-white uppercase tracking-wide">
               Supply Chain &amp; Wafer Fabrication Quality Countermeasures
             </span>
-            <span className="text-[10.5px] font-mono text-sky-400">MIL-STD-883 Qualification</span>
+            <span className="text-[10.5px] font-mono text-slate-200">MIL-STD-883 Qualification</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -599,7 +599,7 @@ export default function AIRecommendationSystem({
       {/* ================= INTERACTIVE ACTION EXECUTION BAR ================= */}
       <div className="p-3.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs text-slate-300">
-          <span className="text-sky-400 font-bold">⚡ Prescriptive Execution:</span>
+          <span className="text-white font-bold">⚡ Prescriptive Execution:</span>
           <span>Execute autonomous countermeasures or generate official ISRO quality directive</span>
         </div>
 
@@ -633,8 +633,8 @@ export default function AIRecommendationSystem({
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1.5 ${
               effectiveFailover
-                ? 'bg-sky-600 text-white border-sky-500 font-bold'
-                : 'bg-sky-500/15 text-sky-300 border-sky-500/30 hover:bg-sky-600 hover:text-white'
+                ? 'bg-slate-700 text-white border-white/40 font-bold'
+                : 'bg-white/10 text-white border-white/20 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <span>🔄</span> {effectiveFailover ? '✓ Cold Spare Active' : 'Switch to Cold Spare'}

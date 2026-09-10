@@ -521,7 +521,7 @@ export default function MultiScreenWall({
                     onClick={() => setActiveQuadTab(mode)}
                     className={`px-2.5 py-0.5 rounded text-xs font-mono transition-all border ${
                       activeQuadTab === mode
-                        ? 'bg-sky-600 text-white border-sky-500 font-semibold'
+                        ? 'bg-white text-slate-900 border-white font-bold shadow-sm'
                         : 'bg-transparent text-slate-400 border-transparent hover:text-white'
                     }`}
                   >

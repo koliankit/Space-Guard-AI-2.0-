@@ -92,7 +92,7 @@ export default function DataIngestModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-[#0B1120]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-sky-400" />
+              <span className="w-2 h-2 rounded-full bg-white" />
               <h2 className="text-sm font-bold text-white tracking-wide uppercase">
                 Data Ingestion &bull; SpaceGuard AI
               </h2>
@@ -119,7 +119,7 @@ export default function DataIngestModal({
             onClick={() => setActiveTab('upload')}
             className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'upload'
-                ? 'bg-sky-600 text-white font-bold shadow-sm'
+                ? 'bg-white text-slate-900 font-bold shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -131,7 +131,7 @@ export default function DataIngestModal({
             onClick={() => setActiveTab('paste')}
             className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'paste'
-                ? 'bg-sky-600 text-white font-bold shadow-sm'
+                ? 'bg-white text-slate-900 font-bold shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -143,7 +143,7 @@ export default function DataIngestModal({
             onClick={() => setActiveTab('preset')}
             className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'preset'
-                ? 'bg-sky-600 text-white font-bold shadow-sm'
+                ? 'bg-white text-slate-900 font-bold shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
@@ -165,18 +165,18 @@ export default function DataIngestModal({
                 onClick={() => fileInputRef.current?.click()}
                 className={`p-8 rounded-xl border-2 border-dashed text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 ${
                   dragActive
-                    ? 'border-sky-400 bg-sky-500/10'
+                    ? 'border-white bg-white/10'
                     : 'border-slate-700 bg-[#0A0F1E] hover:border-slate-500 hover:bg-[#0D152A]'
                 }`}
               >
-                <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-sky-400 text-2xl">
+                <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white text-2xl">
                   📄
                 </div>
                 <div className="text-sm font-medium text-white">
                   Drag and drop your telemetry CSV here
                 </div>
                 <div className="text-xs text-slate-400">
-                  or <span className="text-sky-400 font-semibold underline">browse file from device</span>
+                  or <span className="text-white font-semibold underline">browse file from device</span>
                 </div>
 
                 <input
@@ -202,7 +202,7 @@ export default function DataIngestModal({
                 <button
                   type="button"
                   onClick={() => setPastedText(SAMPLE_CSV)}
-                  className="text-sky-400 hover:text-sky-300 underline text-[11px] font-mono"
+                  className="text-slate-200 hover:text-white underline text-[11px] font-mono"
                 >
                   [+] Insert Sample Dataset
                 </button>
@@ -213,7 +213,7 @@ export default function DataIngestModal({
                 onChange={(e) => setPastedText(e.target.value)}
                 placeholder="component_id,lot_id,subsystem,0h,24h,96h,168h,static_limit_ua&#10;FC-ASIC-088,LOT-01,FC,12.4,14.8,22.1,38.9,50.0&#10;..."
                 rows={10}
-                className="w-full bg-[#050B16] border border-slate-700 rounded-xl p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 leading-relaxed"
+                className="w-full bg-[#050B16] border border-slate-700 rounded-xl p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-white leading-relaxed"
               />
 
               <button
@@ -243,7 +243,7 @@ export default function DataIngestModal({
                       }}
                       className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1 ${
                         isSelected
-                          ? 'bg-sky-950/40 border-sky-400 text-white shadow-sm'
+                          ? 'bg-white/10 border-white text-white shadow-sm ring-1 ring-white/30'
                           : 'bg-[#0A0F1E] border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-[#0E172E]'
                       }`}
                     >
@@ -265,7 +265,7 @@ export default function DataIngestModal({
               <button
                 type="button"
                 onClick={handleLoadMission}
-                className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs transition-colors flex items-center justify-center gap-2 shadow-sm mt-1"
+                className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm mt-1"
               >
                 <span>Load {currentMission.name} Telemetry Dataset &rarr;</span>
               </button>

@@ -250,7 +250,7 @@ export default function OrbitalTrackingView() {
                       y1={satY}
                       x2={360 + (77.59 / 180) * 360}
                       y2={180 - (12.97 / 90) * 180}
-                      stroke="#38A3FF"
+                      stroke="#FFFFFF"
                       strokeWidth="1.5"
                       strokeDasharray="4,2"
                     />

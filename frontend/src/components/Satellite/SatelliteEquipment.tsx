@@ -7,7 +7,7 @@ const STATUS_COLOR: Record<string, string> = {
   safe: '#10B981',
   monitor: '#F59E0B',
   reject: '#EF4444',
-  idle: '#38A3FF',
+  idle: '#FFFFFF',
 }
 
 interface EquipmentModuleProps {
@@ -78,7 +78,7 @@ export default function SatelliteEquipment({
   const equipmentMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: isSelected ? '#ffffff' : isHovered ? '#38A3FF' : '#1E293B',
+        color: isSelected ? '#ffffff' : isHovered ? '#FFFFFF' : '#1E293B',
         metalness: 0.88,
         roughness: 0.2,
         emissive: isSelected ? color : isHovered ? '#F59E0B' : '#0B1120',
@@ -156,7 +156,7 @@ export default function SatelliteEquipment({
             {/* Dual Diagnostic Status LEDs */}
             <mesh position={[0.1, 0.04, 0.125]}>
               <sphereGeometry args={[0.02, 10, 10]} />
-              <meshBasicMaterial color={isReject ? '#EF4444' : isSelected ? '#F59E0B' : '#38A3FF'} />
+              <meshBasicMaterial color={isReject ? '#EF4444' : isSelected ? '#F59E0B' : '#FFFFFF'} />
             </mesh>
             <mesh position={[0.05, 0.04, 0.125]}>
               <sphereGeometry args={[0.02, 10, 10]} />
@@ -218,8 +218,8 @@ export default function SatelliteEquipment({
                 <mesh key={`${col}-${row}`} position={[x, 0.025, z]}>
                   <cylinderGeometry args={[0.024, 0.024, 0.11, 12]} />
                   <meshStandardMaterial
-                    color={isSelected ? '#38A3FF' : '#1E293B'}
-                    emissive={isSelected ? '#38A3FF' : '#0B1120'}
+                    color={isSelected ? '#FFFFFF' : '#334155'}
+                    emissive={isSelected ? '#FFFFFF' : '#0B1120'}
                     emissiveIntensity={isSelected ? 0.6 : 0.1}
                     metalness={0.88}
                     roughness={0.2}
@@ -258,9 +258,9 @@ export default function SatelliteEquipment({
             <mesh position={[0.13, 0.02, 0]}>
               <boxGeometry args={[0.035, 0.07, 0.045]} />
               <meshStandardMaterial
-                color="#38A3FF"
+                color="#FFFFFF"
                 metalness={0.95}
-                emissive={isSelected ? '#38A3FF' : '#000000'}
+                emissive={isSelected ? '#FFFFFF' : '#000000'}
                 emissiveIntensity={isSelected ? 0.5 : 0}
               />
             </mesh>
@@ -284,8 +284,8 @@ export default function SatelliteEquipment({
             <mesh position={[0, 0.09, 0]}>
               <boxGeometry args={[0.13, 0.028, 0.11]} />
               <meshStandardMaterial
-                color="#38A3FF"
-                emissive="#38A3FF"
+                color="#FFFFFF"
+                emissive="#FFFFFF"
                 emissiveIntensity={isSelected ? 0.6 : 0.2}
                 metalness={0.88}
               />
@@ -341,8 +341,8 @@ export default function SatelliteEquipment({
               <mesh key={i} position={[0, y, 0.022]} rotation={[0.45, 0, 0]}>
                 <boxGeometry args={[0.24, 0.038, 0.007]} />
                 <meshStandardMaterial
-                  color="#38A3FF"
-                  emissive="#38A3FF"
+                  color="#CBD5E1"
+                  emissive="#FFFFFF"
                   emissiveIntensity={isSelected ? 0.6 : 0.2}
                   metalness={0.92}
                 />
@@ -372,9 +372,9 @@ export default function SatelliteEquipment({
             <mesh position={[0, 0.09, 0]}>
               <circleGeometry args={[0.076, 22]} />
               <meshStandardMaterial
-                color="#38A3FF"
-                emissive="#1E3A8A"
-                emissiveIntensity={isSelected ? 1.0 : 0.7}
+                color="#E2E8F0"
+                emissive="#94A3B8"
+                emissiveIntensity={isSelected ? 0.9 : 0.5}
                 roughness={0.08}
               />
             </mesh>
@@ -394,7 +394,7 @@ export default function SatelliteEquipment({
                 color="#e2e8f0"
                 metalness={0.92}
                 roughness={0.1}
-                emissive={isSelected ? '#38A3FF' : '#000000'}
+                emissive={isSelected ? '#FFFFFF' : '#000000'}
                 emissiveIntensity={isSelected ? 0.5 : 0}
               />
             </mesh>

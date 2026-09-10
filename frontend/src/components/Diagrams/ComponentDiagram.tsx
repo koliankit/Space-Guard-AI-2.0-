@@ -102,8 +102,8 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
 
               {/* 3. S/X-BAND RF TELEMETRY (COMM) */}
               <g transform="translate(380, 20)">
-                <rect width="140" height="75" rx="4" fill="url(#amberGrad)" stroke="#38A3FF" strokeWidth="1.5" />
-                <text x="70" y="22" fill="#38A3FF" fontSize="10" fontWeight="bold" textAnchor="middle">
+                <rect width="140" height="75" rx="4" fill="url(#amberGrad)" stroke="#FFFFFF" strokeWidth="1.5" />
+                <text x="70" y="22" fill="#FFFFFF" fontSize="10" fontWeight="bold" textAnchor="middle">
                   RF COMM [ISTRAC]
                 </text>
                 <text x="70" y="37" fill="#94A3B8" fontSize="8.5" textAnchor="middle">
@@ -115,8 +115,8 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 <text x="70" y="63" fill="#10B981" fontSize="8" textAnchor="middle" fontWeight="bold">
                   LINK: LOCKED
                 </text>
-                <line x1="70" y1="75" x2="70" y2="110" stroke="#38A3FF" strokeWidth="1.5" />
-                <circle cx="70" cy="110" r="3" fill="#38A3FF" />
+                <line x1="70" y1="75" x2="70" y2="110" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="70" cy="110" r="3" fill="#FFFFFF" />
               </g>
 
               {/* 4. AOCS & PROPULSION */}
@@ -138,22 +138,22 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 <circle cx="75" cy="110" r="3" fill="#10B981" />
               </g>
 
-              {/* 5. QUARANTINED SILICON MODULE */}
+              {/* 5. BATTERY & EPS */}
               <g transform="translate(100, 160)">
-                <rect width="160" height="75" rx="4" fill="url(#rejectGrad)" stroke="#EF4444" strokeWidth="1.5" />
-                <line x1="80" y1="0" x2="80" y2="-30" stroke="#EF4444" strokeWidth="1.5" />
-                <circle cx="80" cy="-30" r="3" fill="#EF4444" />
-                <text x="80" y="22" fill="#EF4444" fontSize="10" fontWeight="bold" textAnchor="middle">
-                  SILICON SCREENING
+                <rect width="160" height="75" rx="4" fill="url(#safeGrad)" stroke="#10B981" strokeWidth="1.5" />
+                <line x1="80" y1="0" x2="80" y2="-30" stroke="#10B981" strokeWidth="1.5" />
+                <circle cx="80" cy="-30" r="3" fill="#10B981" />
+                <text x="80" y="22" fill="#10B981" fontSize="10" fontWeight="bold" textAnchor="middle">
+                  EPS &amp; BATTERY
                 </text>
                 <text x="80" y="37" fill="#94A3B8" fontSize="8.5" textAnchor="middle">
-                  HTOL 168H Chamber
+                  Li-Ion 48Ah Flight Pack
                 </text>
                 <text x="80" y="50" fill="#E2E8F0" fontSize="8" textAnchor="middle">
-                  Latent Defect Filter
+                  DoD: 18.2% &bull; Cell Bal: OK
                 </text>
-                <text x="80" y="63" fill="#EF4444" fontSize="8" textAnchor="middle" fontWeight="bold">
-                  DEFECT QUARANTINE
+                <text x="80" y="63" fill="#10B981" fontSize="8" textAnchor="middle" fontWeight="bold">
+                  CHARGE: 98.4%
                 </text>
               </g>
 
@@ -178,10 +178,10 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
 
               {/* 7. THERMAL CONTROL (TCS) */}
               <g transform="translate(500, 160)">
-                <rect width="140" height="75" rx="4" fill="url(#amberGrad)" stroke="#38A3FF" strokeWidth="1.5" />
-                <line x1="70" y1="0" x2="70" y2="-30" stroke="#38A3FF" strokeWidth="1.5" />
-                <circle cx="70" cy="-30" r="3" fill="#38A3FF" />
-                <text x="70" y="22" fill="#38A3FF" fontSize="10" fontWeight="bold" textAnchor="middle">
+                <rect width="140" height="75" rx="4" fill="url(#amberGrad)" stroke="#FFFFFF" strokeWidth="1.5" />
+                <line x1="70" y1="0" x2="70" y2="-30" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="70" cy="-30" r="3" fill="#FFFFFF" />
+                <text x="70" y="22" fill="#FFFFFF" fontSize="10" fontWeight="bold" textAnchor="middle">
                   THERMAL CONTROL
                 </text>
                 <text x="70" y="37" fill="#94A3B8" fontSize="8.5" textAnchor="middle">

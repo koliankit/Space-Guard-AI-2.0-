@@ -206,7 +206,7 @@ export default function MissionReportView({
                     <td className="py-2 px-3 text-slate-400">{c.lot_id}</td>
                     <td className="py-2 px-3 text-slate-300">{c.v0.toFixed(2)} &#956;A</td>
                     <td className="py-2 px-3 text-reject font-bold">{c.v168.toFixed(2)} &#956;A</td>
-                    <td className="py-2 px-3 text-telemetry-steel">{c.lot_mean != null ? `${c.lot_mean.toFixed(2)} µA` : '-'}</td>
+                    <td className="py-2 px-3 text-slate-100">{c.lot_mean != null ? `${c.lot_mean.toFixed(2)} µA` : '-'}</td>
                     <td className="py-2 px-3 text-reject font-bold">
                       {c.pct_drift > 0 ? '+' : ''}{c.pct_drift.toFixed(1)}%
                     </td>

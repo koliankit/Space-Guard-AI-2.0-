@@ -54,8 +54,8 @@ export default function SolarWings({
   const cellMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: isSelected ? '#0b2e59' : isHovered ? '#092548' : '#06162d',
-        emissive: isSelected ? '#38A3FF' : isHovered ? '#1E3A8A' : '#031b38',
+        color: isSelected ? '#1e293b' : isHovered ? '#0f172a' : '#080d1a',
+        emissive: isSelected ? '#FFFFFF' : isHovered ? '#64748B' : '#0f172a',
         emissiveIntensity: isSelected ? 0.65 : isHovered ? 0.45 : 0.2,
         metalness: 0.95,
         roughness: 0.12,
@@ -102,8 +102,8 @@ export default function SolarWings({
         <mesh rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.075, 0.075, 0.3, 24]} />
           <meshStandardMaterial
-            color={isSelected ? '#F59E0B' : '#2563EB'}
-            emissive={isSelected ? '#F59E0B' : '#1E3A8A'}
+            color={isSelected ? '#F59E0B' : '#475569'}
+            emissive={isSelected ? '#F59E0B' : '#1e293b'}
             emissiveIntensity={isSelected ? 0.7 : 0.25}
             metalness={0.92}
             roughness={0.15}
@@ -131,16 +131,16 @@ export default function SolarWings({
               {/* Glowing High-Tech Edge Framing */}
               <lineSegments geometry={panelEdges}>
                 <lineBasicMaterial
-                  color={isSelected ? '#10B981' : isHovered ? '#F59E0B' : '#38A3FF'}
+                  color={isSelected ? '#10B981' : isHovered ? '#F59E0B' : '#FFFFFF'}
                   transparent
-                  opacity={isSelected ? 0.95 : isHovered ? 0.8 : 0.55}
+                  opacity={isSelected ? 0.95 : isHovered ? 0.8 : 0.65}
                 />
               </lineSegments>
 
               {/* Silicon Cell Conductor Grid Wires */}
               <lineSegments geometry={gridLinesGeo}>
                 <lineBasicMaterial
-                  color={isSelected ? '#F59E0B' : '#2563EB'}
+                  color={isSelected ? '#F59E0B' : '#94A3B8'}
                   transparent
                   opacity={isSelected ? 0.85 : 0.5}
                 />
