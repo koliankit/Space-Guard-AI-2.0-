@@ -15,6 +15,26 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
   const padR = 28
   const padT = 20
   const padB = 40
+  const limitVal = component?.limit_ua || 50
+  const v0 = component?.v0 ?? 0
+  const v24 = component?.v24 ?? 0
+  const v96 = component?.v96 ?? (v0 + (v24 - v0) * 4)
+  const v168 = component?.v168 ?? 0
+  const slope = component?.slope || (v168 - v0) / 168
+  const future264 = component?.predicted_future || v168 + slope * 96
+
+  // Projected value at horizon (Hook called unconditionally)
+  const projectedAtHorizon = useMemo(() => {
+    const deltaH = activeHorizon - 168
+    return v168 + slope * deltaH
+  }, [v168, slope, activeHorizon])
+
+  // Calculate breach hour if slope > 0 (Hook called unconditionally)
+  const breachHour = useMemo(() => {
+    if (slope <= 0) return null
+    const h = 168 + (limitVal - v168) / slope
+    return h > 0 && h <= 500 ? h : null
+  }, [slope, limitVal, v168])
 
   if (!component) {
     return (
@@ -32,27 +52,6 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
       </div>
     )
   }
-
-  const limitVal = component.limit_ua || 50
-  const v0 = component.v0
-  const v24 = component.v24
-  const v96 = component.v96 ?? (v0 + (v24 - v0) * 4)
-  const v168 = component.v168
-  const slope = component.slope || (v168 - v0) / 168
-  const future264 = component.predicted_future || v168 + slope * 96
-
-  // Projected value at horizon
-  const projectedAtHorizon = useMemo(() => {
-    const deltaH = activeHorizon - 168
-    return v168 + slope * deltaH
-  }, [v168, slope, activeHorizon])
-
-  // Calculate breach hour if slope > 0
-  const breachHour = useMemo(() => {
-    if (slope <= 0) return null
-    const h = 168 + (limitVal - v168) / slope
-    return h > 0 && h <= 500 ? h : null
-  }, [slope, limitVal, v168])
 
   // Uncertainty cone variance (+/- 1.5 sigma drift model)
   const lotStd = component.lot_std || 1.8
