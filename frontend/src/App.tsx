@@ -389,8 +389,9 @@ export default function App() {
       )}
 
       {activeTab === 'telemetry' && (
-        <>
-          <div className="grid grid-cols-[300px_1fr_340px] gap-3.5 p-3.5 bg-[#060B16] flex-1 w-full max-xl:grid-cols-1">
+        <div className="flex flex-col xl:flex-row gap-4 p-4 bg-[#060B16] flex-1 w-full items-start">
+          {/* Sticky Left Sidebar: Component Monitor is pinned so selection is NEVER lost on scroll */}
+          <div className="w-full xl:w-[320px] 2xl:w-[350px] flex-shrink-0 xl:sticky xl:top-2 xl:h-[calc(100vh-80px)] flex flex-col rounded-xl overflow-hidden border border-slate-800 bg-[#0B1120] shadow-md z-10">
             <ComponentMonitor
               subsystems={subsystems}
               components={allComponents.length > 0 ? allComponents : flaggedList}
@@ -407,9 +408,13 @@ export default function App() {
                 refreshFlaggedList(searchTerm, mode)
               }}
             />
+          </div>
 
-            <div className="flex flex-col gap-3.5">
-              <div className="relative h-[440px] rounded-lg border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle">
+          {/* Main Telemetry & Mission Intelligence Flow - Fills all available space, eliminates empty voids */}
+          <div className="flex-1 min-w-0 flex flex-col gap-4 w-full">
+            {/* Top Row: 3D Interactive Satellite + Intelligence & Comparison Panels side-by-side */}
+            <div className="grid grid-cols-1 2xl:grid-cols-[1.35fr_1fr] xl:grid-cols-[1.2fr_1fr] gap-4">
+              <div className="relative h-[480px] rounded-xl border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle">
                 <SatelliteScene
                   subsystems={subsystems}
                   onSelect={selectSubsystem}
@@ -417,9 +422,19 @@ export default function App() {
                   selectedComponent={selected}
                 />
               </div>
-              <div className="rounded-lg border border-line bg-[#091120] overflow-hidden shadow-panel-subtle">
-                <TelemetryChart component={selected} />
+              <div className="flex flex-col gap-3.5">
+                <IntelligencePanel component={selected} />
+                <ComparePanel component={selected} />
               </div>
+            </div>
+
+            {/* Enriched Telemetry Oscilloscope Waveform Display (Full Width) */}
+            <div className="rounded-xl border border-line bg-[#091120] overflow-hidden shadow-panel-subtle w-full">
+              <TelemetryChart component={selected} />
+            </div>
+
+            {/* AI Prescriptive Actions & Root Cause Analysis (Full Width) */}
+            <div className="w-full">
               <AIRecommendationSystem
                 component={selected || flaggedList.find((c) => c.status === 'reject') || flaggedList[0] || allComponents[0] || null}
                 onIsolateBus={(id) => {
@@ -429,6 +444,10 @@ export default function App() {
                   log(`Cold standby failover initiated for component ${id}.`, 'ok')
                 }}
               />
+            </div>
+
+            {/* Spacecraft Subsystem Hardware & Command Console (Full Width) */}
+            <div className="w-full">
               <SatelliteEquipmentBoard
                 subsystems={subsystems}
                 components={allComponents.length > 0 ? allComponents : flaggedList}
@@ -438,13 +457,8 @@ export default function App() {
                 onSelectSubsystem={selectSubsystem}
               />
             </div>
-
-            <div className="flex flex-col gap-3">
-              <IntelligencePanel component={selected} />
-              <ComparePanel component={selected} />
-            </div>
           </div>
-        </>
+        </div>
       )}
 
       {activeTab === 'matrix' && (

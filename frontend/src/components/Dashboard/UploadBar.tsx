@@ -216,11 +216,11 @@ export default function UploadBar({
       </div>
 
       {/* Dataset Status Ticker with interactive Lot-Wise Inspector */}
-      <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between gap-3 text-sm md:text-[15px] text-slate-200">
+      <div className="mt-2.5 pt-2.5 border-t border-slate-800/80 flex items-center justify-between gap-3 text-base md:text-lg text-slate-100">
         <div className="flex items-center gap-2.5 flex-wrap">
           <span className="w-2.5 h-2.5 rounded-full bg-white led flex-shrink-0" />
           <div
-            className="flex items-center gap-1.5 flex-wrap text-sm md:text-[15px] leading-snug cursor-pointer select-none"
+            className="flex items-center gap-2 flex-wrap text-sm md:text-base leading-snug cursor-pointer select-none font-medium"
             onClick={(e) => {
               const target = e.target as HTMLElement
               if (
@@ -244,7 +244,7 @@ export default function UploadBar({
                 sounds.playClick()
                 onOpenLotsModal()
               }}
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-bold bg-white/10 hover:bg-white/20 text-white hover:text-white px-2.5 py-0.5 rounded-md border border-white/20 hover:border-white/40 transition-all shadow-sm cursor-pointer ml-1 group"
+              className="inline-flex items-center gap-1.5 text-xs md:text-sm font-mono font-bold bg-white/10 hover:bg-white/20 text-white hover:text-white px-3 py-1 rounded-md border border-white/20 hover:border-white/40 transition-all shadow-sm cursor-pointer ml-1 group"
               title="Open dedicated Lot-Wise Classification Window"
             >
               <span>📦</span>
@@ -252,7 +252,7 @@ export default function UploadBar({
             </button>
           )}
         </div>
-        <span className="text-slate-400 text-[11px] uppercase font-mono tracking-wider bg-[#070D1A] px-2.5 py-1 rounded-md border border-slate-800 whitespace-nowrap hidden lg:inline-block">
+        <span className="text-slate-300 text-xs uppercase font-mono tracking-wider bg-[#070D1A] px-3 py-1 rounded-md border border-slate-800 whitespace-nowrap hidden lg:inline-block">
           MIL-STD-883 HTOL 168H RELIABILITY SPEC
         </span>
       </div>

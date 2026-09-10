@@ -80,40 +80,40 @@ export default function Header({
       <div className="flex flex-wrap items-center justify-between px-4 md:px-6 py-2 border-b border-slate-800/80 gap-3">
         {/* Official ISRO Title & Mission Crest */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg border border-amber-500/40 bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex flex-col items-center justify-center text-white font-display font-bold text-xs shadow-isro">
-            <span className="tracking-tight text-[11px] text-amber-300 font-bold">ISRO</span>
-            <span className="text-[7.5px] text-slate-300 font-mono tracking-widest">MOX</span>
+          <div className="w-10 h-10 rounded-lg border border-amber-500/40 bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex flex-col items-center justify-center text-white font-display font-bold text-xs shadow-isro">
+            <span className="tracking-tight text-xs text-amber-300 font-bold">ISRO</span>
+            <span className="text-[8.5px] text-slate-300 font-mono tracking-widest">MOX</span>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="m-0 text-sm font-display font-bold tracking-wider text-white uppercase">
+              <h1 className="m-0 text-base md:text-lg font-display font-bold tracking-wider text-white uppercase">
                 SpaceGuard AI <span className="text-slate-600 font-normal">|</span> <span className="text-amber-400">Mission Reliability Control</span>
               </h1>
-              <span className="text-[9.5px] px-2 py-0.5 rounded bg-slate-800/90 text-slate-300 border border-slate-700 font-mono font-medium">
+              <span className="text-[10.5px] px-2 py-0.5 rounded bg-slate-800/90 text-slate-300 border border-slate-700 font-mono font-medium">
                 SDSC SHAR // LCC-01
               </span>
             </div>
-            <div className="text-[10.5px] text-slate-400 font-sans mt-0.5">
+            <div className="text-xs md:text-[13px] text-slate-300 font-sans mt-0.5">
               MIL-STD-883 Method 1005 Silicon HTOL Component Screening &amp; Flight Assurance
             </div>
           </div>
         </div>
 
         {/* Synchronized Mission Clocks & Ground Telemetry */}
-        <div className="flex items-center gap-2 text-xs font-mono">
-          <div className="px-3 py-1 rounded bg-[#070D1A] border border-slate-800 flex items-center gap-2">
-            <span className="text-[9.5px] text-slate-400 uppercase font-medium">IST</span>
-            <span className="font-bold text-slate-100 text-xs tabular-nums">{istTime || '16:15:00'}</span>
+        <div className="flex items-center gap-2.5 text-xs font-mono">
+          <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 flex items-center gap-2">
+            <span className="text-[10.5px] text-slate-400 uppercase font-semibold">IST</span>
+            <span className="font-bold text-white text-xs md:text-sm tabular-nums">{istTime || '16:15:00'}</span>
           </div>
-          <div className="px-3 py-1 rounded bg-[#070D1A] border border-amber-500/30 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 led" />
-            <span className="text-[9.5px] text-amber-400 uppercase font-medium">MET</span>
-            <span className="font-bold text-amber-300 text-xs tabular-nums">{formatMet(metSeconds)}</span>
+          <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-amber-500/40 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
+            <span className="text-[10.5px] text-amber-400 uppercase font-semibold">MET</span>
+            <span className="font-bold text-amber-300 text-xs md:text-sm tabular-nums">{formatMet(metSeconds)}</span>
           </div>
-          <div className="px-3 py-1 rounded bg-[#070D1A] border border-slate-800 items-center gap-2 hidden lg:flex">
-            <span className={`w-1.5 h-1.5 rounded-full ${streamActive ? 'bg-emerald-400' : 'bg-slate-600'}`} />
-            <span className="text-[9.5px] text-slate-400">BYL-32 DSN</span>
-            <span className={`text-xs font-semibold ${streamActive ? 'text-emerald-300' : 'text-slate-500'}`}>
+          <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 items-center gap-2 hidden lg:flex">
+            <span className={`w-2 h-2 rounded-full ${streamActive ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+            <span className="text-[10.5px] text-slate-400 font-semibold">BYL-32 DSN</span>
+            <span className={`text-xs md:text-sm font-semibold ${streamActive ? 'text-emerald-300' : 'text-slate-500'}`}>
               {streamActive ? 'CARRIER LOCK' : 'STANDBY'}
             </span>
           </div>
@@ -169,9 +169,9 @@ export default function Header({
       </div>
 
       {/* Secondary Navigation Bar: Edge-to-Edge Mission Console Tabs */}
-      <div className="flex items-center justify-between px-4 md:px-6 py-1.5 bg-[#070C18] border-t border-slate-800/80 overflow-x-auto select-none">
+      <div className="flex items-center justify-between px-4 md:px-6 py-2 bg-[#070C18] border-t border-slate-800/80 overflow-x-auto select-none">
         <div className="flex items-center gap-1.5">
-          <span className="text-[9.5px] text-slate-400 font-display font-semibold uppercase tracking-wider mr-2 hidden md:inline">
+          <span className="text-[10.5px] text-slate-400 font-display font-bold uppercase tracking-wider mr-2 hidden md:inline">
             CONSOLE:
           </span>
           {TABS.map((tab) => {
@@ -181,24 +181,24 @@ export default function Header({
                 key={tab.id}
                 type="button"
                 onClick={() => onSelectTab(tab.id)}
-                className={`text-[11.5px] px-3 py-1 rounded-md transition-all flex items-center gap-2 font-display tracking-wide border ${
+                className={`text-xs md:text-[13px] px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 font-display tracking-wide border ${
                   isActive
                     ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-bold shadow-isro'
-                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    : 'border-transparent text-slate-300 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
-                {tab.icon && <span className="text-xs">{tab.icon}</span>}
-                <span className={`text-[9.5px] font-mono ${isActive ? 'text-amber-200 opacity-90' : 'text-slate-400'}`}>
+                {tab.icon && <span className="text-sm">{tab.icon}</span>}
+                <span className={`text-[10.5px] font-mono font-bold ${isActive ? 'text-amber-200' : 'text-slate-400'}`}>
                   [{tab.tag}]
                 </span>
                 <span>{tab.label}</span>
                 {tab.id === 'matrix' && totalComponents > 0 && (
-                  <span className={`text-[9.5px] font-mono px-1.5 py-0.2 rounded ${isActive ? 'bg-amber-500/30 text-amber-200' : 'bg-slate-800 text-slate-300'}`}>
+                  <span className={`text-[10.5px] font-mono px-1.5 py-0.2 rounded font-bold ${isActive ? 'bg-amber-500/30 text-amber-200' : 'bg-slate-800 text-slate-300'}`}>
                     {totalComponents}
                   </span>
                 )}
                 {tab.id === 'report' && rejectCount > 0 && (
-                  <span className="text-[9.5px] font-mono px-1.5 py-0.2 rounded bg-rose-600 text-white font-bold">
+                  <span className="text-[10.5px] font-mono px-1.5 py-0.2 rounded bg-rose-600 text-white font-bold">
                     !
                   </span>
                 )}
