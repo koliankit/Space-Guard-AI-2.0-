@@ -48,24 +48,24 @@ export default function ModuleBFutureDriftPanel({
         {selected ? (
           <div className="p-3 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col gap-2.5">
             {/* Top Identity & Drift Classification Row */}
-            <div className="flex flex-wrap items-center justify-between gap-2 font-mono">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-white tracking-wide">{selected.component_id}</span>
-                <span className="text-slate-400 text-xs">&bull;</span>
-                <span className="text-amber-300 text-xs">Target Subsystem:</span>
+            <div className="flex flex-wrap items-center justify-between gap-2.5 font-mono">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <span className="text-base md:text-lg font-bold text-white tracking-wide">{selected.component_id}</span>
+                <span className="text-slate-400 text-sm">&bull;</span>
+                <span className="text-amber-300 text-xs md:text-sm font-semibold">Target Subsystem:</span>
                 <button
                   type="button"
                   onClick={() => onSelectSubsystem && onSelectSubsystem(selected.subsystem)}
-                  className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-amber-300 text-[10px] font-bold hover:bg-slate-700 transition-colors"
+                  className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-amber-300 text-xs font-bold hover:bg-slate-700 transition-colors"
                 >
                   [{selected.subsystem}] {loc?.name || selected.subsystem}
                 </button>
               </div>
 
               {/* Drift Trend Badge */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <span
-                  className={`px-2.5 py-0.5 rounded text-[10px] font-bold border ${
+                  className={`px-3 py-1 rounded-md text-xs font-bold border ${
                     willBreach
                       ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                       : isAccelerating
@@ -76,7 +76,7 @@ export default function ModuleBFutureDriftPanel({
                   {selected.drift_trend || (willBreach ? 'PREDICTED EXCEEDANCE' : 'NOMINAL DRIFT')}
                 </span>
                 {willBreach && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-600 text-white animate-pulse">
+                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-rose-600 text-white animate-pulse">
                     CRITICAL BREACH
                   </span>
                 )}
@@ -84,25 +84,25 @@ export default function ModuleBFutureDriftPanel({
             </div>
 
             {/* In-Flight Reliability Forecast Metrics Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">Drift Velocity</span>
-                <span className={`text-sm font-bold mt-0.5 tabular-nums ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
-                  {(slope * 1000).toFixed(2)} <span className="text-[10px] font-normal text-slate-400">nA/hr</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
+                <span className={`text-base font-bold mt-1 tabular-nums ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
+                  {(slope * 1000).toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
                 </span>
               </div>
 
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">264h Extrapolated</span>
-                <span className={`text-sm font-bold mt-0.5 tabular-nums ${willBreach ? 'text-rose-400' : 'text-slate-100'}`}>
-                  {selected.predicted_future.toFixed(1)} <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">264h Extrapolated</span>
+                <span className={`text-base font-bold mt-1 tabular-nums ${willBreach ? 'text-rose-400' : 'text-slate-100'}`}>
+                  {selected.predicted_future.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
                 </span>
               </div>
 
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">Future Safety Margin</span>
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">Future Safety Margin</span>
                 <span
-                  className={`text-sm font-bold mt-0.5 tabular-nums ${
+                  className={`text-base font-bold mt-1 tabular-nums ${
                     (selected.margin_future ?? 0) < 5
                       ? 'text-rose-400'
                       : (selected.margin_future ?? 0) < 15
@@ -111,13 +111,13 @@ export default function ModuleBFutureDriftPanel({
                   }`}
                 >
                   {(selected.margin_future ?? (limitVal - selected.predicted_future)).toFixed(1)}{' '}
-                  <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
+                  <span className="text-xs font-normal text-slate-400">&mu;A</span>
                 </span>
               </div>
 
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">Time to Limit Breach</span>
-                <span className={`text-sm font-bold mt-0.5 tabular-nums ${breachHour && breachHour <= 300 ? 'text-rose-400' : 'text-emerald-400'}`}>
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">Time to Limit Breach</span>
+                <span className={`text-base font-bold mt-1 tabular-nums ${breachHour && breachHour <= 300 ? 'text-rose-400' : 'text-emerald-400'}`}>
                   {breachHour && breachHour > 0 && breachHour < 1000
                     ? `T+${Math.round(breachHour)} hrs`
                     : '> 10,000 hrs (SAFE)'}
@@ -126,18 +126,18 @@ export default function ModuleBFutureDriftPanel({
             </div>
 
             {/* Early-to-Late Validation & Model Accuracy */}
-            <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-slate-300 pt-1 border-t border-slate-800/80">
-              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs md:text-sm font-mono text-slate-200 pt-1.5 border-t border-slate-800/80">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
                 <span className="text-slate-400">Early 0-24h Model:</span>
-                <span className="text-slate-200 font-bold tabular-nums">
+                <span className="text-slate-100 font-bold tabular-nums">
                   {selected.predicted168_from_early.toFixed(1)} &mu;A
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
                 <span className="text-slate-400">Actual 168h Reading:</span>
-                <span className="text-slate-200 font-bold tabular-nums">{selected.v168.toFixed(1)} &mu;A</span>
+                <span className="text-slate-100 font-bold tabular-nums">{selected.v168.toFixed(1)} &mu;A</span>
               </div>
-              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
                 <span className="text-slate-400">Prediction Error:</span>
                 <span className="text-amber-300 font-bold tabular-nums">
                   &plusmn;{(selected.prediction_error_168 ?? Math.abs(selected.v168 - selected.predicted168_from_early)).toFixed(2)} &mu;A
@@ -147,16 +147,16 @@ export default function ModuleBFutureDriftPanel({
 
             {/* Flight Operations Advisory / Mitigation Actions */}
             <div
-              className={`p-2 rounded text-xs flex items-start gap-2 border ${
+              className={`p-3 rounded-lg text-xs md:text-sm flex items-start gap-2.5 border ${
                 willBreach
                   ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                   : 'bg-amber-500/10 border-amber-500/40 text-amber-200'
               }`}
             >
-              <span className="font-bold font-mono text-[11px] uppercase whitespace-nowrap">
+              <span className="font-bold font-mono text-xs md:text-sm uppercase whitespace-nowrap">
                 {willBreach ? '⚠️ Mitigation Advisory:' : 'ℹ️ Flight Recommendation:'}
               </span>
-              <span className="text-[11px] font-sans leading-relaxed">
+              <span className="text-xs md:text-[13.5px] font-sans leading-relaxed">
                 {willBreach
                   ? `Component exhibits runaway leakage drift exceeding ${limitVal} µA threshold in mission orbit. Recommend automated telemetry trip, power bus decoupling, and switching to redundant Cold-Standby channel in ${loc?.bay || 'Equipment Bay'}.`
                   : `Component exhibits stable drift velocity (${(slope * 1000).toFixed(1)} nA/hr). Maintain regular 24h orbital polling cycle. Bus supply remains nominal.`}

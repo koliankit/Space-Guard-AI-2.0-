@@ -412,25 +412,27 @@ export default function App() {
 
           {/* Main Telemetry & Mission Intelligence Flow - Fills all available space, eliminates empty voids */}
           <div className="flex-1 min-w-0 flex flex-col gap-4 w-full">
-            {/* Top Row: 3D Interactive Satellite + Telemetry Waveform Graph on Left & Intelligence Panels on Right */}
-            <div className="grid grid-cols-1 2xl:grid-cols-[1.35fr_1fr] xl:grid-cols-[1.25fr_1fr] gap-4 items-start">
-              <div className="flex flex-col gap-4">
-                <div className="relative h-[430px] md:h-[450px] rounded-xl border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle">
-                  <SatelliteScene
-                    subsystems={subsystems}
-                    onSelect={selectSubsystem}
-                    focusKey={focusKey}
-                    selectedComponent={selected}
-                  />
-                </div>
-                {/* Waveform Graph shifted to upper side, directly below SatelliteScene to utilize empty space */}
-                <div className="rounded-xl border border-line bg-[#091120] overflow-hidden shadow-panel-subtle w-full">
-                  <TelemetryChart component={selected} />
-                </div>
+            {/* Row 1: 3D Interactive Satellite (Left) & Real-Time Intelligence Diagnostics (Right) */}
+            <div className="grid grid-cols-1 2xl:grid-cols-[1.3fr_1fr] xl:grid-cols-[1.2fr_1fr] gap-4 items-stretch">
+              <div className="relative min-h-[440px] rounded-xl border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle flex flex-col">
+                <SatelliteScene
+                  subsystems={subsystems}
+                  onSelect={selectSubsystem}
+                  focusKey={focusKey}
+                  selectedComponent={selected}
+                />
               </div>
-
-              <div className="flex flex-col gap-3.5">
+              <div className="flex flex-col">
                 <IntelligencePanel component={selected} />
+              </div>
+            </div>
+
+            {/* Row 2: Enriched Telemetry Waveform Oscilloscope (Left) & Screening Paradigm Comparison (Right) */}
+            <div className="grid grid-cols-1 2xl:grid-cols-[1.3fr_1fr] xl:grid-cols-[1.2fr_1fr] gap-4 items-stretch">
+              <div className="rounded-xl border border-line bg-[#091120] overflow-hidden shadow-panel-subtle flex flex-col">
+                <TelemetryChart component={selected} />
+              </div>
+              <div className="flex flex-col">
                 <ComparePanel component={selected} />
               </div>
             </div>

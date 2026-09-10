@@ -112,16 +112,16 @@ export default function ModuleAAnomalyPanel({
         {selected ? (
           <div className="p-3 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col gap-2.5">
             {/* Top Identity Row */}
-            <div className="flex flex-wrap items-center justify-between gap-2 font-mono">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-white tracking-wide">{selected.component_id}</span>
-                <span className="text-slate-400 text-xs">&bull;</span>
-                <span className="text-amber-300 text-xs">Lot: {selected.lot_id}</span>
-                <span className="text-slate-400 text-xs">&bull;</span>
+            <div className="flex flex-wrap items-center justify-between gap-2.5 font-mono">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <span className="text-base md:text-lg font-bold text-white tracking-wide">{selected.component_id}</span>
+                <span className="text-slate-400 text-sm">&bull;</span>
+                <span className="text-amber-300 text-xs md:text-sm font-semibold">Lot: {selected.lot_id}</span>
+                <span className="text-slate-400 text-sm">&bull;</span>
                 <button
                   type="button"
                   onClick={() => onSelectSubsystem && onSelectSubsystem(selected.subsystem)}
-                  className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-amber-300 text-[10px] font-bold hover:bg-slate-700 transition-colors"
+                  className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-amber-300 text-xs font-bold hover:bg-slate-700 transition-colors"
                   title="Filter and highlight subsystem in 3D"
                 >
                   [{selected.subsystem}] {loc?.name || selected.subsystem}
@@ -129,11 +129,10 @@ export default function ModuleAAnomalyPanel({
               </div>
 
               {/* Status & Decision Tags */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <span
-                  className={`px-2.5 py-0.5 rounded text-[10px] font-bold border ${
+                  className={`px-3 py-1 rounded-md text-xs font-bold border ${
                     selected.status === 'reject'
-
                       ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                       : selected.status === 'monitor'
                       ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
@@ -144,15 +143,15 @@ export default function ModuleAAnomalyPanel({
                 </span>
 
                 {selected.traditional_decision === 'PASS' && selected.status === 'reject' ? (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-400/40">
+                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-400/40">
                     PASS Spec &bull; REJECT AI
                   </span>
                 ) : selected.traditional_decision === 'FAIL' ? (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">
+                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">
                     FAIL SPEC
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                     PASS SPEC &amp; AI
                   </span>
                 )}
@@ -161,62 +160,62 @@ export default function ModuleAAnomalyPanel({
 
             {/* Satellite Equipment Bay & 3D Coordinates */}
             {loc && (
-              <div className="text-[11px] text-slate-300 bg-slate-900/80 px-2.5 py-1.5 rounded border border-slate-800/90 flex flex-wrap items-center justify-between gap-2 font-mono">
+              <div className="text-xs md:text-sm text-slate-200 bg-slate-900/80 px-3 py-2 rounded-lg border border-slate-800/90 flex flex-wrap items-center justify-between gap-2 font-mono">
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 uppercase text-[10px]">Location:</span>
-                  <span className="text-white font-sans font-semibold">{loc.bay}</span>
+                  <span className="text-slate-400 uppercase text-xs font-semibold">Location:</span>
+                  <span className="text-white font-sans font-bold">{loc.bay}</span>
                   <span className="text-slate-400 font-sans">({loc.deck})</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 text-[10px]">COORDINATES:</span>
-                  <span className="text-amber-300 font-mono">{formatCoordinates(loc.pos)}</span>
+                  <span className="text-slate-400 text-xs font-semibold">COORDINATES:</span>
+                  <span className="text-amber-300 font-mono font-bold">{formatCoordinates(loc.pos)}</span>
                 </div>
               </div>
             )}
 
             {/* HTOL Telemetry Reading Grid (0h, 24h, 96h, 168h, Limit) */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">0h Initial</span>
-                <span className="text-sm font-bold text-slate-100 mt-0.5 tabular-nums">{selected.v0.toFixed(1)} &mu;A</span>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs font-mono">
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">0h Initial</span>
+                <span className="text-base font-bold text-slate-100 mt-1 tabular-nums">{selected.v0.toFixed(1)} &mu;A</span>
               </div>
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">24h Early</span>
-                <span className="text-sm font-bold text-slate-100 mt-0.5 tabular-nums">{selected.v24.toFixed(1)} &mu;A</span>
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">24h Early</span>
+                <span className="text-base font-bold text-slate-100 mt-1 tabular-nums">{selected.v24.toFixed(1)} &mu;A</span>
               </div>
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">96h Mid-HTOL</span>
-                <span className="text-sm font-bold text-slate-100 mt-0.5 tabular-nums">
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">96h Mid-HTOL</span>
+                <span className="text-base font-bold text-slate-100 mt-1 tabular-nums">
                   {selected.v96 != null ? `${selected.v96.toFixed(1)} \u00B5A` : '--'}
                 </span>
               </div>
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">168h Final</span>
-                <span className={`text-sm font-bold mt-0.5 tabular-nums ${selected.status === 'reject' ? 'text-rose-400' : 'text-emerald-400'}`}>
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">168h Final</span>
+                <span className={`text-base font-bold mt-1 tabular-nums ${selected.status === 'reject' ? 'text-rose-400' : 'text-emerald-400'}`}>
                   {selected.v168.toFixed(1)} &mu;A
                 </span>
               </div>
-              <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">Spec Limit</span>
-                <span className="text-sm font-bold text-rose-400 mt-0.5 tabular-nums">{(selected.limit_ua || 50).toFixed(1)} &mu;A</span>
+              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+                <span className="text-xs text-slate-400 uppercase font-semibold">Spec Limit</span>
+                <span className="text-base font-bold text-rose-400 mt-1 tabular-nums">{(selected.limit_ua || 50).toFixed(1)} &mu;A</span>
               </div>
             </div>
 
             {/* Outlier & Statistical Analysis Row */}
-            <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-slate-300 pt-1 border-t border-slate-800/80">
-              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs md:text-sm font-mono text-slate-200 pt-1.5 border-t border-slate-800/80">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
                 <span className="text-slate-400">Lot &mu; / &sigma;:</span>
-                <span className="text-slate-200 font-bold tabular-nums">
+                <span className="text-slate-100 font-bold tabular-nums">
                   {selected.lot_mean?.toFixed(1) ?? '--'} &mu;A &bull; {selected.lot_std?.toFixed(2) ?? '--'}
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
                 <span className="text-slate-400">Lot z-Score:</span>
                 <span className={`font-bold tabular-nums ${Math.abs(selected.z168 || 0) > 2 ? 'text-rose-400' : 'text-amber-300'}`}>
                   {selected.z168 > 0 ? '+' : ''}{selected.z168?.toFixed(2) ?? '--'}&sigma;
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
                 <span className="text-slate-400">Isolation Score:</span>
                 <span className="text-purple-300 font-bold tabular-nums">
                   {selected.iso_score != null ? `${(selected.iso_score * 100).toFixed(1)}%` : '--'}
@@ -226,11 +225,11 @@ export default function ModuleAAnomalyPanel({
 
             {/* AI Diagnostics & Failure Physics */}
             {selected.reason && (
-              <div className="p-2 rounded bg-slate-900/60 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
-                <span className="text-amber-400 font-bold font-mono text-[11px] uppercase whitespace-nowrap">
+              <div className="p-2.5 rounded-lg bg-slate-900/70 border border-slate-800 text-xs md:text-sm text-slate-200 flex items-start gap-2.5">
+                <span className="text-amber-400 font-bold font-mono text-xs md:text-sm uppercase whitespace-nowrap">
                   Physics Diagnosis:
                 </span>
-                <span className="text-[11px] text-slate-300 font-sans leading-relaxed">
+                <span className="text-xs md:text-[13.5px] text-slate-200 font-sans leading-relaxed">
                   {selected.reason}
                 </span>
               </div>

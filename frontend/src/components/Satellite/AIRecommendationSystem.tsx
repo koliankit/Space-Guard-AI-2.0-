@@ -333,39 +333,39 @@ export default function AIRecommendationSystem({
   }
 
   return (
-    <div className="bg-[#0B1120] border border-slate-700/80 rounded-xl p-5 font-sans text-xs select-none shadow-xl flex flex-col gap-4">
+    <div className="bg-[#0B1120] border border-slate-700/80 rounded-xl p-5 md:p-6 font-sans text-xs select-none shadow-xl flex flex-col gap-4 w-full">
       {/* ================= HEADER BANNER ================= */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-800 bg-[#0F172A] -m-5 p-5 mb-0 rounded-t-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white text-lg shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 bg-[#0F172A] -m-5 md:-m-6 p-5 md:p-6 mb-0 rounded-t-xl">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white text-2xl shadow-sm">
             <span>🤖</span>
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="m-0 text-sm font-bold text-white tracking-wide uppercase">
+            <div className="flex items-center gap-2.5">
+              <h3 className="m-0 text-base md:text-lg font-bold text-white tracking-wide uppercase font-display">
                 AI Prescriptive Recommendation System
               </h3>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white border border-white/20 font-semibold">
+              <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-white/10 text-white border border-white/20 font-bold">
                 Autonomous Mission Assurance
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-xs md:text-sm text-slate-300 mt-1">
               Predictive degradation modeling, in-flight countermeasures &amp; ISRO flight disposition directives
             </p>
           </div>
         </div>
 
         {/* Confidence Badge & Urgency Indicator */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3.5">
           <div className="text-right">
-            <div className="text-[10px] text-slate-400 uppercase font-medium">Model Confidence</div>
-            <div className="font-mono text-sm font-extrabold text-white">
-              {confidenceScore}% <span className="text-[10px] font-normal text-slate-400 font-sans">Ensemble ML</span>
+            <div className="text-xs text-slate-400 uppercase font-semibold">Model Confidence</div>
+            <div className="font-mono text-base md:text-lg font-black text-white">
+              {confidenceScore}% <span className="text-xs font-normal text-slate-400 font-sans">Ensemble ML</span>
             </div>
           </div>
 
           <div
-            className={`px-3 py-1.5 rounded-lg border text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-lg border text-xs md:text-sm font-bold uppercase tracking-wide flex items-center gap-2 shadow-sm ${
               isReject
                 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                 : isMonitor
@@ -374,8 +374,8 @@ export default function AIRecommendationSystem({
             }`}
           >
             <span
-              className={`w-2 h-2 rounded-full ${
-                isReject ? 'bg-rose-500' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
+              className={`w-2.5 h-2.5 rounded-full ${
+                isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400 led' : 'bg-emerald-400'
               }`}
             />
             <span>
@@ -387,66 +387,66 @@ export default function AIRecommendationSystem({
 
       {/* ================= COMPONENT SUMMARY STRIP ================= */}
       {component && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 p-3 rounded-xl bg-[#070D1A] border border-slate-800">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[#070D1A] border border-slate-800">
           <div>
-            <span className="text-slate-400 block text-[10px] uppercase font-medium">Target Component</span>
-            <span className="font-mono text-xs font-bold text-white">{component.component_id}</span>
-            <span className="text-slate-400 text-[10px] block">[{component.subsystem}] {component.subsystem_name}</span>
+            <span className="text-slate-400 block text-xs uppercase font-semibold">Target Component</span>
+            <span className="font-mono text-sm md:text-base font-bold text-white">{component.component_id}</span>
+            <span className="text-slate-300 text-xs block">[{component.subsystem}] {component.subsystem_name}</span>
           </div>
 
           <div>
-            <span className="text-slate-400 block text-[10px] uppercase font-medium">Qualification Lot</span>
-            <span className="font-mono text-xs font-bold text-slate-200">{component.lot_id}</span>
-            <span className="text-slate-400 text-[10px] block">Method 1005 HTOL 168h</span>
+            <span className="text-slate-400 block text-xs uppercase font-semibold">Qualification Lot</span>
+            <span className="font-mono text-sm md:text-base font-bold text-slate-200">{component.lot_id}</span>
+            <span className="text-slate-300 text-xs block">Method 1005 HTOL 168h</span>
           </div>
 
           <div>
-            <span className="text-slate-400 block text-[10px] uppercase font-medium">Current vs Predicted</span>
-            <span className="font-mono text-xs font-bold text-rose-400">
+            <span className="text-slate-400 block text-xs uppercase font-semibold">Current vs Predicted</span>
+            <span className="font-mono text-sm md:text-base font-bold text-rose-400">
               {component.v168.toFixed(1)} &mu;A &rarr; {component.predicted_future.toFixed(1)} &mu;A
             </span>
-            <span className="text-slate-400 text-[10px] block">Spec limit: {component.limit_ua} &mu;A</span>
+            <span className="text-slate-300 text-xs block">Spec limit: {component.limit_ua} &mu;A</span>
           </div>
 
           <div>
-            <span className="text-slate-400 block text-[10px] uppercase font-medium">Estimated MTTF Horizon</span>
-            <span className={`font-mono text-xs font-bold ${isReject ? 'text-rose-400' : 'text-emerald-400'}`}>
+            <span className="text-slate-400 block text-xs uppercase font-semibold">Estimated MTTF Horizon</span>
+            <span className={`font-mono text-sm md:text-base font-bold ${isReject ? 'text-rose-400' : 'text-emerald-400'}`}>
               {isReject ? '< 96 Hours (Critical)' : '> 10 Years (Nominal)'}
             </span>
-            <span className="text-slate-400 text-[10px] block">Orbital thermal cycling</span>
+            <span className="text-slate-300 text-xs block">Orbital thermal cycling</span>
           </div>
         </div>
       )}
 
       {/* ================= PREDICTIVE DEGRADATION FORECAST CALLOUT ================= */}
-      <div className="p-3.5 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <div className="flex items-start gap-2.5">
-          <span className="text-amber-400 text-base mt-0.5">⚠️</span>
+      <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="text-amber-400 text-xl mt-0.5">⚠️</span>
           <div>
-            <span className="text-slate-200 font-semibold text-xs block">
+            <span className="text-slate-100 font-bold text-sm md:text-base block">
               AI Forecasted In-Orbit Degradation Curve &amp; Time-To-Failure:
             </span>
-            <p className="text-[11.5px] text-slate-300 mt-0.5 leading-relaxed">
+            <p className="text-xs md:text-sm text-slate-200 mt-1 leading-relaxed">
               {profile.estimatedTimeToFailure}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end md:self-center font-mono text-[11px] text-slate-400 bg-[#070D1A] px-3 py-1.5 rounded-lg border border-slate-800">
-          <span>Physical Failure:</span>
-          <span className="text-slate-200 font-semibold">{profile.failureMechanism.slice(0, 48)}...</span>
+        <div className="flex items-center gap-2.5 self-end md:self-center font-mono text-xs md:text-sm text-slate-300 bg-[#070D1A] px-3.5 py-2 rounded-lg border border-slate-800">
+          <span className="text-slate-400 uppercase font-semibold">Physical Failure:</span>
+          <span className="text-white font-bold">{profile.failureMechanism.slice(0, 52)}...</span>
         </div>
       </div>
 
       {/* ================= TAB NAVIGATION ================= */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+      <div className="flex items-center gap-2.5 border-b border-slate-800 pb-2.5 flex-wrap">
         <button
           type="button"
           onClick={() => setActiveTab('actions')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'actions'
               ? 'bg-white text-slate-900 font-bold shadow-sm'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              : 'text-slate-300 hover:text-white hover:bg-slate-800'
           }`}
         >
           <span>🎯</span> Prescriptive Engineering Actions ({profile.actions.length})
@@ -455,10 +455,10 @@ export default function AIRecommendationSystem({
         <button
           type="button"
           onClick={() => setActiveTab('measures')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'measures'
               ? 'bg-white text-slate-900 font-bold shadow-sm'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              : 'text-slate-300 hover:text-white hover:bg-slate-800'
           }`}
         >
           <span>🛡️</span> Preventative Operational Measures ({profile.operationalMeasures.length})
@@ -467,10 +467,10 @@ export default function AIRecommendationSystem({
         <button
           type="button"
           onClick={() => setActiveTab('manufacturing')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'manufacturing'
               ? 'bg-white text-slate-900 font-bold shadow-sm'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              : 'text-slate-300 hover:text-white hover:bg-slate-800'
           }`}
         >
           <span>🔬</span> Quality &amp; Manufacturing Countermeasures ({profile.manufacturingCountermeasures.length})
@@ -479,19 +479,19 @@ export default function AIRecommendationSystem({
 
       {/* ================= TAB 1: PRESCRIPTIVE ACTIONS ================= */}
       {activeTab === 'actions' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
           {profile.actions.map((act, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col justify-between gap-3 hover:border-slate-600 transition-colors shadow-sm"
+              className="p-4 md:p-5 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col justify-between gap-3.5 hover:border-slate-600 transition-colors shadow-sm"
             >
               <div>
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
-                  <span className="text-[10px] font-mono uppercase font-semibold text-slate-400 tracking-wider">
+                <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 mb-3">
+                  <span className="text-xs font-mono uppercase font-bold text-slate-300 tracking-wider">
                     {act.category}
                   </span>
                   <span
-                    className={`text-[9.5px] font-bold px-2 py-0.5 rounded font-mono uppercase ${
+                    className={`text-xs font-bold px-2.5 py-0.5 rounded font-mono uppercase ${
                       act.urgency === 'IMMEDIATE'
                         ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
                         : act.urgency === 'PREVENTATIVE'
@@ -503,25 +503,25 @@ export default function AIRecommendationSystem({
                   </span>
                 </div>
 
-                <h4 className="text-xs font-bold text-white mb-1.5">{act.title}</h4>
-                <p className="text-[11.5px] text-slate-300 leading-relaxed mb-3">
+                <h4 className="text-sm md:text-base font-bold text-white mb-2">{act.title}</h4>
+                <p className="text-xs md:text-sm text-slate-200 leading-relaxed mb-3.5 font-sans">
                   {act.action}
                 </p>
 
-                <div className="text-[11px] text-slate-400 bg-[#070D1A] p-2.5 rounded-lg border border-slate-800 leading-relaxed space-y-1">
+                <div className="text-xs md:text-sm text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed space-y-1.5 font-sans">
                   <div>
-                    <span className="text-slate-300 font-medium">Engineering Rationale: </span>
+                    <span className="text-slate-100 font-bold">Engineering Rationale: </span>
                     {act.rationale}
                   </div>
-                  <div className="text-[10px] text-slate-500 font-mono pt-1 border-t border-slate-800/80">
+                  <div className="text-xs text-slate-400 font-mono pt-1.5 border-t border-slate-800/80">
                     Ref: {act.isroStandard}
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-800 text-[10.5px] text-slate-400 font-mono flex items-center justify-between">
+              <div className="pt-2.5 border-t border-slate-800 text-xs md:text-sm text-slate-300 font-mono flex items-center justify-between">
                 <span>Timeframe:</span>
-                <span className="text-slate-200 font-semibold">{act.timeframe}</span>
+                <span className="text-white font-bold">{act.timeframe}</span>
               </div>
             </div>
           ))}
@@ -530,31 +530,31 @@ export default function AIRecommendationSystem({
 
       {/* ================= TAB 2: OPERATIONAL MEASURES ================= */}
       {activeTab === 'measures' && (
-        <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col gap-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <span className="text-xs font-bold text-white uppercase tracking-wide">
+        <div className="p-4 md:p-5 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col gap-3.5">
+          <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
+            <span className="text-sm md:text-base font-bold text-white uppercase tracking-wide">
               Real-Time In-Flight Operational Measures &amp; Flight Envelope Limits
             </span>
-            <span className="text-[10.5px] font-mono text-emerald-400">ISRO Mission Assurance Verified</span>
+            <span className="text-xs font-mono text-emerald-400 font-bold">ISRO Mission Assurance Verified</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             {profile.operationalMeasures.map((measure, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-2"
+                className="p-4 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-3"
               >
-                <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-white/15 text-white flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5">
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-white/15 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
                     {idx + 1}
                   </span>
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs md:text-sm text-slate-200 leading-relaxed font-sans">
                     {measure}
                   </p>
                 </div>
-                <div className="text-[10px] text-slate-500 font-mono pt-1.5 border-t border-slate-800/80 flex justify-between">
+                <div className="text-xs text-slate-400 font-mono pt-2 border-t border-slate-800/80 flex justify-between">
                   <span>Status: Active</span>
-                  <span className="text-white font-semibold">Enforced</span>
+                  <span className="text-white font-bold">Enforced</span>
                 </div>
               </div>
             ))}
@@ -564,31 +564,31 @@ export default function AIRecommendationSystem({
 
       {/* ================= TAB 3: MANUFACTURING COUNTERMEASURES ================= */}
       {activeTab === 'manufacturing' && (
-        <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col gap-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <span className="text-xs font-bold text-white uppercase tracking-wide">
+        <div className="p-4 md:p-5 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col gap-3.5">
+          <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
+            <span className="text-sm md:text-base font-bold text-white uppercase tracking-wide">
               Supply Chain &amp; Wafer Fabrication Quality Countermeasures
             </span>
-            <span className="text-[10.5px] font-mono text-slate-200">MIL-STD-883 Qualification</span>
+            <span className="text-xs font-mono text-slate-200 font-bold">MIL-STD-883 Qualification</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             {profile.manufacturingCountermeasures.map((cm, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-2"
+                className="p-4 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-3"
               >
-                <div className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5">
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
                     {idx + 1}
                   </span>
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs md:text-sm text-slate-200 leading-relaxed font-sans">
                     {cm}
                   </p>
                 </div>
-                <div className="text-[10px] text-slate-500 font-mono pt-1.5 border-t border-slate-800/80 flex justify-between">
+                <div className="text-xs text-slate-400 font-mono pt-2 border-t border-slate-800/80 flex justify-between">
                   <span>Quality Standard: Level S</span>
-                  <span className="text-emerald-400">Mandatory</span>
+                  <span className="text-emerald-400 font-bold">Mandatory</span>
                 </div>
               </div>
             ))}
@@ -597,13 +597,13 @@ export default function AIRecommendationSystem({
       )}
 
       {/* ================= INTERACTIVE ACTION EXECUTION BAR ================= */}
-      <div className="p-3.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-slate-300">
+      <div className="p-4 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-wrap items-center justify-between gap-3.5">
+        <div className="flex items-center gap-2 text-xs md:text-sm text-slate-200">
           <span className="text-white font-bold">⚡ Prescriptive Execution:</span>
           <span>Execute autonomous countermeasures or generate official ISRO quality directive</span>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <button
             type="button"
             onClick={() => {
@@ -613,9 +613,9 @@ export default function AIRecommendationSystem({
               }
               sounds.playPing()
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border flex items-center gap-2 cursor-pointer ${
               effectiveIsolated
-                ? 'bg-rose-500 text-white border-rose-600 font-bold'
+                ? 'bg-rose-500 text-white border-rose-600 shadow-sm'
                 : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500 hover:text-white'
             }`}
           >
@@ -631,9 +631,9 @@ export default function AIRecommendationSystem({
               }
               sounds.playSuccess()
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border flex items-center gap-2 cursor-pointer ${
               effectiveFailover
-                ? 'bg-slate-700 text-white border-white/40 font-bold'
+                ? 'bg-slate-700 text-white border-white/40 shadow-sm'
                 : 'bg-white/10 text-white border-white/20 hover:bg-slate-700 hover:text-white'
             }`}
           >
@@ -643,9 +643,9 @@ export default function AIRecommendationSystem({
           <button
             type="button"
             onClick={handleApplyDerating}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border flex items-center gap-2 cursor-pointer ${
               derated
-                ? 'bg-amber-500/30 text-amber-300 border-amber-500 font-bold'
+                ? 'bg-amber-500/30 text-amber-300 border-amber-500 shadow-sm'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
             }`}
           >
@@ -655,7 +655,7 @@ export default function AIRecommendationSystem({
           <button
             type="button"
             onClick={handleExportDirective}
-            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors flex items-center gap-1.5 shadow-sm"
+            className="px-4 py-2 rounded-lg text-xs md:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
           >
             <span>📋</span> {directiveExported ? '✓ Directive Logged' : 'Export ISRO Action Directive'}
           </button>

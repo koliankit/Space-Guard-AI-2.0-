@@ -10,18 +10,18 @@ const STAGES = [0, 24, 96, 168]
 export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphProps) {
   const [stageH, setStageH] = useState<number>(168)
 
-  const W = 560
-  const H = 220
-  const padL = 46
-  const padR = 24
-  const padT = 20
-  const padB = 40
+  const W = 720
+  const H = 280
+  const padL = 54
+  const padR = 28
+  const padT = 24
+  const padB = 44
 
   // Signal spectrogram equalizer bars along the bottom
   const spectrumBars = useMemo(() => {
-    return Array.from({ length: 32 }, (_, i) => {
-      const val = Math.abs(Math.sin((i / 32) * Math.PI * 3.2)) * 14 + 4
-      return Math.min(val, 18)
+    return Array.from({ length: 36 }, (_, i) => {
+      const val = Math.abs(Math.sin((i / 36) * Math.PI * 3.2)) * 18 + 5
+      return Math.min(val, 24)
     })
   }, [])
 
@@ -115,32 +115,32 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
   return (
     <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none">
       {/* Top Header & Stage Scrubbing Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-800/80 pb-2.5">
         <div className="flex items-center gap-2">
           <span
             className="w-2.5 h-2.5 rounded-full led"
             style={{ backgroundColor: curveColor }}
           />
-          <span className="font-display font-bold text-xs text-white tracking-wider uppercase">
+          <span className="font-display font-bold text-xs md:text-sm text-white tracking-wider uppercase">
             GRAPH A &bull; HTOL 168H PARAMETRIC ANOMALY OSCILLOSCOPE
           </span>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-200 font-bold">
             {component.component_id}
           </span>
         </div>
 
         {/* Stage Filter Buttons */}
-        <div className="flex items-center gap-1 bg-[#050914] p-0.5 rounded-lg border border-slate-800">
-          <span className="text-[9.5px] font-mono text-slate-400 px-1.5 uppercase">Stage:</span>
+        <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
+          <span className="text-xs font-mono text-slate-400 px-1.5 uppercase font-bold">Stage:</span>
           {STAGES.map((h) => (
             <button
               key={h}
               type="button"
               onClick={() => setStageH(h)}
-              className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
+              className={`px-3 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
                 stageH === h
-                  ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 font-bold shadow-isro'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-amber-500/30 text-amber-300 border border-amber-500/60 font-bold shadow-isro'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
               {h}h
@@ -151,7 +151,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
 
       {/* Main SVG Chart Canvas */}
       <div className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812]">
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[210px] block">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[260px] md:h-[290px] block">
           <defs>
             <linearGradient id="area-grad-a" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={curveColor} stopOpacity="0.22" />
@@ -327,26 +327,26 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
       </div>
 
       {/* Legend & Telemetry Readouts */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] font-mono text-slate-300 pt-1 border-t border-slate-800/60">
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="flex items-center gap-1.5">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm font-mono text-slate-200 pt-2 border-t border-slate-800/80">
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="flex items-center gap-2">
             <span
-              className="inline-block w-2.5 h-1 rounded-full"
+              className="inline-block w-3.5 h-1.5 rounded-full"
               style={{ backgroundColor: curveColor }}
             />
-            <span className="font-semibold text-white">Component Measured</span>
+            <span className="font-bold text-white">Component Measured</span>
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-0.5 bg-white border-t border-dashed border-white" />
-            <span className="text-slate-100 font-medium">Lot Norm Mean ({lotMean.toFixed(1)}&mu;A)</span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-1 bg-white border-t border-dashed border-white" />
+            <span className="text-slate-100 font-semibold">Lot Norm Mean ({lotMean.toFixed(1)}&mu;A)</span>
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-0.5 bg-rose-500" />
-            <span className="text-rose-400 font-medium">Limit Threshold</span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-1 bg-rose-500" />
+            <span className="text-rose-400 font-semibold">Limit Threshold</span>
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <span>
             Delta Drift: <b className="text-white font-bold">{((component.v168 ?? 0) - (component.v0 ?? 0)).toFixed(2)} &micro;A</b>
           </span>
@@ -358,7 +358,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
                   ? 'text-rose-400 font-bold'
                   : Math.abs(component.z168 ?? 0) >= 2
                   ? 'text-amber-400 font-bold'
-                  : 'text-emerald-400'
+                  : 'text-emerald-400 font-bold'
               }
             >
               {component.z168 != null ? `${component.z168 > 0 ? '+' : ''}${component.z168.toFixed(2)}σ` : '--'}

@@ -9,12 +9,12 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
   const [activeHorizon, setActiveHorizon] = useState<216 | 264 | 336>(264)
   const [hoveredPoint, setHoveredPoint] = useState<{ hour: number; val: number; label: string } | null>(null)
 
-  const W = 560
-  const H = 220
-  const padL = 46
-  const padR = 28
-  const padT = 20
-  const padB = 40
+  const W = 720
+  const H = 280
+  const padL = 54
+  const padR = 32
+  const padT = 24
+  const padB = 44
   const limitVal = component?.limit_ua || 50
   const v0 = component?.v0 ?? 0
   const v24 = component?.v24 ?? 0
@@ -108,13 +108,13 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
   return (
     <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg">
       {/* Top Header & Extrapolation Horizon Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs md:text-sm">
         <div className="flex items-center gap-2">
-          <span className="font-display font-bold text-amber-400 flex items-center gap-1.5 text-xs uppercase tracking-wider">
+          <span className="font-display font-bold text-amber-400 flex items-center gap-1.5 text-xs md:text-sm uppercase tracking-wider">
             <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
             MODULE B &bull; IN-FLIGHT DRIFT FORECASTING
           </span>
-          <span className={`px-2 py-0.5 rounded text-[9.5px] font-mono font-bold border ${
+          <span className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold border ${
             willBreach
               ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
               : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
@@ -124,17 +124,17 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
         </div>
 
         {/* Projection Horizon Buttons */}
-        <div className="flex items-center gap-1 bg-[#050914] p-0.5 rounded border border-slate-800 font-mono text-[10px]">
-          <span className="text-slate-400 px-1 uppercase text-[9.5px]">HORIZON:</span>
+        <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-xs">
+          <span className="text-slate-400 px-1 uppercase text-xs font-bold">HORIZON:</span>
           {([216, 264, 336] as const).map((h) => (
             <button
               key={h}
               type="button"
               onClick={() => setActiveHorizon(h)}
-              className={`px-2 py-0.5 rounded transition-colors ${
+              className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
                 activeHorizon === h
                   ? 'bg-amber-500/30 text-amber-300 border border-amber-500/60 font-bold shadow-isro'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
               +{h - 168}h ({h}h)
@@ -147,8 +147,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
       <div className="relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden">
         <svg
           viewBox={`0 0 ${W} ${H}`}
-          className="w-full h-auto block select-none"
-          style={{ minHeight: '190px' }}
+          className="w-full h-[260px] md:h-[290px] block select-none"
         >
           <defs>
             <linearGradient id="coneGrad" x1="0" y1="0" x2="1" y2="0">
@@ -416,32 +415,32 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
       </div>
 
       {/* Metric Callouts & Flight Advisory Bottom Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-        <div className="p-2 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <span className="text-[10px] text-slate-400 uppercase">Drift Velocity</span>
-          <span className={`text-sm font-bold mt-0.5 tabular-nums ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
-            {(slope * 1000).toFixed(2)} <span className="text-[10px] font-normal text-slate-400">nA/hr</span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+          <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
+            {(slope * 1000).toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
           </span>
         </div>
 
-        <div className="p-2 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <span className="text-[10px] text-slate-400 uppercase">Early Pred Error</span>
-          <span className="text-sm font-bold text-amber-300 mt-0.5 tabular-nums">
-            &plusmn;{predError.toFixed(2)} <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
+        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+          <span className="text-xs text-slate-400 uppercase font-semibold">Early Pred Error</span>
+          <span className="text-base font-bold text-amber-300 mt-0.5 tabular-nums">
+            &plusmn;{predError.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
 
-        <div className="p-2 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <span className="text-[10px] text-slate-400 uppercase">+{activeHorizon - 168}h Projection</span>
-          <span className={`text-sm font-bold mt-0.5 tabular-nums ${willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'}`}>
-            {projectedAtHorizon.toFixed(2)} <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
+        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+          <span className="text-xs text-slate-400 uppercase font-semibold">+{activeHorizon - 168}h Projection</span>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'}`}>
+            {projectedAtHorizon.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
 
-        <div className="p-2 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <span className="text-[10px] text-slate-400 uppercase">Future Margin</span>
-          <span className={`text-sm font-bold mt-0.5 tabular-nums ${marginFuture < 5 ? 'text-rose-400' : marginFuture < 15 ? 'text-amber-400' : 'text-emerald-400'}`}>
-            {marginFuture.toFixed(1)} <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
+        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+          <span className="text-xs text-slate-400 uppercase font-semibold">Future Margin</span>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${marginFuture < 5 ? 'text-rose-400' : marginFuture < 15 ? 'text-amber-400' : 'text-emerald-400'}`}>
+            {marginFuture.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
       </div>

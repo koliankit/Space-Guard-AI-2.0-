@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import type { ComponentOut, SubsystemStatus } from '../../types'
 import { getSubsystemLocation, formatCoordinates } from '../../utils/satelliteLocations'
 import { sounds } from '../../utils/soundEffects'
+import AIRecommendationSystem from '../Satellite/AIRecommendationSystem'
 
 interface LotArchitectureViewProps {
   components: ComponentOut[]
@@ -260,137 +261,148 @@ export default function LotArchitectureView({
       </div>
 
       {/* Main 2-Column Work Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-4 flex-1">
-        {/* Left Column: Qualification Lots Selector Cards */}
-        <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-          <div className="bg-[#0F172A] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-display flex items-center gap-2">
-              <span>📦</span> Qualification Lots ({lotGroups.length})
-            </span>
-            <span className="text-[10px] text-slate-400 font-mono">Select lot to inspect</span>
-          </div>
+      <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] lg:grid-cols-[380px_1fr] gap-4 flex-1 items-start">
+        {/* Left Column: Qualification Lots Selector Cards + AI Lot Recommendation System */}
+        <div className="flex flex-col gap-4 w-full">
+          <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+            <div className="bg-[#0F172A] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-display flex items-center gap-2">
+                <span>📦</span> Qualification Lots ({lotGroups.length})
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">Select lot to inspect</span>
+            </div>
 
-          <div className="p-3 overflow-y-auto flex-1 space-y-2.5 max-h-[calc(100vh-280px)]">
-            {lotGroups.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 text-xs italic">
-                No qualification lots loaded. Upload a CSV file or load an ISRO flight batch to inspect.
-              </div>
-            ) : (
-              lotGroups.map((lot) => {
-                const isSelected = activeLot?.lot_id === lot.lot_id
-                const pctOfTotal = ((lot.total / (totalComponents || 1)) * 100).toFixed(1)
-                const isRej = lot.rejectCount > 0
-                const isMon = lot.monitorCount > 0
+            <div className="p-3 overflow-y-auto flex-1 space-y-2.5 max-h-[380px]">
+              {lotGroups.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 text-xs italic">
+                  No qualification lots loaded. Upload a CSV file or load an ISRO flight batch to inspect.
+                </div>
+              ) : (
+                lotGroups.map((lot) => {
+                  const isSelected = activeLot?.lot_id === lot.lot_id
+                  const pctOfTotal = ((lot.total / (totalComponents || 1)) * 100).toFixed(1)
+                  const isRej = lot.rejectCount > 0
+                  const isMon = lot.monitorCount > 0
 
-                return (
-                  <div
-                    key={lot.lot_id}
-                    onClick={() => {
-                      sounds.playClick()
-                      setSelectedLotId(lot.lot_id)
-                    }}
-                    className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all ${
-                      isSelected
-                        ? 'bg-amber-950/30 border-amber-500 shadow-md ring-1 ring-amber-400/50'
-                        : isRej
-                        ? 'bg-[#150A10] border-rose-900/50 hover:border-rose-700 hover:bg-[#1A0C14]'
-                        : 'bg-[#070D1A] border-slate-800 hover:border-slate-700 hover:bg-[#0D162B]'
-                    }`}
-                  >
-                    {/* Header: Lot ID and Status Badge */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
+                  return (
+                    <div
+                      key={lot.lot_id}
+                      onClick={() => {
+                        sounds.playClick()
+                        setSelectedLotId(lot.lot_id)
+                      }}
+                      className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all ${
+                        isSelected
+                          ? 'bg-amber-950/30 border-amber-500 shadow-md ring-1 ring-amber-400/50'
+                          : isRej
+                          ? 'bg-[#150A10] border-rose-900/50 hover:border-rose-700 hover:bg-[#1A0C14]'
+                          : 'bg-[#070D1A] border-slate-800 hover:border-slate-700 hover:bg-[#0D162B]'
+                      }`}
+                    >
+                      {/* Header: Lot ID and Status Badge */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-2.5 h-2.5 rounded-full ${
+                              isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400' : isScreened ? 'bg-emerald-400' : 'bg-slate-500'
+                            }`}
+                          />
+                          <span className="font-mono font-bold text-xs text-white tracking-wide">
+                            {lot.lot_id}
+                          </span>
+                        </div>
                         <span
-                          className={`w-2.5 h-2.5 rounded-full ${
-                            isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400' : isScreened ? 'bg-emerald-400' : 'bg-slate-500'
+                          className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
+                            isRej
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              : isMon
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                              : isScreened
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                              : 'bg-slate-800 text-slate-300 border border-slate-700'
                           }`}
-                        />
-                        <span className="font-mono font-bold text-xs text-white tracking-wide">
-                          {lot.lot_id}
+                        >
+                          {isRej
+                            ? `${lot.rejectCount} REJECT`
+                            : isMon
+                            ? `${lot.monitorCount} MONITOR`
+                            : isScreened
+                            ? 'ALL NOMINAL'
+                            : 'INGESTED'}
                         </span>
                       </div>
-                      <span
-                        className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
-                          isRej
-                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                            : isMon
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                            : isScreened
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                            : 'bg-slate-800 text-slate-300 border border-slate-700'
-                        }`}
-                      >
-                        {isRej
-                          ? `${lot.rejectCount} REJECT`
-                          : isMon
-                          ? `${lot.monitorCount} MONITOR`
-                          : isScreened
-                          ? 'ALL NOMINAL'
-                          : 'INGESTED'}
-                      </span>
-                    </div>
 
-                    {/* Lot Stats: Total Components and Baseline */}
-                    <div className="flex items-center justify-between text-xs font-mono text-slate-300 mb-2">
-                      <span>
-                        Size: <b className="text-white font-bold">{lot.total} parts</b> ({pctOfTotal}%)
-                      </span>
-                      <span className="text-slate-400">
-                        Baseline &mu;: <b className="text-amber-300 font-bold">{lot.mean.toFixed(1)} &mu;A</b>
-                      </span>
-                    </div>
-
-                    {/* Subsystem Location Distribution Tag Pills */}
-                    <div className="pt-2 border-t border-slate-800/80">
-                      <div className="text-[10px] text-slate-400 uppercase font-semibold mb-1 flex justify-between">
-                        <span>Allocated Subsystems:</span>
-                        <span className="text-slate-300 font-mono">{lot.subsystems.length} bays</span>
+                      {/* Lot Stats: Total Components and Baseline */}
+                      <div className="flex items-center justify-between text-xs font-mono text-slate-300 mb-2">
+                        <span>
+                          Size: <b className="text-white font-bold">{lot.total} parts</b> ({pctOfTotal}%)
+                        </span>
+                        <span className="text-slate-400">
+                          Baseline &mu;: <b className="text-amber-300 font-bold">{lot.mean.toFixed(1)} &mu;A</b>
+                        </span>
                       </div>
-                      <div className="flex flex-wrap gap-1">
-                        {Object.entries(lot.subsystemCounts).map(([sub, count]) => {
-                          const loc = getSubsystemLocation(sub)
-                          return (
-                            <span
-                              key={sub}
-                              className="px-1.5 py-0.5 rounded text-[9.5px] font-mono bg-slate-900 border border-slate-700/80 text-slate-300 flex items-center gap-1"
-                              title={`${count} components in ${loc.name} (${loc.bay})`}
-                            >
-                              <b className="text-amber-400 font-bold">[{sub}]</b>
-                              <span>{count}</span>
-                            </span>
-                          )
-                        })}
-                      </div>
-                    </div>
 
-                    {/* Health Distribution Bar (if screened) */}
-                    {isScreened && (
-                      <div className="mt-2.5">
-                        <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden flex mb-1">
-                          <div
-                            style={{ width: `${(lot.safeCount / (lot.total || 1)) * 100}%` }}
-                            className="bg-emerald-500 h-full"
-                          />
-                          <div
-                            style={{ width: `${(lot.monitorCount / (lot.total || 1)) * 100}%` }}
-                            className="bg-amber-500 h-full"
-                          />
-                          <div
-                            style={{ width: `${(lot.rejectCount / (lot.total || 1)) * 100}%` }}
-                            className="bg-rose-500 h-full"
-                          />
+                      {/* Subsystem Location Distribution Tag Pills */}
+                      <div className="pt-2 border-t border-slate-800/80">
+                        <div className="text-[10px] text-slate-400 uppercase font-semibold mb-1 flex justify-between">
+                          <span>Allocated Subsystems:</span>
+                          <span className="text-slate-300 font-mono">{lot.subsystems.length} bays</span>
                         </div>
-                        <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
-                          <span className="text-emerald-400">{lot.safeCount} Safe</span>
-                          <span className="text-amber-400">{lot.monitorCount} Monitor</span>
-                          <span className="text-rose-400 font-bold">{lot.rejectCount} Quarantine</span>
+                        <div className="flex flex-wrap gap-1">
+                          {Object.entries(lot.subsystemCounts).map(([sub, count]) => {
+                            return (
+                              <span
+                                key={sub}
+                                className="px-1.5 py-0.5 rounded text-[9.5px] font-mono bg-slate-900 border border-slate-800 text-slate-300"
+                              >
+                                [{sub}] {count}
+                              </span>
+                            )
+                          })}
                         </div>
                       </div>
-                    )}
-                  </div>
-                )
-              })
-            )}
+
+                      {/* Health Distribution Bar (if screened) */}
+                      {isScreened && (
+                        <div className="mt-2.5">
+                          <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden flex mb-1">
+                            <div
+                              style={{ width: `${(lot.safeCount / (lot.total || 1)) * 100}%` }}
+                              className="bg-emerald-500 h-full"
+                            />
+                            <div
+                              style={{ width: `${(lot.monitorCount / (lot.total || 1)) * 100}%` }}
+                              className="bg-amber-500 h-full"
+                            />
+                            <div
+                              style={{ width: `${(lot.rejectCount / (lot.total || 1)) * 100}%` }}
+                              className="bg-rose-500 h-full"
+                            />
+                          </div>
+                          <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
+                            <span className="text-emerald-400">{lot.safeCount} Safe</span>
+                            <span className="text-amber-400">{lot.monitorCount} Monitor</span>
+                            <span className="text-rose-400 font-bold">{lot.rejectCount} Quarantine</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </div>
+
+          {/* AI Prescriptive Recommendation & Wafer Quality Disposition Engine - Fills empty space */}
+          <div className="w-full">
+            <AIRecommendationSystem
+              component={
+                activeLot?.parts.find((p) => p.status === 'reject') ||
+                activeLot?.parts.find((p) => p.status === 'monitor') ||
+                activeLot?.parts[0] ||
+                null
+              }
+            />
           </div>
         </div>
 
