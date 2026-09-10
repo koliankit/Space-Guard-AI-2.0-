@@ -16,6 +16,7 @@ export default function UploadBar({
   activeMissionId = 'GAGANYAAN',
   onSelectMission,
   onOpenIngestModal,
+  onOpenLotsModal,
 }: {
   metaText: string
   canRun: boolean
@@ -30,6 +31,7 @@ export default function UploadBar({
   activeMissionId?: string
   onSelectMission?: (missionId: string) => void
   onOpenIngestModal?: () => void
+  onOpenLotsModal?: () => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
@@ -42,7 +44,7 @@ export default function UploadBar({
         <div className="flex items-center gap-3 flex-1 min-w-[340px]">
           {/* Ingest CSV Trigger */}
           <div
-            className={`border rounded-lg px-3.5 py-1.5 flex items-center gap-2 cursor-pointer transition-all ${
+            className={`border rounded-lg px-3 py-1.5 flex items-center gap-2 cursor-pointer transition-all ${
               drag
                 ? 'border-sky-400 bg-sky-500/10 text-white'
                 : 'border-slate-700/80 bg-[#070D1A] text-slate-300 hover:border-slate-500 hover:bg-[#0D162B]'
@@ -66,9 +68,9 @@ export default function UploadBar({
             }}
           >
             <span className="text-sky-400 font-bold text-sm">📁</span>
-            <span className="text-[11.5px] font-medium">
-              <span className="text-slate-400">INGEST CSV OR </span>
-              <span className="text-sky-400 font-semibold underline decoration-sky-400/40">UPLOAD FILE</span>
+            <span className="text-[11px] font-medium">
+              <span className="text-slate-400">INGEST </span>
+              <span className="text-sky-400 font-semibold underline decoration-sky-400/40">CSV FILE</span>
             </span>
             <input
               ref={inputRef}
@@ -80,6 +82,17 @@ export default function UploadBar({
               }}
             />
           </div>
+
+          {/* Direct Paste CSV Trigger */}
+          <button
+            type="button"
+            onClick={() => onOpenIngestModal?.()}
+            className="border border-slate-700/80 bg-[#070D1A] hover:bg-[#0D162B] hover:border-sky-400 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all flex items-center gap-1.5"
+            title="Paste raw CSV text directly from clipboard"
+          >
+            <span className="text-emerald-400">📋</span>
+            <span>PASTE CSV DATA</span>
+          </button>
 
           {/* Mission Preset Pills */}
           <div className="flex items-center gap-1 bg-[#060D1A] p-1 rounded-lg border border-slate-800">
@@ -201,11 +214,42 @@ export default function UploadBar({
         </div>
       </div>
 
-      {/* Dataset Status Ticker */}
+      {/* Dataset Status Ticker with interactive Lot-Wise Inspector */}
       <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between gap-3 text-sm md:text-[15px] text-slate-200">
         <div className="flex items-center gap-2.5 flex-wrap">
           <span className="w-2.5 h-2.5 rounded-full bg-sky-400 led flex-shrink-0" />
-          <div className="flex items-center gap-1.5 flex-wrap text-sm md:text-[15px] leading-snug" dangerouslySetInnerHTML={{ __html: metaText }} />
+          <div
+            className="flex items-center gap-1.5 flex-wrap text-sm md:text-[15px] leading-snug cursor-pointer select-none"
+            onClick={(e) => {
+              const target = e.target as HTMLElement
+              if (
+                target.closest('.lot-clickable') ||
+                target.classList.contains('lot-clickable') ||
+                target.textContent?.toLowerCase().includes('lot')
+              ) {
+                sounds.playClick()
+                onOpenLotsModal?.()
+              }
+            }}
+            title="Click lot badge to open Lot-Wise Classification Window"
+            dangerouslySetInnerHTML={{ __html: metaText }}
+          />
+
+          {/* Dedicated quick-access button to open Lot-Wise Classification Window */}
+          {onOpenLotsModal && (
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playClick()
+                onOpenLotsModal()
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-bold bg-sky-500/15 hover:bg-sky-500/30 text-sky-300 hover:text-white px-2.5 py-0.5 rounded-md border border-sky-500/40 hover:border-sky-400 transition-all shadow-sm cursor-pointer ml-1 group"
+              title="Open dedicated Lot-Wise Classification Window"
+            >
+              <span>📦</span>
+              <span>INSPECT LOTS &rarr;</span>
+            </button>
+          )}
         </div>
         <span className="text-slate-400 text-[11px] uppercase font-mono tracking-wider bg-[#070D1A] px-2.5 py-1 rounded-md border border-slate-800 whitespace-nowrap hidden lg:inline-block">
           MIL-STD-883 HTOL 168H RELIABILITY SPEC

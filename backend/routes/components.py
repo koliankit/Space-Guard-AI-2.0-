@@ -42,7 +42,7 @@ def list_components(
     status: Optional[str] = Query(None, description="safe | monitor | reject"),
     search: Optional[str] = Query(None),
     subsystem: Optional[str] = Query(None),
-    limit: int = Query(60, le=500),
+    limit: int = Query(60, le=5000),
     offset: int = 0,
     db: Session = Depends(get_db),
 ):

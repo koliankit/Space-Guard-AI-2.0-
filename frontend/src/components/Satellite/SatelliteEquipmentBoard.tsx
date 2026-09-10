@@ -37,6 +37,9 @@ export default function SatelliteEquipmentBoard({
     })
   }
 
+  const [filterCategory, setFilterCategory] = useState<'subsystem' | 'lot'>('subsystem')
+  const [selectedLot, setSelectedLot] = useState<string | null>(null)
+
   const handleToggleFailover = (id: string) => {
     setFailovers((prev) => {
       const next = !prev[id]
@@ -45,11 +48,32 @@ export default function SatelliteEquipmentBoard({
     })
   }
 
-  // Filtered components based on active subsystem focus
+  // Unique qualification lots with part counts
+  const lotList = useMemo(() => {
+    const map = new Map<string, { lot_id: string; count: number; status: 'safe' | 'monitor' | 'reject' }>()
+    components.forEach((c) => {
+      const lot = c.lot_id || 'UNKNOWN'
+      let item = map.get(lot)
+      if (!item) {
+        item = { lot_id: lot, count: 0, status: 'safe' }
+        map.set(lot, item)
+      }
+      item.count++
+      if (c.status === 'reject') item.status = 'reject'
+      else if (c.status === 'monitor' && item.status !== 'reject') item.status = 'monitor'
+    })
+    return Array.from(map.values()).sort((a, b) => a.lot_id.localeCompare(b.lot_id))
+  }, [components])
+
+  // Filtered components based on active subsystem or lot focus
   const displayedComponents = useMemo(() => {
+    if (filterCategory === 'lot') {
+      if (!selectedLot) return components.slice(0, 48)
+      return components.filter((c) => c.lot_id === selectedLot)
+    }
     if (!focusKey) return components.slice(0, 48)
     return components.filter((c) => c.subsystem === focusKey)
-  }, [components, focusKey])
+  }, [components, focusKey, filterCategory, selectedLot])
 
   // Active component for Cause, Reason, Satellite Impact & Improvement Deep Dive
   const activeComponent = useMemo(() => {
@@ -94,7 +118,11 @@ export default function SatelliteEquipmentBoard({
           <h3 className="m-0 font-bold text-xs tracking-wide uppercase text-white">
             Spacecraft Subsystem Hardware &amp; Command Console
           </h3>
-          {activeSub ? (
+          {filterCategory === 'lot' ? (
+            <span className="font-mono text-[11px] text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded border border-sky-500/30 font-medium">
+              LOT CLASSIFICATION: {selectedLot || 'ALL FLIGHT LOTS'}
+            </span>
+          ) : activeSub ? (
             <span className="font-mono text-[11px] text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded border border-sky-500/30 font-medium">
               FILTER: [{activeSub.key}] {activeSub.name}
             </span>
@@ -137,43 +165,107 @@ export default function SatelliteEquipmentBoard({
         </div>
       </div>
 
-      {/* Subsystem Quick Filter Pills */}
-      <div className="flex items-center gap-1.5 overflow-x-auto px-4 py-2 bg-[#080D1A] border-b border-slate-800/80 text-xs">
-        <span className="text-slate-400 font-medium tracking-wider uppercase mr-1 whitespace-nowrap text-[10px]">
-          SUBSYSTEM:
-        </span>
-        <button
-          type="button"
-          onClick={() => onSelectSubsystem('')}
-          className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
-            !focusKey
-              ? 'bg-sky-600 border-sky-500 text-white font-semibold'
-              : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
-          }`}
-        >
-          ALL
-        </button>
-        {subsystems.map((s) => (
+      {/* Classification Mode & Filter Pills Row */}
+      <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 bg-[#080D1A] border-b border-slate-800/80 text-xs">
+        {/* Classification Selector: Subsystems vs Lots */}
+        <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded-md p-0.5 mr-1 flex-shrink-0">
           <button
-            key={s.key}
             type="button"
-            onClick={() => onSelectSubsystem(s.key)}
-            className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap flex items-center gap-1.5 text-[11px] font-medium border ${
-              focusKey === s.key
-                ? 'bg-sky-600 border-sky-500 text-white font-semibold'
-                : s.status === 'reject'
-                ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
-                : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+            onClick={() => setFilterCategory('subsystem')}
+            className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
+              filterCategory === 'subsystem'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                s.status === 'reject' ? 'bg-rose-500' : s.status === 'monitor' ? 'bg-amber-400' : 'bg-emerald-400'
-              }`}
-            />
-            <span>{s.key}</span>
+            Subsystems
           </button>
-        ))}
+          <button
+            type="button"
+            onClick={() => setFilterCategory('lot')}
+            className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
+              filterCategory === 'lot'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            Lots ({lotList.length})
+          </button>
+        </div>
+
+        {filterCategory === 'subsystem' ? (
+          <>
+            <button
+              type="button"
+              onClick={() => onSelectSubsystem('')}
+              className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
+                !focusKey
+                  ? 'bg-sky-600 border-sky-500 text-white font-semibold'
+                  : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              ALL
+            </button>
+            {subsystems.map((s) => (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => onSelectSubsystem(s.key)}
+                className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap flex items-center gap-1.5 text-[11px] font-medium border ${
+                  focusKey === s.key
+                    ? 'bg-sky-600 border-sky-500 text-white font-semibold'
+                    : s.status === 'reject'
+                    ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
+                    : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    s.status === 'reject' ? 'bg-rose-500' : s.status === 'monitor' ? 'bg-amber-400' : 'bg-emerald-400'
+                  }`}
+                />
+                <span>{s.key}</span>
+              </button>
+            ))}
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => setSelectedLot(null)}
+              className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
+                !selectedLot
+                  ? 'bg-sky-600 border-sky-500 text-white font-semibold'
+                  : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              ALL LOTS
+            </button>
+            {lotList.map((lot) => (
+              <button
+                key={lot.lot_id}
+                type="button"
+                onClick={() => setSelectedLot(lot.lot_id === selectedLot ? null : lot.lot_id)}
+                className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap flex items-center gap-1.5 text-[11px] font-mono border ${
+                  selectedLot === lot.lot_id
+                    ? 'bg-sky-600 border-sky-500 text-white font-bold shadow-sm'
+                    : lot.status === 'reject'
+                    ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
+                    : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+                title={`Filter components to lot ${lot.lot_id} (${lot.count} components)`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    lot.status === 'reject' ? 'bg-rose-500' : lot.status === 'monitor' ? 'bg-amber-400' : 'bg-emerald-400'
+                  }`}
+                />
+                <span>{lot.lot_id}</span>
+                <span className="text-[9.5px] opacity-75 font-sans">({lot.count})</span>
+              </button>
+            ))}
+          </>
+        )}
       </div>
 
       {/* --- VIEW 1: SATELLITE COMPONENTS LIST --- */}

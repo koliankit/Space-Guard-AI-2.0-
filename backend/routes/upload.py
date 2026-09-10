@@ -5,7 +5,7 @@ from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database import get_db
-from services import preprocessing
+from services import preprocessing, satellite_mapper
 from models.orm_models import Batch
 
 router = APIRouter(prefix="/api", tags=["upload"])
@@ -45,6 +45,8 @@ async def upload_dataset(
     if meta["valid"] == 0:
         raise HTTPException(400, "No valid rows found after mapping — please check the column mapping.")
 
+    clean_df = satellite_mapper.add_subsystem(clean_df)
+
     batch = Batch(
         filename=file.filename, source="upload",
         rows=meta["rows"], valid=meta["valid"], missing=meta["missing"],
@@ -60,6 +62,7 @@ async def upload_dataset(
     records = [
         ComponentRecord(
             batch_id=batch.id, component_id=r.component_id, lot_id=r.lot_id,
+            subsystem=getattr(r, "subsystem", None),
             v0=r.v0, v24=r.v24, v96=(None if pd.isna(r.v96) else r.v96), v168=r.v168,
             limit_ua=r.limit, ground_truth=(None if pd.isna(r.ground_truth) else r.ground_truth),
         )

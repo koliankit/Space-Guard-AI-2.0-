@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { sounds } from '../../utils/soundEffects'
 
-export type DashboardTab = 'wall' | 'telemetry' | 'matrix' | 'orbital' | 'subsystems' | 'report'
+export type DashboardTab = 'wall' | 'lots' | 'telemetry' | 'matrix' | 'orbital' | 'subsystems' | 'report'
 
 interface HeaderProps {
   streamActive: boolean
@@ -65,12 +65,13 @@ export default function Header({
   }
 
   const TABS: { id: DashboardTab; label: string; tag: string; icon?: string }[] = [
-    { id: 'wall', label: 'Panoramic MCC Wall', tag: '00', icon: '🖥️' },
-    { id: 'telemetry', label: '3D Satellite & Telemetry', tag: '01' },
-    { id: 'matrix', label: 'AI Screening Matrix', tag: '02' },
-    { id: 'orbital', label: 'Orbital DSN Tracking', tag: '03' },
-    { id: 'subsystems', label: 'Subsystem Diagnostics', tag: '04' },
-    { id: 'report', label: 'Clearance Report & PDF', tag: '05' },
+    { id: 'wall', label: 'Command Wall (Module A & B)', tag: '00', icon: '⚡' },
+    { id: 'lots', label: 'Lot Architecture & Locations', tag: '01', icon: '📦' },
+    { id: 'telemetry', label: '3D Satellite & Telemetry', tag: '02' },
+    { id: 'matrix', label: 'AI Screening Matrix', tag: '03' },
+    { id: 'orbital', label: 'Orbital DSN Tracking', tag: '04' },
+    { id: 'subsystems', label: 'Subsystem Diagnostics', tag: '05' },
+    { id: 'report', label: 'Clearance Report & PDF', tag: '06' },
   ]
 
   return (

@@ -12,8 +12,9 @@ export async function isBackendAvailable(): Promise<boolean> {
     const timer = setTimeout(() => controller.abort(), 1200)
     const res = await fetch(`${API_BASE}/api/health`, { signal: controller.signal })
     clearTimeout(timer)
-    backendReachable = res.ok
-    return res.ok
+    const contentType = res.headers.get('content-type')
+    backendReachable = res.ok && Boolean(contentType && contentType.includes('application/json'))
+    return backendReachable
   } catch {
     backendReachable = false
     return false

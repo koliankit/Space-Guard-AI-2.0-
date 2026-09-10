@@ -540,17 +540,27 @@ class ClientISROEngine {
         continue
       }
 
-      let sub = 'FC'
+      let sub = ''
       if (colSub !== -1 && parts[colSub]) {
-        sub = parts[colSub].toUpperCase()
+        const rawSub = parts[colSub].toUpperCase()
+        const found = SUBSYSTEMS.find((s) => s.key === rawSub || s.name.toUpperCase() === rawSub)
+        sub = found ? found.key : rawSub
       } else {
         // Infer subsystem from ID if possible
         const idUpper = id.toUpperCase()
         for (const s of SUBSYSTEMS) {
-          if (idUpper.includes(s.key)) {
+          if (idUpper.includes(`-${s.key}-`) || idUpper.startsWith(`${s.key}-`) || idUpper.endsWith(`-${s.key}`) || idUpper.includes(s.key)) {
             sub = s.key
             break
           }
+        }
+        if (!sub) {
+          // Deterministic hash distribution across all 11 satellite subsystems
+          let h = 0
+          for (let c = 0; c < id.length; c++) {
+            h = (h * 31 + id.charCodeAt(c)) >>> 0
+          }
+          sub = SUBSYSTEMS[h % SUBSYSTEMS.length].key
         }
       }
 

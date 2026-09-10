@@ -6,6 +6,7 @@ import MappingModal from './components/Dashboard/MappingModal'
 import PipelineOverlay from './components/Dashboard/PipelineOverlay'
 import AuditLog, { type AuditEntry } from './components/Dashboard/AuditLog'
 import DataIngestModal from './components/Dashboard/DataIngestModal'
+import LotClassificationModal from './components/Dashboard/LotClassificationModal'
 import ComponentMonitor from './components/ComponentPanel/ComponentMonitor'
 import IntelligencePanel from './components/ComponentPanel/IntelligencePanel'
 import ComparePanel from './components/Charts/ComparePanel'
@@ -19,6 +20,7 @@ import ScreeningMatrixView from './components/Views/ScreeningMatrixView'
 import OrbitalTrackingView from './components/Views/OrbitalTrackingView'
 import SubsystemsView from './components/Views/SubsystemsView'
 import MissionReportView from './components/Views/MissionReportView'
+import LotArchitectureView from './components/Views/LotArchitectureView'
 import MultiScreenWall from './components/Dashboard/MultiScreenWall'
 import ISROPitchModal from './components/Dashboard/ISROPitchModal'
 import { ISRO_MISSIONS } from './offlineEngine'
@@ -38,7 +40,8 @@ export default function App() {
 
   const [activeMissionId, setActiveMissionId] = useState<string>('GAGANYAAN')
   const [pitchModalOpen, setPitchModalOpen] = useState(false)
-  const [ingestModalOpen, setIngestModalOpen] = useState(true)
+  const [ingestModalOpen, setIngestModalOpen] = useState(false)
+  const [lotModalOpen, setLotModalOpen] = useState(false)
 
   const activeMission = ISRO_MISSIONS.find((m) => m.id === activeMissionId) || ISRO_MISSIONS[0]
 
@@ -69,7 +72,7 @@ export default function App() {
     setAudit((a) => [...a, { time: getTimestamp(), text, cls }])
   }
 
-  function resetForNewBatch(result: { batch_id: number; rows: number; valid: number; missing: number; lots: number }, label: string) {
+  async function resetForNewBatch(result: { batch_id: number; rows: number; valid: number; missing: number; lots: number }, label: string) {
     if (modalTimerId) clearTimeout(modalTimerId)
     setQuarantineToast(null)
     setAlertComponent(null)
@@ -77,15 +80,22 @@ export default function App() {
     setAnalysisRun(false)
     setMission(null)
     setFlaggedList([])
-    setAllComponents([])
     setSelected(null)
     setFocusKey(null)
     setAudit([])
     setDataMetaText(
-      `<span class="font-bold text-white text-sm md:text-base tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-extrabold text-base md:text-lg text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-md border border-emerald-500/40 leading-none shadow-sm mx-0.5">${result.valid}</span> <span class="text-slate-100 font-semibold text-sm md:text-base">components across</span> <span class="inline-flex items-center font-mono font-extrabold text-sky-400 text-base md:text-lg bg-sky-500/15 px-2.5 py-0.5 rounded-md border border-sky-500/40 leading-none shadow-sm mx-0.5">${result.lots}</span> <span class="text-slate-100 font-semibold text-sm md:text-base">lots.</span>`
+      `<span class="font-bold text-white text-sm md:text-base tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-extrabold text-base md:text-lg text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-md border border-emerald-500/40 leading-none shadow-sm mx-0.5">${result.valid}</span> <span class="text-slate-100 font-semibold text-sm md:text-base">components across</span> <button type="button" class="lot-clickable inline-flex items-center gap-1 font-mono font-extrabold text-base md:text-lg text-sky-400 hover:text-white bg-sky-500/20 hover:bg-sky-500/35 px-2.5 py-0.5 rounded-md border border-sky-500/50 hover:border-sky-400 leading-none shadow-sm mx-0.5 transition-all cursor-pointer group" title="Click to open Lot-Wise Classification Window"><span class="underline decoration-sky-400/60 group-hover:decoration-white">${result.lots}</span> <span class="text-xs uppercase font-sans font-bold tracking-wider text-sky-300 group-hover:text-white">lots 📦</span></button>`
     )
     log(`Flight dataset uploaded \u2014 ${result.rows} components parsed.`)
     log(`${result.valid} components validated across ${result.lots} qualification lots (${result.missing} rows skipped).`, 'ok')
+    try {
+      const list = await api.listComponents(result.batch_id, { limit: 1000 })
+      if (list?.components?.length) {
+        setAllComponents(list.components)
+      }
+    } catch {
+      // fallback
+    }
   }
 
   const handleFile = useCallback(async (file: File) => {
@@ -145,9 +155,9 @@ export default function App() {
     }
   }
 
-  // On initial website load, open the Data Ingestion / CSV Upload window
+  // On initial website load, automatically acquire the Gaganyaan flight batch
   useEffect(() => {
-    setIngestModalOpen(true)
+    handleDemo('GAGANYAAN', false)
   }, [])
 
   // Keyboard shortcut listener for ISRO Briefing Deck (Press 'P')
@@ -303,6 +313,7 @@ export default function App() {
         activeMissionId={activeMissionId}
         onSelectMission={handleSelectMission}
         onOpenIngestModal={() => setIngestModalOpen(true)}
+        onOpenLotsModal={() => setLotModalOpen(true)}
       />
 
       {/* Horizontal Health Metrics Bar — only appears after data has been loaded and screened */}
@@ -357,6 +368,23 @@ export default function App() {
           onSelectSubsystem={selectSubsystem}
           focusKey={focusKey}
           running={running}
+          onRunScreening={() => runScreening()}
+          onUploadFile={handleFile}
+          onOpenLotsModal={() => setLotModalOpen(true)}
+          onNavigateToLotsTab={() => setActiveTab('lots')}
+        />
+      )}
+
+      {activeTab === 'lots' && (
+        <LotArchitectureView
+          components={allComponents.length > 0 ? allComponents : flaggedList}
+          subsystems={subsystems}
+          onSelectComponent={selectComponent}
+          onFocusSubsystem={selectSubsystem}
+          onFocusIn3D={focusIn3D}
+          onRunScreening={() => runScreening()}
+          running={running}
+          selectedId={selected?.component_id ?? null}
         />
       )}
 
@@ -484,6 +512,19 @@ export default function App() {
         onSelectMission={handleSelectMission}
         onRunScreening={() => runScreening()}
         onOpenTab={setActiveTab}
+      />
+
+      <LotClassificationModal
+        isOpen={lotModalOpen}
+        onClose={() => setLotModalOpen(false)}
+        components={allComponents}
+        batchId={batchId}
+        activeMissionName={activeMission.name}
+        onSelectComponent={(id) => {
+          selectComponent(id)
+          setActiveTab('telemetry')
+        }}
+        onFocusSubsystem={(key) => setFocusKey(key)}
       />
     </div>
   )
