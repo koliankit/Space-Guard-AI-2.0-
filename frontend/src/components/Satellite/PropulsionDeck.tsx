@@ -93,10 +93,10 @@ export default function PropulsionDeck({
       <mesh position={[0, 0, 0]}>
         <cylinderGeometry args={[0.78, 0.82, 0.05, 8]} />
         <meshStandardMaterial
-          color={isSelected ? '#00ff9d' : isHovered ? '#10b981' : '#1e293b'}
+          color={isSelected ? '#F59E0B' : isHovered ? '#D97706' : '#1e293b'}
           metalness={0.9}
           roughness={0.2}
-          emissive={isSelected ? '#00ff9d' : '#001a12'}
+          emissive={isSelected ? '#F59E0B' : '#0f172a'}
           emissiveIntensity={isSelected ? 0.4 : 0.05}
           transparent={isXray}
           opacity={isXray ? 0.35 : 1.0}
@@ -145,7 +145,7 @@ export default function PropulsionDeck({
       {(isSelected || isHovered) && (
         <group ref={plumeRef} position={[0, -0.58, 0]} rotation={[Math.PI, 0, 0]}>
           <coneGeometry args={[0.16, 0.38, 16]} />
-          <meshBasicMaterial color="#00f0ff" transparent opacity={0.65} />
+          <meshBasicMaterial color="#38A3FF" transparent opacity={0.65} />
         </group>
       )}
 
@@ -158,7 +158,7 @@ export default function PropulsionDeck({
               color="#94a3b8"
               metalness={0.95}
               roughness={0.12}
-              emissive={isSelected ? '#00f0ff' : '#0f172a'}
+              emissive={isSelected ? '#F59E0B' : '#0f172a'}
               emissiveIntensity={isSelected ? 0.35 : 0.05}
             />
           </mesh>

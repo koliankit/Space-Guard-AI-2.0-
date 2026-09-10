@@ -177,54 +177,54 @@ export default function MultiScreenWall({
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-[#060913] text-slate-100 font-sans select-none overflow-x-auto min-h-[calc(100vh-140px)]">
+    <div className="flex flex-col flex-1 bg-[#060B16] text-slate-100 font-sans select-none overflow-x-auto min-h-[calc(100vh-140px)] w-full">
       {/* Wall Header Banner: ISRO Sriharikota Mission Control Display Wall */}
-      <div className="bg-[#0B1120] border-b border-slate-800 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#091120] border-b border-slate-800/90 px-4 md:px-6 py-2 flex flex-wrap items-center justify-between gap-3 w-full">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-slate-800/90 border border-slate-700 text-slate-200 text-xs font-bold tracking-wide uppercase">
-            <span className="w-2 h-2 rounded-full bg-sky-400 led" />
-            SDSC SHAR // Mission Operations Wall
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 border border-amber-500/40 text-amber-300 text-xs font-display font-bold tracking-wider uppercase shadow-isro">
+            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
+            ISRO SDSC SHAR // Mission Operations Wall
           </div>
-          <span className="text-slate-400 text-xs hidden lg:inline">
-            Range Operations Directorate &bull; Launch Control Centre (LCC)
+          <span className="text-slate-400 text-xs hidden lg:inline font-sans">
+            Range Operations Directorate &bull; Launch Control Centre (LCC-01)
           </span>
         </div>
 
         {/* Live Synchronized MCC Status Banner & View Switcher */}
-        <div className="flex flex-wrap items-center gap-2.5 text-xs">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-[#070D1A] border border-slate-800">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded bg-[#070D1A] border border-slate-800">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="text-slate-400 text-[10px] uppercase font-medium">Batch:</span>
-            <span className="text-emerald-400 font-semibold text-xs font-mono">{components.length} parts</span>
+            <span className="text-slate-400 text-[9.5px] font-display uppercase font-medium">Flight Batch:</span>
+            <span className="text-emerald-400 font-bold text-xs font-mono tabular-nums">{components.length} parts</span>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-[#070D1A] border border-slate-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-            <span className="text-slate-400 text-[10px] uppercase font-medium">Lots:</span>
-            <span className="text-sky-300 font-semibold text-xs font-mono">{lotGroups.length} Flight Lots</span>
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded bg-[#070D1A] border border-slate-800">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span className="text-slate-400 text-[9.5px] font-display uppercase font-medium">Lots:</span>
+            <span className="text-amber-300 font-bold text-xs font-mono tabular-nums">{lotGroups.length} Qualification Lots</span>
           </div>
 
           {/* Primary View Mode Switcher */}
-          <div className="flex items-center gap-1 bg-[#070D1A] p-1 rounded-md border border-slate-800">
-            <span className="text-slate-400 text-[10px] uppercase font-semibold px-1.5">View:</span>
+          <div className="flex items-center gap-1 bg-[#050914] p-0.5 rounded border border-slate-800">
+            <span className="text-slate-400 text-[9.5px] font-display uppercase font-semibold px-1.5">View:</span>
             <button
               type="button"
               onClick={() => setConsoleLayout('dual')}
-              className={`px-2.5 py-1 rounded text-xs font-mono transition-all border ${
+              className={`px-2.5 py-0.5 rounded text-xs font-display tracking-wide transition-all border ${
                 consoleLayout === 'dual'
-                  ? 'bg-sky-600 text-white border-sky-500 font-bold shadow-sm'
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/60 font-bold shadow-isro'
                   : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
               }`}
-              title="Split Prototype: Module A (Anomaly Analysis) on Left + Module B (Future Drift) on Right"
+              title="Split View: Module A (Anomaly Analysis) on Left + Module B (Future Drift) on Right"
             >
               ⚡ Dual Split (A + B)
             </button>
             <button
               type="button"
               onClick={() => setConsoleLayout('moduleA')}
-              className={`px-2.5 py-1 rounded text-xs font-mono transition-all border ${
+              className={`px-2.5 py-0.5 rounded text-xs font-display tracking-wide transition-all border ${
                 consoleLayout === 'moduleA'
-                  ? 'bg-sky-600 text-white border-sky-500 font-bold shadow-sm'
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/60 font-bold shadow-isro'
                   : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
               }`}
               title="Focus on Module A: Silicon Anomaly Detection & HTOL Analysis"
@@ -234,9 +234,9 @@ export default function MultiScreenWall({
             <button
               type="button"
               onClick={() => setConsoleLayout('moduleB')}
-              className={`px-2.5 py-1 rounded text-xs font-mono transition-all border ${
+              className={`px-2.5 py-0.5 rounded text-xs font-display tracking-wide transition-all border ${
                 consoleLayout === 'moduleB'
-                  ? 'bg-sky-600 text-white border-sky-500 font-bold shadow-sm'
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/60 font-bold shadow-isro'
                   : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
               }`}
               title="Focus on Module B: Future Drift & In-Flight Reliability Forecasting"
@@ -246,9 +246,9 @@ export default function MultiScreenWall({
             <button
               type="button"
               onClick={() => setConsoleLayout('quad')}
-              className={`px-2.5 py-1 rounded text-xs font-mono transition-all border ${
+              className={`px-2.5 py-0.5 rounded text-xs font-display tracking-wide transition-all border ${
                 consoleLayout === 'quad'
-                  ? 'bg-sky-600 text-white border-sky-500 font-bold shadow-sm'
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/60 font-bold shadow-isro'
                   : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
               }`}
               title="Switch to 2x2 Command Wall (3D Digital Twin, Orbit Dynamics, HTOL Oscilloscope, Lot Architecture)"
@@ -260,20 +260,20 @@ export default function MultiScreenWall({
       </div>
 
       {/* CSV Ingestion & Direct Paste Command Strip */}
-      <div className="bg-[#091122] border-b border-slate-800 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <span className="text-[10px] text-sky-400 font-mono font-bold uppercase tracking-wider">
-            Telemetry Input:
+      <div className="bg-[#070D1A] border-b border-slate-800 px-4 md:px-6 py-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] text-amber-400 font-display font-bold uppercase tracking-wider">
+            TELEMETRY INPUT:
           </span>
 
           {/* Trigger Upload File */}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-3 py-1.5 rounded-lg bg-[#070D1A] hover:bg-[#0E1A33] border border-slate-700 hover:border-sky-400 text-slate-200 font-mono text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded bg-[#0A1224] hover:bg-[#111C36] border border-slate-700 hover:border-amber-500/50 text-slate-200 font-mono text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <span>📁</span>
-            <span>Upload CSV File</span>
+            <span>Upload CSV</span>
           </button>
           <input
             ref={fileInputRef}
@@ -287,14 +287,14 @@ export default function MultiScreenWall({
           <button
             type="button"
             onClick={() => setShowPasteBox((v) => !v)}
-            className={`px-3 py-1.5 rounded-lg border font-mono text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 rounded border font-mono text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
               showPasteBox
-                ? 'bg-sky-600 border-sky-400 text-white font-bold shadow-sm'
-                : 'bg-[#070D1A] hover:bg-[#0E1A33] border-slate-700 hover:border-sky-400 text-slate-200'
+                ? 'bg-amber-500/25 border-amber-500/60 text-amber-300 font-bold shadow-isro'
+                : 'bg-[#0A1224] hover:bg-[#111C36] border-slate-700 hover:border-amber-500/50 text-slate-200'
             }`}
           >
             <span>📋</span>
-            <span>{showPasteBox ? '[-] Hide Paste Area' : '[+] Paste CSV Data'}</span>
+            <span>{showPasteBox ? '[-] Close Paste' : '[+] Paste Data'}</span>
           </button>
 
           {/* Insert Sample Flight CSV Button */}
@@ -307,10 +307,10 @@ export default function MultiScreenWall({
                 if (onRunScreening) setTimeout(() => onRunScreening(), 400)
               }
             }}
-            className="px-2.5 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-mono text-xs transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-xs transition-colors cursor-pointer"
             title="Load standard 10-part ISRO test telemetry batch"
           >
-            <span>⚡ Load Sample CSV</span>
+            <span>⚡ Load Sample Telemetry</span>
           </button>
         </div>
 
@@ -321,7 +321,7 @@ export default function MultiScreenWall({
               type="button"
               disabled={running}
               onClick={() => onRunScreening()}
-              className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+              className="px-3.5 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white font-display font-bold text-xs uppercase shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 tracking-wider"
             >
               <span>{running ? '⚙️ Screening Pipeline Active...' : '⚡ Execute AI Screening'}</span>
             </button>
@@ -331,7 +331,7 @@ export default function MultiScreenWall({
             <button
               type="button"
               onClick={onNavigateToLotsTab}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-mono text-xs hidden md:inline-flex items-center gap-1"
+              className="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-mono text-xs hidden md:inline-flex items-center gap-1"
             >
               <span>Full Lot Matrix ↗</span>
             </button>
@@ -341,16 +341,16 @@ export default function MultiScreenWall({
 
       {/* Expandable Inline Paste Textarea Box */}
       {showPasteBox && (
-        <div className="bg-[#050B16] border-b border-sky-500/40 p-4 animate-fade-in flex flex-col gap-2.5 text-xs font-mono">
+        <div className="bg-[#050B16] border-b border-amber-500/40 p-4 animate-fade-in flex flex-col gap-2.5 text-xs font-mono">
           <div className="flex items-center justify-between">
             <span className="text-slate-200 font-bold flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-sky-400 led" />
-              Direct CSV / TSV Paste Input (Clipboard Data)
+              <span className="w-2 h-2 rounded-full bg-amber-400 led" />
+              Direct CSV / TSV Paste Input (Flight Telemetry)
             </span>
             <button
               type="button"
               onClick={() => setPasteText(SAMPLE_CSV)}
-              className="text-sky-400 hover:underline text-[11px]"
+              className="text-amber-400 hover:underline text-[11px]"
             >
               [+] Fill with Example Telemetry
             </button>
@@ -361,12 +361,12 @@ export default function MultiScreenWall({
             onChange={(e) => setPasteText(e.target.value)}
             placeholder="Paste your CSV text here (e.g. component_id,lot_id,subsystem,0h,24h,96h,168h,static_limit_ua)..."
             rows={5}
-            className="w-full bg-[#081022] border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+            className="w-full bg-[#081022] border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
           />
 
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11px] text-slate-400">
-              Columns supported: <code className="text-sky-300">component_id, lot_id, subsystem, 0h, 24h, 168h, limit</code>
+              Columns supported: <code className="text-amber-300">component_id, lot_id, subsystem, 0h, 24h, 168h, limit</code>
             </span>
             <div className="flex items-center gap-2">
               <button
@@ -380,7 +380,7 @@ export default function MultiScreenWall({
                 type="button"
                 disabled={!pasteText.trim()}
                 onClick={handlePasteSubmit}
-                className="px-4 py-1 rounded bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs uppercase cursor-pointer"
+                className="px-4 py-1 rounded bg-emerald-700 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold text-xs uppercase cursor-pointer"
               >
                 ⚡ Parse &amp; Screen Pasted CSV
               </button>
@@ -390,9 +390,9 @@ export default function MultiScreenWall({
       )}
 
       {/* Lot Intelligence & Equipment Bay Quick Action Strip */}
-      <div className="bg-[#080E1C] border-b border-slate-800/90 px-4 md:px-6 py-2 flex flex-wrap items-center justify-between gap-2.5 text-xs">
-        <div className="flex items-center gap-2 overflow-x-auto py-0.5">
-          <span className="text-[10px] text-slate-400 uppercase font-mono font-bold whitespace-nowrap">
+      <div className="bg-[#070C18] border-b border-slate-800/90 px-4 md:px-6 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
+          <span className="text-[10px] text-slate-400 uppercase font-display font-bold tracking-wider whitespace-nowrap">
             Flight Lots:
           </span>
           {lotGroups.map((lot) => {
@@ -411,7 +411,7 @@ export default function MultiScreenWall({
                 }}
                 className={`px-2 py-0.5 rounded text-[10.5px] font-mono whitespace-nowrap transition-all border flex items-center gap-1.5 ${
                   isLotSelected
-                    ? 'bg-sky-600 border-sky-500 text-white font-bold shadow-sm'
+                    ? 'bg-amber-500/25 border-amber-500/60 text-amber-300 font-bold shadow-isro'
                     : lot.rejects > 0
                     ? 'border-rose-500/40 text-rose-300 bg-[#070D1A] hover:bg-rose-500/20'
                     : 'border-slate-800 bg-[#070D1A] text-slate-300 hover:text-white hover:bg-slate-800'
@@ -425,11 +425,11 @@ export default function MultiScreenWall({
                       ? 'bg-amber-400'
                       : isScreened
                       ? 'bg-emerald-400'
-                      : 'bg-sky-400'
+                      : 'bg-slate-400'
                   }`}
                 />
                 <span>{lot.lot_id}</span>
-                <span className="text-[9px] opacity-80">({lot.parts.length})</span>
+                <span className="text-[9px] opacity-80 tabular-nums">({lot.parts.length})</span>
               </button>
             )
           })}
@@ -440,7 +440,7 @@ export default function MultiScreenWall({
             <button
               type="button"
               onClick={onOpenLotsModal}
-              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-mono border border-slate-700 flex items-center gap-1 transition-colors"
+              className="px-2.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-mono border border-slate-700 flex items-center gap-1 transition-colors"
               title="Open Lot-Wise Classification Modal"
             >
               <span>📦 Lots Modal</span>
@@ -448,7 +448,7 @@ export default function MultiScreenWall({
           )}
 
           <div className="text-[11px] font-mono text-slate-400">
-            Selected: <b className="text-sky-300">{effectiveSelected?.component_id || 'None'}</b>
+            Selected: <b className="text-amber-300">{effectiveSelected?.component_id || 'None'}</b>
           </div>
         </div>
       </div>
@@ -479,6 +479,7 @@ export default function MultiScreenWall({
             </div>
           </div>
         )}
+
 
         {/* ================= MODE 2: MODULE A ONLY ================= */}
         {consoleLayout === 'moduleA' && (
@@ -597,7 +598,7 @@ export default function MultiScreenWall({
                         </div>
                         <div className="flex justify-between bg-slate-900/60 p-1.5 rounded border border-slate-800/80">
                           <span>Biak (Indonesia):</span>
-                          <span className="text-sky-300 font-mono font-bold">AZ 045&deg; EL 31&deg;</span>
+                          <span className="text-amber-400 font-mono font-bold">AZ 045&deg; EL 31&deg;</span>
                         </div>
                       </div>
                     </div>
@@ -605,7 +606,7 @@ export default function MultiScreenWall({
 
                   <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-2 text-xs text-slate-400 flex justify-between font-mono">
                     <span>Feed: Primary Radar TEL-1</span>
-                    <span className="text-sky-300">Doppler Lock: +14.2 kHz</span>
+                    <span className="text-amber-400">Doppler Lock: +14.2 kHz</span>
                   </div>
                 </div>
               )}
@@ -618,7 +619,7 @@ export default function MultiScreenWall({
                       <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-semibold border border-slate-700">
                         SCREEN 02
                       </span>
-                      <span className="text-xs font-bold text-white tracking-wide">
+                      <span className="text-xs font-bold text-white tracking-wide font-display">
                         Spacecraft 3D Digital Twin &amp; AOCS
                       </span>
                       {effectiveSelected && (
@@ -636,13 +637,13 @@ export default function MultiScreenWall({
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                       <span className="text-slate-300 font-medium text-[11px]">Vehicle Console</span>
                     </div>
                   </div>
 
                   <div className="p-3.5 flex-1 flex flex-col gap-3">
-                    <div className="relative flex-1 min-h-[290px] rounded-lg border border-slate-800 bg-[radial-gradient(ellipse_at_50%_40%,#0C203E_0%,#060B14_85%)] overflow-hidden">
+                    <div className="relative flex-1 min-h-[290px] rounded-lg border border-slate-800 bg-[radial-gradient(ellipse_at_50%_40%,#111C33_0%,#060B14_85%)] overflow-hidden">
                       <SatelliteScene
                         subsystems={subsystems}
                         onSelect={onSelectSubsystem}
@@ -659,7 +660,7 @@ export default function MultiScreenWall({
                           onClick={() => onSelectSubsystem(s.key)}
                           className={`p-2 rounded-lg border text-left transition-all ${
                             focusKey === s.key || effectiveSelected?.subsystem === s.key
-                              ? 'bg-sky-500/15 border-sky-500 text-white shadow-sm'
+                              ? 'bg-amber-500/15 border-amber-500/70 text-white shadow-sm'
                               : s.status === 'reject'
                               ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                               : 'bg-[#070D1A] border-slate-800 text-slate-300 hover:border-slate-700'
@@ -696,7 +697,7 @@ export default function MultiScreenWall({
                       <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-semibold border border-slate-700">
                         SCREEN 03
                       </span>
-                      <span className="text-xs font-bold text-white tracking-wide">
+                      <span className="text-xs font-bold text-white tracking-wide font-display">
                         HTOL 168H Silicon Telemetry &amp; Parametric Drift
                       </span>
                     </div>
@@ -743,7 +744,7 @@ export default function MultiScreenWall({
 
                   <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-2 text-xs text-slate-400 flex justify-between font-mono">
                     <span>Sampling: 24-Bit Sigma-Delta ADC</span>
-                    <span className="text-sky-300">Oven Temp: 125.0&deg;C Constant</span>
+                    <span className="text-amber-400">Oven Temp: 125.0&deg;C Constant</span>
                   </div>
                 </div>
               )}
@@ -756,7 +757,7 @@ export default function MultiScreenWall({
                       <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-semibold border border-slate-700">
                         SCREEN 04
                       </span>
-                      <span className="text-xs font-bold text-white tracking-wide">
+                      <span className="text-xs font-bold text-white tracking-wide font-display">
                         {screen4Mode === 'lots' ? 'Flight Qualification Lots & Satellite Locations' : 'Quarantined Anomaly Ledger'}
                       </span>
                     </div>
@@ -767,7 +768,7 @@ export default function MultiScreenWall({
                           type="button"
                           onClick={() => setScreen4Mode('lots')}
                           className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
-                            screen4Mode === 'lots' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                            screen4Mode === 'lots' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                           }`}
                         >
                           📦 Lots ({lotGroups.length})
@@ -789,12 +790,12 @@ export default function MultiScreenWall({
                     {screen4Mode === 'lots' ? (
                       <div className="flex-1 flex flex-col gap-2.5 overflow-hidden">
                         {activeWallLot && (
-                          <div className="p-2.5 rounded-lg bg-sky-950/40 border border-sky-500/30 flex flex-col gap-2 text-xs">
+                          <div className="p-2.5 rounded-lg bg-amber-950/20 border border-amber-500/30 flex flex-col gap-2 text-xs">
                             <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-slate-200">
-                              <span className="font-bold text-sky-300">{activeWallLot.lot_id}</span>
+                              <span className="font-bold text-amber-300">{activeWallLot.lot_id}</span>
                               <span className="text-emerald-400 font-bold">{activeWallLot.parts.length} components</span>
                             </div>
-                            <div className="pt-1.5 border-t border-sky-500/20 flex flex-wrap items-center gap-1.5">
+                            <div className="pt-1.5 border-t border-amber-500/20 flex flex-wrap items-center gap-1.5">
                               {Object.entries(activeWallLot.subsystemCounts).map(([subKey, count]) => {
                                 const loc = getSubsystemLocation(subKey)
                                 return (
@@ -807,7 +808,7 @@ export default function MultiScreenWall({
                                     }}
                                     className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#070D1A] border border-slate-700 text-slate-300 hover:text-white flex items-center gap-1"
                                   >
-                                    <span className="font-bold text-cyan">[{subKey}]</span>
+                                    <span className="font-bold text-amber-400">[{subKey}]</span>
                                     <span>{count} in {loc.name}</span>
                                   </button>
                                 )
@@ -841,11 +842,11 @@ export default function MultiScreenWall({
                                         onSelectSubsystem(c.subsystem)
                                       }}
                                       className={`cursor-pointer transition-colors ${
-                                        isSel ? 'bg-sky-500/20 text-white font-bold' : 'hover:bg-slate-800/40 text-slate-300'
+                                        isSel ? 'bg-amber-500/20 text-white font-bold' : 'hover:bg-slate-800/40 text-slate-300'
                                       }`}
                                     >
                                       <td className="py-1.5 px-2.5 font-mono font-bold text-white">{c.component_id}</td>
-                                      <td className="py-1.5 px-2 text-cyan font-bold font-mono">[{c.subsystem}]</td>
+                                      <td className="py-1.5 px-2 text-amber-400 font-bold font-mono">[{c.subsystem}]</td>
                                       <td className="py-1.5 px-2 text-slate-300">{loc.bay}</td>
                                       <td className="py-1.5 px-2 font-mono text-slate-200">{c.v168.toFixed(1)}&mu;A</td>
                                       <td className="py-1.5 px-2">
@@ -896,7 +897,7 @@ export default function MultiScreenWall({
                                   }`}
                                 >
                                   <td className="py-1.5 px-2.5 font-bold font-mono text-white">{c.component_id}</td>
-                                  <td className="py-1.5 px-2 text-cyan font-mono font-bold">[{c.subsystem}] {loc.name}</td>
+                                  <td className="py-1.5 px-2 text-amber-400 font-mono font-bold">[{c.subsystem}] {loc.name}</td>
                                   <td className="py-1.5 px-2 text-rose-400 font-bold font-mono">{c.v168.toFixed(1)}&mu;A</td>
                                   <td className="py-1.5 px-2 text-rose-400 font-mono">+{c.z168.toFixed(2)}&sigma;</td>
                                   <td className="py-1.5 px-2">
@@ -932,8 +933,8 @@ export default function MultiScreenWall({
             className="w-full flex items-center justify-between text-left cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-sky-400" />
-              <span className="text-xs font-bold text-slate-200 tracking-wide uppercase">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span className="text-xs font-bold text-slate-200 tracking-wide uppercase font-display">
                 ISRO SDSC SHAR Component Architecture &amp; HTOL Telemetry DAQ Schematics
               </span>
             </div>
@@ -951,3 +952,4 @@ export default function MultiScreenWall({
     </div>
   )
 }
+

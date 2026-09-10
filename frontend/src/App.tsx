@@ -84,7 +84,7 @@ export default function App() {
     setFocusKey(null)
     setAudit([])
     setDataMetaText(
-      `<span class="font-bold text-white text-sm md:text-base tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-extrabold text-base md:text-lg text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-md border border-emerald-500/40 leading-none shadow-sm mx-0.5">${result.valid}</span> <span class="text-slate-100 font-semibold text-sm md:text-base">components across</span> <button type="button" class="lot-clickable inline-flex items-center gap-1 font-mono font-extrabold text-base md:text-lg text-sky-400 hover:text-white bg-sky-500/20 hover:bg-sky-500/35 px-2.5 py-0.5 rounded-md border border-sky-500/50 hover:border-sky-400 leading-none shadow-sm mx-0.5 transition-all cursor-pointer group" title="Click to open Lot-Wise Classification Window"><span class="underline decoration-sky-400/60 group-hover:decoration-white">${result.lots}</span> <span class="text-xs uppercase font-sans font-bold tracking-wider text-sky-300 group-hover:text-white">lots 📦</span></button>`
+      `<span class="font-bold text-white text-sm md:text-base tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-extrabold text-base md:text-lg text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-md border border-emerald-500/40 leading-none shadow-sm mx-0.5">${result.valid}</span> <span class="text-slate-100 font-semibold text-sm md:text-base">components across</span> <button type="button" class="lot-clickable inline-flex items-center gap-1 font-mono font-extrabold text-base md:text-lg text-amber-400 hover:text-white bg-amber-500/20 hover:bg-amber-500/35 px-2.5 py-0.5 rounded-md border border-amber-500/50 hover:border-amber-400 leading-none shadow-sm mx-0.5 transition-all cursor-pointer group" title="Click to open Lot-Wise Classification Window"><span class="underline decoration-amber-400/60 group-hover:decoration-white">${result.lots}</span> <span class="text-xs uppercase font-sans font-bold tracking-wider text-amber-300 group-hover:text-white">lots 📦</span></button>`
     )
     log(`Flight dataset uploaded \u2014 ${result.rows} components parsed.`)
     log(`${result.valid} components validated across ${result.lots} qualification lots (${result.missing} rows skipped).`, 'ok')
@@ -335,7 +335,7 @@ export default function App() {
               CRITICAL ANOMALY IDENTIFIED:
             </span>
             <span>
-              Part <b className="text-white font-bold">{quarantineToast.component_id}</b> in <b className="text-cyan">[{quarantineToast.subsystem}] {quarantineToast.subsystem_name}</b> has Risk Score <b className="text-rose-400">{quarantineToast.risk_score}/100</b> ({quarantineToast.v168.toFixed(1)} &micro;A drift).
+              Part <b className="text-white font-bold">{quarantineToast.component_id}</b> in <b className="text-amber-400">[{quarantineToast.subsystem}] {quarantineToast.subsystem_name}</b> has Risk Score <b className="text-rose-400">{quarantineToast.risk_score}/100</b> ({quarantineToast.v168.toFixed(1)} &micro;A drift).
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -390,7 +390,7 @@ export default function App() {
 
       {activeTab === 'telemetry' && (
         <>
-          <div className="grid grid-cols-[290px_1fr_320px] gap-3 p-3 bg-[#060913] flex-1 max-xl:grid-cols-1">
+          <div className="grid grid-cols-[300px_1fr_340px] gap-3.5 p-3.5 bg-[#060B16] flex-1 w-full max-xl:grid-cols-1">
             <ComponentMonitor
               subsystems={subsystems}
               components={allComponents.length > 0 ? allComponents : flaggedList}
@@ -408,8 +408,8 @@ export default function App() {
               }}
             />
 
-            <div className="flex flex-col gap-3">
-              <div className="relative h-[440px] rounded-xl border border-slate-800 bg-[radial-gradient(ellipse_at_50%_40%,#0C203E_0%,#060B14_85%)] overflow-hidden shadow-lg">
+            <div className="flex flex-col gap-3.5">
+              <div className="relative h-[440px] rounded-lg border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle">
                 <SatelliteScene
                   subsystems={subsystems}
                   onSelect={selectSubsystem}
@@ -417,7 +417,7 @@ export default function App() {
                   selectedComponent={selected}
                 />
               </div>
-              <div className="rounded-xl border border-slate-800 bg-[#090F1E] overflow-hidden shadow-md">
+              <div className="rounded-lg border border-line bg-[#091120] overflow-hidden shadow-panel-subtle">
                 <TelemetryChart component={selected} />
               </div>
               <AIRecommendationSystem

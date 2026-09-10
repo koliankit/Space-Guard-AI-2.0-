@@ -28,17 +28,17 @@ export default function ModuleBFutureDriftPanel({
   return (
     <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[580px]">
       {/* Module B Top Bezel Bar */}
-      <div className="bg-[#0F172A] border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <div className="bg-[#0D162A] border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold border border-amber-500/40">
             MODULE B
           </span>
-          <span className="text-xs font-bold text-white tracking-wide uppercase">
+          <span className="text-xs font-display font-bold text-white tracking-wider uppercase">
             Future Drift &amp; In-Flight Reliability Forecasting
           </span>
         </div>
         <div className="flex items-center gap-2 text-xs font-mono">
-          <span className={`w-2 h-2 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
+          <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
           <span className="text-slate-400 text-[11px]">FLIGHT HORIZON: +96H &bull; 264H</span>
         </div>
       </div>
@@ -56,7 +56,7 @@ export default function ModuleBFutureDriftPanel({
                 <button
                   type="button"
                   onClick={() => onSelectSubsystem && onSelectSubsystem(selected.subsystem)}
-                  className="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold hover:bg-amber-500/30 transition-colors"
+                  className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-amber-300 text-[10px] font-bold hover:bg-slate-700 transition-colors"
                 >
                   [{selected.subsystem}] {loc?.name || selected.subsystem}
                 </button>
@@ -87,14 +87,14 @@ export default function ModuleBFutureDriftPanel({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">Drift Velocity</span>
-                <span className={`text-sm font-bold mt-0.5 ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
+                <span className={`text-sm font-bold mt-0.5 tabular-nums ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
                   {(slope * 1000).toFixed(2)} <span className="text-[10px] font-normal text-slate-400">nA/hr</span>
                 </span>
               </div>
 
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">264h Extrapolated</span>
-                <span className={`text-sm font-bold mt-0.5 ${willBreach ? 'text-rose-400' : 'text-slate-100'}`}>
+                <span className={`text-sm font-bold mt-0.5 tabular-nums ${willBreach ? 'text-rose-400' : 'text-slate-100'}`}>
                   {selected.predicted_future.toFixed(1)} <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
                 </span>
               </div>
@@ -102,7 +102,7 @@ export default function ModuleBFutureDriftPanel({
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">Future Safety Margin</span>
                 <span
-                  className={`text-sm font-bold mt-0.5 ${
+                  className={`text-sm font-bold mt-0.5 tabular-nums ${
                     (selected.margin_future ?? 0) < 5
                       ? 'text-rose-400'
                       : (selected.margin_future ?? 0) < 15
@@ -117,7 +117,7 @@ export default function ModuleBFutureDriftPanel({
 
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">Time to Limit Breach</span>
-                <span className={`text-sm font-bold mt-0.5 ${breachHour && breachHour <= 300 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                <span className={`text-sm font-bold mt-0.5 tabular-nums ${breachHour && breachHour <= 300 ? 'text-rose-400' : 'text-emerald-400'}`}>
                   {breachHour && breachHour > 0 && breachHour < 1000
                     ? `T+${Math.round(breachHour)} hrs`
                     : '> 10,000 hrs (SAFE)'}
@@ -127,19 +127,19 @@ export default function ModuleBFutureDriftPanel({
 
             {/* Early-to-Late Validation & Model Accuracy */}
             <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-slate-300 pt-1 border-t border-slate-800/80">
-              <div className="flex justify-between bg-slate-900/40 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
                 <span className="text-slate-400">Early 0-24h Model:</span>
-                <span className="text-slate-200 font-bold">
+                <span className="text-slate-200 font-bold tabular-nums">
                   {selected.predicted168_from_early.toFixed(1)} &mu;A
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/40 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
                 <span className="text-slate-400">Actual 168h Reading:</span>
-                <span className="text-slate-200 font-bold">{selected.v168.toFixed(1)} &mu;A</span>
+                <span className="text-slate-200 font-bold tabular-nums">{selected.v168.toFixed(1)} &mu;A</span>
               </div>
-              <div className="flex justify-between bg-slate-900/40 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
                 <span className="text-slate-400">Prediction Error:</span>
-                <span className="text-sky-300 font-bold">
+                <span className="text-amber-300 font-bold tabular-nums">
                   &plusmn;{(selected.prediction_error_168 ?? Math.abs(selected.v168 - selected.predicted168_from_early)).toFixed(2)} &mu;A
                 </span>
               </div>
@@ -178,10 +178,11 @@ export default function ModuleBFutureDriftPanel({
       {/* Module B Bezel Bottom Bar */}
       <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-2 text-xs text-slate-400 flex justify-between font-mono">
         <span>Extrapolation Algorithm: Empirical Arrhenius Degradation Model</span>
-        <span className={willBreach ? 'text-rose-400 font-bold' : 'text-emerald-400'}>
+        <span className={willBreach ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
           {willBreach ? 'ACTION REQUIRED: ISOLATE COMPONENT' : 'SYSTEM RELIABILITY: NOMINAL'}
         </span>
       </div>
     </div>
   )
 }
+

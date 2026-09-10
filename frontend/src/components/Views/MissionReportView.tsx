@@ -48,16 +48,16 @@ export default function MissionReportView({
   }
 
   return (
-    <div className="flex flex-col flex-1 p-6 bg-bg font-mono select-none overflow-y-auto">
+    <div className="flex flex-col flex-1 p-4 sm:p-6 bg-bg font-mono select-none overflow-y-auto w-full">
       {/* Top Header & Actions Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-line mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-line mb-6 w-full">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-safe led" />
             <h2 className="m-0 text-sm font-display font-black tracking-widest text-slate-100 uppercase">
               ISRO SDSC SHAR FLIGHT CLEARANCE CERTIFICATE &amp; SCREENING REPORT
             </h2>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-cyan/15 text-cyan border border-cyan/40 font-bold">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-isro-amber/15 text-isro-amber border border-isro-amber/40 font-bold">
               DOC REF: ISRO-SDSC-SHAR-QA-2026-SG1
             </span>
           </div>
@@ -71,21 +71,21 @@ export default function MissionReportView({
           <button
             type="button"
             onClick={handleDownloadCertPdf}
-            className="hud-glass-interactive border-safe/60 text-safe hover:bg-safe/10 text-xs px-3.5 py-1.5 rounded border transition-all flex items-center gap-1.5 font-bold shadow-neon-green"
+            className="hud-glass-interactive border-safe/60 text-safe hover:bg-safe/10 text-xs px-3.5 py-1.5 rounded border transition-all flex items-center gap-1.5 font-bold shadow-sm"
           >
             <span>&#8681;</span> DOWNLOAD CERTIFICATE (PDF)
           </button>
           <button
             type="button"
             onClick={handleDownloadFullReportPdf}
-            className="hud-glass-interactive border-cyan/60 text-cyan hover:bg-cyan/10 text-xs px-3.5 py-1.5 rounded border transition-all flex items-center gap-1.5 font-bold shadow-neon-cyan"
+            className="hud-glass-interactive border-isro-amber/60 text-isro-amber hover:bg-isro-amber/10 text-xs px-3.5 py-1.5 rounded border transition-all flex items-center gap-1.5 font-bold shadow-sm"
           >
             <span>&#8681;</span> DOWNLOAD FULL REPORT (PDF)
           </button>
           <button
             type="button"
             onClick={handleDownloadExcel}
-            className="hud-glass-interactive border-emerald-400/70 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-xs px-3.5 py-1.5 rounded border transition-all flex items-center gap-1.5 font-bold shadow-[0_0_12px_rgba(52,211,153,0.3)]"
+            className="hud-glass-interactive border-emerald-400/70 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-xs px-3.5 py-1.5 rounded border transition-all flex items-center gap-1.5 font-bold shadow-sm"
           >
             <span>&#8681;</span> DOWNLOAD EXCEL (.CSV)
           </button>
@@ -99,7 +99,7 @@ export default function MissionReportView({
           <button
             type="button"
             onClick={handlePrint}
-            className="hud-glass-interactive border-line text-slate-200 hover:border-cyan hover:text-cyan text-xs px-3 py-1.5 rounded border transition-all flex items-center gap-1.5"
+            className="hud-glass-interactive border-line text-slate-200 hover:border-isro-amber hover:text-isro-amber text-xs px-3 py-1.5 rounded border transition-all flex items-center gap-1.5"
           >
             <span>&#9113;</span> PRINT / HIGH-DPI PDF
           </button>
@@ -107,10 +107,10 @@ export default function MissionReportView({
       </div>
 
       {/* Official Certificate Paper Container */}
-      <div className="max-w-5xl mx-auto w-full bg-[#081528] border-2 border-line p-8 rounded-lg shadow-panel-subtle reticle-corner space-y-6">
+      <div className="w-full bg-[#070E1A] border-2 border-line p-6 sm:p-8 rounded-lg shadow-panel-subtle reticle-corner space-y-6">
         {/* Certificate Masthead */}
         <div className="text-center pb-6 border-b border-line/80">
-          <div className="inline-block border border-cyan px-4 py-1 rounded bg-cyan/10 text-cyan font-display font-black text-sm tracking-widest mb-2 shadow-neon-cyan">
+          <div className="inline-block border border-isro-amber px-4 py-1 rounded bg-isro-amber/10 text-isro-amber font-display font-black text-sm tracking-widest mb-2 shadow-sm">
             भारतीय अंतरिक्ष अनुसंधान संगठन / INDIAN SPACE RESEARCH ORGANISATION
           </div>
           <div className="text-xs text-slate-400 font-bold tracking-widest uppercase mb-1">
@@ -120,41 +120,41 @@ export default function MissionReportView({
             FLIGHT READINESS COMPONENT SCREENING CLEARANCE CERTIFICATE
           </h1>
           <div className="text-xs text-slate-400 mt-1 font-mono">
-            Spacecraft: <b className="text-cyan">SPACEGUARD-1 (LEO SSO 520KM)</b> &bull; Standard:{' '}
+            Spacecraft: <b className="text-isro-amber">SPACEGUARD-1 (LEO SSO 520KM)</b> &bull; Standard:{' '}
             <b className="text-safe">MIL-STD-883 METHOD 1005 (168h HTOL BURN-IN)</b>
           </div>
         </div>
 
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-          <div className="p-3 rounded bg-[#0B1A30] border border-line">
-            <div className="text-2xl font-display font-black text-cyan">{health}%</div>
+          <div className="p-3 rounded bg-[#0A1322] border border-line">
+            <div className="text-2xl font-display font-black text-isro-amber">{health}%</div>
             <div className="text-[10px] text-slate-400 uppercase mt-0.5">Mission Health Score</div>
           </div>
-          <div className="p-3 rounded bg-[#0B1A30] border border-line">
+          <div className="p-3 rounded bg-[#0A1322] border border-line">
             <div className="text-2xl font-display font-black text-safe">{safeCount}</div>
             <div className="text-[10px] text-slate-400 uppercase mt-0.5">Flight Approved (Safe)</div>
           </div>
-          <div className="p-3 rounded bg-[#0B1A30] border border-line">
+          <div className="p-3 rounded bg-[#0A1322] border border-line">
             <div className="text-2xl font-display font-black text-monitor">{monitored.length}</div>
             <div className="text-[10px] text-slate-400 uppercase mt-0.5">Active Orbital Monitor</div>
           </div>
-          <div className="p-3 rounded bg-[#0B1A30] border border-line">
+          <div className="p-3 rounded bg-[#0A1322] border border-line">
             <div className="text-2xl font-display font-black text-reject">{rejected.length}</div>
             <div className="text-[10px] text-slate-400 uppercase mt-0.5">Quarantined / Defects</div>
           </div>
         </div>
 
         {/* Executive Anomaly Prevention Summary */}
-        <div className="bg-[#0B1A30] p-4 rounded border border-line space-y-2 text-xs leading-relaxed">
-          <div className="text-cyan font-display font-bold uppercase tracking-wider text-xs flex items-center gap-1.5">
+        <div className="bg-[#0A1322] p-4 rounded border border-line space-y-2 text-xs leading-relaxed">
+          <div className="text-isro-amber font-display font-bold uppercase tracking-wider text-xs flex items-center gap-1.5">
             <span>&gt;&gt;</span> Executive Reliability Finding &bull; Range Safety Directorate:
           </div>
           <p className="text-slate-200 m-0">
             SpaceGuard AI performed multi-dimensional screening across 168 hours of High-Temperature Operating Life (HTOL) burn-in data under constant 125&deg;C thermal bias. Traditional fixed-datasheet threshold inspection evaluated <b className="text-white">99.5%</b> of components as passing, which would have allowed <b className="text-reject">{rejected.length} latent silicon gate-oxide defects</b> to escape into flight hardware.
           </p>
           <p className="text-slate-200 m-0">
-            By deploying <b className="text-cyan">Lot-Relative Robust z-Scores</b>, <b className="text-safe">Isolation Forest Multivariate Outlier Detection</b>, and <b className="text-cyan">Linear Drift Extrapolation (+96h)</b>, anomalous gate dielectrics were intercepted and quarantined before stage stacking at Sriharikota Second Launch Pad (SLP).
+            By deploying <b className="text-isro-amber">Lot-Relative Robust z-Scores</b>, <b className="text-safe">Isolation Forest Multivariate Outlier Detection</b>, and <b className="text-isro-amber">Linear Drift Extrapolation (+96h)</b>, anomalous gate dielectrics were intercepted and quarantined before stage stacking at Sriharikota Second Launch Pad (SLP).
           </p>
         </div>
 
@@ -173,9 +173,9 @@ export default function MissionReportView({
               MIL-STD-883 Method 1005 Criterion: z-Score &gt; 3.0&sigma; or Dynamic Drift Violation
             </span>
           </div>
-          <div className="overflow-x-auto rounded border border-line bg-[#091526]">
+          <div className="overflow-x-auto rounded border border-line bg-[#060D18]">
             <table className="w-full text-left text-[11px] font-mono border-collapse">
-              <thead className="bg-[#0D203A] text-[10px] uppercase text-slate-300 border-b border-line">
+              <thead className="bg-[#0A1424] text-[10px] uppercase text-slate-300 border-b border-line">
                 <tr>
                   <th className="py-2.5 px-3">Part ID</th>
                   <th className="py-2.5 px-3">Subsystem</th>
@@ -202,11 +202,11 @@ export default function MissionReportView({
                 {rejected.map((c) => (
                   <tr key={c.component_id} className="hover:bg-reject/10 transition-colors">
                     <td className="py-2 px-3 font-bold text-slate-100">{c.component_id}</td>
-                    <td className="py-2 px-3 text-cyan font-bold">[{c.subsystem}]</td>
+                    <td className="py-2 px-3 text-isro-amber font-bold">[{c.subsystem}]</td>
                     <td className="py-2 px-3 text-slate-400">{c.lot_id}</td>
                     <td className="py-2 px-3 text-slate-300">{c.v0.toFixed(2)} &#956;A</td>
                     <td className="py-2 px-3 text-reject font-bold">{c.v168.toFixed(2)} &#956;A</td>
-                    <td className="py-2 px-3 text-cyan">{c.lot_mean != null ? `${c.lot_mean.toFixed(2)} µA` : '-'}</td>
+                    <td className="py-2 px-3 text-telemetry-steel">{c.lot_mean != null ? `${c.lot_mean.toFixed(2)} µA` : '-'}</td>
                     <td className="py-2 px-3 text-reject font-bold">
                       {c.pct_drift > 0 ? '+' : ''}{c.pct_drift.toFixed(1)}%
                     </td>
@@ -230,7 +230,7 @@ export default function MissionReportView({
 
         {/* Quality Assurance Sign-Off Block */}
         <div className="pt-6 border-t border-line grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-mono">
-          <div className="p-3.5 rounded bg-[#0B1A30] border border-line">
+          <div className="p-3.5 rounded bg-[#0A1322] border border-line">
             <div className="text-slate-400 uppercase text-[10px]">Lead Screening Engineer:</div>
             <div className="text-slate-100 font-bold text-sm mt-1">Dr. K. Ramanathan, Ph.D.</div>
             <div className="text-slate-400 text-[10px]">ISTRAC Quality Assurance &bull; ISRO Bengaluru</div>
@@ -238,7 +238,7 @@ export default function MissionReportView({
               <span>&#10003;</span> DIGITAL SIGNATURE VERIFIED: SHA256-8F4C2E9A-ISTRAC
             </div>
           </div>
-          <div className="p-3.5 rounded bg-[#0B1A30] border border-line">
+          <div className="p-3.5 rounded bg-[#0A1322] border border-line">
             <div className="text-slate-400 uppercase text-[10px]">Mission Reliability Director:</div>
             <div className="text-slate-100 font-bold text-sm mt-1">Dr. V. Somnath, Outstanding Scientist</div>
             <div className="text-slate-400 text-[10px]">

@@ -106,13 +106,13 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
   const predError = component.prediction_error_168 ?? Math.abs(v168 - early168)
 
   return (
-    <div className="bg-[#071120] border border-slate-800 rounded-xl p-3 flex flex-col gap-2 relative">
+    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg">
       {/* Top Header & Extrapolation Horizon Selector */}
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2">
-          <span className="font-mono font-bold text-amber-400 flex items-center gap-1.5 text-[11px] uppercase tracking-wide">
-            <span className={`w-2 h-2 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
-            Module B &bull; In-Flight Drift Forecasting
+          <span className="font-display font-bold text-amber-400 flex items-center gap-1.5 text-xs uppercase tracking-wider">
+            <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
+            MODULE B &bull; IN-FLIGHT DRIFT FORECASTING
           </span>
           <span className={`px-2 py-0.5 rounded text-[9.5px] font-mono font-bold border ${
             willBreach
@@ -124,8 +124,8 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
         </div>
 
         {/* Projection Horizon Buttons */}
-        <div className="flex items-center gap-1 bg-[#050B16] p-0.5 rounded border border-slate-800 font-mono text-[10px]">
-          <span className="text-slate-400 px-1">HORIZON:</span>
+        <div className="flex items-center gap-1 bg-[#050914] p-0.5 rounded border border-slate-800 font-mono text-[10px]">
+          <span className="text-slate-400 px-1 uppercase text-[9.5px]">HORIZON:</span>
           {([216, 264, 336] as const).map((h) => (
             <button
               key={h}
@@ -133,8 +133,8 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
               onClick={() => setActiveHorizon(h)}
               className={`px-2 py-0.5 rounded transition-colors ${
                 activeHorizon === h
-                  ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50 font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-amber-500/30 text-amber-300 border border-amber-500/60 font-bold shadow-isro'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
               }`}
             >
               +{h - 168}h ({h}h)
@@ -144,7 +144,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
       </div>
 
       {/* SVG Canvas Area */}
-      <div className="relative rounded-lg border border-slate-800/80 bg-[#050B16] overflow-hidden">
+      <div className="relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="w-full h-auto block select-none"
@@ -153,14 +153,14 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           <defs>
             <linearGradient id="coneGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.05" />
-              <stop offset="100%" stopColor={willBreach ? '#f43f5e' : '#f59e0b'} stopOpacity="0.22" />
+              <stop offset="100%" stopColor={willBreach ? '#ef4444' : '#f59e0b'} stopOpacity="0.22" />
             </linearGradient>
             <linearGradient id="flightZoneGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#0284c7" stopOpacity="0.03" />
-              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.09" />
+              <stop offset="0%" stopColor="#38a3ff" stopOpacity="0.03" />
+              <stop offset="100%" stopColor="#38a3ff" stopOpacity="0.08" />
             </linearGradient>
             <pattern id="gridPatternB" width="30" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 30 0 L 0 0 0 20" fill="none" stroke="#1e293b" strokeWidth="0.4" strokeOpacity="0.6" />
+              <path d="M 30 0 L 0 0 0 20" fill="none" stroke="#162238" strokeWidth="0.5" strokeOpacity="0.7" />
             </pattern>
           </defs>
 
@@ -178,11 +178,12 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           <text
             x={toX(168) + 8}
             y={padT + 14}
-            fill="#38bdf8"
+            fill="#38a3ff"
             fontSize="8"
-            fontFamily="monospace"
+            fontFamily="Rajdhani, sans-serif"
+            fontWeight="bold"
             letterSpacing="0.08em"
-            opacity={0.7}
+            opacity={0.8}
           >
             IN-FLIGHT PROJECTION ZONE (+{activeHorizon - 168}H)
           </text>
@@ -197,7 +198,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                   y1={yPos}
                   x2={W - padR}
                   y2={yPos}
-                  stroke={yVal === limitVal ? '#f43f5e' : '#1e293b'}
+                  stroke={yVal === limitVal ? '#ef4444' : '#162238'}
                   strokeDasharray={yVal === limitVal ? '4 3' : undefined}
                   strokeWidth={yVal === limitVal ? 1.2 : 0.6}
                   strokeOpacity={yVal === limitVal ? 0.9 : 0.8}
@@ -206,7 +207,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                   x={padL - 6}
                   y={yPos + 3}
                   textAnchor="end"
-                  fill={yVal === limitVal ? '#f43f5e' : '#64748b'}
+                  fill={yVal === limitVal ? '#ef4444' : '#64748b'}
                   fontSize="9"
                   fontFamily="monospace"
                   fontWeight={yVal === limitVal ? 'bold' : 'normal'}
@@ -227,7 +228,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                   y1={padT}
                   x2={xPos}
                   y2={H - padB}
-                  stroke={h === 168 ? '#38bdf8' : h === activeHorizon ? '#f59e0b' : '#1e293b'}
+                  stroke={h === 168 ? '#38a3ff' : h === activeHorizon ? '#f59e0b' : '#162238'}
                   strokeDasharray={h >= 168 ? '3 3' : undefined}
                   strokeWidth={h >= 168 ? 1 : 0.5}
                   strokeOpacity={h >= 168 ? 0.7 : 0.5}
@@ -236,7 +237,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                   x={xPos}
                   y={H - padB + 14}
                   textAnchor="middle"
-                  fill={h === 168 ? '#38bdf8' : h === activeHorizon ? '#f59e0b' : '#64748b'}
+                  fill={h === 168 ? '#38a3ff' : h === activeHorizon ? '#f59e0b' : '#64748b'}
                   fontSize="9"
                   fontFamily="monospace"
                   fontWeight={h >= 168 ? 'bold' : 'normal'}
@@ -246,6 +247,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
               </g>
             )
           })}
+
 
           {/* 168H Ground Completion Marker */}
           <text
@@ -284,7 +286,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           <path
             d={measuredPathD}
             fill="none"
-            stroke="#38bdf8"
+            stroke="#38a3ff"
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -294,7 +296,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           <path
             d={extrapPathD}
             fill="none"
-            stroke={willBreach ? '#f43f5e' : '#f59e0b'}
+            stroke={willBreach ? '#ef4444' : '#f59e0b'}
             strokeWidth="2"
             strokeDasharray="4 3"
             strokeLinecap="round"
@@ -311,7 +313,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                 onMouseEnter={() => setHoveredPoint({ hour: p.h, val: p.v, label: p.label })}
                 onMouseLeave={() => setHoveredPoint(null)}
               >
-                <circle cx={cx} cy={cy} r="4" fill="#0284c7" stroke="#38bdf8" strokeWidth="1.5" />
+                <circle cx={cx} cy={cy} r="4" fill="#0284c7" stroke="#38a3ff" strokeWidth="1.5" />
                 <circle cx={cx} cy={cy} r="1.5" fill="#ffffff" />
               </g>
             )
@@ -366,11 +368,11 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           {/* Breach Crosshair & Annotation if within visible range */}
           {breachHour && breachHour <= maxX && (
             <g transform={`translate(${toX(breachHour)}, ${toY(limitVal)})`}>
-              <circle r="7" fill="none" stroke="#f43f5e" strokeWidth="1.5" className="animate-ping" opacity="0.75" />
-              <circle r="5" fill="#f43f5e" fillOpacity="0.3" stroke="#f43f5e" strokeWidth="1.8" />
-              <line x1="-8" y1="0" x2="8" y2="0" stroke="#f43f5e" strokeWidth="1.5" />
-              <line x1="0" y1="-8" x2="0" y2="8" stroke="#f43f5e" strokeWidth="1.5" />
-              <text x="0" y="-11" textAnchor="middle" fill="#f43f5e" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
+              <circle r="7" fill="none" stroke="#ef4444" strokeWidth="1.5" className="animate-ping" opacity="0.75" />
+              <circle r="5" fill="#ef4444" fillOpacity="0.3" stroke="#ef4444" strokeWidth="1.8" />
+              <line x1="-8" y1="0" x2="8" y2="0" stroke="#ef4444" strokeWidth="1.5" />
+              <line x1="0" y1="-8" x2="0" y2="8" stroke="#ef4444" strokeWidth="1.5" />
+              <text x="0" y="-11" textAnchor="middle" fill="#ef4444" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
                 BREACH T+{Math.round(breachHour)}H
               </text>
             </g>
@@ -386,14 +388,14 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
                 height="22"
                 rx="4"
                 fill="#0f172a"
-                stroke="#38bdf8"
+                stroke="#f59e0b"
                 strokeWidth="1"
                 filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"
               />
               <text x="0" y="-2" textAnchor="middle" fill="#94a3b8" fontSize="7.5" fontFamily="monospace">
                 {hoveredPoint.label}
               </text>
-              <text x="0" y="6" textAnchor="middle" fill="#38bdf8" fontSize="8.5" fontFamily="monospace" fontWeight="bold">
+              <text x="0" y="6" textAnchor="middle" fill="#f59e0b" fontSize="8.5" fontFamily="monospace" fontWeight="bold">
                 {hoveredPoint.val.toFixed(2)} &mu;A
               </text>
             </g>
@@ -417,28 +419,28 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
         <div className="p-2 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
           <span className="text-[10px] text-slate-400 uppercase">Drift Velocity</span>
-          <span className={`text-sm font-bold mt-0.5 ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
+          <span className={`text-sm font-bold mt-0.5 tabular-nums ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
             {(slope * 1000).toFixed(2)} <span className="text-[10px] font-normal text-slate-400">nA/hr</span>
           </span>
         </div>
 
         <div className="p-2 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
           <span className="text-[10px] text-slate-400 uppercase">Early Pred Error</span>
-          <span className="text-sm font-bold text-sky-300 mt-0.5">
+          <span className="text-sm font-bold text-amber-300 mt-0.5 tabular-nums">
             &plusmn;{predError.toFixed(2)} <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
 
         <div className="p-2 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
           <span className="text-[10px] text-slate-400 uppercase">+{activeHorizon - 168}h Projection</span>
-          <span className={`text-sm font-bold mt-0.5 ${willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'}`}>
+          <span className={`text-sm font-bold mt-0.5 tabular-nums ${willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'}`}>
             {projectedAtHorizon.toFixed(2)} <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
 
         <div className="p-2 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
           <span className="text-[10px] text-slate-400 uppercase">Future Margin</span>
-          <span className={`text-sm font-bold mt-0.5 ${marginFuture < 5 ? 'text-rose-400' : marginFuture < 15 ? 'text-amber-400' : 'text-emerald-400'}`}>
+          <span className={`text-sm font-bold mt-0.5 tabular-nums ${marginFuture < 5 ? 'text-rose-400' : marginFuture < 15 ? 'text-amber-400' : 'text-emerald-400'}`}>
             {marginFuture.toFixed(1)} <span className="text-[10px] font-normal text-slate-400">&mu;A</span>
           </span>
         </div>

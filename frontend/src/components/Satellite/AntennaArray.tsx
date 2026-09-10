@@ -88,7 +88,7 @@ export default function AntennaArray({
         <mesh position={[0, -0.22, 0]}>
           <cylinderGeometry args={[0.065, 0.085, 0.18, 20]} />
           <meshStandardMaterial
-            color={isSelected ? '#0284c7' : '#0a1e24'}
+            color={isSelected ? '#F59E0B' : '#1E293B'}
             metalness={0.88}
             roughness={0.25}
           />
@@ -96,10 +96,10 @@ export default function AntennaArray({
         <mesh position={[0, -0.1, 0]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.048, 0.048, 0.16, 16]} />
           <meshStandardMaterial
-            color={isSelected ? '#00ff9d' : '#00f0ff'}
+            color={isSelected ? '#F59E0B' : '#38A3FF'}
             metalness={0.92}
             roughness={0.15}
-            emissive={isSelected ? '#00ff9d' : '#00f0ff'}
+            emissive={isSelected ? '#F59E0B' : '#1E3A8A'}
             emissiveIntensity={isSelected ? 0.6 : 0.2}
           />
         </mesh>
@@ -107,9 +107,9 @@ export default function AntennaArray({
         {/* Main Carbon-composite Parabolic Reflector Dish */}
         <mesh geometry={dishGeometry} rotation={[Math.PI, 0, 0]}>
           <meshStandardMaterial
-            color={isSelected ? '#042e20' : isHovered ? '#062920' : '#02120e'}
-            emissive={isSelected ? '#00ff9d' : isHovered ? '#00d280' : '#011c13'}
-            emissiveIntensity={isSelected ? 0.55 : isHovered ? 0.35 : 0.15}
+            color={isSelected ? '#1E293B' : isHovered ? '#111827' : '#0B1120'}
+            emissive={isSelected ? '#F59E0B' : isHovered ? '#D97706' : '#1E3A8A'}
+            emissiveIntensity={isSelected ? 0.45 : isHovered ? 0.25 : 0.1}
             metalness={0.88}
             roughness={0.2}
             side={THREE.DoubleSide}
@@ -133,7 +133,7 @@ export default function AntennaArray({
         {/* Dish structural glowing rib lines */}
         <lineSegments geometry={dishEdges} rotation={[Math.PI, 0, 0]}>
           <lineBasicMaterial
-            color={isSelected ? '#00ff87' : isHovered ? '#00f0ff' : '#00ff9d'}
+            color={isSelected ? '#F59E0B' : isHovered ? '#38A3FF' : '#475569'}
             transparent
             opacity={isSelected ? 0.95 : isHovered ? 0.8 : 0.55}
           />
@@ -149,9 +149,9 @@ export default function AntennaArray({
               <mesh position={[x / 2, 0.13, z / 2]} rotation={[Math.sin(angle) * 0.42, 0, -Math.cos(angle) * 0.42]}>
                 <cylinderGeometry args={[0.009, 0.009, 0.34, 8]} />
                 <meshStandardMaterial
-                  color={isSelected ? '#00ff87' : '#38bdf8'}
+                  color={isSelected ? '#F59E0B' : '#38A3FF'}
                   metalness={0.92}
-                  emissive={isSelected ? '#00ff87' : '#0284c7'}
+                  emissive={isSelected ? '#F59E0B' : '#1E3A8A'}
                   emissiveIntensity={isSelected ? 0.4 : 0.15}
                 />
               </mesh>
@@ -163,9 +163,9 @@ export default function AntennaArray({
         <mesh ref={feedPulseRef} position={[0, 0.24, 0]}>
           <sphereGeometry args={[0.045, 20, 20]} />
           <meshStandardMaterial
-            color={isSelected ? '#00ff87' : '#00f0ff'}
-            emissive={isSelected ? '#00ff87' : '#00f0ff'}
-            emissiveIntensity={isSelected ? 1.2 : 0.6}
+            color={isSelected ? '#F59E0B' : '#38A3FF'}
+            emissive={isSelected ? '#F59E0B' : '#1E3A8A'}
+            emissiveIntensity={isSelected ? 1.0 : 0.5}
             metalness={0.92}
             roughness={0.1}
           />
@@ -181,7 +181,7 @@ export default function AntennaArray({
         {/* Mast stalk with gold grounding band */}
         <mesh position={[0, 0.14, 0]}>
           <cylinderGeometry args={[0.016, 0.022, 0.28, 12]} />
-          <meshStandardMaterial color="#00ff9d" metalness={0.9} roughness={0.18} />
+          <meshStandardMaterial color="#F59E0B" metalness={0.9} roughness={0.18} />
         </mesh>
         {/* Glowing Helical Antenna Coil */}
         <primitive
@@ -190,7 +190,7 @@ export default function AntennaArray({
               new THREE.Line(
                 helixPoints,
                 new THREE.LineBasicMaterial({
-                  color: isSelected ? '#00ff87' : '#00f0ff',
+                  color: isSelected ? '#10B981' : '#F59E0B',
                   linewidth: 2,
                 }),
               ),
@@ -201,9 +201,9 @@ export default function AntennaArray({
         <mesh position={[0, 0.68, 0]}>
           <coneGeometry args={[0.022, 0.07, 12]} />
           <meshStandardMaterial
-            color={isSelected ? '#00ff87' : '#00f0ff'}
-            emissive={isSelected ? '#00ff87' : '#00f0ff'}
-            emissiveIntensity={isSelected ? 1.0 : 0.6}
+            color={isSelected ? '#10B981' : '#F59E0B'}
+            emissive={isSelected ? '#10B981' : '#F59E0B'}
+            emissiveIntensity={isSelected ? 0.9 : 0.4}
           />
         </mesh>
       </group>
@@ -213,18 +213,18 @@ export default function AntennaArray({
         <mesh position={[0, 0.09, 0]}>
           <coneGeometry args={[0.045, 0.1, 20]} />
           <meshStandardMaterial
-            color={isSelected ? '#00ff9d' : '#38bdf8'}
+            color={isSelected ? '#F59E0B' : '#38A3FF'}
             metalness={0.88}
-            emissive={isSelected ? '#00ff9d' : '#0284c7'}
+            emissive={isSelected ? '#F59E0B' : '#1E3A8A'}
             emissiveIntensity={isSelected ? 0.5 : 0.2}
           />
         </mesh>
         <mesh position={[0, -0.01, 0]} rotation={[Math.PI, 0, 0]}>
           <coneGeometry args={[0.045, 0.1, 20]} />
           <meshStandardMaterial
-            color={isSelected ? '#00ff9d' : '#38bdf8'}
+            color={isSelected ? '#F59E0B' : '#38A3FF'}
             metalness={0.88}
-            emissive={isSelected ? '#00ff9d' : '#0284c7'}
+            emissive={isSelected ? '#F59E0B' : '#1E3A8A'}
             emissiveIntensity={isSelected ? 0.5 : 0.2}
           />
         </mesh>

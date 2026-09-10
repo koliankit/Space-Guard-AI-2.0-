@@ -34,8 +34,8 @@ export default function IntelligencePanel({ component }: { component: ComponentO
   if (!component) {
     return (
       <div className="bg-[#0B1120] p-4 rounded-xl border border-slate-800 flex flex-col justify-center items-center text-center font-sans">
-        <h3 className="m-0 mb-3 text-xs font-bold uppercase tracking-wide text-white flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-400" />
+        <h3 className="m-0 mb-3 text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2 font-display">
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
           Component Intelligence
         </h3>
         <div className="text-slate-400 text-xs leading-relaxed py-6 px-4 border border-dashed border-slate-800 rounded-lg max-w-xs">
@@ -73,8 +73,8 @@ export default function IntelligencePanel({ component }: { component: ComponentO
     <div className="bg-[#0B1120] p-4 rounded-xl border border-slate-800 flex flex-col h-full overflow-y-auto font-sans text-xs shadow-md">
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-3">
-        <h3 className="m-0 text-xs font-bold uppercase tracking-wide text-white flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-400" />
+        <h3 className="m-0 text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2 font-display">
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
           Component Intelligence
         </h3>
         <div className="flex items-center gap-1.5">
@@ -118,7 +118,7 @@ export default function IntelligencePanel({ component }: { component: ComponentO
             Lot: <span className="text-slate-200 font-bold">{component.lot_id}</span>
           </div>
         </div>
-        <div className="text-xs text-sky-400 mt-1 font-medium flex items-center justify-between">
+        <div className="text-xs text-amber-400 mt-1 font-medium flex items-center justify-between">
           <span>{component.subsystem_name} &bull; [{component.subsystem}]</span>
           <span className="text-[10px] text-slate-400 uppercase font-mono">{component.parameter || 'Leakage Current (µA)'}</span>
         </div>
@@ -154,7 +154,7 @@ export default function IntelligencePanel({ component }: { component: ComponentO
       <div className="mb-3.5 p-3 rounded-lg bg-[#070D1A] border border-slate-800">
         <div className="text-[10px] text-slate-400 uppercase font-semibold mb-2 flex items-center justify-between">
           <span>HTOL Burn-In Measurements</span>
-          <span className="text-sky-400 text-[10px] font-mono">MIL-STD-883 M1005</span>
+          <span className="text-amber-400 text-[10px] font-mono">MIL-STD-883 M1005</span>
         </div>
         <div className="grid grid-cols-4 gap-2 text-center font-mono">
           <div className="bg-[#0F172A] p-2 rounded-lg border border-slate-800">
@@ -171,7 +171,7 @@ export default function IntelligencePanel({ component }: { component: ComponentO
           </div>
           <div className="bg-[#0F172A] p-2 rounded-lg border border-slate-800">
             <div className="text-[9.5px] text-slate-400 mb-0.5">168h</div>
-            <div className={`font-bold text-xs ${isReject ? 'text-rose-400' : 'text-sky-400'}`}>{component.v168.toFixed(2)}</div>
+            <div className={`font-bold text-xs ${isReject ? 'text-rose-400' : 'text-amber-400'}`}>{component.v168.toFixed(2)}</div>
           </div>
         </div>
       </div>
@@ -237,9 +237,9 @@ export default function IntelligencePanel({ component }: { component: ComponentO
       <div className="mt-auto pt-3 border-t border-slate-800">
         <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider mb-2 flex items-center justify-between font-sans">
           <span className="flex items-center gap-1.5">
-            <span className="text-sky-400 font-bold">&gt;&gt;</span> WHY WAS THIS COMPONENT FLAGGED?
+            <span className="text-amber-400 font-bold">&gt;&gt;</span> WHY WAS THIS COMPONENT FLAGGED?
           </span>
-          <span className="text-[9.5px] text-sky-400 font-mono font-semibold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20">
+          <span className="text-[9.5px] text-amber-300 font-mono font-semibold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
             XAI ENGINE
           </span>
         </div>

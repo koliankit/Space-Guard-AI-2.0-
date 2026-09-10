@@ -88,8 +88,8 @@ export default function ComponentMonitor({
     <div className="bg-[#0B1120] p-4 border-r border-slate-800 flex flex-col h-full overflow-hidden font-sans text-xs">
       {/* Header */}
       <div className="flex items-center justify-between mb-2.5">
-        <h3 className="m-0 text-xs font-bold uppercase tracking-wide text-white flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-400" />
+        <h3 className="m-0 text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2 font-display">
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
           Component Intelligence
         </h3>
         <span className="text-[10px] font-mono text-slate-400">ISRO-INSTR-01</span>
@@ -99,7 +99,7 @@ export default function ComponentMonitor({
       <div className="relative mb-2.5">
         <span className="absolute left-3 top-2 text-slate-400 text-xs">🔍</span>
         <input
-          className="w-full pl-8 pr-3 py-1.5 bg-[#070D1A] border border-slate-800 rounded-lg text-slate-100 font-mono text-xs focus:border-sky-500 outline-none transition-all placeholder:text-slate-500"
+          className="w-full pl-8 pr-3 py-1.5 bg-[#070D1A] border border-slate-800 rounded-lg text-slate-100 font-mono text-xs focus:border-amber-500 outline-none transition-all placeholder:text-slate-500"
           placeholder="Search Component ID..."
           onChange={(e) => onSearch(e.target.value)}
         />
@@ -116,7 +116,7 @@ export default function ComponentMonitor({
               ? 'border-rose-500 bg-rose-500/20 text-rose-300 font-semibold'
               : f === 'MONITOR'
               ? 'border-amber-500 bg-amber-500/20 text-amber-300 font-semibold'
-              : 'border-sky-500 bg-sky-500/20 text-sky-300 font-semibold'
+              : 'border-amber-500 bg-amber-500/20 text-amber-300 font-semibold'
 
           return (
             <button
@@ -144,9 +144,9 @@ export default function ComponentMonitor({
             setClassificationMode('lots')
             setSelectedSubKey(null)
           }}
-          className={`flex-1 py-1 px-2 rounded text-[10.5px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-1 px-2 rounded text-[10.5px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 font-display ${
             classificationMode === 'lots'
-              ? 'bg-sky-600 text-white shadow-sm'
+              ? 'bg-amber-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -159,9 +159,9 @@ export default function ComponentMonitor({
             setClassificationMode('subsystems')
             setSelectedLot(null)
           }}
-          className={`flex-1 py-1 px-2 rounded text-[10.5px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-1 px-2 rounded text-[10.5px] font-bold uppercase transition-all flex items-center justify-center gap-1.5 font-display ${
             classificationMode === 'subsystems'
-              ? 'bg-sky-600 text-white shadow-sm'
+              ? 'bg-amber-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -196,7 +196,7 @@ export default function ComponentMonitor({
                   key={lot.lot_id}
                   className={`flex items-center justify-between py-1.5 px-2 rounded-md cursor-pointer text-xs transition-all border ${
                     isSelected
-                      ? 'border-sky-500 bg-sky-500/20 text-white font-semibold shadow-sm'
+                      ? 'border-amber-500 bg-amber-500/20 text-white font-semibold shadow-sm'
                       : 'border-slate-800/80 bg-[#070D1A] hover:bg-slate-800/60 hover:border-slate-700 text-slate-200'
                   }`}
                   onClick={() => {
@@ -210,7 +210,7 @@ export default function ComponentMonitor({
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${DOT_COLOR[lot.status] ?? DOT_COLOR.idle}`} />
-                    <span className="font-mono text-[11px] font-bold text-sky-400 truncate">
+                    <span className="font-mono text-[11px] font-bold text-amber-400 truncate">
                       {lot.lot_id}
                     </span>
                   </div>
@@ -239,7 +239,7 @@ export default function ComponentMonitor({
                   key={s.key}
                   className={`flex items-center gap-2 py-1.5 px-2 rounded-md cursor-pointer text-xs transition-all border ${
                     isSelected
-                      ? 'border-sky-500 bg-sky-500/20 text-white font-semibold'
+                      ? 'border-amber-500 bg-amber-500/20 text-white font-semibold'
                       : 'border-transparent hover:bg-slate-800/60 hover:border-slate-700'
                   }`}
                   onClick={() => {
@@ -249,7 +249,7 @@ export default function ComponentMonitor({
                   }}
                 >
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${DOT_COLOR[s.status] ?? DOT_COLOR.idle}`} />
-                  <span className="font-mono font-bold text-sky-400 text-[11px] w-9">[{s.key}]</span>
+                  <span className="font-mono font-bold text-amber-400 text-[11px] w-9">[{s.key}]</span>
                   <span className="flex-1 text-slate-200 truncate text-[11.5px]">{s.name}</span>
                   <span className="font-mono text-slate-400 text-[10.5px]">{s.count}</span>
                 </div>
@@ -261,8 +261,8 @@ export default function ComponentMonitor({
 
       {/* Active Lot/Subsystem Filter Status Indicator */}
       {(selectedLot || selectedSubKey) && (
-        <div className="mb-2 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-between text-[10.5px]">
-          <span className="text-sky-300 font-mono truncate">
+        <div className="mb-2 p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-[10.5px]">
+          <span className="text-amber-300 font-mono truncate">
             {selectedLot ? (
               <>
                 Lot: <b>{selectedLot}</b> ({displayedComponents.length} components)
@@ -309,7 +309,7 @@ export default function ComponentMonitor({
                 key={c.component_id}
                 className={`flex justify-between items-center py-2 px-2.5 rounded-lg cursor-pointer text-xs transition-all border ${
                   selectedId === c.component_id
-                    ? 'border-sky-500 bg-sky-500/15 text-white font-semibold shadow-sm'
+                    ? 'border-amber-500 bg-amber-500/15 text-white font-semibold shadow-sm'
                     : 'border-slate-800/80 bg-[#070D1A] hover:border-slate-700 hover:bg-slate-800/40'
                 }`}
                 onClick={() => onSelectComponent(c.component_id)}
@@ -332,7 +332,7 @@ export default function ComponentMonitor({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-400">[{c.subsystem}]</span>
+                  <span className="text-[10px] text-slate-400 font-mono">[{c.subsystem}]</span>
                   <span
                     className={`font-mono font-bold px-1.5 py-0.5 rounded text-[10.5px] ${
                       c.status === 'safe'

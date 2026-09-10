@@ -4,10 +4,10 @@ import * as THREE from 'three'
 import type { ComponentOut, SubsystemStatus } from '../../types'
 
 const STATUS_COLOR: Record<string, string> = {
-  safe: '#00FF87',
-  monitor: '#FFB020',
-  reject: '#FF334B',
-  idle: '#38BDF8',
+  safe: '#10B981',
+  monitor: '#F59E0B',
+  reject: '#EF4444',
+  idle: '#38A3FF',
 }
 
 interface EquipmentModuleProps {
@@ -78,11 +78,11 @@ export default function SatelliteEquipment({
   const equipmentMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: isSelected ? '#ffffff' : isHovered ? '#baffd9' : '#143b33',
+        color: isSelected ? '#ffffff' : isHovered ? '#38A3FF' : '#1E293B',
         metalness: 0.88,
         roughness: 0.2,
-        emissive: isSelected ? color : isHovered ? '#00FF9D' : '#001a12',
-        emissiveIntensity: isSelected ? 0.8 : isHovered ? 0.5 : 0.15,
+        emissive: isSelected ? color : isHovered ? '#F59E0B' : '#0B1120',
+        emissiveIntensity: isSelected ? 0.8 : isHovered ? 0.4 : 0.1,
         transparent: isXray,
         opacity: isXray ? 0.4 : 1.0,
       }),
@@ -146,8 +146,8 @@ export default function SatelliteEquipment({
               <mesh key={i} position={[x, 0.11, 0]}>
                 <boxGeometry args={[0.016, 0.035, 0.22]} />
                 <meshStandardMaterial
-                  color={isSelected ? '#00ff9d' : '#021c16'}
-                  emissive={isSelected ? '#00ff9d' : '#000000'}
+                  color={isSelected ? '#F59E0B' : '#1E293B'}
+                  emissive={isSelected ? '#F59E0B' : '#000000'}
                   emissiveIntensity={isSelected ? 0.4 : 0}
                   metalness={0.9}
                 />
@@ -156,11 +156,11 @@ export default function SatelliteEquipment({
             {/* Dual Diagnostic Status LEDs */}
             <mesh position={[0.1, 0.04, 0.125]}>
               <sphereGeometry args={[0.02, 10, 10]} />
-              <meshBasicMaterial color={isReject ? '#FF334B' : isSelected ? '#00FF9D' : '#38BDF8'} />
+              <meshBasicMaterial color={isReject ? '#EF4444' : isSelected ? '#F59E0B' : '#38A3FF'} />
             </mesh>
             <mesh position={[0.05, 0.04, 0.125]}>
               <sphereGeometry args={[0.02, 10, 10]} />
-              <meshBasicMaterial color="#00FF9D" />
+              <meshBasicMaterial color="#10B981" />
             </mesh>
           </group>
         )
@@ -190,8 +190,8 @@ export default function SatelliteEquipment({
             <mesh position={[0, -0.06, 0.115]}>
               <boxGeometry args={[0.24, 0.024, 0.024]} />
               <meshStandardMaterial
-                color="#00FF9D"
-                emissive="#00FF9D"
+                color="#F59E0B"
+                emissive="#F59E0B"
                 emissiveIntensity={isSelected ? 0.7 : 0.3}
                 metalness={0.9}
               />
@@ -206,8 +206,8 @@ export default function SatelliteEquipment({
             <mesh position={[0, -0.05, 0]}>
               <boxGeometry args={[0.3, 0.035, 0.24]} />
               <meshStandardMaterial
-                color={isSelected ? '#00ff9d' : '#052820'}
-                emissive={isSelected ? '#00ff9d' : '#011c13'}
+                color={isSelected ? '#F59E0B' : '#0F172A'}
+                emissive={isSelected ? '#F59E0B' : '#0B1120'}
                 emissiveIntensity={isSelected ? 0.4 : 0.1}
                 metalness={0.85}
               />
@@ -218,8 +218,8 @@ export default function SatelliteEquipment({
                 <mesh key={`${col}-${row}`} position={[x, 0.025, z]}>
                   <cylinderGeometry args={[0.024, 0.024, 0.11, 12]} />
                   <meshStandardMaterial
-                    color={isSelected ? '#38bdf8' : '#0b382d'}
-                    emissive={isSelected ? '#00f0ff' : '#02241b'}
+                    color={isSelected ? '#38A3FF' : '#1E293B'}
+                    emissive={isSelected ? '#38A3FF' : '#0B1120'}
                     emissiveIntensity={isSelected ? 0.6 : 0.1}
                     metalness={0.88}
                     roughness={0.2}
@@ -239,8 +239,8 @@ export default function SatelliteEquipment({
             <mesh position={[0, 0, 0.09]} rotation={[Math.PI / 2, 0, 0]}>
               <torusGeometry args={[0.07, 0.018, 10, 20]} />
               <meshStandardMaterial
-                color="#00FF9D"
-                emissive="#00FF9D"
+                color="#F59E0B"
+                emissive="#F59E0B"
                 emissiveIntensity={isSelected ? 0.8 : 0.3}
                 metalness={0.92}
               />
@@ -258,9 +258,9 @@ export default function SatelliteEquipment({
             <mesh position={[0.13, 0.02, 0]}>
               <boxGeometry args={[0.035, 0.07, 0.045]} />
               <meshStandardMaterial
-                color="#00FF9D"
+                color="#38A3FF"
                 metalness={0.95}
-                emissive={isSelected ? '#00ff9d' : '#000000'}
+                emissive={isSelected ? '#38A3FF' : '#000000'}
                 emissiveIntensity={isSelected ? 0.5 : 0}
               />
             </mesh>
@@ -284,8 +284,8 @@ export default function SatelliteEquipment({
             <mesh position={[0, 0.09, 0]}>
               <boxGeometry args={[0.13, 0.028, 0.11]} />
               <meshStandardMaterial
-                color="#00FF9D"
-                emissive="#00FF9D"
+                color="#38A3FF"
+                emissive="#38A3FF"
                 emissiveIntensity={isSelected ? 0.6 : 0.2}
                 metalness={0.88}
               />
@@ -300,14 +300,14 @@ export default function SatelliteEquipment({
             <group rotation={[0.4, 0.2, 0]}>
               <mesh>
                 <cylinderGeometry args={[0.035, 0.048, 0.15, 18]} />
-                <meshStandardMaterial color="#031f18" metalness={0.92} roughness={0.1} />
+                <meshStandardMaterial color="#0B1120" metalness={0.92} roughness={0.1} />
               </mesh>
-              {/* Internal optical lens glass in glowing neon green */}
+              {/* Internal optical lens glass in calibrated emerald */}
               <mesh position={[0, 0.065, 0]}>
                 <circleGeometry args={[0.03, 18]} />
                 <meshStandardMaterial
-                  color="#00FF9D"
-                  emissive="#00FF9D"
+                  color="#10B981"
+                  emissive="#10B981"
                   emissiveIntensity={isSelected ? 1.0 : 0.6}
                   roughness={0.05}
                   metalness={0.9}
@@ -317,7 +317,7 @@ export default function SatelliteEquipment({
             {/* Sensor mounting bracket */}
             <mesh position={[0, -0.065, 0]}>
               <boxGeometry args={[0.13, 0.035, 0.13]} />
-              <meshStandardMaterial color="#072d24" metalness={0.85} />
+              <meshStandardMaterial color="#1E293B" metalness={0.85} />
             </mesh>
           </group>
         )
@@ -329,8 +329,8 @@ export default function SatelliteEquipment({
             <mesh>
               <boxGeometry args={[0.28, 0.24, 0.035]} />
               <meshStandardMaterial
-                color={isSelected ? '#00ff9d' : '#0a3b30'}
-                emissive={isSelected ? '#00ff9d' : '#02241b'}
+                color={isSelected ? '#F59E0B' : '#1E293B'}
+                emissive={isSelected ? '#F59E0B' : '#0B1120'}
                 emissiveIntensity={isSelected ? 0.5 : 0.1}
                 metalness={0.88}
                 roughness={0.15}
@@ -341,8 +341,8 @@ export default function SatelliteEquipment({
               <mesh key={i} position={[0, y, 0.022]} rotation={[0.45, 0, 0]}>
                 <boxGeometry args={[0.24, 0.038, 0.007]} />
                 <meshStandardMaterial
-                  color="#00FF9D"
-                  emissive="#00FF9D"
+                  color="#38A3FF"
+                  emissive="#38A3FF"
                   emissiveIntensity={isSelected ? 0.6 : 0.2}
                   metalness={0.92}
                 />
@@ -356,14 +356,14 @@ export default function SatelliteEquipment({
           <group rotation={[Math.PI / 2, 0, 0]}>
             <mesh>
               <cylinderGeometry args={[0.085, 0.11, 0.24, 22]} />
-              <meshStandardMaterial color="#031e17" metalness={0.88} roughness={0.18} />
+              <meshStandardMaterial color="#0B1120" metalness={0.88} roughness={0.18} />
             </mesh>
             {/* Front Aperture Hood Ring */}
             <mesh position={[0, 0.12, 0]}>
               <torusGeometry args={[0.088, 0.014, 10, 22]} />
               <meshStandardMaterial
-                color="#00FF9D"
-                emissive="#00FF9D"
+                color="#F59E0B"
+                emissive="#F59E0B"
                 emissiveIntensity={isSelected ? 0.8 : 0.4}
                 metalness={0.92}
               />
@@ -372,8 +372,8 @@ export default function SatelliteEquipment({
             <mesh position={[0, 0.09, 0]}>
               <circleGeometry args={[0.076, 22]} />
               <meshStandardMaterial
-                color="#00FF9D"
-                emissive="#00b4d8"
+                color="#38A3FF"
+                emissive="#1E3A8A"
                 emissiveIntensity={isSelected ? 1.0 : 0.7}
                 roughness={0.08}
               />
@@ -394,7 +394,7 @@ export default function SatelliteEquipment({
                 color="#e2e8f0"
                 metalness={0.92}
                 roughness={0.1}
-                emissive={isSelected ? '#00f0ff' : '#000000'}
+                emissive={isSelected ? '#38A3FF' : '#000000'}
                 emissiveIntensity={isSelected ? 0.5 : 0}
               />
             </mesh>
@@ -408,17 +408,17 @@ export default function SatelliteEquipment({
             <mesh position={[0, 0, 0.055]}>
               <cylinderGeometry args={[0.07, 0.07, 0.028, 22]} />
               <meshStandardMaterial
-                color={isSelected ? '#38bdf8' : '#64748b'}
+                color={isSelected ? '#F59E0B' : '#64748b'}
                 metalness={0.92}
                 roughness={0.18}
-                emissive={isSelected ? '#00f0ff' : '#000000'}
+                emissive={isSelected ? '#F59E0B' : '#000000'}
                 emissiveIntensity={isSelected ? 0.5 : 0}
               />
             </mesh>
             <mesh position={[0.055, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[0.065, 0.065, 0.028, 22]} />
               <meshStandardMaterial
-                color={isSelected ? '#38bdf8' : '#64748b'}
+                color={isSelected ? '#F59E0B' : '#64748b'}
                 metalness={0.92}
                 roughness={0.18}
               />
@@ -470,8 +470,8 @@ export default function SatelliteEquipment({
       <mesh position={[0, -0.085, 0]}>
         <boxGeometry args={[0.16, 0.014, 0.16]} />
         <meshStandardMaterial
-          color={isSelected ? '#00ff9d' : '#334155'}
-          emissive={isSelected ? '#00ff9d' : '#000000'}
+          color={isSelected ? '#F59E0B' : '#334155'}
+          emissive={isSelected ? '#F59E0B' : '#000000'}
           emissiveIntensity={isSelected ? 0.4 : 0}
           metalness={0.8}
         />

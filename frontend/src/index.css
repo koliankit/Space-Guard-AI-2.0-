@@ -2,80 +2,90 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root { height: 100%; margin: 0; }
-body {
-  background: #080D1A;
-  color: #E2E8F0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+html, body, #root {
+  height: 100%;
+  margin: 0;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; border: 1px solid #334155; }
-::-webkit-scrollbar-thumb:hover { background: #38BDF8; }
-::-webkit-scrollbar-track { background: #080D1A; }
+body {
+  background: #070B14;
+  color: #E2E8F0;
+  font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
-@keyframes pulsedot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(1.15); } }
-@keyframes modalin { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* Precision Tabular Numbers for Telemetry & Measurement Data */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
 
-.led { animation: blink 2.2s infinite; }
-.dot-pulse { animation: pulsedot 1s infinite; }
-.modal-anim { animation: modalin .2s cubic-bezier(0.16, 1, 0.3, 1); }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E2D4A;
+  border-radius: 3px;
+  border: 1px solid #283C62;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #F59E0B;
+}
+::-webkit-scrollbar-track {
+  background: #070B14;
+}
 
-/* Cyber Deep Space Grid Overlay */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+@keyframes pulsedot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(1.1); } }
+@keyframes modalin { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.led { animation: blink 2s infinite; }
+.dot-pulse { animation: pulsedot 1.2s infinite; }
+.modal-anim { animation: modalin .18s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* ISRO Spacecraft Flight Telemetry Grid (Subtle, Clean & Non-distracting) */
 .grid-overlay {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .28;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .4;
   background-image:
-    linear-gradient(rgba(0, 240, 255, .04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, .04) 1px, transparent 1px);
+    linear-gradient(rgba(148, 163, 184, .03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, .03) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
-/* Subtle CRT Scanline overlay */
-.scanlines {
-  position: relative;
-}
-.scanlines::after {
-  content: " ";
-  display: block;
-  position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(10, 16, 26, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-  background-size: 100% 4px;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0.35;
-}
-
-/* Aerospace Precision Glassmorphism */
+/* Aerospace Precision Console Glass */
 .hud-glass {
-  background: rgba(13, 21, 39, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(14, 23, 41, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(51, 65, 85, 0.6);
 }
 
 .hud-glass-interactive {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(14, 23, 41, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(51, 65, 85, 0.6);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hud-glass-interactive:hover {
-  background: rgba(22, 36, 65, 0.9);
-  border-color: rgba(56, 189, 248, 0.5);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  background: rgba(20, 32, 57, 0.95);
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
 }
 
 .hud-tag {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 9.5px;
-  letter-spacing: 0.08em;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-/* Tactical Reticle Corners - Subtler Precision */
+/* Tactical Precision Reticle Corners */
 .reticle-corner {
   position: relative;
 }
@@ -84,16 +94,16 @@ body {
   position: absolute;
   top: -1px; left: -1px;
   width: 6px; height: 6px;
-  border-top: 1.5px solid #00F0FF;
-  border-left: 1.5px solid #00F0FF;
+  border-top: 1.5px solid #F59E0B;
+  border-left: 1.5px solid #F59E0B;
 }
 .reticle-corner::after {
   content: '';
   position: absolute;
   bottom: -1px; right: -1px;
   width: 6px; height: 6px;
-  border-bottom: 1.5px solid #00F0FF;
-  border-right: 1.5px solid #00F0FF;
+  border-bottom: 1.5px solid #F59E0B;
+  border-right: 1.5px solid #F59E0B;
 }
 
 /* Reticle Corners - Green (Safe) */
@@ -108,12 +118,12 @@ body {
 
 /* Reticle Corners - Red (Reject / Alert) */
 .reticle-corner-red::before {
-  border-top: 2px solid #EF4444;
-  border-left: 2px solid #EF4444;
+  border-top: 1.5px solid #EF4444;
+  border-left: 1.5px solid #EF4444;
 }
 .reticle-corner-red::after {
-  border-bottom: 2px solid #EF4444;
-  border-right: 2px solid #EF4444;
+  border-bottom: 1.5px solid #EF4444;
+  border-right: 1.5px solid #EF4444;
 }
 
 @keyframes radar-sweep {
@@ -122,28 +132,17 @@ body {
 }
 
 .radar-spinner {
-  animation: radar-sweep 4s linear infinite;
+  animation: radar-sweep 5s linear infinite;
 }
 
-/* Clean Professional Aerospace Accents */
-.text-glow-cyan {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+/* Card & Console Shadows */
+.shadow-isro {
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.15);
 }
-.text-glow-green {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+.shadow-telemetry {
+  box-shadow: 0 2px 10px rgba(56, 163, 255, 0.15);
 }
-.text-glow-red {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* Subtle Card & Elevation Shadows */
-.shadow-neon-cyan {
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
-}
-.shadow-neon-green {
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
-}
-.shadow-alert-glow {
+.shadow-alert {
   box-shadow: 0 2px 10px rgba(239, 68, 68, 0.2);
 }
 

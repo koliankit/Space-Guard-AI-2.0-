@@ -110,10 +110,10 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
 
   const isRej = component.status === 'reject'
   const isMon = component.status === 'monitor'
-  const curveColor = isRej ? '#FF334B' : isMon ? '#F59E0B' : '#00FF87'
+  const curveColor = isRej ? '#EF4444' : isMon ? '#F59E0B' : '#10B981'
 
   return (
-    <div className="bg-[#071120] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2.5 shadow-lg select-none">
+    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none">
       {/* Top Header & Stage Scrubbing Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
         <div className="flex items-center gap-2">
@@ -121,7 +121,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
             className="w-2.5 h-2.5 rounded-full led"
             style={{ backgroundColor: curveColor }}
           />
-          <span className="font-mono font-bold text-xs text-white tracking-wide uppercase">
+          <span className="font-display font-bold text-xs text-white tracking-wider uppercase">
             GRAPH A &bull; HTOL 168H PARAMETRIC ANOMALY OSCILLOSCOPE
           </span>
           <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
@@ -130,7 +130,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
         </div>
 
         {/* Stage Filter Buttons */}
-        <div className="flex items-center gap-1 bg-[#050B16] p-0.5 rounded-lg border border-slate-800">
+        <div className="flex items-center gap-1 bg-[#050914] p-0.5 rounded-lg border border-slate-800">
           <span className="text-[9.5px] font-mono text-slate-400 px-1.5 uppercase">Stage:</span>
           {STAGES.map((h) => (
             <button
@@ -139,8 +139,8 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
               onClick={() => setStageH(h)}
               className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
                 stageH === h
-                  ? 'bg-sky-600 text-white font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 font-bold shadow-isro'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
               }`}
             >
               {h}h
@@ -150,21 +150,21 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
       </div>
 
       {/* Main SVG Chart Canvas */}
-      <div className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#050B16]">
+      <div className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812]">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[210px] block">
           <defs>
             <linearGradient id="area-grad-a" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={curveColor} stopOpacity="0.28" />
+              <stop offset="0%" stopColor={curveColor} stopOpacity="0.22" />
               <stop offset="100%" stopColor={curveColor} stopOpacity="0.0" />
             </linearGradient>
 
             <linearGradient id="lot-band-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#00F0FF" stopOpacity="0.12" />
-              <stop offset="100%" stopColor="#00F0FF" stopOpacity="0.03" />
+              <stop offset="0%" stopColor="#38A3FF" stopOpacity="0.1" />
+              <stop offset="100%" stopColor="#38A3FF" stopOpacity="0.02" />
             </linearGradient>
 
             <filter id="glow-a" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feGaussianBlur stdDeviation="2.5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -178,12 +178,12 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
             const val = minY + (maxY - minY) * f
             return (
               <g key={f}>
-                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#132B4A" strokeWidth={0.8} />
+                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#162238" strokeWidth={0.8} />
                 <text
                   x={padL - 6}
                   y={y + 3.5}
                   textAnchor="end"
-                  className="fill-slate-400 text-[8.5px] font-mono"
+                  className="fill-slate-400 text-[8.5px] font-mono tabular-nums"
                 >
                   {val.toFixed(1)}
                 </text>
@@ -201,7 +201,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
                   x2={x}
                   y1={padT}
                   y2={H - padB}
-                  stroke="#102540"
+                  stroke="#152033"
                   strokeDasharray="2 2"
                   strokeWidth={0.8}
                 />
@@ -225,8 +225,8 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
               width={xFor(stageH) - xFor(0)}
               height={Math.max(0, yFor(bandLow) - yFor(bandHigh))}
               fill="url(#lot-band-grad)"
-              stroke="#00F0FF"
-              strokeOpacity="0.3"
+              stroke="#38A3FF"
+              strokeOpacity="0.25"
               strokeDasharray="3 3"
             />
           )}
@@ -237,7 +237,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
             x2={W - padR}
             y1={yFor(limitVal)}
             y2={yFor(limitVal)}
-            stroke="#FF334B"
+            stroke="#EF4444"
             strokeWidth={1.5}
             strokeDasharray="4 3"
           />
@@ -250,22 +250,22 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
             SPEC LIMIT ({limitVal}&mu;A)
           </text>
 
-          {/* Lot Norm Baseline Trace (Cyan line) */}
+          {/* Lot Norm Baseline Trace (Steel Blue line) */}
           {baselinePts.length > 1 && (
             <path
               d={baselineCurve}
               fill="none"
-              stroke="#00F0FF"
+              stroke="#38A3FF"
               strokeWidth={1.4}
               strokeDasharray="3 2"
-              opacity={0.85}
+              opacity={0.8}
             />
           )}
 
           {/* Shaded Area under Component Curve */}
           {areaD && <path d={areaD} fill="url(#area-grad-a)" />}
 
-          {/* Component Waveform Curve (Solid Glowing Trace) */}
+          {/* Component Waveform Curve (Solid Trace) */}
           {smoothCurve && (
             <path
               d={smoothCurve}
@@ -288,15 +288,15 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
                   cx={cx}
                   cy={cy}
                   r={isWorstPoint ? 5 : 4}
-                  fill={isWorstPoint ? '#FF334B' : curveColor}
-                  stroke="#050B16"
+                  fill={isWorstPoint ? '#EF4444' : curveColor}
+                  stroke="#040812"
                   strokeWidth={1.5}
                 />
                 <text
                   x={cx}
                   y={cy - 8}
                   textAnchor="middle"
-                  className="fill-white text-[8.5px] font-mono font-bold"
+                  className="fill-white text-[8.5px] font-mono font-bold tabular-nums"
                 >
                   {val.toFixed(1)}
                 </text>
@@ -316,8 +316,8 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
                   y={18 - bh}
                   width={bw}
                   height={bh}
-                  fill="#00F0FF"
-                  opacity={0.35 + (bh / 18) * 0.4}
+                  fill="#F59E0B"
+                  opacity={0.3 + (bh / 18) * 0.4}
                   rx={1}
                 />
               )
@@ -337,8 +337,8 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
             <span className="font-semibold text-white">Component Measured</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-0.5 bg-cyan border-t border-dashed border-cyan" />
-            <span className="text-cyan font-medium">Lot Norm Mean ({lotMean.toFixed(1)}&mu;A)</span>
+            <span className="inline-block w-2.5 h-0.5 bg-blue-400 border-t border-dashed border-blue-400" />
+            <span className="text-blue-300 font-medium">Lot Norm Mean ({lotMean.toFixed(1)}&mu;A)</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block w-2.5 h-0.5 bg-rose-500" />
@@ -369,3 +369,4 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
     </div>
   )
 }
+

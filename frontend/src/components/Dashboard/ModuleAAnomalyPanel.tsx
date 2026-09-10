@@ -34,19 +34,19 @@ export default function ModuleAAnomalyPanel({
   const loc = selected ? getSubsystemLocation(selected.subsystem) : null
 
   return (
-    <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[580px]">
+    <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[560px]">
       {/* Module A Top Bezel Bar */}
-      <div className="bg-[#0F172A] border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <div className="bg-[#0D162A] border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <span className="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-mono font-bold border border-sky-500/40">
+          <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold border border-amber-500/40">
             MODULE A
           </span>
-          <span className="text-xs font-bold text-white tracking-wide uppercase">
+          <span className="text-xs font-display font-bold text-white tracking-wider uppercase">
             Anomaly Detection &amp; Silicon Data Analysis
           </span>
         </div>
         <div className="flex items-center gap-2 text-xs font-mono">
-          <span className="w-2 h-2 rounded-full bg-sky-400 led" />
+          <span className="w-2 h-2 rounded-full bg-amber-400 led" />
           <span className="text-slate-400 text-[11px]">HTOL TELEMETRY DAQ</span>
         </div>
       </div>
@@ -61,7 +61,7 @@ export default function ModuleAAnomalyPanel({
             placeholder="Search Part / Lot..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#050B16] border border-slate-700/80 rounded px-2.5 py-1 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-sky-500"
+            className="w-full bg-[#050B16] border border-slate-700/80 rounded px-2.5 py-1 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-amber-500"
           />
         </div>
 
@@ -79,8 +79,8 @@ export default function ModuleAAnomalyPanel({
                     : filter === 'monitor'
                     ? 'bg-amber-600 text-white font-bold'
                     : filter === 'safe'
-                    ? 'bg-emerald-600 text-white font-bold'
-                    : 'bg-sky-600 text-white font-bold'
+                    ? 'bg-emerald-700 text-white font-bold'
+                    : 'bg-amber-500/30 text-amber-300 border border-amber-500/50 font-bold'
                   : 'text-slate-400 hover:text-white bg-[#050B16] border border-slate-800'
               }`}
             >
@@ -95,7 +95,7 @@ export default function ModuleAAnomalyPanel({
           onChange={(e) => {
             if (e.target.value) onSelectComponent(e.target.value)
           }}
-          className="bg-[#050B16] border border-slate-700 text-slate-200 text-xs font-mono rounded px-2 py-1 max-w-[200px] focus:outline-none focus:border-sky-500"
+          className="bg-[#050B16] border border-slate-700 text-slate-200 text-xs font-mono rounded px-2 py-1 max-w-[200px] focus:outline-none focus:border-amber-500"
         >
           <option value="" disabled>Select Component ({filteredComponents.length})</option>
           {filteredComponents.slice(0, 100).map((c) => (
@@ -116,12 +116,12 @@ export default function ModuleAAnomalyPanel({
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-white tracking-wide">{selected.component_id}</span>
                 <span className="text-slate-400 text-xs">&bull;</span>
-                <span className="text-sky-300 text-xs">Lot: {selected.lot_id}</span>
+                <span className="text-amber-300 text-xs">Lot: {selected.lot_id}</span>
                 <span className="text-slate-400 text-xs">&bull;</span>
                 <button
                   type="button"
                   onClick={() => onSelectSubsystem && onSelectSubsystem(selected.subsystem)}
-                  className="px-1.5 py-0.5 rounded bg-sky-500/15 border border-sky-500/30 text-cyan text-[10px] font-bold hover:bg-sky-500/30 transition-colors"
+                  className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-amber-300 text-[10px] font-bold hover:bg-slate-700 transition-colors"
                   title="Filter and highlight subsystem in 3D"
                 >
                   [{selected.subsystem}] {loc?.name || selected.subsystem}
@@ -133,6 +133,7 @@ export default function ModuleAAnomalyPanel({
                 <span
                   className={`px-2.5 py-0.5 rounded text-[10px] font-bold border ${
                     selected.status === 'reject'
+
                       ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                       : selected.status === 'monitor'
                       ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
@@ -160,7 +161,7 @@ export default function ModuleAAnomalyPanel({
 
             {/* Satellite Equipment Bay & 3D Coordinates */}
             {loc && (
-              <div className="text-[11px] text-slate-300 bg-slate-900/60 px-2.5 py-1.5 rounded border border-slate-800/80 flex flex-wrap items-center justify-between gap-2 font-mono">
+              <div className="text-[11px] text-slate-300 bg-slate-900/80 px-2.5 py-1.5 rounded border border-slate-800/90 flex flex-wrap items-center justify-between gap-2 font-mono">
                 <div className="flex items-center gap-2">
                   <span className="text-slate-400 uppercase text-[10px]">Location:</span>
                   <span className="text-white font-sans font-semibold">{loc.bay}</span>
@@ -168,7 +169,7 @@ export default function ModuleAAnomalyPanel({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-slate-400 text-[10px]">COORDINATES:</span>
-                  <span className="text-sky-300">{formatCoordinates(loc.pos)}</span>
+                  <span className="text-amber-300 font-mono">{formatCoordinates(loc.pos)}</span>
                 </div>
               </div>
             )}
@@ -177,47 +178,47 @@ export default function ModuleAAnomalyPanel({
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">0h Initial</span>
-                <span className="text-sm font-bold text-slate-100 mt-0.5">{selected.v0.toFixed(1)} &mu;A</span>
+                <span className="text-sm font-bold text-slate-100 mt-0.5 tabular-nums">{selected.v0.toFixed(1)} &mu;A</span>
               </div>
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">24h Early</span>
-                <span className="text-sm font-bold text-slate-100 mt-0.5">{selected.v24.toFixed(1)} &mu;A</span>
+                <span className="text-sm font-bold text-slate-100 mt-0.5 tabular-nums">{selected.v24.toFixed(1)} &mu;A</span>
               </div>
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">96h Mid-HTOL</span>
-                <span className="text-sm font-bold text-slate-100 mt-0.5">
+                <span className="text-sm font-bold text-slate-100 mt-0.5 tabular-nums">
                   {selected.v96 != null ? `${selected.v96.toFixed(1)} \u00B5A` : '--'}
                 </span>
               </div>
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">168h Final</span>
-                <span className={`text-sm font-bold mt-0.5 ${selected.status === 'reject' ? 'text-rose-400' : 'text-emerald-400'}`}>
+                <span className={`text-sm font-bold mt-0.5 tabular-nums ${selected.status === 'reject' ? 'text-rose-400' : 'text-emerald-400'}`}>
                   {selected.v168.toFixed(1)} &mu;A
                 </span>
               </div>
               <div className="p-2 rounded bg-[#050B16] border border-slate-800 flex flex-col">
                 <span className="text-[10px] text-slate-400 uppercase">Spec Limit</span>
-                <span className="text-sm font-bold text-rose-400 mt-0.5">{(selected.limit_ua || 50).toFixed(1)} &mu;A</span>
+                <span className="text-sm font-bold text-rose-400 mt-0.5 tabular-nums">{(selected.limit_ua || 50).toFixed(1)} &mu;A</span>
               </div>
             </div>
 
             {/* Outlier & Statistical Analysis Row */}
             <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-slate-300 pt-1 border-t border-slate-800/80">
-              <div className="flex justify-between bg-slate-900/40 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
                 <span className="text-slate-400">Lot &mu; / &sigma;:</span>
-                <span className="text-slate-200 font-bold">
+                <span className="text-slate-200 font-bold tabular-nums">
                   {selected.lot_mean?.toFixed(1) ?? '--'} &mu;A &bull; {selected.lot_std?.toFixed(2) ?? '--'}
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/40 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
                 <span className="text-slate-400">Lot z-Score:</span>
-                <span className={`font-bold ${Math.abs(selected.z168 || 0) > 2 ? 'text-rose-400' : 'text-sky-300'}`}>
+                <span className={`font-bold tabular-nums ${Math.abs(selected.z168 || 0) > 2 ? 'text-rose-400' : 'text-amber-300'}`}>
                   {selected.z168 > 0 ? '+' : ''}{selected.z168?.toFixed(2) ?? '--'}&sigma;
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/40 px-2 py-1 rounded">
+              <div className="flex justify-between bg-slate-900/50 px-2 py-1 rounded">
                 <span className="text-slate-400">Isolation Score:</span>
-                <span className="text-purple-300 font-bold">
+                <span className="text-purple-300 font-bold tabular-nums">
                   {selected.iso_score != null ? `${(selected.iso_score * 100).toFixed(1)}%` : '--'}
                 </span>
               </div>
@@ -225,8 +226,8 @@ export default function ModuleAAnomalyPanel({
 
             {/* AI Diagnostics & Failure Physics */}
             {selected.reason && (
-              <div className="p-2 rounded bg-slate-900/50 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
-                <span className="text-sky-400 font-bold font-mono text-[11px] uppercase whitespace-nowrap">
+              <div className="p-2 rounded bg-slate-900/60 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
+                <span className="text-amber-400 font-bold font-mono text-[11px] uppercase whitespace-nowrap">
                   Physics Diagnosis:
                 </span>
                 <span className="text-[11px] text-slate-300 font-sans leading-relaxed">
@@ -250,10 +251,11 @@ export default function ModuleAAnomalyPanel({
       {/* Module A Bezel Bottom Bar */}
       <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-2 text-xs text-slate-400 flex justify-between font-mono">
         <span>DAQ Sampling: 24-Bit Sigma-Delta ADC @ 125&deg;C HTOL</span>
-        <span className="text-sky-300">
+        <span className="text-slate-300">
           Evaluated: {components.length} components
         </span>
       </div>
     </div>
   )
 }
+

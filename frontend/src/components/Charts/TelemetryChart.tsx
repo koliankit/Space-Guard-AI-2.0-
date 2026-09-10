@@ -7,15 +7,15 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   const [stageH, setStageH] = useState(168)
 
   return (
-    <div className="bg-panel p-4 border-r border-line relative overflow-hidden">
+    <div className="bg-[#0B1120] p-4 border-r border-slate-800 relative overflow-hidden font-sans">
       {/* Top Header */}
       <div className="flex items-center justify-between mb-2.5">
-        <h3 className="m-0 text-[11px] font-display tracking-widest uppercase text-cyan text-glow-cyan flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-cyan led" />
+        <h3 className="m-0 text-xs font-bold font-display tracking-wider uppercase text-amber-400 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
           Burn-In Waveform Telemetry
         </h3>
-        <span className="font-mono text-[9px] text-muted tracking-wider">
-          CHANNEL: <span className="text-safe font-bold">OSC-CH1 / CH2</span>
+        <span className="font-mono text-[10px] text-slate-400 tracking-wider">
+          CHANNEL: <span className="text-emerald-400 font-bold">OSC-CH1 / CH2</span>
         </span>
       </div>
 
@@ -26,8 +26,8 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             key={h}
             className={`flex-1 py-1 px-1 text-center font-mono text-[10.5px] rounded border transition-all ${
               stageH === h
-                ? 'border-cyan bg-cyan/20 text-white font-bold shadow-neon-cyan'
-                : 'border-line bg-bg text-muted hover:border-cyan hover:text-white'
+                ? 'border-amber-500 bg-amber-500/20 text-amber-300 font-bold shadow-sm'
+                : 'border-slate-800 bg-[#070D1A] text-slate-400 hover:border-amber-500/50 hover:text-white'
             }`}
             onClick={() => setStageH(h)}
           >
@@ -40,22 +40,22 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
       <WaveformOscilloscope component={component} uptoH={stageH} />
 
       {/* Tri-Color Legend */}
-      <div className="flex gap-4 text-[9.5px] font-mono text-muted mt-2 flex-wrap items-center">
+      <div className="flex gap-4 text-[9.5px] font-mono text-slate-400 mt-2 flex-wrap items-center">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-1 rounded-full bg-safe shadow-[0_0_6px_#00FF87]" />
+          <span className="inline-block w-2.5 h-1 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
           <span className="text-slate-200 font-semibold">Component Current (&#956;A)</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-1 rounded-full bg-cyan shadow-[0_0_6px_#00F0FF]" />
-          <span className="text-cyan">Lot Norm Baseline</span>
+          <span className="inline-block w-2.5 h-1 rounded-full bg-[#38A3FF] shadow-[0_0_6px_rgba(56,163,255,0.5)]" />
+          <span className="text-[#38A3FF]">Lot Baseline</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-0.5 bg-reject shadow-[0_0_4px_#FF334B]" />
+          <span className="inline-block w-2.5 h-0.5 bg-rose-500 shadow-[0_0_4px_rgba(239,68,68,0.5)]" />
           <span className="text-rose-300">Datasheet Limit</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-0.5 border-t-2 border-dashed border-monitor" />
-          <span className="text-monitor font-semibold">Drift Projection</span>
+          <span className="inline-block w-2.5 h-0.5 border-t-2 border-dashed border-amber-400" />
+          <span className="text-amber-300 font-semibold">Drift Projection</span>
         </span>
       </div>
     </div>
@@ -70,17 +70,16 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
     padT = 16,
     padB = 36
 
-  // Spectrogram equalizer bars at bottom of chart (Image 2 style)
+  // Spectrogram equalizer bars at bottom of chart
   const spectrumBars = useMemo(() => {
     return Array.from({ length: 36 }, (_, i) => {
-      // Harmonic wave distribution
       const val = Math.abs(Math.sin((i / 36) * Math.PI * 3.5)) * 16 + 4
       return Math.min(val, 20)
     })
   }, [])
 
   if (!component) {
-    // Generate active multi-channel spacecraft bus waveforms so chart is never empty
+    // Active multi-channel spacecraft bus waveforms when idle
     const busPts1 = Array.from({ length: 24 }, (_, i) => {
       const x = padL + (i / 23) * (W - padL - padR)
       const y = H / 2 - 25 + Math.sin(i * 0.65) * 18 + Math.cos(i * 1.3) * 6
@@ -94,19 +93,19 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
     }).join(' ')
 
     return (
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[195px] block bg-[#071426] rounded border border-line select-none">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[195px] block bg-[#060B16] rounded border border-slate-800 select-none">
         <defs>
           <linearGradient id="busGradGreen" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#00FF87" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#00FF87" stopOpacity="0" />
+            <stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
           </linearGradient>
-          <linearGradient id="busGradCyan" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#00F0FF" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#00F0FF" stopOpacity="0" />
+          <linearGradient id="busGradSteel" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#38A3FF" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#38A3FF" stopOpacity="0" />
           </linearGradient>
         </defs>
 
-        {/* Oscilloscope Reticle Grid */}
+        {/* Reticle Grid */}
         {[0.25, 0.5, 0.75].map((pct, i) => (
           <line
             key={`h-${i}`}
@@ -114,8 +113,8 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
             y1={padT + pct * (H - padT - padB)}
             x2={W - padR}
             y2={padT + pct * (H - padT - padB)}
-            stroke="#00F0FF"
-            strokeOpacity="0.12"
+            stroke="#94A3B8"
+            strokeOpacity="0.08"
             strokeDasharray="4 4"
           />
         ))}
@@ -126,32 +125,32 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
             y1={padT}
             x2={padL + pct * (W - padL - padR)}
             y2={H - padB}
-            stroke="#00F0FF"
-            strokeOpacity="0.12"
+            stroke="#94A3B8"
+            strokeOpacity="0.08"
             strokeDasharray="4 4"
           />
         ))}
 
         {/* Channel 1: Primary Bus Voltage Waveform */}
-        <polyline points={busPts1} fill="none" stroke="#00FF87" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 6px #00FF87)' }} />
+        <polyline points={busPts1} fill="none" stroke="#10B981" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 6px rgba(16,185,129,0.5))' }} />
 
         {/* Channel 2: Solar Array Output Waveform */}
-        <polyline points={busPts2} fill="none" stroke="#00F0FF" strokeWidth="1.8" strokeDasharray="3 2" style={{ filter: 'drop-shadow(0 0 5px #00F0FF)' }} />
+        <polyline points={busPts2} fill="none" stroke="#38A3FF" strokeWidth="1.8" strokeDasharray="3 2" style={{ filter: 'drop-shadow(0 0 5px rgba(56,163,255,0.4))' }} />
 
-        {/* Dynamic Telemetry Status Header */}
-        <text x={padL + 8} y={padT + 14} className="fill-safe text-[9.5px] font-mono font-bold tracking-wider">
+        {/* Telemetry Status Header */}
+        <text x={padL + 8} y={padT + 14} className="fill-emerald-400 text-[9.5px] font-mono font-bold tracking-wider">
           &bull; CH1: 28.4V BUS (NOMINAL)
         </text>
-        <text x={padL + 160} y={padT + 14} className="fill-cyan text-[9.5px] font-mono font-bold tracking-wider">
+        <text x={padL + 160} y={padT + 14} className="fill-[#38A3FF] text-[9.5px] font-mono font-bold tracking-wider">
           &bull; CH2: 14.2A SOLAR
         </text>
-        <text x={padL + 280} y={padT + 14} className="fill-monitor text-[9.5px] font-mono font-bold tracking-wider">
+        <text x={padL + 280} y={padT + 14} className="fill-amber-400 text-[9.5px] font-mono font-bold tracking-wider">
           &bull; CH3: 98.4% SOC
         </text>
 
         {/* Center Prompt */}
-        <rect x={W / 2 - 140} y={H / 2 - 12} width="280" height="24" rx="4" fill="#041224" stroke="#00F0FF" strokeOpacity="0.4" />
-        <text x={W / 2} y={H / 2 + 4} textAnchor="middle" className="fill-cyan text-[9px] font-mono font-bold tracking-wider">
+        <rect x={W / 2 - 140} y={H / 2 - 12} width="280" height="24" rx="4" fill="#0A1020" stroke="#F59E0B" strokeOpacity="0.4" />
+        <text x={W / 2} y={H / 2 + 4} textAnchor="middle" className="fill-amber-300 text-[9px] font-mono font-bold tracking-wider">
           [ SPACECRAFT BUS STREAM &bull; SELECT COMPONENT TO ISOLATE ]
         </text>
       </svg>
@@ -163,11 +162,9 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
   stages.push([168, component.v168])
   const shown = stages.filter(([h]) => h <= uptoH)
 
-  // Baseline envelope
   const bandLow = component.v168 * 0.88
   const bandHigh = component.v168 * 1.12
 
-  // Axis dynamic ranges
   const allVals = [
     component.v0,
     component.v24,
@@ -184,7 +181,6 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
   const xFor = (h: number) => padL + (h / 216) * (W - padL - padR)
   const yFor = (v: number) => H - padB - ((v - minY) / (maxY - minY || 1)) * (H - padT - padB)
 
-  // Catmull-Rom smooth interpolation
   const createSmoothPath = (points: [number, number][]) => {
     if (points.length < 2) return ''
     const mapped = points.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
@@ -193,7 +189,7 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
       const p0 = i > 0 ? mapped[i - 1] : mapped[i]
       const p1 = mapped[i]
       const p2 = mapped[i + 1]
-      const p3 = i != mapped.length - 2 ? mapped[i + 2] : p2
+      const p3 = i !== mapped.length - 2 ? mapped[i + 2] : p2
 
       const cp1x = p1.x + (p2.x - p0.x) / 6
       const cp1y = p1.y + (p2.y - p0.y) / 6
@@ -208,13 +204,12 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
   const smoothCurve = createSmoothPath(shown)
   const last = shown[shown.length - 1]
 
-  // Closed area for subtle glowing gradient fill
   const areaD =
     shown.length > 1
       ? `${smoothCurve} L ${xFor(last[0])} ${H - padB} L ${xFor(shown[0][0])} ${H - padB} Z`
       : ''
 
-  // Secondary channel curve (lot baseline trace in Blue/Cyan)
+  // Secondary channel curve (lot baseline trace in steel blue)
   const baselinePts: [number, number][] = [
     [0, component.v0 * 0.98],
     [24, component.v0 + (component.v168 - component.v0) * 0.15],
@@ -224,9 +219,8 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
   const baselineCurve = createSmoothPath(baselinePts)
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[195px] block bg-[#071426] rounded border border-line">
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[195px] block bg-[#060B16] rounded border border-slate-800">
       <defs>
-        {/* Glow Filters for Green & Cyan */}
         <filter id="glow-green" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="3" result="blur" />
           <feMerge>
@@ -235,7 +229,7 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
           </feMerge>
         </filter>
 
-        <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+        <filter id="glow-steel" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -244,30 +238,30 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
         </filter>
 
         <linearGradient id="neon-area-gradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#00FF87" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#00FF87" stopOpacity="0.0" />
+          <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
         </linearGradient>
 
         <linearGradient id="spec-gradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#00F0FF" stopOpacity="0.85" />
-          <stop offset="100%" stopColor="#1D4ED8" stopOpacity="0.2" />
+          <stop offset="0%" stopColor="#38A3FF" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#1E3A8A" stopOpacity="0.2" />
         </linearGradient>
       </defs>
 
-      {/* Oscilloscope Gridlines */}
+      {/* Gridlines */}
       {[0, 0.25, 0.5, 0.75, 1].map((f) => {
         const y = padT + (H - padT - padB) * (1 - f)
         return (
           <g key={f}>
-            <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#132B4A" strokeWidth={0.8} />
-            <text x={padL - 6} y={y + 3.5} textAnchor="end" className="fill-muted text-[8.5px] font-mono">
+            <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#1E293B" strokeWidth={0.8} />
+            <text x={padL - 6} y={y + 3.5} textAnchor="end" className="fill-slate-500 text-[8.5px] font-mono">
               {(minY + (maxY - minY) * f).toFixed(1)}
             </text>
           </g>
         )
       })}
 
-      {/* Equalizer Frequency Bars along bottom */}
+      {/* Equalizer Frequency Bars */}
       <g transform={`translate(${padL}, ${H - padB + 2})`}>
         {spectrumBars.map((bh, idx) => {
           const bw = (W - padL - padR) / spectrumBars.length - 2
@@ -293,47 +287,47 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
         x2={W - padR}
         y1={yFor(component.limit_ua)}
         y2={yFor(component.limit_ua)}
-        stroke="#FF334B"
+        stroke="#EF4444"
         strokeWidth={1.4}
         strokeDasharray="5,4"
-        style={{ filter: 'drop-shadow(0 0 4px #FF334B)' }}
+        style={{ filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.5))' }}
       />
-      <text x={W - padR} y={yFor(component.limit_ua) - 4} textAnchor="end" fill="#FF334B" className="text-[8.5px] font-mono font-bold">
+      <text x={W - padR} y={yFor(component.limit_ua) - 4} textAnchor="end" fill="#EF4444" className="text-[8.5px] font-mono font-bold">
         LIMIT {component.limit_ua.toFixed(0)} &#956;A
       </text>
 
       {/* Gradient Under-curve Fill */}
       {areaD && <path d={areaD} fill="url(#neon-area-gradient)" />}
 
-      {/* Secondary Lot Baseline Waveform in Electric Cyan / Blue */}
+      {/* Secondary Lot Baseline Waveform in Steel Blue */}
       {baselineCurve && (
         <path
           d={baselineCurve}
           fill="none"
-          stroke="#00F0FF"
+          stroke="#38A3FF"
           strokeWidth={1.8}
-          filter="url(#glow-cyan)"
+          filter="url(#glow-steel)"
           opacity={0.8}
         />
       )}
 
-      {/* Primary Glowing Neon Green Waveform (Component Current) */}
+      {/* Primary Waveform (Component Current) */}
       {smoothCurve && (
         <path
           d={smoothCurve}
           fill="none"
-          stroke="#00FF87"
+          stroke="#10B981"
           strokeWidth={2.4}
           filter="url(#glow-green)"
         />
       )}
 
-      {/* Data Point Ping Markers in Green */}
+      {/* Data Point Ping Markers */}
       {shown.map(([h, v]) => (
         <g key={h}>
-          <circle cx={xFor(h)} cy={yFor(v)} r={4.5} fill="#071426" stroke="#00FF87" strokeWidth={2} filter="url(#glow-green)" />
-          <circle cx={xFor(h)} cy={yFor(v)} r={2} fill="#00FF87" />
-          <text x={xFor(h)} y={yFor(v) - 8} textAnchor="middle" fill="#00FF87" className="text-[9px] font-mono font-bold">
+          <circle cx={xFor(h)} cy={yFor(v)} r={4.5} fill="#060B16" stroke="#10B981" strokeWidth={2} filter="url(#glow-green)" />
+          <circle cx={xFor(h)} cy={yFor(v)} r={2} fill="#10B981" />
+          <text x={xFor(h)} y={yFor(v) - 8} textAnchor="middle" fill="#10B981" className="text-[9px] font-mono font-bold">
             {v.toFixed(2)}
           </text>
         </g>
@@ -347,13 +341,13 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
             y1={yFor(last[1])}
             x2={xFor(216)}
             y2={yFor(component.predicted_future)}
-            stroke="#FFB020"
+            stroke="#F59E0B"
             strokeWidth={1.8}
             strokeDasharray="4,3"
-            style={{ filter: 'drop-shadow(0 0 3px #FFB020)' }}
+            style={{ filter: 'drop-shadow(0 0 3px rgba(245,158,11,0.5))' }}
           />
-          <circle cx={xFor(216)} cy={yFor(component.predicted_future)} r={3.5} fill="#FFB020" />
-          <text x={xFor(216)} y={yFor(component.predicted_future) - 6} textAnchor="end" fill="#FFB020" className="text-[8.5px] font-mono font-bold">
+          <circle cx={xFor(216)} cy={yFor(component.predicted_future)} r={3.5} fill="#F59E0B" />
+          <text x={xFor(216)} y={yFor(component.predicted_future) - 6} textAnchor="end" fill="#F59E0B" className="text-[8.5px] font-mono font-bold">
             +96h: {component.predicted_future.toFixed(2)}
           </text>
         </>
@@ -361,11 +355,11 @@ function WaveformOscilloscope({ component, uptoH }: { component: ComponentOut | 
 
       {/* Stage Time Labels */}
       {['0h', '24h', '96h', '168h'].map((lab, i) => (
-        <text key={lab} x={xFor(STAGES[i])} y={H - padB + 22} textAnchor="middle" className="fill-muted text-[9px] font-mono">
+        <text key={lab} x={xFor(STAGES[i])} y={H - padB + 22} textAnchor="middle" className="fill-slate-400 text-[9px] font-mono">
           {lab}
         </text>
       ))}
-      <text x={xFor(216)} y={H - padB + 22} textAnchor="middle" className="fill-monitor text-[9px] font-mono font-bold">
+      <text x={xFor(216)} y={H - padB + 22} textAnchor="middle" className="fill-amber-400 text-[9px] font-mono font-bold">
         216h
       </text>
     </svg>

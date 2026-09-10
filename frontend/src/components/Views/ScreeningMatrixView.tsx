@@ -221,16 +221,16 @@ export default function ScreeningMatrixView({
   }
 
   return (
-    <div className="flex flex-col flex-1 p-5 bg-[#060913] font-mono select-none overflow-hidden text-slate-100">
+    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#060B16] font-mono select-none overflow-hidden text-slate-100 w-full">
       {/* Top Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan led" />
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
             <h2 className="m-0 text-sm font-display font-black tracking-widest text-white uppercase">
               ISRO COMPONENT SCREENING MATRIX &amp; ANOMALY LEDGER
             </h2>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-cyan/15 text-cyan border border-cyan/40 font-bold">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/40 font-bold">
               MIL-STD-883 METHOD 1005 HTOL
             </span>
           </div>
@@ -245,7 +245,7 @@ export default function ScreeningMatrixView({
             type="button"
             onClick={handleExportCSV}
             disabled={components.length === 0}
-            className="hud-glass px-3 py-1.5 rounded border border-slate-700 text-cyan hover:border-cyan text-xs flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="hud-glass px-3 py-1.5 rounded border border-slate-700 text-amber-300 hover:border-amber-400 text-xs flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <span>&#8681;</span> EXPORT CSV LEDGER
           </button>
@@ -253,11 +253,11 @@ export default function ScreeningMatrixView({
       </div>
 
       {/* SIH26170 Requirement 11: Traditional vs AI Screening Paradigm Comparison Banner */}
-      <div className="mb-3 p-3 rounded-xl bg-[#0B1528] border border-cyan/30 text-xs shadow-sm">
+      <div className="mb-3 p-3 rounded-xl bg-[#0B1528] border border-amber-500/30 text-xs shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase font-display font-black px-2 py-0.5 rounded bg-cyan/20 text-cyan border border-cyan/40">
-              SIH26170 ARCHITECTURE
+            <span className="text-[10px] uppercase font-display font-black px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              ISRO ARCHITECTURE
             </span>
             <span className="font-bold text-white text-xs">
               AI detects abnormal component behavior, predicts future degradation, explains the risk, and localizes the exact component on the spacecraft.
@@ -281,11 +281,11 @@ export default function ScreeningMatrixView({
             </div>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-[#061B24] border border-cyan/40">
-            <div className="text-[10px] font-bold text-cyan uppercase mb-1 flex items-center gap-1">
+          <div className="p-2.5 rounded-lg bg-[#131C2E] border border-amber-500/40">
+            <div className="text-[10px] font-bold text-amber-400 uppercase mb-1 flex items-center gap-1">
               <span className="text-emerald-400">&#10003;</span> SPACEGUARD AI DECISION-SUPPORT LAYER:
             </div>
-            <div className="font-mono text-cyan">
+            <div className="font-mono text-amber-300">
               Detect &rarr; <b className="text-white">Understand</b> &rarr; <b className="text-white">Predict (168h)</b> &rarr; <b className="text-white">Localize (3D)</b> &rarr; <b className="text-rose-300">Decide</b>
             </div>
             <div className="text-[10px] text-slate-300 mt-1">
@@ -306,7 +306,7 @@ export default function ScreeningMatrixView({
               0h+24h &rarr; 168h Extrapolation:
             </span>
             <span className="text-white font-bold">
-              MAE: <span className="text-cyan font-mono">{metrics.mae.toFixed(3)} µA</span> &bull; RMSE: <span className="text-cyan font-mono">{metrics.rmse.toFixed(3)} µA</span>
+              MAE: <span className="text-amber-300 font-mono">{metrics.mae.toFixed(3)} µA</span> &bull; RMSE: <span className="text-amber-300 font-mono">{metrics.rmse.toFixed(3)} µA</span>
             </span>
           </div>
 
@@ -321,7 +321,7 @@ export default function ScreeningMatrixView({
                   FNR (Escapes): <b className={((1 - (metrics.recall ?? 1)) * 100) > 0 ? 'text-rose-400' : 'text-emerald-400'}>{((1 - (metrics.recall ?? 1)) * 100).toFixed(1)}%</b>
                 </span>
                 <span className="text-slate-600">|</span>
-                <span className="text-slate-400">F1: <b className="text-cyan">{(metrics.f1! * 100).toFixed(1)}%</b></span>
+                <span className="text-slate-400">F1: <b className="text-amber-300">{(metrics.f1! * 100).toFixed(1)}%</b></span>
               </div>
             ) : (
               <span className="text-[10px] text-slate-400 italic">
@@ -340,7 +340,7 @@ export default function ScreeningMatrixView({
             onClick={() => setFilterMode('ALL')}
             className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'ALL'
-                ? 'bg-cyan/20 border-cyan text-cyan font-bold shadow-neon-cyan'
+                ? 'bg-amber-500/20 border-amber-500 text-amber-300 font-bold shadow-sm'
                 : 'hud-glass border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
@@ -412,7 +412,7 @@ export default function ScreeningMatrixView({
             <select
               value={selectedLotFilter}
               onChange={(e) => setSelectedLotFilter(e.target.value)}
-              className="bg-[#0A1020] border border-slate-700 text-slate-200 text-xs px-2.5 py-1.5 rounded focus:border-cyan outline-none font-mono cursor-pointer"
+              className="bg-[#0A1020] border border-slate-700 text-slate-200 text-xs px-2.5 py-1.5 rounded focus:border-amber-500 outline-none font-mono cursor-pointer"
             >
               <option value="ALL">📦 All Lots ({availableLots.length})</option>
               {availableLots.map((l) => (
@@ -430,7 +430,7 @@ export default function ScreeningMatrixView({
               onClick={() => setViewGrouping('flat')}
               className={`px-2.5 py-1 rounded text-[10.5px] uppercase font-bold transition-all ${
                 viewGrouping === 'flat'
-                  ? 'bg-cyan/20 border border-cyan/40 text-cyan shadow-sm'
+                  ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -441,7 +441,7 @@ export default function ScreeningMatrixView({
               onClick={() => setViewGrouping('lot_grouped')}
               className={`px-2.5 py-1 rounded text-[10.5px] uppercase font-bold transition-all ${
                 viewGrouping === 'lot_grouped'
-                  ? 'bg-cyan/20 border border-cyan/40 text-cyan shadow-sm'
+                  ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -457,7 +457,7 @@ export default function ScreeningMatrixView({
             placeholder="Search Part ID, Subsystem, Lot..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#0A1020] border border-slate-700 text-slate-100 text-xs px-3 py-1.5 rounded focus:border-cyan focus:outline-none placeholder-slate-500"
+            className="w-full bg-[#0A1020] border border-slate-700 text-slate-100 text-xs px-3 py-1.5 rounded focus:border-amber-500 focus:outline-none placeholder-slate-500"
           />
           {searchTerm && (
             <button
@@ -473,8 +473,8 @@ export default function ScreeningMatrixView({
 
       {/* Selected Lot Active Indicator Banner */}
       {selectedLotFilter !== 'ALL' && (
-        <div className="mb-3 px-3 py-1.5 bg-sky-500/10 border border-sky-500/30 rounded-lg flex items-center justify-between text-xs">
-          <span className="font-mono text-sky-300">
+        <div className="mb-3 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center justify-between text-xs">
+          <span className="font-mono text-amber-300">
             Filtered by Qualification Lot: <b>{selectedLotFilter}</b> ({filtered.length} matching components)
           </span>
           <button
@@ -539,7 +539,7 @@ export default function ScreeningMatrixView({
 
                     <div className="flex items-center gap-3 font-mono text-xs">
                       <span className="text-slate-400 text-[11px]">
-                        Lot Baseline &mu;: <b className="text-cyan">{lot.mean.toFixed(2)} &micro;A</b>
+                        Lot Baseline &mu;: <b className="text-amber-300">{lot.mean.toFixed(2)} &micro;A</b>
                       </span>
                       {lot.rejects > 0 && (
                         <span className="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold">
@@ -592,7 +592,7 @@ export default function ScreeningMatrixView({
                                 onClick={() => onSelectComponent(c.component_id)}
                                 className={`cursor-pointer transition-colors ${
                                   isSelected
-                                    ? 'bg-cyan/15 text-white font-semibold'
+                                    ? 'bg-amber-500/15 text-white font-semibold'
                                     : isReject
                                     ? 'hover:bg-rose-500/10'
                                     : isMonitor
@@ -632,7 +632,7 @@ export default function ScreeningMatrixView({
                                 <td className="py-1.5 px-3 font-bold text-white whitespace-nowrap">
                                   {c.component_id}
                                 </td>
-                                <td className="py-1.5 px-3 text-cyan whitespace-nowrap font-bold">
+                                <td className="py-1.5 px-3 text-amber-400 whitespace-nowrap font-bold">
                                   [{c.subsystem}]
                                 </td>
                                 <td className="py-1.5 px-3 text-slate-400">{c.v0.toFixed(2)}</td>
@@ -645,7 +645,7 @@ export default function ScreeningMatrixView({
                                 <td className={`py-1.5 px-3 font-bold ${Math.abs(c.z168) >= 3.0 ? 'text-rose-400' : Math.abs(c.z168) >= 2.0 ? 'text-amber-400' : 'text-slate-300'}`}>
                                   {c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;
                                 </td>
-                                <td className="py-1.5 px-3 text-cyan font-bold">{c.predicted168_from_early.toFixed(2)}</td>
+                                <td className="py-1.5 px-3 text-amber-300 font-bold">{c.predicted168_from_early.toFixed(2)}</td>
                                 <td className="py-1.5 px-3 text-slate-300">{c.predicted_future.toFixed(2)}</td>
                                 <td className="py-1.5 px-3 font-bold text-rose-400">{c.risk_score}</td>
                                 <td className="py-1.5 px-3 text-right">
@@ -655,7 +655,7 @@ export default function ScreeningMatrixView({
                                       e.stopPropagation()
                                       onFocusIn3D(c)
                                     }}
-                                    className="hud-glass px-2 py-0.5 rounded border border-slate-700 text-cyan hover:border-cyan text-[10px]"
+                                    className="hud-glass px-2 py-0.5 rounded border border-slate-700 text-amber-300 hover:border-amber-400 text-[10px]"
                                   >
                                     3D &rarr;
                                   </button>
@@ -681,7 +681,7 @@ export default function ScreeningMatrixView({
                 <th className="py-2.5 px-3">AI Verdict &amp; Health</th>
                 <th className="py-2.5 px-3">Traditional vs AI</th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-cyan"
+                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
                   onClick={() => {
                     if (sortBy === 'id') setSortAsc(!sortAsc)
                     else {
@@ -698,7 +698,7 @@ export default function ScreeningMatrixView({
                 <th className="py-2.5 px-3">24h (&micro;A)</th>
                 <th className="py-2.5 px-3">96h (&micro;A)</th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-cyan"
+                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
                   onClick={() => {
                     if (sortBy === 'v168') setSortAsc(!sortAsc)
                     else {
@@ -712,7 +712,7 @@ export default function ScreeningMatrixView({
                 <th className="py-2.5 px-3">Spec Limit</th>
                 <th className="py-2.5 px-3">Lot Mean (&mu;)</th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-cyan"
+                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
                   onClick={() => {
                     if (sortBy === 'z168') setSortAsc(!sortAsc)
                     else {
@@ -724,7 +724,7 @@ export default function ScreeningMatrixView({
                   Lot z-Score {sortBy === 'z168' ? (sortAsc ? '\u25b2' : '\u25bc') : ''}
                 </th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-cyan"
+                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
                   onClick={() => {
                     if (sortBy === 'pred168') setSortAsc(!sortAsc)
                     else {
@@ -738,7 +738,7 @@ export default function ScreeningMatrixView({
                 </th>
                 <th className="py-2.5 px-3">Projected (264h)</th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-cyan"
+                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
                   onClick={() => {
                     if (sortBy === 'risk') setSortAsc(!sortAsc)
                     else {
@@ -772,7 +772,7 @@ export default function ScreeningMatrixView({
                       onClick={() => onSelectComponent(c.component_id)}
                       className={`cursor-pointer transition-colors ${
                         isSelected
-                          ? 'bg-cyan/15 text-white font-semibold'
+                          ? 'bg-amber-500/15 text-white font-semibold'
                           : isReject
                           ? 'hover:bg-rose-500/10'
                           : isMonitor
@@ -839,7 +839,7 @@ export default function ScreeningMatrixView({
                       </td>
 
                       {/* Subsystem */}
-                      <td className="py-2 px-3 text-cyan whitespace-nowrap font-bold">
+                      <td className="py-2 px-3 text-amber-400 whitespace-nowrap font-bold">
                         [{c.subsystem}]
                       </td>
 
@@ -870,7 +870,7 @@ export default function ScreeningMatrixView({
                       </td>
 
                       {/* Early Pred 168h from 0h+24h */}
-                      <td className="py-2 px-3 text-cyan font-bold" title={`Predicted from 0h+24h: ${c.predicted168_from_early.toFixed(2)} µA`}>
+                      <td className="py-2 px-3 text-amber-300 font-bold" title={`Predicted from 0h+24h: ${c.predicted168_from_early.toFixed(2)} µA`}>
                         {c.predicted168_from_early.toFixed(2)}
                       </td>
 
@@ -917,7 +917,7 @@ export default function ScreeningMatrixView({
                             e.stopPropagation()
                             onFocusIn3D(c)
                           }}
-                          className="hud-glass px-2 py-0.5 rounded border border-slate-700 text-cyan hover:border-cyan text-[10px] transition-all"
+                          className="hud-glass px-2 py-0.5 rounded border border-slate-700 text-amber-300 hover:border-amber-400 text-[10px] transition-all"
                           title="Focus and highlight this component on the 3D Satellite Digital Twin"
                         >
                           3D SENSOR &rarr;

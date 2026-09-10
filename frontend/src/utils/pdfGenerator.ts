@@ -106,11 +106,11 @@ function esc(str: string | null | undefined): string {
 function drawIsroLogo(cx: number, cy: number, scale = 1): string {
   let s = ''
   // Outer circular glow ring
-  s += `q 0.05 0.15 0.30 rg ${cx - 24 * scale} ${cy - 24 * scale} ${48 * scale} ${48 * scale} re f Q\n`
-  s += `q 0 0.85 1 RG ${1.5 * scale} w ${cx - 24 * scale} ${cy - 24 * scale} ${48 * scale} ${48 * scale} re S Q\n`
+  s += `q 0.05 0.08 0.18 rg ${cx - 24 * scale} ${cy - 24 * scale} ${48 * scale} ${48 * scale} re f Q\n`
+  s += `q 0.96 0.62 0.04 RG ${1.5 * scale} w ${cx - 24 * scale} ${cy - 24 * scale} ${48 * scale} ${48 * scale} re S Q\n`
 
-  // Cyan orbital arc
-  s += `q 0 0.94 1 RG ${2 * scale} w `
+  // Steel blue orbital arc
+  s += `q 0.22 0.64 1.0 RG ${2 * scale} w `
   s += `${cx - 18 * scale} ${cy - 12 * scale} m `
   s += `${cx - 6 * scale} ${cy + 20 * scale} ${cx + 12 * scale} ${cy + 18 * scale} ${cx + 18 * scale} ${cy - 8 * scale} c S Q\n`
 

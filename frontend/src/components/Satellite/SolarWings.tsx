@@ -55,7 +55,7 @@ export default function SolarWings({
     () =>
       new THREE.MeshStandardMaterial({
         color: isSelected ? '#0b2e59' : isHovered ? '#092548' : '#06162d',
-        emissive: isSelected ? '#00e5ff' : isHovered ? '#00b4d8' : '#031b38',
+        emissive: isSelected ? '#38A3FF' : isHovered ? '#1E3A8A' : '#031b38',
         emissiveIntensity: isSelected ? 0.65 : isHovered ? 0.45 : 0.2,
         metalness: 0.95,
         roughness: 0.12,
@@ -84,7 +84,7 @@ export default function SolarWings({
   const frameMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: isSelected ? '#38bdf8' : '#1e293b',
+        color: isSelected ? '#F59E0B' : '#1e293b',
         metalness: 0.9,
         roughness: 0.2,
       }),
@@ -102,8 +102,8 @@ export default function SolarWings({
         <mesh rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.075, 0.075, 0.3, 24]} />
           <meshStandardMaterial
-            color={isSelected ? '#00f0ff' : '#0284c7'}
-            emissive={isSelected ? '#00f0ff' : '#0369a1'}
+            color={isSelected ? '#F59E0B' : '#2563EB'}
+            emissive={isSelected ? '#F59E0B' : '#1E3A8A'}
             emissiveIntensity={isSelected ? 0.7 : 0.25}
             metalness={0.92}
             roughness={0.15}
@@ -131,7 +131,7 @@ export default function SolarWings({
               {/* Glowing High-Tech Edge Framing */}
               <lineSegments geometry={panelEdges}>
                 <lineBasicMaterial
-                  color={isSelected ? '#00ff87' : isHovered ? '#00f0ff' : '#00b4d8'}
+                  color={isSelected ? '#10B981' : isHovered ? '#F59E0B' : '#38A3FF'}
                   transparent
                   opacity={isSelected ? 0.95 : isHovered ? 0.8 : 0.55}
                 />
@@ -140,7 +140,7 @@ export default function SolarWings({
               {/* Silicon Cell Conductor Grid Wires */}
               <lineSegments geometry={gridLinesGeo}>
                 <lineBasicMaterial
-                  color={isSelected ? '#38bdf8' : '#0284c7'}
+                  color={isSelected ? '#F59E0B' : '#2563EB'}
                   transparent
                   opacity={isSelected ? 0.85 : 0.5}
                 />

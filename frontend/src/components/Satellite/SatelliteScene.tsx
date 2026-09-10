@@ -114,7 +114,7 @@ function SpacecraftModel({
     () =>
       new THREE.MeshStandardMaterial({
         color: isPaySelected ? '#f8fafc' : isPayHovered ? '#fef08a' : '#c98a0c',
-        emissive: isPaySelected ? '#00f0ff' : isPayHovered ? '#ca8a04' : '#6b4306',
+        emissive: isPaySelected ? '#F59E0B' : isPayHovered ? '#ca8a04' : '#6b4306',
         emissiveIntensity: isPaySelected ? 0.7 : isPayHovered ? 0.4 : 0.15,
         metalness: 0.92,
         roughness: 0.2,
@@ -129,7 +129,7 @@ function SpacecraftModel({
     () =>
       new THREE.MeshStandardMaterial({
         color: '#0f172a',
-        emissive: '#00f0ff',
+        emissive: '#1E3A8A',
         emissiveIntensity: 0.08,
         metalness: 0.88,
         roughness: 0.25,
@@ -147,7 +147,7 @@ function SpacecraftModel({
     <group ref={groupRef}>
       {/* --- Central Avionics Structural Core Frame --- */}
       <lineSegments geometry={trussEdges}>
-        <lineBasicMaterial color="#00FF9D" transparent opacity={isXray ? 0.9 : 0.3} />
+        <lineBasicMaterial color="#F59E0B" transparent opacity={isXray ? 0.9 : 0.3} />
       </lineSegments>
 
       {/* --- Main Bus Octagonal Chassis (MLI Thermal Blanket) --- */}
@@ -169,7 +169,7 @@ function SpacecraftModel({
       />
       <lineSegments geometry={busEdges}>
         <lineBasicMaterial
-          color={isPaySelected ? '#00ff9d' : '#00f0ff'}
+          color={isPaySelected ? '#F59E0B' : '#38A3FF'}
           transparent
           opacity={isPaySelected ? 0.95 : isXray ? 0.85 : 0.5}
         />
@@ -179,20 +179,20 @@ function SpacecraftModel({
       <mesh position={[0, 0.64, 0]}>
         <torusGeometry args={[0.91, 0.035, 14, 36]} />
         <meshStandardMaterial
-          color="#38bdf8"
+          color="#94A3B8"
           metalness={0.94}
           roughness={0.15}
-          emissive="#0284c7"
+          emissive="#1E293B"
           emissiveIntensity={0.3}
         />
       </mesh>
       <mesh position={[0, -0.64, 0]}>
         <torusGeometry args={[0.97, 0.035, 14, 36]} />
         <meshStandardMaterial
-          color="#38bdf8"
+          color="#94A3B8"
           metalness={0.94}
           roughness={0.15}
-          emissive="#0284c7"
+          emissive="#1E293B"
           emissiveIntensity={0.3}
         />
       </mesh>
@@ -267,23 +267,23 @@ function HologramFloor() {
         <mesh key={i} rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[r - 0.015, r, 64]} />
           <meshBasicMaterial
-            color={i % 2 === 0 ? '#00F0FF' : '#00FF87'}
+            color={i % 2 === 0 ? '#F59E0B' : '#38A3FF'}
             transparent
-            opacity={0.35 - i * 0.06}
+            opacity={0.25 - i * 0.04}
             side={THREE.DoubleSide}
           />
         </mesh>
       ))}
 
-      {/* Rotating Radar Crosshairs in Cyan */}
+      {/* Rotating Radar Crosshairs in ISRO Amber */}
       <group ref={radarRef}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <planeGeometry args={[7.4, 0.02]} />
-          <meshBasicMaterial color="#00F0FF" transparent opacity={0.3} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#F59E0B" transparent opacity={0.25} side={THREE.DoubleSide} />
         </mesh>
         <mesh rotation={[Math.PI / 2, 0, Math.PI / 2]}>
           <planeGeometry args={[7.4, 0.02]} />
-          <meshBasicMaterial color="#00F0FF" transparent opacity={0.3} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#F59E0B" transparent opacity={0.25} side={THREE.DoubleSide} />
         </mesh>
       </group>
     </group>
@@ -313,13 +313,13 @@ function EarthBackground() {
         />
       </mesh>
 
-      {/* Atmospheric Cyan Rim Glow Haze */}
+      {/* Atmospheric Steel Blue Rim Glow Haze */}
       <mesh>
         <sphereGeometry args={[21.4, 48, 48]} />
         <meshBasicMaterial
-          color="#00F0FF"
+          color="#38A3FF"
           transparent
-          opacity={0.22}
+          opacity={0.18}
           side={THREE.BackSide}
         />
       </mesh>
@@ -479,11 +479,11 @@ export default function SatelliteScene({
         {/* Primary Sunlight (High contrast, sharp specular) */}
         <directionalLight position={[6, 8, 4]} intensity={2.8} color="#fffbf0" />
 
-        {/* Earth Albedo Bounce Light (Cyan/Blue reflection from below) */}
-        <directionalLight position={[-3, -6, 2]} intensity={1.2} color="#00F0FF" />
+        {/* Earth Albedo Bounce Light (Steel blue reflection from below) */}
+        <directionalLight position={[-3, -6, 2]} intensity={1.1} color="#38A3FF" />
 
-        {/* Neon Green Deep Space Rim Light */}
-        <pointLight position={[-5, 2, -4]} intensity={0.9} color="#00FF87" />
+        {/* ISRO Telemetry Amber Solar Specular Light */}
+        <pointLight position={[-5, 2, -4]} intensity={0.8} color="#F59E0B" />
 
         {/* Deep Space Cosmic Starfield */}
         <Stars radius={110} depth={50} count={3400} factor={3.8} saturation={0.7} fade speed={0.8} />
@@ -561,11 +561,11 @@ class CanvasErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center h-full p-6 bg-[#030E1D] text-center font-mono">
-          <div className="w-12 h-12 rounded-full border border-cyan/40 bg-cyan/10 flex items-center justify-center text-cyan mb-3 shadow-neon-cyan">
+        <div className="flex flex-col items-center justify-center h-full p-6 bg-[#060B16] text-center font-mono">
+          <div className="w-12 h-12 rounded-full border border-isro-amber/40 bg-isro-amber/10 flex items-center justify-center text-isro-amber mb-3 shadow-sm">
             &#128752;
           </div>
-          <div className="text-cyan font-display font-bold text-xs uppercase tracking-wider mb-1">
+          <div className="text-isro-amber font-display font-bold text-xs uppercase tracking-wider mb-1">
             3D Spacecraft Canvas (Fallback Telemetry Mode)
           </div>
           <div className="text-slate-400 text-[10px] max-w-sm">

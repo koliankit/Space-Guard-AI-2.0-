@@ -219,17 +219,17 @@ export default function LotClassificationModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/85 backdrop-blur-md animate-fade-in font-sans">
       {/* Modal Container */}
-      <div className="bg-[#090F1E] border border-sky-500/40 rounded-2xl w-full max-w-6xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden reticle-corner">
+      <div className="bg-[#060B16] border border-isro-amber/40 rounded-lg w-full max-w-6xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden reticle-corner">
         {/* Top Header Bar */}
-        <div className="px-6 py-3.5 border-b border-slate-800 bg-[#0C152B] flex items-center justify-between gap-4">
+        <div className="px-6 py-3.5 border-b border-line bg-[#091120] flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="w-3 h-3 rounded-full bg-sky-400 led shadow-neon-cyan" />
+            <span className="w-3 h-3 rounded-full bg-isro-amber led shadow-sm" />
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="m-0 text-base font-bold text-white tracking-wide uppercase font-mono flex items-center gap-2">
                   <span>📦 FLIGHT QUALIFICATION LOTS CLASSIFICATION</span>
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-isro-amber/20 text-isro-amber border border-isro-amber/40 font-bold">
                   {totalLots} FLIGHT LOTS &bull; {totalParts} TOTAL COMPONENTS
                 </span>
               </div>
@@ -404,9 +404,9 @@ export default function LotClassificationModal({
                       </div>
                       <div className="text-[11px] text-slate-400 mt-1 font-sans">
                         MIL-STD-883 HTOL 168h Burn-In Baseline &mu; ={' '}
-                        <b className="text-cyan font-mono">{activeLot.mean.toFixed(2)} &micro;A</b> &bull; &sigma; ={' '}
+                        <b className="text-isro-amber font-mono">{activeLot.mean.toFixed(2)} &micro;A</b> &bull; &sigma; ={' '}
                         <b className="text-slate-300 font-mono">{activeLot.std.toFixed(2)}</b> &bull; Subsystems:{' '}
-                        <span className="text-sky-300 font-mono font-semibold">
+                        <span className="text-telemetry-steel font-mono font-semibold">
                           {activeLot.subsystems.map((s) => `[${s}]`).join(' ')}
                         </span>
                       </div>
@@ -439,12 +439,12 @@ export default function LotClassificationModal({
                           onClick={() => setSubsystemFilter(isFiltered ? 'ALL' : subKey)}
                           className={`px-2 py-0.5 rounded text-[10.5px] font-mono transition-all border flex items-center gap-1 cursor-pointer ${
                             isFiltered
-                              ? 'bg-sky-600 border-sky-400 text-white font-bold'
-                              : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-sky-400 hover:text-white'
+                              ? 'bg-isro-amber/30 border-isro-amber text-isro-amber font-bold'
+                              : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-isro-amber hover:text-white'
                           }`}
                           title={`Click to filter by ${loc.name} (${loc.bay})`}
                         >
-                          <span className="font-bold text-cyan">[{subKey}]</span>
+                          <span className="font-bold text-isro-amber">[{subKey}]</span>
                           <span>{count} in {loc.name}</span>
                           <span className="text-[9px] text-slate-400">({loc.bay})</span>
                         </button>

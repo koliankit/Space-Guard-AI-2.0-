@@ -5,7 +5,7 @@ const STATUS_COLOR: Record<string, string> = {
   safe: '#10B981',
   monitor: '#F59E0B',
   reject: '#EF4444',
-  idle: '#38BDF8',
+  idle: '#94A3B8',
 }
 
 interface SatelliteHUDProps {
@@ -33,7 +33,6 @@ export default function SatelliteHUD({
   subsystems,
   selectedKey,
   hoveredKey,
-  selectedComponent,
   isAutoRotate,
   isExploded,
   isXray,
@@ -47,7 +46,6 @@ export default function SatelliteHUD({
   onRotateRight,
   onTiltUp,
   onTiltDown,
-  onDeselect,
 }: SatelliteHUDProps) {
   const [activePreset, setActivePreset] = useState<'iso' | 'nadir' | 'solar' | 'hga' | 'propulsion'>('iso')
   const [equalizerBars, setEqualizerBars] = useState<number[]>(Array(16).fill(20))
@@ -61,9 +59,6 @@ export default function SatelliteHUD({
     return () => clearInterval(interval)
   }, [])
 
-  const currentKey = hoveredKey || selectedKey
-  const activeSubsystem = subsystems.find((s) => s.key === currentKey)
-
   const handlePreset = (preset: 'iso' | 'nadir' | 'solar' | 'hga' | 'propulsion') => {
     setActivePreset(preset)
     onSetCameraPreset(preset)
@@ -71,17 +66,17 @@ export default function SatelliteHUD({
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-3 select-none overflow-hidden font-mono">
-      {/* Central Circular Radar Reticle (Subtle) */}
+      {/* Central Circular Radar Reticle */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-        <div className="relative w-[300px] h-[300px] rounded-full border border-cyan/30 flex items-center justify-center">
-          <div className="w-[200px] h-[200px] rounded-full border border-dashed border-cyan/20 flex items-center justify-center" />
-          <div className="absolute top-0 bottom-0 w-px bg-cyan/15" />
-          <div className="absolute left-0 right-0 h-px bg-cyan/15" />
-          <div className="absolute inset-0 rounded-full radar-spinner border-t border-cyan/50 pointer-events-none" />
+        <div className="relative w-[300px] h-[300px] rounded-full border border-amber-500/20 flex items-center justify-center">
+          <div className="w-[200px] h-[200px] rounded-full border border-dashed border-amber-500/15 flex items-center justify-center" />
+          <div className="absolute top-0 bottom-0 w-px bg-amber-500/15" />
+          <div className="absolute left-0 right-0 h-px bg-amber-500/15" />
+          <div className="absolute inset-0 rounded-full radar-spinner border-t border-amber-500/40 pointer-events-none" />
         </div>
       </div>
 
-      {/* --- Top Bar: Controls & Presets --- */}
+      {/* Top Bar: Controls & Presets */}
       <div className="flex flex-wrap items-center justify-between gap-2 relative z-20">
         {/* Left: Viewport Orbit & Camera Controls */}
         <div className="flex items-center gap-1.5 pointer-events-auto">
@@ -91,12 +86,12 @@ export default function SatelliteHUD({
             onClick={onToggleRotate}
             className={`text-[10px] px-2 py-1 rounded border transition-all flex items-center gap-1.5 ${
               isAutoRotate
-                ? 'bg-cyan/20 border-cyan text-cyan font-bold shadow-neon-cyan'
+                ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-bold shadow-sm'
                 : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
             }`}
             title="Toggle Automatic Orbit Rotation"
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotate ? 'bg-cyan dot-pulse' : 'bg-slate-500'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotate ? 'bg-amber-400 dot-pulse' : 'bg-slate-500'}`} />
             {isAutoRotate ? 'ROTATING' : 'PAUSED'}
           </button>
 
@@ -105,7 +100,7 @@ export default function SatelliteHUD({
             <button
               type="button"
               onClick={onRotateLeft}
-              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-cyan rounded transition-colors"
+              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-amber-400 rounded transition-colors"
               title="Rotate Left"
             >
               &#8634;
@@ -113,7 +108,7 @@ export default function SatelliteHUD({
             <button
               type="button"
               onClick={onRotateRight}
-              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-cyan rounded transition-colors"
+              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-amber-400 rounded transition-colors"
               title="Rotate Right"
             >
               &#8635;
@@ -121,7 +116,7 @@ export default function SatelliteHUD({
             <button
               type="button"
               onClick={onTiltUp}
-              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-cyan rounded transition-colors"
+              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-amber-400 rounded transition-colors"
               title="Tilt Up"
             >
               &#9650;
@@ -129,7 +124,7 @@ export default function SatelliteHUD({
             <button
               type="button"
               onClick={onTiltDown}
-              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-cyan rounded transition-colors"
+              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-amber-400 rounded transition-colors"
               title="Tilt Down"
             >
               &#9660;
@@ -156,7 +151,7 @@ export default function SatelliteHUD({
             onClick={onToggleXray}
             className={`text-[10px] px-2 py-1 rounded border transition-all ${
               isXray
-                ? 'bg-cyan/20 border-cyan text-white font-bold'
+                ? 'bg-amber-500/20 border-amber-500/60 text-white font-bold'
                 : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
             }`}
             title="X-Ray Translucent Skin"
@@ -168,7 +163,7 @@ export default function SatelliteHUD({
           <button
             type="button"
             onClick={onResetView}
-            className="hud-glass border-slate-700 text-slate-400 hover:text-cyan text-[10px] px-2 py-1 rounded border"
+            className="hud-glass border-slate-700 text-slate-400 hover:text-amber-400 text-[10px] px-2 py-1 rounded border"
             title="Reset Camera"
           >
             &#8630;
@@ -192,7 +187,7 @@ export default function SatelliteHUD({
               onClick={() => handlePreset(preset.id)}
               className={`text-[9.5px] px-2 py-0.5 rounded border transition-all ${
                 activePreset === preset.id
-                  ? 'bg-cyan/20 border-cyan text-cyan font-bold shadow-neon-cyan'
+                  ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-bold shadow-sm'
                   : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
               }`}
             >
@@ -202,9 +197,9 @@ export default function SatelliteHUD({
         </div>
       </div>
 
-      {/* --- Bottom Bar: Telemetry Equalizer + Subsystem Pills --- */}
+      {/* Bottom Bar: Telemetry Equalizer + Subsystem Carousel */}
       <div className="flex flex-col gap-1.5 relative z-20">
-        {/* Equalizer Telemetry Signal Bar (Compact) */}
+        {/* Equalizer Telemetry Signal Bar */}
         <div className="flex items-end justify-center gap-0.5 h-3 pointer-events-none opacity-60">
           {equalizerBars.map((val, idx) => (
             <div
@@ -212,16 +207,16 @@ export default function SatelliteHUD({
               className="w-1 rounded-t transition-all duration-200"
               style={{
                 height: `${val}%`,
-                backgroundColor: idx % 2 === 0 ? '#00F0FF' : '#10B981',
+                backgroundColor: idx % 2 === 0 ? '#F59E0B' : '#10B981',
               }}
             />
           ))}
         </div>
 
-        {/* Subsystems Carousel / Quick Target Pills */}
+        {/* Subsystems Carousel */}
         {subsystems.length > 0 && (
           <div className="flex items-center gap-1 overflow-x-auto py-1 px-2 hud-glass rounded-lg border border-slate-800 pointer-events-auto max-w-full">
-            <span className="text-[8.5px] text-cyan tracking-wider uppercase px-1 whitespace-nowrap font-bold">
+            <span className="text-[8.5px] text-amber-400 tracking-wider uppercase px-1 whitespace-nowrap font-bold">
               SUBSYSTEMS:
             </span>
             {subsystems.map((sub) => {
@@ -234,7 +229,7 @@ export default function SatelliteHUD({
                   onClick={() => onSelectSubsystem(sub.key)}
                   className={`flex items-center gap-1 px-2 py-0.5 rounded text-[9.5px] whitespace-nowrap transition-all border ${
                     isCurr
-                      ? 'bg-cyan/20 border-cyan text-white font-bold shadow-neon-cyan'
+                      ? 'bg-amber-500/20 border-amber-500/60 text-white font-bold shadow-sm'
                       : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >

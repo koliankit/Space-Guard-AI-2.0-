@@ -18,13 +18,13 @@ export default function ComparePanel({ component }: { component: ComponentOut | 
       {/* Header */}
       <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 mb-3">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-400" />
-          <h4 className="m-0 text-xs font-bold tracking-wide uppercase text-white">
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
+          <h4 className="m-0 text-xs font-bold tracking-wider uppercase text-white font-display">
             Screening Paradigm Comparison
           </h4>
         </div>
-        <span className="text-[10px] font-mono text-sky-300 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/30 font-semibold">
-          SIH26170 ARCHITECTURE
+        <span className="text-[10px] font-mono text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 font-semibold">
+          ISRO QUALIFICATION PROTOCOL
         </span>
       </div>
 
@@ -66,10 +66,10 @@ export default function ComparePanel({ component }: { component: ComponentOut | 
         <div className="p-3.5 rounded-lg bg-[#0F172A] border border-slate-700/80 flex flex-col justify-between shadow-sm">
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10.5px] uppercase font-bold text-sky-400 flex items-center gap-1.5">
+              <span className="text-[10.5px] uppercase font-bold text-amber-400 flex items-center gap-1.5 font-display">
                 <span className="text-emerald-400 font-black">&#10003;</span> SpaceGuard AI Screening
               </span>
-              <span className="text-[9.5px] px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 font-semibold font-mono">
+              <span className="text-[9.5px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold font-mono">
                 Behavioral Intelligence
               </span>
             </div>
