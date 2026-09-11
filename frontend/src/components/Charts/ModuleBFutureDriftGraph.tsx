@@ -2,19 +2,36 @@ import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { ComponentOut } from '../../types'
 import { sounds } from '../../utils/soundEffects'
 
-interface ModuleBFutureDriftGraphProps {
-  component: ComponentOut | null
+export interface ModuleBSimData {
+  progress: number
+  p1: number
+  p2: number
+  currentH: number
+  currentVal: number
+  liveVelocity: number
+  liveProjection: number
+  liveMargin: number
+  isSimulating: boolean
 }
 
-export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDriftGraphProps) {
+interface ModuleBFutureDriftGraphProps {
+  component: ComponentOut | null
+  onSimUpdate?: (data: ModuleBSimData) => void
+}
+
+export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: ModuleBFutureDriftGraphProps) {
   const [activeHorizon, setActiveHorizon] = useState<216 | 264 | 336>(264)
   const [hoveredPoint, setHoveredPoint] = useState<{ hour: number; val: number; label: string } | null>(null)
   const [animProgress, setAnimProgress] = useState<number>(1)
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
+  const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (17s), 1x (8.5s slow), 2x (4.2s)
 
   const measuredPathRef = useRef<SVGPathElement>(null)
   const [measuredLen, setMeasuredLen] = useState<number>(600)
   const animFrameRef = useRef<number | null>(null)
+  const startTimeRef = useRef<number>(0)
+  const elapsedOffsetRef = useRef<number>(0)
   const hasPinged168Ref = useRef<boolean>(false)
   const hasPingedHorizonRef = useRef<boolean>(false)
 
@@ -46,22 +63,29 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
     return h > 0 && h <= 500 ? h : null
   }, [slope, limitVal, v168])
 
+  // Base simulation duration: 8500ms (Very slow and deliberate for clear observation)
+  const baseDuration = 8500 / simSpeed
+
   // Start two-phase live telemetry simulation
-  const startSimulation = useCallback(() => {
+  const startSimulation = useCallback((resetOffset = true) => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     setIsSimulating(true)
-    setAnimProgress(0)
-    hasPinged168Ref.current = false
-    hasPingedHorizonRef.current = false
+    setIsPaused(false)
+    if (resetOffset) {
+      setAnimProgress(0)
+      elapsedOffsetRef.current = 0
+      hasPinged168Ref.current = false
+      hasPingedHorizonRef.current = false
+    }
     sounds.playClick()
-    const startTime = performance.now()
-    const duration = 2400 // 2.4 seconds total simulation time
+    startTimeRef.current = performance.now() - elapsedOffsetRef.current
 
     const tick = (now: number) => {
-      const elapsed = now - startTime
-      const rawP = Math.min(1, elapsed / duration)
-      // Smooth cubic pacing
-      const easeP = rawP < 0.5 ? 4 * rawP * rawP * rawP : 1 - Math.pow(-2 * rawP + 2, 3) / 2
+      const elapsed = now - startTimeRef.current
+      elapsedOffsetRef.current = elapsed
+      const rawP = Math.min(1, elapsed / baseDuration)
+      // Smooth linear pacing for steady flight tracking
+      const easeP = rawP < 0.15 ? 2.5 * rawP * rawP : rawP > 0.85 ? 1 - 2.5 * Math.pow(1 - rawP, 2) : rawP
       setAnimProgress(easeP)
 
       if (rawP < 1) {
@@ -69,16 +93,26 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
       } else {
         setAnimProgress(1)
         setIsSimulating(false)
+        setIsPaused(false)
         animFrameRef.current = null
       }
     }
     animFrameRef.current = requestAnimationFrame(tick)
-  }, [])
+  }, [baseDuration])
+
+  const togglePause = useCallback(() => {
+    if (isPaused) {
+      startSimulation(false)
+    } else {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+      setIsPaused(true)
+    }
+  }, [isPaused, startSimulation])
 
   // Auto-trigger simulation when component or horizon changes
   useEffect(() => {
     if (component?.component_id) {
-      startSimulation()
+      startSimulation(true)
     }
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
@@ -234,6 +268,23 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
     }
   }, [animProgress, p1, v0, v24, v96, v168, currentExtrapH, currentExtrapVal, toX, toY])
 
+  // Notify parent dashboard panel of live simulation telemetry
+  useEffect(() => {
+    if (onSimUpdate) {
+      onSimUpdate({
+        progress: animProgress,
+        p1,
+        p2,
+        currentH: probeTip.h,
+        currentVal: probeTip.v,
+        liveVelocity: liveDriftVelocity,
+        liveProjection,
+        liveMargin,
+        isSimulating,
+      })
+    }
+  }, [animProgress, p1, p2, probeTip.h, probeTip.v, liveDriftVelocity, liveProjection, liveMargin, isSimulating, onSimUpdate])
+
   // If no component is selected, render empty state (all hooks have been unconditionally called above)
   if (!component) {
     return (
@@ -272,26 +323,58 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           </span>
         </div>
 
-        {/* Live Simulation status & Horizon Buttons */}
+        {/* Live Simulation status, Speed Selector & Horizon Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Live Simulation Indicator & Replay Control */}
-          <div className="flex items-center gap-1.5">
+          {/* Playback Controls & Speed Toggle */}
+          <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
             {isSimulating ? (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                {p2 > 0
-                  ? `EXTRAPOLATING [+${Math.round(currentExtrapH - 168)}h]`
-                  : `GROUND SWEEP [${Math.round(probeTip.h)}h]`}
-              </span>
+              <button
+                type="button"
+                onClick={togglePause}
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
+                title={isPaused ? 'Resume Simulation' : 'Pause Simulation'}
+              >
+                <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
+              </button>
             ) : (
               <button
                 type="button"
-                onClick={startSimulation}
-                className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
+                onClick={() => startSimulation(true)}
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
                 title="Replay in-flight drift simulation"
               >
-                <span>▶</span> REPLAY SIMULATION
+                <span>↺</span> REPLAY
               </button>
+            )}
+
+            {/* Speed Selector */}
+            <div className="flex items-center gap-0.5 pl-1 border-l border-slate-700 text-[9.5px] font-mono">
+              {([0.5, 1, 2] as const).map((spd) => (
+                <button
+                  key={spd}
+                  type="button"
+                  onClick={() => setSimSpeed(spd)}
+                  className={`px-1.5 py-0.5 rounded ${
+                    simSpeed === spd
+                      ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title={spd === 0.5 ? 'Ultra Slow (17s)' : spd === 1 ? 'Slow Observation (8.5s)' : 'Fast (4s)'}
+                >
+                  {spd === 0.5 ? '0.5x' : spd === 1 ? '1x' : '2x'}
+                </button>
+              ))}
+            </div>
+
+            {/* Live Phase Pill */}
+            {isSimulating && (
+              <span className="text-[9.5px] font-mono font-bold text-amber-400 px-1 animate-pulse">
+                {isPaused
+                  ? 'PAUSED'
+                  : p2 > 0
+                  ? `+${Math.round(currentExtrapH - 168)}h`
+                  : `${Math.round(probeTip.h)}h`}
+              </span>
             )}
           </div>
 
@@ -564,7 +647,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
               <circle
                 cx={probeTip.x}
                 cy={probeTip.y}
-                r={8}
+                r={9}
                 fill={probeTip.isExtrap ? '#f59e0b' : '#ffffff'}
                 opacity={0.35}
               />

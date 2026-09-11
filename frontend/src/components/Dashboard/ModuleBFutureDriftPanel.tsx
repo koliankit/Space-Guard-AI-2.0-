@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { ComponentOut } from '../../types'
 import ModuleBFutureDriftGraph from '../Charts/ModuleBFutureDriftGraph'
 import { getSubsystemLocation } from '../../utils/satelliteLocations'
@@ -14,10 +14,28 @@ export default function ModuleBFutureDriftPanel({
   selected,
   onSelectSubsystem,
 }: ModuleBFutureDriftPanelProps) {
+  const [simData, setSimData] = useState<{
+    progress: number
+    p1: number
+    p2: number
+    currentH: number
+    currentVal: number
+    liveVelocity: number
+    liveProjection: number
+    liveMargin: number
+    isSimulating: boolean
+  } | null>(null)
+
   const loc = selected ? getSubsystemLocation(selected.subsystem) : null
   const limitVal = selected?.limit_ua || 50
   const slope = selected?.slope || (selected ? (selected.v168 - selected.v0) / 168 : 0)
-  const willBreach = selected?.future_limit_breach || (selected && selected.predicted_future >= limitVal)
+
+  const isSim = simData?.isSimulating && (simData.progress ?? 1) < 1
+  const liveVel = isSim ? (simData?.liveVelocity ?? slope * 1000) : slope * 1000
+  const liveProj = isSim ? (simData?.liveProjection ?? selected?.predicted_future ?? 0) : selected?.predicted_future ?? 0
+  const liveMarg = isSim ? (simData?.liveMargin ?? (limitVal - liveProj)) : selected?.margin_future ?? (limitVal - (selected?.predicted_future ?? 0))
+  const willBreach = isSim ? liveProj >= limitVal : selected?.future_limit_breach || (selected && selected.predicted_future >= limitVal)
+
   const breachHour =
     slope > 0 && selected
       ? 168 + (limitVal - selected.v168) / slope
@@ -39,7 +57,13 @@ export default function ModuleBFutureDriftPanel({
         </div>
         <div className="flex items-center gap-2 text-xs font-mono">
           <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
-          <span className="text-slate-400 text-[11px]">FLIGHT HORIZON: +96H &bull; 264H</span>
+          <span className="text-slate-400 text-[11px]">
+            {isSim
+              ? simData?.p2 && simData.p2 > 0
+                ? `IN-FLIGHT EXTRAPOLATING: +${Math.round((simData?.currentH ?? 168) - 168)}H`
+                : `GROUND BASELINE SWEEP: T+${Math.round(simData?.currentH ?? 0)}H`
+              : 'FLIGHT HORIZON: +96H \u2022 264H'}
+          </span>
         </div>
       </div>
 
@@ -65,7 +89,7 @@ export default function ModuleBFutureDriftPanel({
               {/* Drift Trend Badge */}
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-3 py-1 rounded-md text-xs font-bold border ${
+                  className={`px-3 py-1 rounded-md text-xs font-bold border transition-all ${
                     willBreach
                       ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                       : isAccelerating
@@ -73,7 +97,18 @@ export default function ModuleBFutureDriftPanel({
                       : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                   }`}
                 >
-                  {selected.drift_trend || (willBreach ? 'PREDICTED EXCEEDANCE' : 'NOMINAL DRIFT')}
+                  {isSim ? (
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                      {willBreach
+                        ? 'CRITICAL LIMIT EXCEEDANCE'
+                        : simData?.p2 && simData.p2 > 0
+                        ? `EXTRAPOLATING (+${Math.round((simData?.currentH ?? 168) - 168)}H)`
+                        : `MEASURING T+${Math.round(simData?.currentH ?? 0)}H`}
+                    </span>
+                  ) : (
+                    selected.drift_trend || (willBreach ? 'PREDICTED EXCEEDANCE' : 'NOMINAL DRIFT')
+                  )}
                 </span>
                 {willBreach && (
                   <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-rose-600 text-white animate-pulse">
@@ -83,35 +118,43 @@ export default function ModuleBFutureDriftPanel({
               </div>
             </div>
 
-            {/* In-Flight Reliability Forecast Metrics Grid */}
+            {/* In-Flight Reliability Forecast Metrics Grid (Live count-up synchronized with sweep) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
               <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
-                <span className={`text-base font-bold mt-1 tabular-nums ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
-                  {(slope * 1000).toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
+                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />}
+                </div>
+                <span className={`text-base font-bold mt-1 tabular-nums ${liveVel > 50 ? 'text-rose-400' : 'text-amber-400'}`}>
+                  {liveVel.toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
                 </span>
               </div>
 
               <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-xs text-slate-400 uppercase font-semibold">264h Extrapolated</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400 uppercase font-semibold">264h Extrapolated</span>
+                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />}
+                </div>
                 <span className={`text-base font-bold mt-1 tabular-nums ${willBreach ? 'text-rose-400' : 'text-slate-100'}`}>
-                  {selected.predicted_future.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+                  {liveProj.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
                 </span>
               </div>
 
               <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-xs text-slate-400 uppercase font-semibold">Future Safety Margin</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400 uppercase font-semibold">Future Safety Margin</span>
+                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />}
+                </div>
                 <span
                   className={`text-base font-bold mt-1 tabular-nums ${
-                    (selected.margin_future ?? 0) < 5
+                    liveMarg < 5
                       ? 'text-rose-400'
-                      : (selected.margin_future ?? 0) < 15
+                      : liveMarg < 15
                       ? 'text-amber-400'
                       : 'text-emerald-400'
                   }`}
                 >
-                  {(selected.margin_future ?? (limitVal - selected.predicted_future)).toFixed(1)}{' '}
-                  <span className="text-xs font-normal text-slate-400">&mu;A</span>
+                  {liveMarg.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
                 </span>
               </div>
 
@@ -171,7 +214,7 @@ export default function ModuleBFutureDriftPanel({
 
         {/* Module B Dedicated Graph: Future Drift Forecaster */}
         <div className="mt-1">
-          <ModuleBFutureDriftGraph component={selected} />
+          <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>
 

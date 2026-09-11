@@ -2,19 +2,32 @@ import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { ComponentOut } from '../../types'
 import { sounds } from '../../utils/soundEffects'
 
+export interface ModuleASimData {
+  progress: number
+  simHour: number
+  simVal: number
+  isSimulating: boolean
+}
+
 interface ModuleAAnomalyGraphProps {
   component: ComponentOut | null
+  onSimUpdate?: (data: ModuleASimData) => void
 }
 
 const STAGES = [0, 24, 96, 168]
 
-export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphProps) {
+export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAAnomalyGraphProps) {
   const [stageH, setStageH] = useState<number>(168)
   const [animProgress, setAnimProgress] = useState<number>(1)
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
+  const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (16s), 1x (8s slow), 2x (4s)
+
   const pathRef = useRef<SVGPathElement>(null)
   const [pathLength, setPathLength] = useState<number>(800)
   const animFrameRef = useRef<number | null>(null)
+  const startTimeRef = useRef<number>(0)
+  const elapsedOffsetRef = useRef<number>(0)
   const lastPingHourRef = useRef<number>(-1)
 
   const W = 720
@@ -23,63 +36,6 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
   const padR = 28
   const padT = 24
   const padB = 44
-
-  // Live simulation telemetry sweep callback
-  const startSweepAnimation = useCallback(() => {
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    setIsSimulating(true)
-    setAnimProgress(0)
-    lastPingHourRef.current = -1
-    sounds.playClick()
-    const startTime = performance.now()
-    const duration = 2200 // 2.2 seconds slow-to-medium sweep
-
-    const tick = (now: number) => {
-      const elapsed = now - startTime
-      const rawP = Math.min(1, elapsed / duration)
-      // Smooth cubic ease-in-out for realistic oscilloscope probe sweep
-      const easeP = rawP < 0.5 ? 4 * rawP * rawP * rawP : 1 - Math.pow(-2 * rawP + 2, 3) / 2
-      setAnimProgress(easeP)
-
-      if (rawP < 1) {
-        animFrameRef.current = requestAnimationFrame(tick)
-      } else {
-        setAnimProgress(1)
-        setIsSimulating(false)
-        animFrameRef.current = null
-      }
-    }
-    animFrameRef.current = requestAnimationFrame(tick)
-  }, [])
-
-  // Auto-trigger sweep when component changes or stage filter changes
-  useEffect(() => {
-    if (component?.component_id) {
-      startSweepAnimation()
-    }
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    }
-  }, [component?.component_id, stageH, startSweepAnimation])
-
-  // Measure path length on DOM mount/update
-  useEffect(() => {
-    if (pathRef.current) {
-      const len = pathRef.current.getTotalLength()
-      if (len > 0 && Math.abs(len - pathLength) > 1) {
-        setPathLength(len)
-      }
-    }
-  }, [component, stageH, pathLength])
-
-  // Signal spectrogram equalizer bars along the bottom (animating dynamically during sweep)
-  const spectrumBars = useMemo(() => {
-    return Array.from({ length: 36 }, (_, i) => {
-      const wave = isSimulating ? Math.sin(animProgress * Math.PI * 4 + i * 0.4) * 4 : 0
-      const base = Math.abs(Math.sin((i / 36) * Math.PI * 3.2)) * 18 + 5
-      return Math.min(Math.max(4, base + wave), 24)
-    })
-  }, [isSimulating, animProgress])
 
   // Geometry calculations
   const limitVal = component?.limit_ua || 50
@@ -190,6 +146,94 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
     return Math.max(minY, Math.min(maxY, val))
   }, [tipPoint.y, minY, maxY, H, padT, padB])
 
+  // Base simulation duration: 8000ms (Very slow and deliberate for clear observation)
+  const baseDuration = 8000 / simSpeed
+
+  // Live simulation telemetry sweep callback
+  const startSweepAnimation = useCallback((resetOffset = true) => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+    setIsSimulating(true)
+    setIsPaused(false)
+    if (resetOffset) {
+      setAnimProgress(0)
+      elapsedOffsetRef.current = 0
+      lastPingHourRef.current = -1
+    }
+    sounds.playClick()
+    startTimeRef.current = performance.now() - elapsedOffsetRef.current
+
+    const tick = (now: number) => {
+      const elapsed = now - startTimeRef.current
+      elapsedOffsetRef.current = elapsed
+      const rawP = Math.min(1, elapsed / baseDuration)
+      // Smooth linear-cubic hybrid pacing for steady, readable live rates
+      const easeP = rawP < 0.2 ? 2.5 * rawP * rawP : rawP > 0.8 ? 1 - 2.5 * Math.pow(1 - rawP, 2) : rawP
+      setAnimProgress(easeP)
+
+      if (rawP < 1) {
+        animFrameRef.current = requestAnimationFrame(tick)
+      } else {
+        setAnimProgress(1)
+        setIsSimulating(false)
+        setIsPaused(false)
+        animFrameRef.current = null
+      }
+    }
+    animFrameRef.current = requestAnimationFrame(tick)
+  }, [baseDuration])
+
+  const togglePause = useCallback(() => {
+    if (isPaused) {
+      // Resume
+      startSweepAnimation(false)
+    } else {
+      // Pause
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+      setIsPaused(true)
+    }
+  }, [isPaused, startSweepAnimation])
+
+  // Auto-trigger sweep when component changes or stage filter changes
+  useEffect(() => {
+    if (component?.component_id) {
+      startSweepAnimation(true)
+    }
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+    }
+  }, [component?.component_id, stageH, startSweepAnimation])
+
+  // Notify parent dashboard of live simulation state
+  useEffect(() => {
+    if (onSimUpdate) {
+      onSimUpdate({
+        progress: animProgress,
+        simHour,
+        simVal,
+        isSimulating,
+      })
+    }
+  }, [animProgress, simHour, simVal, isSimulating, onSimUpdate])
+
+  // Measure path length on DOM mount/update
+  useEffect(() => {
+    if (pathRef.current) {
+      const len = pathRef.current.getTotalLength()
+      if (len > 0 && Math.abs(len - pathLength) > 1) {
+        setPathLength(len)
+      }
+    }
+  }, [component, stageH, pathLength])
+
+  // Signal spectrogram equalizer bars along the bottom (animating dynamically during sweep)
+  const spectrumBars = useMemo(() => {
+    return Array.from({ length: 36 }, (_, i) => {
+      const wave = isSimulating && !isPaused ? Math.sin(animProgress * Math.PI * 6 + i * 0.4) * 5 : 0
+      const base = Math.abs(Math.sin((i / 36) * Math.PI * 3.2)) * 18 + 5
+      return Math.min(Math.max(4, base + wave), 24)
+    })
+  }, [isSimulating, isPaused, animProgress])
+
   // Trigger audio pings at time milestones
   useEffect(() => {
     if (!isSimulating) return
@@ -247,24 +291,54 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
           </span>
         </div>
 
-        {/* Action controls & Stage Filter Buttons */}
+        {/* Action controls, Speed selector & Stage Filter Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Live Simulation Indicator & Replay Control */}
-          <div className="flex items-center gap-1.5">
+          {/* Playback Controls & Speed Toggle */}
+          <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
             {isSimulating ? (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-bold animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                LIVE SWEEP [{(animProgress * 100).toFixed(0)}%]
-              </span>
+              <button
+                type="button"
+                onClick={togglePause}
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
+                title={isPaused ? 'Resume Simulation' : 'Pause Simulation'}
+              >
+                <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
+              </button>
             ) : (
               <button
                 type="button"
-                onClick={startSweepAnimation}
-                className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
+                onClick={() => startSweepAnimation(true)}
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
                 title="Replay oscilloscope live telemetry sweep"
               >
-                <span>▶</span> REPLAY SWEEP
+                <span>↺</span> REPLAY
               </button>
+            )}
+
+            {/* Speed Selector */}
+            <div className="flex items-center gap-0.5 pl-1 border-l border-slate-700 text-[9.5px] font-mono">
+              {([0.5, 1, 2] as const).map((spd) => (
+                <button
+                  key={spd}
+                  type="button"
+                  onClick={() => setSimSpeed(spd)}
+                  className={`px-1.5 py-0.5 rounded ${
+                    simSpeed === spd
+                      ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title={spd === 0.5 ? 'Ultra Slow (16s)' : spd === 1 ? 'Slow Observation (8s)' : 'Fast (4s)'}
+                >
+                  {spd === 0.5 ? '0.5x' : spd === 1 ? '1x' : '2x'}
+                </button>
+              ))}
+            </div>
+
+            {/* Live Progress Pill */}
+            {isSimulating && (
+              <span className="text-[9.5px] font-mono font-bold text-emerald-400 px-1 animate-pulse">
+                {isPaused ? 'PAUSED' : `[T+${Math.round(simHour)}h]`}
+              </span>
             )}
           </div>
 
@@ -406,7 +480,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
           </text>
 
           {/* Lot Norm Baseline Trace (Crisp White dashed line) */}
-          {baselinePtsLengthCheck(shown.length) && baselineCurve && (
+          {baselineCurve && (
             <path
               d={baselineCurve}
               fill="none"
@@ -496,7 +570,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
               <circle
                 cx={tipPoint.x}
                 cy={tipPoint.y}
-                r={8}
+                r={9}
                 fill={curveColor}
                 opacity={0.35}
               />
@@ -615,8 +689,4 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
       </div>
     </div>
   )
-}
-
-function baselinePtsLengthCheck(length: number) {
-  return length > 1
 }
