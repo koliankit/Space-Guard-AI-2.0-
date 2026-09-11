@@ -24,11 +24,12 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
   const padR = 32
   const padT = 24
   const padB = 44
+
   const limitVal = component?.limit_ua || 50
-  const v0 = component?.v0 ?? 0
-  const v24 = component?.v24 ?? 0
+  const v0 = component?.v0 ?? 10
+  const v24 = component?.v24 ?? 10.2
   const v96 = component?.v96 ?? (v0 + (v24 - v0) * 4)
-  const v168 = component?.v168 ?? 0
+  const v168 = component?.v168 ?? 11.4
   const slope = component?.slope || (v168 - v0) / 168
   const future264 = component?.predicted_future || v168 + slope * 96
 
@@ -94,25 +95,8 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
     }
   }, [component, measuredLen])
 
-  if (!component) {
-    return (
-      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-mono font-bold text-amber-400 flex items-center gap-1.5 text-[11px] uppercase">
-            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
-            Module B &bull; Future Drift Forecaster (+96h Projection)
-          </span>
-          <span className="text-[10px] text-slate-400 font-mono">MODEL: POLYNOMIAL EXTENSION</span>
-        </div>
-        <div className="h-[200px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
-          [ AWAITING COMPONENT SELECTION TO DISPLAY DRIFT PROJECTION ]
-        </div>
-      </div>
-    )
-  }
-
   // Uncertainty cone variance (+/- 1.5 sigma drift model)
-  const lotStd = component.lot_std || 1.8
+  const lotStd = component?.lot_std || 1.8
   const coneSpread = Math.max(2.5, lotStd * 1.6)
   const coneUpper = projectedAtHorizon + coneSpread
   const coneLower = Math.max(0, projectedAtHorizon - coneSpread)
@@ -124,28 +108,44 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
   // Max X is active horizon (e.g. 264h or 336h)
   const maxX = Math.max(activeHorizon, breachHour && breachHour <= 336 ? breachHour + 20 : 280)
 
-  const toX = (hour: number) => padL + (hour / maxX) * (W - padL - padR)
-  const toY = (val: number) => {
-    const range = maxVal - minVal || 1
-    return H - padB - ((val - minVal) / range) * (H - padT - padB)
-  }
+  const toX = useCallback(
+    (hour: number) => padL + (hour / maxX) * (W - padL - padR),
+    [maxX, padL, padR, W]
+  )
+  const toY = useCallback(
+    (val: number) => {
+      const range = maxVal - minVal || 1
+      return H - padB - ((val - minVal) / range) * (H - padT - padB)
+    },
+    [maxVal, minVal, H, padB, padT]
+  )
 
   // Y-ticks
-  const yTicks = [0, 10, 20, 30, 40, 50].filter((v) => v >= minVal && v <= maxVal)
-  if (!yTicks.includes(limitVal)) yTicks.push(limitVal)
-  yTicks.sort((a, b) => a - b)
+  const yTicks = useMemo(() => {
+    const ticks = [0, 10, 20, 30, 40, 50].filter((v) => v >= minVal && v <= maxVal)
+    if (!ticks.includes(limitVal)) ticks.push(limitVal)
+    ticks.sort((a, b) => a - b)
+    return ticks
+  }, [minVal, maxVal, limitVal])
 
   // Measured points (0h, 24h, 96h, 168h)
-  const measuredPoints = [
-    { h: 0, v: v0, label: '0h Initial' },
-    { h: 24, v: v24, label: '24h Early' },
-    { h: 96, v: v96, label: '96h Mid-HTOL' },
-    { h: 168, v: v168, label: '168h Burn-in' },
-  ]
+  const measuredPoints = useMemo(
+    () => [
+      { h: 0, v: v0, label: '0h Initial' },
+      { h: 24, v: v24, label: '24h Early' },
+      { h: 96, v: v96, label: '96h Mid-HTOL' },
+      { h: 168, v: v168, label: '168h Burn-in' },
+    ],
+    [v0, v24, v96, v168]
+  )
 
-  const measuredPathD = measuredPoints
-    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${toX(p.h).toFixed(1)} ${toY(p.v).toFixed(1)}`)
-    .join(' ')
+  const measuredPathD = useMemo(
+    () =>
+      measuredPoints
+        .map((p, i) => `${i === 0 ? 'M' : 'L'} ${toX(p.h).toFixed(1)} ${toY(p.v).toFixed(1)}`)
+        .join(' '),
+    [measuredPoints, toX, toY]
+  )
 
   // Simulation Phase Calculations
   // Phase 1 (0 -> 0.45): Ground Burn-in sweep (0h -> 168h)
@@ -153,47 +153,55 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
   const p1 = Math.min(1, animProgress / 0.45)
   const p2 = animProgress <= 0.45 ? 0 : (animProgress - 0.45) / 0.55
 
-  // Trigger audio milestone pings
-  if (p1 >= 1 && !hasPinged168Ref.current && isSimulating) {
-    hasPinged168Ref.current = true
-    sounds.playPing()
-  }
-  if (p2 >= 0.98 && !hasPingedHorizonRef.current && isSimulating) {
-    hasPingedHorizonRef.current = true
-    sounds.playPing()
-  }
+  // Trigger audio milestone pings inside useEffect
+  useEffect(() => {
+    if (!isSimulating) return
+    if (p1 >= 1 && !hasPinged168Ref.current) {
+      hasPinged168Ref.current = true
+      sounds.playPing()
+    }
+    if (p2 >= 0.98 && !hasPingedHorizonRef.current) {
+      hasPingedHorizonRef.current = true
+      sounds.playPing()
+    }
+  }, [p1, p2, isSimulating])
 
   // Dynamic In-Flight extrapolation hour & value
   const currentExtrapH = 168 + p2 * (activeHorizon - 168)
   const currentExtrapVal = v168 + slope * (p2 * (activeHorizon - 168))
 
   // Dynamic extrapolation path
-  const extrapPathD =
-    p2 > 0
-      ? `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} L ${toX(currentExtrapH).toFixed(1)} ${toY(
-          currentExtrapVal
-        ).toFixed(1)}`
-      : ''
+  const extrapPathD = useMemo(() => {
+    if (p2 <= 0) return ''
+    return `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} L ${toX(currentExtrapH).toFixed(1)} ${toY(
+      currentExtrapVal
+    ).toFixed(1)}`
+  }, [p2, toX, toY, v168, currentExtrapH, currentExtrapVal])
 
   // Early prediction checkpoint (0-24h projection to 168h)
-  const early168 = component.predicted168_from_early
-  const earlyPredPathD = `M ${toX(24).toFixed(1)} ${toY(v24).toFixed(1)} L ${toX(168).toFixed(1)} ${toY(early168).toFixed(1)}`
+  const early168 = component?.predicted168_from_early ?? (v24 + (v24 - v0) * 6)
+  const earlyPredPathD = useMemo(
+    () => `M ${toX(24).toFixed(1)} ${toY(v24).toFixed(1)} L ${toX(168).toFixed(1)} ${toY(early168).toFixed(1)}`,
+    [toX, toY, v24, early168]
+  )
 
   // Shaded variance cone polygon dynamically expanding with p2
   const currentSpread = coneSpread * p2
   const currentUpper = currentExtrapVal + currentSpread
   const currentLower = Math.max(0, currentExtrapVal - currentSpread)
 
-  const conePolygonD =
-    p2 > 0.05
-      ? `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} ` +
-        `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentUpper).toFixed(1)} ` +
-        `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentLower).toFixed(1)} Z`
-      : ''
+  const conePolygonD = useMemo(() => {
+    if (p2 <= 0.05) return ''
+    return (
+      `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} ` +
+      `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentUpper).toFixed(1)} ` +
+      `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentLower).toFixed(1)} Z`
+    )
+  }, [p2, toX, toY, v168, currentExtrapH, currentUpper, currentLower])
 
-  const willBreach = component.future_limit_breach || projectedAtHorizon >= limitVal
-  const marginFuture = component.margin_future ?? (limitVal - projectedAtHorizon)
-  const predError = component.prediction_error_168 ?? Math.abs(v168 - early168)
+  const willBreach = component?.future_limit_breach || projectedAtHorizon >= limitVal
+  const marginFuture = component?.margin_future ?? (limitVal - projectedAtHorizon)
+  const predError = component?.prediction_error_168 ?? Math.abs(v168 - early168)
 
   // Live interpolated metric card values synchronized with sweep
   const liveDriftVelocity = animProgress >= 1 ? slope * 1000 : (slope * 1000) * Math.min(1, p1 * 1.2)
@@ -224,7 +232,25 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
         isExtrap: true,
       }
     }
-  }, [animProgress, p1, v0, v24, v96, v168, currentExtrapH, currentExtrapVal])
+  }, [animProgress, p1, v0, v24, v96, v168, currentExtrapH, currentExtrapVal, toX, toY])
+
+  // If no component is selected, render empty state (all hooks have been unconditionally called above)
+  if (!component) {
+    return (
+      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-mono font-bold text-amber-400 flex items-center gap-1.5 text-[11px] uppercase">
+            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
+            Module B &bull; Future Drift Forecaster (+96h Projection)
+          </span>
+          <span className="text-[10px] text-slate-400 font-mono">MODEL: POLYNOMIAL EXTENSION</span>
+        </div>
+        <div className="h-[200px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
+          [ AWAITING COMPONENT SELECTION TO DISPLAY DRIFT PROJECTION ]
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg select-none">
@@ -235,11 +261,13 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
             <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
             MODULE B &bull; IN-FLIGHT DRIFT FORECASTING
           </span>
-          <span className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold border ${
-            willBreach
-              ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-          }`}>
+          <span
+            className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold border ${
+              willBreach
+                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+            }`}
+          >
             {willBreach ? 'BREACH PREDICTED' : 'NOMINAL DRIFT'}
           </span>
         </div>
@@ -251,7 +279,9 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
             {isSimulating ? (
               <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold animate-pulse">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                {p2 > 0 ? `EXTRAPOLATING [+${Math.round(currentExtrapH - 168)}h]` : `GROUND SWEEP [${Math.round(probeTip.h)}h]`}
+                {p2 > 0
+                  ? `EXTRAPOLATING [+${Math.round(currentExtrapH - 168)}h]`
+                  : `GROUND SWEEP [${Math.round(probeTip.h)}h]`}
               </span>
             ) : (
               <button
@@ -287,10 +317,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
 
       {/* SVG Canvas Area */}
       <div className="relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden">
-        <svg
-          viewBox={`0 0 ${W} ${H}`}
-          className="w-full h-[260px] md:h-[290px] block select-none"
-        >
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[260px] md:h-[290px] block select-none">
           <defs>
             <linearGradient id="coneGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.05" />
@@ -687,4 +714,3 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
     </div>
   )
 }
-

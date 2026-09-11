@@ -24,7 +24,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
   const padT = 24
   const padB = 44
 
-  // Live simulation telemetry sweep
+  // Live simulation telemetry sweep callback
   const startSweepAnimation = useCallback(() => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     setIsSimulating(true)
@@ -81,54 +81,39 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
     })
   }, [isSimulating, animProgress])
 
-  if (!component) {
-    return (
-      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-mono font-bold text-white flex items-center gap-1.5 text-[11px] uppercase">
-            <span className="w-2 h-2 rounded-full bg-white led" />
-            Module A &bull; Parametric Waveform Telemetry
-          </span>
-          <span className="text-[10px] text-slate-400 font-mono">CHANNEL: 24-BIT SIGMA-DELTA ADC</span>
-        </div>
-        <div className="h-[200px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
-          [ AWAITING COMPONENT SELECTION TO DISPLAY SILICON OSCILLOSCOPE ]
-        </div>
-      </div>
-    )
-  }
-
-  const stages: [number, number][] = [[0, component.v0], [24, component.v24]]
-  if (component.v96 != null) stages.push([96, component.v96])
-  stages.push([168, component.v168])
-  const shown = stages.filter(([h]) => h <= stageH)
-
-  const limitVal = component.limit_ua || 50
-  const lotMean = component.lot_mean ?? component.v168 * 0.94
-  const lotStd = component.lot_std ?? 1.8
+  // Geometry calculations
+  const limitVal = component?.limit_ua || 50
+  const lotMean = component?.lot_mean ?? (component?.v168 ? component.v168 * 0.94 : 11.5)
+  const lotStd = component?.lot_std ?? 1.8
 
   const bandLow = Math.max(0, lotMean - 2 * lotStd)
   const bandHigh = lotMean + 2 * lotStd
 
-  const allVals = [
-    component.v0,
-    component.v24,
-    component.v96 ?? component.v24,
-    component.v168,
-    limitVal,
-    bandLow,
-    bandHigh,
-  ]
+  const v0 = component?.v0 ?? 10
+  const v24 = component?.v24 ?? 10.2
+  const v96 = component?.v96 ?? 10.8
+  const v168 = component?.v168 ?? 11.4
+
+  const allVals = [v0, v24, v96, v168, limitVal, bandLow, bandHigh]
   const minY = Math.max(0, Math.min(...allVals) * 0.8)
   const maxY = Math.max(...allVals) * 1.15
 
   const xFor = (h: number) => padL + (h / 168) * (W - padL - padR)
   const yFor = (v: number) => H - padB - ((v - minY) / (maxY - minY || 1)) * (H - padT - padB)
 
-  // Smooth Catmull-Rom interpolation for component curve
-  const createSmoothPath = (points: [number, number][]) => {
-    if (points.length < 2) return ''
-    const mapped = points.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
+  const stages: [number, number][] = useMemo(() => {
+    const list: [number, number][] = [[0, v0], [24, v24]]
+    if (component?.v96 != null) list.push([96, v96])
+    list.push([168, v168])
+    return list
+  }, [v0, v24, v96, v168, component?.v96])
+
+  const shown = useMemo(() => stages.filter(([h]) => h <= stageH), [stages, stageH])
+
+  // Smooth Catmull-Rom curve
+  const smoothCurve = useMemo(() => {
+    if (shown.length < 2) return ''
+    const mapped = shown.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
     let d = `M ${mapped[0].x} ${mapped[0].y}`
     for (let i = 0; i < mapped.length - 1; i++) {
       const p0 = i > 0 ? mapped[i - 1] : mapped[i]
@@ -144,42 +129,54 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
       d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
     }
     return d
-  }
+  }, [shown, minY, maxY])
 
-  const smoothCurve = createSmoothPath(shown)
   const lastPoint = shown[shown.length - 1]
 
-  // Closed area under curve
-  const areaD =
-    shown.length > 1
-      ? `${smoothCurve} L ${xFor(lastPoint[0])} ${H - padB} L ${xFor(shown[0][0])} ${H - padB} Z`
-      : ''
+  const areaD = useMemo(() => {
+    if (shown.length <= 1 || !smoothCurve) return ''
+    return `${smoothCurve} L ${xFor(lastPoint[0])} ${H - padB} L ${xFor(shown[0][0])} ${H - padB} Z`
+  }, [smoothCurve, shown, lastPoint, H, padB])
 
-  // Baseline peer mean curve
-  const baselinePts: [number, number][] = [
-    [0, component.v0 * 0.95],
-    [24, component.v0 + (lotMean - component.v0) * 0.18],
-    [96, component.v0 + (lotMean - component.v0) * 0.6],
-    [168, lotMean],
-  ].filter(([h]) => h <= stageH) as [number, number][]
-  const baselineCurve = createSmoothPath(baselinePts)
+  const baselineCurve = useMemo(() => {
+    const baselinePts: [number, number][] = [
+      [0, v0 * 0.95],
+      [24, v0 + (lotMean - v0) * 0.18],
+      [96, v0 + (lotMean - v0) * 0.6],
+      [168, lotMean],
+    ].filter(([h]) => h <= stageH) as [number, number][]
 
-  const isRej = component.status === 'reject'
-  const isMon = component.status === 'monitor'
-  const curveColor = isRej ? '#EF4444' : isMon ? '#F59E0B' : '#10B981'
+    if (baselinePts.length < 2) return ''
+    const mapped = baselinePts.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
+    let d = `M ${mapped[0].x} ${mapped[0].y}`
+    for (let i = 0; i < mapped.length - 1; i++) {
+      const p0 = i > 0 ? mapped[i - 1] : mapped[i]
+      const p1 = mapped[i]
+      const p2 = mapped[i + 1]
+      const p3 = i !== mapped.length - 2 ? mapped[i + 2] : p2
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6
+      const cp1y = p1.y + (p2.y - p0.y) / 6
+      const cp2x = p2.x - (p3.x - p1.x) / 6
+      const cp2y = p2.y - (p3.y - p1.y) / 6
+
+      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
+    }
+    return d
+  }, [v0, lotMean, stageH, minY, maxY])
 
   // Probe tip coordinates along the path
   const tipPoint = useMemo(() => {
     if (!pathRef.current || pathLength <= 0) {
-      return { x: xFor(0), y: yFor(component.v0) }
+      return { x: xFor(0), y: yFor(v0) }
     }
     const currentLen = Math.min(pathLength, Math.max(0, pathLength * animProgress))
     try {
       return pathRef.current.getPointAtLength(currentLen)
     } catch {
-      return { x: xFor(0), y: yFor(component.v0) }
+      return { x: xFor(0), y: yFor(v0) }
     }
-  }, [animProgress, pathLength, component.v0])
+  }, [animProgress, pathLength, v0, minY, maxY])
 
   // Current simulated hour and telemetry value from probe position
   const simHour = useMemo(() => {
@@ -204,6 +201,28 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
       }
     }
   }, [simHour, isSimulating, stageH])
+
+  // If no component is selected, render empty state (all hooks have been unconditionally called above)
+  if (!component) {
+    return (
+      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-mono font-bold text-white flex items-center gap-1.5 text-[11px] uppercase">
+            <span className="w-2 h-2 rounded-full bg-white led" />
+            Module A &bull; Parametric Waveform Telemetry
+          </span>
+          <span className="text-[10px] text-slate-400 font-mono">CHANNEL: 24-BIT SIGMA-DELTA ADC</span>
+        </div>
+        <div className="h-[200px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
+          [ AWAITING COMPONENT SELECTION TO DISPLAY SILICON OSCILLOSCOPE ]
+        </div>
+      </div>
+    )
+  }
+
+  const isRej = component.status === 'reject'
+  const isMon = component.status === 'monitor'
+  const curveColor = isRej ? '#EF4444' : isMon ? '#F59E0B' : '#10B981'
 
   // Live interpolated readouts for dashboard synchronization
   const finalDelta = (component.v168 ?? 0) - (component.v0 ?? 0)
@@ -387,7 +406,7 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
           </text>
 
           {/* Lot Norm Baseline Trace (Crisp White dashed line) */}
-          {baselinePts.length > 1 && (
+          {baselinePtsLengthCheck(shown.length) && baselineCurve && (
             <path
               d={baselineCurve}
               fill="none"
@@ -598,4 +617,6 @@ export default function ModuleAAnomalyGraph({ component }: ModuleAAnomalyGraphPr
   )
 }
 
-
+function baselinePtsLengthCheck(length: number) {
+  return length > 1
+}
