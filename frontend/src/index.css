@@ -2,6 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Sitka Small Semibold';
+  src: local('Sitka Small Semibold'), local('Sitka Small-Semibold'), local('Sitka Small'), local('SitkaVF');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sitka Small';
+  src: local('Sitka Small Semibold'), local('Sitka Small-Semibold'), local('Sitka Small'), local('SitkaVF');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after,
+html,
+body,
+#root,
+button,
+input,
+optgroup,
+select,
+textarea,
+pre,
+code,
+kbd,
+samp,
+svg,
+svg text {
+  font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
+}
+
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -10,7 +46,9 @@ html, body, #root {
 body {
   background: #070B14;
   color: #E2E8F0;
-  font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
+  font-weight: 600;
+  font-variation-settings: 'opsz' 14, 'wght' 600;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -78,7 +116,7 @@ body {
 }
 
 .hud-tag {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
   font-size: 10px;
   letter-spacing: 0.1em;

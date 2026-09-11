@@ -58,7 +58,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 strokeWidth="3"
                 strokeDasharray="6 3"
               />
-              <text x="380" y="122" fill="#F59E0B" fontSize="10" fontFamily="monospace" textAnchor="middle" fontWeight="bold">
+              <text x="380" y="122" fill="#F59E0B" fontSize="10" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" textAnchor="middle" fontWeight="bold">
                 ISRO DUAL-REDUNDANT MIL-STD-1553B SYSTEM AVIONICS DATA BUS
               </text>
 
@@ -234,7 +234,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 strokeWidth="1"
                 strokeDasharray="4 3"
               />
-              <text x="45" y="35" fill="#EF4444" fontSize="9" fontWeight="bold" fontFamily="monospace">
+              <text x="45" y="35" fill="#EF4444" fontSize="9" fontWeight="bold" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif">
                 [HTOL BURN-IN OVEN: 125&deg;C CONSTANT &bull; 168 HOURS DURATION]
               </text>
 

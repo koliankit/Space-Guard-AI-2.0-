@@ -24,7 +24,7 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 32, color: '#EF4444', background: '#060B16', fontFamily: "'JetBrains Mono', monospace", minHeight: '100vh', zIndex: 99999 }}>
+        <div style={{ padding: 32, color: '#EF4444', background: '#060B16', fontFamily: "'Sitka Small Semibold', 'Sitka Small', Georgia, serif", minHeight: '100vh', zIndex: 99999 }}>
           <div style={{ display: 'inline-block', border: '1px solid #F59E0B', padding: '4px 12px', borderRadius: 4, background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', fontWeight: 'bold', marginBottom: 16 }}>
             ISRO SPACEGUARD AI &bull; MISSION CONTROL CRITICAL EXCEPTION
           </div>
@@ -40,7 +40,7 @@ class ErrorBoundary extends React.Component<
             onClick={() => {
               window.location.href = window.location.origin + window.location.pathname + '?r=' + Date.now()
             }}
-            style={{ marginTop: 20, padding: '10px 24px', background: '#10B981', color: '#060B16', border: 'none', borderRadius: 4, fontWeight: 'bold', cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '1px' }}
+            style={{ marginTop: 20, padding: '10px 24px', background: '#10B981', color: '#060B16', border: 'none', borderRadius: 4, fontWeight: 'bold', cursor: 'pointer', fontFamily: "'Sitka Small Semibold', 'Sitka Small', Georgia, serif", letterSpacing: '1px' }}
           >
             &#8635; REINITIALIZE SYSTEM
           </button>

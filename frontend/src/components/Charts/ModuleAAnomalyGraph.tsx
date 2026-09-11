@@ -613,7 +613,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
                   textAnchor="middle"
                   fill="#FFFFFF"
                   fontSize="8.5"
-                  fontFamily="monospace"
+                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight="bold"
                 >
                   T+{Math.round(simHour)}h: {simVal.toFixed(2)} &mu;A

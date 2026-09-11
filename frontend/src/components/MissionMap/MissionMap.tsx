@@ -73,7 +73,7 @@ export default function MissionMap({ critical }: { critical: boolean }) {
           </text>
 
           {critical && (
-            <text x="150" y="180" textAnchor="middle" fontSize="9.5" fill="#EF4444" fontFamily="monospace" fontWeight="bold">
+            <text x="150" y="180" textAnchor="middle" fontSize="9.5" fill="#EF4444" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
               &#9888; DEFECT DETECTED IN FLIGHT
             </text>
           )}

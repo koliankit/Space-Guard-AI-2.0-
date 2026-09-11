@@ -55,10 +55,10 @@ export default {
         monitor: '#F59E0B',
       },
       fontFamily: {
-        sans: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['Rajdhani', 'Space Grotesk', 'sans-serif'],
-        telemetry: ['Rajdhani', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+        sans: ["'Sitka Small Semibold'", "'Sitka Small'", "'Sitka Text'", "'Sitka'", 'Georgia', 'serif'],
+        display: ["'Sitka Small Semibold'", "'Sitka Small'", "'Sitka Text'", "'Sitka'", 'Georgia', 'serif'],
+        telemetry: ["'Sitka Small Semibold'", "'Sitka Small'", "'Sitka Text'", "'Sitka'", 'Georgia', 'serif'],
+        mono: ["'Sitka Small Semibold'", "'Sitka Small'", "'Sitka Text'", "'Sitka'", 'Georgia', 'serif'],
       },
       boxShadow: {
         'isro-gold': '0 0 16px rgba(245, 158, 11, 0.22)',

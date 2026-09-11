@@ -431,7 +431,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             y={padT + 14}
             fill="#ffffff"
             fontSize="8"
-            fontFamily="Rajdhani, sans-serif"
+            fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
             fontWeight="bold"
             letterSpacing="0.08em"
             opacity={0.8}
@@ -460,7 +460,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   textAnchor="end"
                   fill={yVal === limitVal ? '#ef4444' : '#64748b'}
                   fontSize="9"
-                  fontFamily="monospace"
+                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight={yVal === limitVal ? 'bold' : 'normal'}
                 >
                   {yVal.toFixed(0)}
@@ -490,7 +490,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   textAnchor="middle"
                   fill={h === 168 ? '#ffffff' : h === activeHorizon ? '#f59e0b' : '#64748b'}
                   fontSize="9"
-                  fontFamily="monospace"
+                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight={h >= 168 ? 'bold' : 'normal'}
                 >
                   {h}h
@@ -506,7 +506,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             textAnchor="middle"
             fill="#ffffff"
             fontSize="7.5"
-            fontFamily="monospace"
+            fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
           >
             ▲ HTOL END
           </text>
@@ -514,7 +514,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
           {/* Datasheet Limit Badge */}
           <g transform={`translate(${W - padR - 105}, ${toY(limitVal) - 9})`}>
             <rect width="102" height="15" rx="3" fill="#881337" opacity="0.8" />
-            <text x="51" y="10.5" textAnchor="middle" fill="#fda4af" fontSize="8" fontFamily="monospace" fontWeight="bold">
+            <text x="51" y="10.5" textAnchor="middle" fill="#fda4af" fontSize="8" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
               SPEC LIMIT {limitVal.toFixed(1)} &mu;A
             </text>
           </g>
@@ -685,7 +685,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   textAnchor="middle"
                   fill="#ffffff"
                   fontSize="8.5"
-                  fontFamily="monospace"
+                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight="bold"
                 >
                   T+{Math.round(probeTip.h)}h: {probeTip.v.toFixed(2)} &mu;A
@@ -701,7 +701,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               <circle r="5" fill="#ef4444" fillOpacity="0.3" stroke="#ef4444" strokeWidth="1.8" />
               <line x1="-8" y1="0" x2="8" y2="0" stroke="#ef4444" strokeWidth="1.5" />
               <line x1="0" y1="-8" x2="0" y2="8" stroke="#ef4444" strokeWidth="1.5" />
-              <text x="0" y="-11" textAnchor="middle" fill="#ef4444" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
+              <text x="0" y="-11" textAnchor="middle" fill="#ef4444" fontSize="7.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
                 BREACH T+{Math.round(breachHour)}H
               </text>
             </g>
@@ -721,10 +721,10 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 strokeWidth="1"
                 filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"
               />
-              <text x="0" y="-2" textAnchor="middle" fill="#94a3b8" fontSize="7.5" fontFamily="monospace">
+              <text x="0" y="-2" textAnchor="middle" fill="#94a3b8" fontSize="7.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif">
                 {hoveredPoint.label}
               </text>
-              <text x="0" y="6" textAnchor="middle" fill="#f59e0b" fontSize="8.5" fontFamily="monospace" fontWeight="bold">
+              <text x="0" y="6" textAnchor="middle" fill="#f59e0b" fontSize="8.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
                 {hoveredPoint.val.toFixed(2)} &mu;A
               </text>
             </g>
@@ -737,7 +737,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             textAnchor="end"
             fill="#64748b"
             fontSize="8"
-            fontFamily="monospace"
+            fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
           >
             &mu;A
           </text>
