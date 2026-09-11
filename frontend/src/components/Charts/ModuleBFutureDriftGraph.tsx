@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { ComponentOut } from '../../types'
+import { sounds } from '../../utils/soundEffects'
 
 interface ModuleBFutureDriftGraphProps {
   component: ComponentOut | null
@@ -8,6 +9,14 @@ interface ModuleBFutureDriftGraphProps {
 export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDriftGraphProps) {
   const [activeHorizon, setActiveHorizon] = useState<216 | 264 | 336>(264)
   const [hoveredPoint, setHoveredPoint] = useState<{ hour: number; val: number; label: string } | null>(null)
+  const [animProgress, setAnimProgress] = useState<number>(1)
+  const [isSimulating, setIsSimulating] = useState<boolean>(false)
+
+  const measuredPathRef = useRef<SVGPathElement>(null)
+  const [measuredLen, setMeasuredLen] = useState<number>(600)
+  const animFrameRef = useRef<number | null>(null)
+  const hasPinged168Ref = useRef<boolean>(false)
+  const hasPingedHorizonRef = useRef<boolean>(false)
 
   const W = 720
   const H = 280
@@ -35,6 +44,55 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
     const h = 168 + (limitVal - v168) / slope
     return h > 0 && h <= 500 ? h : null
   }, [slope, limitVal, v168])
+
+  // Start two-phase live telemetry simulation
+  const startSimulation = useCallback(() => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+    setIsSimulating(true)
+    setAnimProgress(0)
+    hasPinged168Ref.current = false
+    hasPingedHorizonRef.current = false
+    sounds.playClick()
+    const startTime = performance.now()
+    const duration = 2400 // 2.4 seconds total simulation time
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime
+      const rawP = Math.min(1, elapsed / duration)
+      // Smooth cubic pacing
+      const easeP = rawP < 0.5 ? 4 * rawP * rawP * rawP : 1 - Math.pow(-2 * rawP + 2, 3) / 2
+      setAnimProgress(easeP)
+
+      if (rawP < 1) {
+        animFrameRef.current = requestAnimationFrame(tick)
+      } else {
+        setAnimProgress(1)
+        setIsSimulating(false)
+        animFrameRef.current = null
+      }
+    }
+    animFrameRef.current = requestAnimationFrame(tick)
+  }, [])
+
+  // Auto-trigger simulation when component or horizon changes
+  useEffect(() => {
+    if (component?.component_id) {
+      startSimulation()
+    }
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+    }
+  }, [component?.component_id, activeHorizon, startSimulation])
+
+  // Measure ground measured path length
+  useEffect(() => {
+    if (measuredPathRef.current) {
+      const len = measuredPathRef.current.getTotalLength()
+      if (len > 0 && Math.abs(len - measuredLen) > 1) {
+        setMeasuredLen(len)
+      }
+    }
+  }, [component, measuredLen])
 
   if (!component) {
     return (
@@ -89,26 +147,89 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${toX(p.h).toFixed(1)} ${toY(p.v).toFixed(1)}`)
     .join(' ')
 
-  // Extrapolation path from 168h to activeHorizon
-  const extrapPathD = `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} L ${toX(activeHorizon).toFixed(1)} ${toY(projectedAtHorizon).toFixed(1)}`
+  // Simulation Phase Calculations
+  // Phase 1 (0 -> 0.45): Ground Burn-in sweep (0h -> 168h)
+  // Phase 2 (0.45 -> 1.0): In-Flight Extrapolation & Cone Expansion (168h -> activeHorizon)
+  const p1 = Math.min(1, animProgress / 0.45)
+  const p2 = animProgress <= 0.45 ? 0 : (animProgress - 0.45) / 0.55
+
+  // Trigger audio milestone pings
+  if (p1 >= 1 && !hasPinged168Ref.current && isSimulating) {
+    hasPinged168Ref.current = true
+    sounds.playPing()
+  }
+  if (p2 >= 0.98 && !hasPingedHorizonRef.current && isSimulating) {
+    hasPingedHorizonRef.current = true
+    sounds.playPing()
+  }
+
+  // Dynamic In-Flight extrapolation hour & value
+  const currentExtrapH = 168 + p2 * (activeHorizon - 168)
+  const currentExtrapVal = v168 + slope * (p2 * (activeHorizon - 168))
+
+  // Dynamic extrapolation path
+  const extrapPathD =
+    p2 > 0
+      ? `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} L ${toX(currentExtrapH).toFixed(1)} ${toY(
+          currentExtrapVal
+        ).toFixed(1)}`
+      : ''
 
   // Early prediction checkpoint (0-24h projection to 168h)
   const early168 = component.predicted168_from_early
   const earlyPredPathD = `M ${toX(24).toFixed(1)} ${toY(v24).toFixed(1)} L ${toX(168).toFixed(1)} ${toY(early168).toFixed(1)}`
 
-  // Shaded variance cone polygon (from 168h to activeHorizon)
-  const conePolygonD = `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} ` +
-    `L ${toX(activeHorizon).toFixed(1)} ${toY(coneUpper).toFixed(1)} ` +
-    `L ${toX(activeHorizon).toFixed(1)} ${toY(coneLower).toFixed(1)} Z`
+  // Shaded variance cone polygon dynamically expanding with p2
+  const currentSpread = coneSpread * p2
+  const currentUpper = currentExtrapVal + currentSpread
+  const currentLower = Math.max(0, currentExtrapVal - currentSpread)
+
+  const conePolygonD =
+    p2 > 0.05
+      ? `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} ` +
+        `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentUpper).toFixed(1)} ` +
+        `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentLower).toFixed(1)} Z`
+      : ''
 
   const willBreach = component.future_limit_breach || projectedAtHorizon >= limitVal
   const marginFuture = component.margin_future ?? (limitVal - projectedAtHorizon)
   const predError = component.prediction_error_168 ?? Math.abs(v168 - early168)
 
+  // Live interpolated metric card values synchronized with sweep
+  const liveDriftVelocity = animProgress >= 1 ? slope * 1000 : (slope * 1000) * Math.min(1, p1 * 1.2)
+  const livePredError = animProgress >= 1 ? predError : predError * Math.min(1, p1 * 1.5)
+  const liveProjection = animProgress >= 1 ? projectedAtHorizon : v168 + (projectedAtHorizon - v168) * p2
+  const liveMargin =
+    animProgress >= 1
+      ? marginFuture
+      : (limitVal - v168) + (marginFuture - (limitVal - v168)) * p2
+
+  // Probe Tip in Phase 1 vs Phase 2
+  const probeTip = useMemo(() => {
+    if (animProgress <= 0.45) {
+      const curH = p1 * 168
+      const curV =
+        curH <= 24
+          ? v0 + ((v24 - v0) / 24) * curH
+          : curH <= 96
+          ? v24 + ((v96 - v24) / 72) * (curH - 24)
+          : v96 + ((v168 - v96) / 72) * (curH - 96)
+      return { x: toX(curH), y: toY(curV), h: curH, v: curV, isExtrap: false }
+    } else {
+      return {
+        x: toX(currentExtrapH),
+        y: toY(currentExtrapVal),
+        h: currentExtrapH,
+        v: currentExtrapVal,
+        isExtrap: true,
+      }
+    }
+  }, [animProgress, p1, v0, v24, v96, v168, currentExtrapH, currentExtrapVal])
+
   return (
-    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg">
+    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg select-none">
       {/* Top Header & Extrapolation Horizon Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs md:text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs md:text-sm border-b border-slate-800/80 pb-2.5">
         <div className="flex items-center gap-2">
           <span className="font-display font-bold text-amber-400 flex items-center gap-1.5 text-xs md:text-sm uppercase tracking-wider">
             <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
@@ -123,23 +244,44 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           </span>
         </div>
 
-        {/* Projection Horizon Buttons */}
-        <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-xs">
-          <span className="text-slate-400 px-1 uppercase text-xs font-bold">HORIZON:</span>
-          {([216, 264, 336] as const).map((h) => (
-            <button
-              key={h}
-              type="button"
-              onClick={() => setActiveHorizon(h)}
-              className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
-                activeHorizon === h
-                  ? 'bg-amber-500/30 text-amber-300 border border-amber-500/60 font-bold shadow-isro'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              +{h - 168}h ({h}h)
-            </button>
-          ))}
+        {/* Live Simulation status & Horizon Buttons */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Live Simulation Indicator & Replay Control */}
+          <div className="flex items-center gap-1.5">
+            {isSimulating ? (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                {p2 > 0 ? `EXTRAPOLATING [+${Math.round(currentExtrapH - 168)}h]` : `GROUND SWEEP [${Math.round(probeTip.h)}h]`}
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={startSimulation}
+                className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
+                title="Replay in-flight drift simulation"
+              >
+                <span>▶</span> REPLAY SIMULATION
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-xs">
+            <span className="text-slate-400 px-1 uppercase text-xs font-bold">HORIZON:</span>
+            {([216, 264, 336] as const).map((h) => (
+              <button
+                key={h}
+                type="button"
+                onClick={() => setActiveHorizon(h)}
+                className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                  activeHorizon === h
+                    ? 'bg-amber-500/30 text-amber-300 border border-amber-500/60 font-bold shadow-isro'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                +{h - 168}h ({h}h)
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -152,7 +294,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           <defs>
             <linearGradient id="coneGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.05" />
-              <stop offset="100%" stopColor={willBreach ? '#ef4444' : '#f59e0b'} stopOpacity="0.22" />
+              <stop offset="100%" stopColor={willBreach ? '#ef4444' : '#f59e0b'} stopOpacity="0.25" />
             </linearGradient>
             <linearGradient id="flightZoneGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#ffffff" stopOpacity="0.03" />
@@ -247,7 +389,6 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
             )
           })}
 
-
           {/* 168H Ground Completion Marker */}
           <text
             x={toX(168)}
@@ -268,47 +409,57 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
             </text>
           </g>
 
-          {/* Predictive Uncertainty Cone */}
-          <path d={conePolygonD} fill="url(#coneGrad)" />
+          {/* Dynamic Predictive Uncertainty Cone (expanding with p2) */}
+          {conePolygonD && <path d={conePolygonD} fill="url(#coneGrad)" />}
 
           {/* Early Prediction Checkpoint Trace (24h -> 168h projection) */}
-          <path
-            d={earlyPredPathD}
-            fill="none"
-            stroke="#94a3b8"
-            strokeWidth="1"
-            strokeDasharray="2 3"
-            opacity="0.6"
-          />
+          {p1 >= 0.14 && (
+            <path
+              d={earlyPredPathD}
+              fill="none"
+              stroke="#94a3b8"
+              strokeWidth="1"
+              strokeDasharray="2 3"
+              opacity={Math.min(0.6, (p1 - 0.14) * 2)}
+            />
+          )}
 
-          {/* Measured Past Telemetry Line (0h -> 168h) */}
+          {/* Measured Past Telemetry Line (0h -> 168h, drawn live via strokeDashoffset) */}
           <path
+            ref={measuredPathRef}
             d={measuredPathD}
             fill="none"
             stroke="#ffffff"
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            strokeDasharray={measuredLen}
+            strokeDashoffset={measuredLen * (1 - p1)}
           />
 
-          {/* Future Extrapolation Line (168h -> Horizon) */}
-          <path
-            d={extrapPathD}
-            fill="none"
-            stroke={willBreach ? '#ef4444' : '#f59e0b'}
-            strokeWidth="2"
-            strokeDasharray="4 3"
-            strokeLinecap="round"
-          />
+          {/* Future Extrapolation Line (168h -> Horizon, drawn dynamically in Phase 2) */}
+          {extrapPathD && (
+            <path
+              d={extrapPathD}
+              fill="none"
+              stroke={willBreach ? '#ef4444' : '#f59e0b'}
+              strokeWidth="2.2"
+              strokeDasharray="4 3"
+              strokeLinecap="round"
+            />
+          )}
 
-          {/* Nodes for Measured Points */}
+          {/* Nodes for Measured Points (Sequentially appearing as reached) */}
           {measuredPoints.map((p) => {
+            const isReached = p1 >= p.h / 168 || animProgress >= 1
+            if (!isReached) return null
+
             const cx = toX(p.h)
             const cy = toY(p.v)
             return (
               <g
                 key={p.h}
-                className="cursor-pointer"
+                className="cursor-pointer transition-opacity duration-300"
                 onMouseEnter={() => setHoveredPoint({ hour: p.h, val: p.v, label: p.label })}
                 onMouseLeave={() => setHoveredPoint(null)}
               >
@@ -319,53 +470,122 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
           })}
 
           {/* Early Prediction 168h Point & Error Delta Bar */}
-          <g>
-            <circle
-              cx={toX(168)}
-              cy={toY(early168)}
-              r="3.5"
-              fill="#0f172a"
-              stroke="#94a3b8"
-              strokeWidth="1.2"
-              strokeDasharray="2 2"
-            />
-            {/* Connecting delta line between actual 168h and predicted from 24h */}
-            <line
-              x1={toX(168)}
-              y1={toY(v168)}
-              x2={toX(168)}
-              y2={toY(early168)}
-              stroke="#f59e0b"
-              strokeWidth="1.2"
-              strokeDasharray="2 2"
-            />
-          </g>
+          {p1 >= 1 && (
+            <g>
+              <circle
+                cx={toX(168)}
+                cy={toY(early168)}
+                r="3.5"
+                fill="#0f172a"
+                stroke="#94a3b8"
+                strokeWidth="1.2"
+                strokeDasharray="2 2"
+              />
+              <line
+                x1={toX(168)}
+                y1={toY(v168)}
+                x2={toX(168)}
+                y2={toY(early168)}
+                stroke="#f59e0b"
+                strokeWidth="1.2"
+                strokeDasharray="2 2"
+              />
+            </g>
+          )}
 
-          {/* Future Projection Node at Horizon */}
-          <g
-            className="cursor-pointer"
-            onMouseEnter={() =>
-              setHoveredPoint({
-                hour: activeHorizon,
-                val: projectedAtHorizon,
-                label: `Projected @ +${activeHorizon - 168}h`,
-              })
-            }
-            onMouseLeave={() => setHoveredPoint(null)}
-          >
-            <circle
-              cx={toX(activeHorizon)}
-              cy={toY(projectedAtHorizon)}
-              r="5"
-              fill={willBreach ? '#be123c' : '#d97706'}
-              stroke={willBreach ? '#fda4af' : '#fde68a'}
-              strokeWidth="2"
-            />
-            <circle cx={toX(activeHorizon)} cy={toY(projectedAtHorizon)} r="2" fill="#ffffff" />
-          </g>
+          {/* Future Projection Node at Horizon (activates in Phase 2) */}
+          {p2 > 0 && (
+            <g
+              className="cursor-pointer"
+              onMouseEnter={() =>
+                setHoveredPoint({
+                  hour: activeHorizon,
+                  val: projectedAtHorizon,
+                  label: `Projected @ +${activeHorizon - 168}h`,
+                })
+              }
+              onMouseLeave={() => setHoveredPoint(null)}
+            >
+              {p2 >= 0.98 && (
+                <circle
+                  cx={toX(activeHorizon)}
+                  cy={toY(projectedAtHorizon)}
+                  r="10"
+                  fill="none"
+                  stroke={willBreach ? '#ef4444' : '#f59e0b'}
+                  strokeWidth="1.5"
+                  className="animate-ping"
+                  opacity={0.6}
+                />
+              )}
+              <circle
+                cx={toX(currentExtrapH)}
+                cy={toY(currentExtrapVal)}
+                r="5"
+                fill={willBreach ? '#be123c' : '#d97706'}
+                stroke={willBreach ? '#fda4af' : '#fde68a'}
+                strokeWidth="2"
+              />
+              <circle cx={toX(currentExtrapH)} cy={toY(currentExtrapVal)} r="2" fill="#ffffff" />
+            </g>
+          )}
 
-          {/* Breach Crosshair & Annotation if within visible range */}
-          {breachHour && breachHour <= maxX && (
+          {/* Live Probe Scanner Head & Telemetry Badge */}
+          {isSimulating && animProgress < 1 && (
+            <g>
+              {/* Probe Pulse Circle */}
+              <circle
+                cx={probeTip.x}
+                cy={probeTip.y}
+                r={8}
+                fill={probeTip.isExtrap ? '#f59e0b' : '#ffffff'}
+                opacity={0.35}
+              />
+              <circle
+                cx={probeTip.x}
+                cy={probeTip.y}
+                r={4.5}
+                fill={probeTip.isExtrap ? '#f59e0b' : '#38bdf8'}
+                stroke="#ffffff"
+                strokeWidth={1.5}
+              />
+              <circle cx={probeTip.x} cy={probeTip.y} r={1.5} fill="#ffffff" />
+
+              {/* Floating HUD Telemetry Badge */}
+              <g
+                transform={`translate(${Math.min(
+                  W - padR - 55,
+                  Math.max(padL + 55, probeTip.x)
+                )}, ${Math.max(padT + 16, probeTip.y - 18)})`}
+              >
+                <rect
+                  x="-50"
+                  y="-12"
+                  width="100"
+                  height="20"
+                  rx="4"
+                  fill="#0B1528"
+                  stroke={probeTip.isExtrap ? '#f59e0b' : '#38bdf8'}
+                  strokeWidth="1.2"
+                  filter="drop-shadow(0 2px 5px rgba(0,0,0,0.6))"
+                />
+                <text
+                  x="0"
+                  y="2"
+                  textAnchor="middle"
+                  fill="#ffffff"
+                  fontSize="8.5"
+                  fontFamily="monospace"
+                  fontWeight="bold"
+                >
+                  T+{Math.round(probeTip.h)}h: {probeTip.v.toFixed(2)} &mu;A
+                </text>
+              </g>
+            </g>
+          )}
+
+          {/* Breach Crosshair & Annotation if within visible range and reached by sweep */}
+          {breachHour && breachHour <= maxX && (p2 === 1 || currentExtrapH >= breachHour) && (
             <g transform={`translate(${toX(breachHour)}, ${toY(limitVal)})`}>
               <circle r="7" fill="none" stroke="#ef4444" strokeWidth="1.5" className="animate-ping" opacity="0.75" />
               <circle r="5" fill="#ef4444" fillOpacity="0.3" stroke="#ef4444" strokeWidth="1.8" />
@@ -377,7 +597,7 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
             </g>
           )}
 
-          {/* Active Tooltip */}
+          {/* Active Hover Tooltip */}
           {hoveredPoint && (
             <g transform={`translate(${toX(hoveredPoint.hour)}, ${Math.max(padT + 15, toY(hoveredPoint.val) - 18)})`}>
               <rect
@@ -414,36 +634,57 @@ export default function ModuleBFutureDriftGraph({ component }: ModuleBFutureDrif
         </svg>
       </div>
 
-      {/* Metric Callouts & Flight Advisory Bottom Row */}
+      {/* Metric Callouts & Flight Advisory Bottom Row (Live Count-Up Synchronized with Sweep) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
         <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${slope > 0.05 ? 'text-rose-400' : 'text-amber-400'}`}>
-            {(slope * 1000).toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
+            {isSimulating && (
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+            )}
+          </div>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${liveDriftVelocity > 50 ? 'text-rose-400' : 'text-amber-400'}`}>
+            {liveDriftVelocity.toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
           </span>
         </div>
 
         <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <span className="text-xs text-slate-400 uppercase font-semibold">Early Pred Error</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400 uppercase font-semibold">Early Pred Error</span>
+            {isSimulating && (
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+            )}
+          </div>
           <span className="text-base font-bold text-amber-300 mt-0.5 tabular-nums">
-            &plusmn;{predError.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+            &plusmn;{livePredError.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
 
         <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <span className="text-xs text-slate-400 uppercase font-semibold">+{activeHorizon - 168}h Projection</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400 uppercase font-semibold">+{activeHorizon - 168}h Projection</span>
+            {isSimulating && (
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+            )}
+          </div>
           <span className={`text-base font-bold mt-0.5 tabular-nums ${willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'}`}>
-            {projectedAtHorizon.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+            {liveProjection.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
 
         <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <span className="text-xs text-slate-400 uppercase font-semibold">Future Margin</span>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${marginFuture < 5 ? 'text-rose-400' : marginFuture < 15 ? 'text-amber-400' : 'text-emerald-400'}`}>
-            {marginFuture.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400 uppercase font-semibold">Future Margin</span>
+            {isSimulating && (
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+            )}
+          </div>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${liveMargin < 5 ? 'text-rose-400' : liveMargin < 15 ? 'text-amber-400' : 'text-emerald-400'}`}>
+            {liveMargin.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
       </div>
     </div>
   )
 }
+
