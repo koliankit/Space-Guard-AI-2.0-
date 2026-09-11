@@ -35,7 +35,7 @@ export default function App() {
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
   const [dataMetaText, setDataMetaText] = useState(
-    '<span class="text-slate-300 font-medium text-sm md:text-base">No dataset loaded &mdash; upload a file or load ISRO flight batch.</span>'
+    '<span class="text-slate-200 font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry or load ISRO flight batch.</span>'
   )
 
   const [activeMissionId, setActiveMissionId] = useState<string>('GAGANYAAN')
@@ -84,7 +84,7 @@ export default function App() {
     setFocusKey(null)
     setAudit([])
     setDataMetaText(
-      `<span class="font-bold text-white text-sm md:text-base tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-extrabold text-base md:text-lg text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-md border border-emerald-500/40 leading-none shadow-sm mx-0.5">${result.valid}</span> <span class="text-slate-100 font-semibold text-sm md:text-base">components across</span> <button type="button" class="lot-clickable inline-flex items-center gap-1 font-mono font-extrabold text-base md:text-lg text-amber-400 hover:text-white bg-amber-500/20 hover:bg-amber-500/35 px-2.5 py-0.5 rounded-md border border-amber-500/50 hover:border-amber-400 leading-none shadow-sm mx-0.5 transition-all cursor-pointer group" title="Click to open Lot-Wise Classification Window"><span class="underline decoration-amber-400/60 group-hover:decoration-white">${result.lots}</span> <span class="text-xs uppercase font-sans font-bold tracking-wider text-amber-300 group-hover:text-white">lots 📦</span></button>`
+      `<span class="font-bold text-white text-base md:text-lg tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-black text-lg md:text-xl text-emerald-400 bg-emerald-500/20 px-3 py-1 rounded-lg border border-emerald-500/50 leading-none shadow-sm mx-1">${result.valid}</span> <span class="text-slate-200 font-semibold text-base">components across</span> <button type="button" class="lot-clickable inline-flex items-center gap-1.5 font-mono font-black text-lg md:text-xl text-amber-400 hover:text-white bg-amber-500/25 hover:bg-amber-500/40 px-3 py-1 rounded-lg border border-amber-500/60 hover:border-amber-400 leading-none shadow-sm mx-1 transition-all cursor-pointer group" title="Click to open Lot-Wise Classification Window"><span class="underline decoration-amber-400/60 group-hover:decoration-white">${result.lots}</span> <span class="text-xs uppercase font-sans font-bold tracking-wider text-amber-300 group-hover:text-white">lots 📦</span></button>`
     )
     log(`Flight dataset uploaded \u2014 ${result.rows} components parsed.`)
     log(`${result.valid} components validated across ${result.lots} qualification lots (${result.missing} rows skipped).`, 'ok')

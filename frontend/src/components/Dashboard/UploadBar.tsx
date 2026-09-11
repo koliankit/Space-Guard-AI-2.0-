@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react'
-import { ISRO_MISSIONS } from '../../offlineEngine'
 import { sounds } from '../../utils/soundEffects'
 
 export default function UploadBar({
@@ -13,8 +12,6 @@ export default function UploadBar({
   onReport,
   onReportPdf,
   onReportExcel,
-  activeMissionId = 'GAGANYAAN',
-  onSelectMission,
   onOpenIngestModal,
   onOpenLotsModal,
 }: {
@@ -38,18 +35,19 @@ export default function UploadBar({
   const [showExportMenu, setShowExportMenu] = useState(false)
 
   return (
-    <div className="border-b border-slate-800/90 bg-[#080E1C] px-4 md:px-6 py-2 font-sans text-xs select-none">
+    <div className="border-b border-slate-800/90 bg-[#080E1C] px-4 md:px-6 py-3 font-sans select-none">
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        {/* Left Section: Ingest Action + Mission Selector */}
-        <div className="flex items-center gap-2.5 flex-1 min-w-[340px] flex-wrap">
-          {/* Ingest CSV Trigger */}
+        {/* Left Section: Core Telemetry Data Ingestion Actions */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Prominent Ingest CSV Trigger (Upload / Drag & Drop / Direct Paste Modal) */}
           <div
-            className={`border rounded-lg px-3 py-1.5 flex items-center gap-2 cursor-pointer transition-all ${
+            className={`border rounded-xl px-4 py-2.5 flex items-center gap-2.5 cursor-pointer transition-all shadow-sm ${
               drag
-                ? 'border-amber-400 bg-amber-500/10 text-white'
-                : 'border-slate-700/80 bg-[#0A1224] text-slate-300 hover:border-amber-500/60 hover:bg-[#111C36]'
+                ? 'border-amber-400 bg-amber-500/20 text-white ring-2 ring-amber-400/40'
+                : 'border-slate-700/90 bg-[#0B1326] text-slate-200 hover:border-amber-500/70 hover:bg-[#111D38]'
             }`}
             onClick={() => {
+              sounds.playClick()
               if (onOpenIngestModal) {
                 onOpenIngestModal()
               } else {
@@ -64,13 +62,17 @@ export default function UploadBar({
             onDrop={(e) => {
               e.preventDefault()
               setDrag(false)
-              if (e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0])
+              if (e.dataTransfer.files[0]) {
+                sounds.playSuccess()
+                onFile(e.dataTransfer.files[0])
+              }
             }}
+            title="Upload CSV/TSV flight telemetry or paste raw dataset"
           >
-            <span className="text-amber-400 font-bold text-sm">📁</span>
-            <span className="text-[11px] font-medium font-sans">
-              <span className="text-slate-400">INGEST </span>
-              <span className="text-amber-400 font-semibold underline decoration-amber-400/40">CSV FILE</span>
+            <span className="text-amber-400 font-bold text-lg">📁</span>
+            <span className="text-sm font-display font-semibold tracking-wide">
+              <span className="text-slate-300">INGEST </span>
+              <span className="text-amber-400 font-bold underline decoration-amber-400/50">CSV TELEMETRY</span>
             </span>
             <input
               ref={inputRef}
@@ -83,75 +85,42 @@ export default function UploadBar({
             />
           </div>
 
-          {/* Direct Paste CSV Trigger */}
+          {/* Quick Load Flight Batch */}
           <button
             type="button"
-            onClick={() => onOpenIngestModal?.()}
-            className="border border-slate-700/80 bg-[#0A1224] hover:bg-[#111C36] hover:border-amber-500/50 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all flex items-center gap-1.5"
-            title="Paste raw CSV text directly from clipboard"
-          >
-            <span className="text-amber-400">📋</span>
-            <span>PASTE CSV DATA</span>
-          </button>
-
-          {/* Mission Preset Pills */}
-          <div className="flex items-center gap-1 bg-[#060B16] p-1 rounded-lg border border-slate-800">
-            <span className="text-[9.5px] text-slate-400 font-display uppercase font-semibold px-1.5 hidden xl:inline">
-              MISSION:
-            </span>
-            {ISRO_MISSIONS.map((m) => {
-              const isSelected = activeMissionId === m.id
-              return (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => {
-                    sounds.playClick()
-                    onSelectMission?.(m.id)
-                  }}
-                  className={`text-[11px] px-2.5 py-0.5 rounded-md transition-all flex items-center gap-1.5 font-medium font-sans border ${
-                    isSelected
-                      ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-semibold shadow-isro'
-                      : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                  title={`${m.name} — ${m.description}`}
-                >
-                  <span>{m.icon}</span>
-                  <span className="tracking-wide">{m.name.split(' ')[0]}</span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Right Section: Core Execution Actions */}
-        <div className="flex items-center gap-2">
-          {/* Load Batch */}
-          <button
-            type="button"
-            className="text-[11px] font-display font-bold px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-1.5"
+            className="text-sm font-display font-bold px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800/90 text-slate-100 hover:bg-slate-700 hover:border-amber-400 hover:text-white transition-all flex items-center gap-2 cursor-pointer shadow-sm"
             onClick={() => {
               sounds.playPing()
               onDemo()
             }}
-            title="Load authentic ISRO spacecraft burn-in telemetry batch"
+            title="Load standard ISRO Gaganyaan qualification telemetry batch"
           >
-            <span className="text-amber-400">▶</span> LOAD FLIGHT BATCH
+            <span className="text-amber-400 text-base">▶</span>
+            <span>LOAD FLIGHT BATCH</span>
           </button>
+        </div>
 
-          {/* Primary CTA: Execute Screening */}
+        {/* Right Section: Core Execution & Export Actions */}
+        <div className="flex items-center gap-3">
+          {/* Primary Big CTA: Execute AI Screening */}
           <button
             type="button"
             disabled={!canRun || running}
-            className="text-[11.5px] font-display font-bold px-4 py-1.5 rounded-lg bg-emerald-700 text-white hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm uppercase tracking-wide cursor-pointer"
+            className={`text-sm md:text-[15px] font-display font-black px-6 py-2.5 rounded-xl transition-all flex items-center gap-2.5 shadow-lg uppercase tracking-wider cursor-pointer border ${
+              running
+                ? 'bg-amber-600 text-white border-amber-400/60 shadow-amber-950/60 cursor-wait'
+                : canRun
+                ? 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border-emerald-400/60 shadow-emerald-950/70 hover:shadow-emerald-900/80 hover:scale-[1.01]'
+                : 'bg-slate-800 text-slate-500 border-slate-700 opacity-50 cursor-not-allowed'
+            }`}
             onClick={() => {
               sounds.playPing()
               onRun()
             }}
-            title="Execute Isolation Forest and XGBoost latent drift screening"
+            title="Execute Isolation Forest and XGBoost latent drift screening on loaded batch"
           >
-            <span>{running ? '⟳' : '⚡'}</span>
-            <span>{running ? 'SCREENING ACTIVE...' : 'EXECUTE AI SCREENING'}</span>
+            <span className={running ? 'animate-spin' : 'text-lg'}>{running ? '⟳' : '⚡'}</span>
+            <span>{running ? 'SCREENING IN PROGRESS...' : 'EXECUTE AI SCREENING'}</span>
           </button>
 
           {/* Export Dropdown Menu */}
@@ -159,55 +128,58 @@ export default function UploadBar({
             <button
               type="button"
               disabled={!canReport}
-              onClick={() => setShowExportMenu((v) => !v)}
-              className="text-[11px] font-display font-semibold px-3 py-1.5 rounded-lg border border-slate-700 bg-[#0B1325] text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-slate-500 hover:text-white transition-colors flex items-center gap-1.5"
+              onClick={() => {
+                sounds.playClick()
+                setShowExportMenu((v) => !v)
+              }}
+              className="text-sm font-display font-bold px-4 py-2.5 rounded-xl border border-slate-700 bg-[#0B1325] text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:border-slate-500 hover:text-white transition-all flex items-center gap-2 cursor-pointer shadow-sm"
               title="Export Flight Clearance Reports & Logs"
             >
-              <span>📥</span> EXPORT CLEARANCE ▾
+              <span className="text-base">📥</span>
+              <span>EXPORT CLEARANCE ▾</span>
             </button>
 
             {showExportMenu && canReport && (
-              <div className="absolute right-0 top-full mt-1.5 w-52 bg-[#0B1325] border border-slate-700 rounded-lg shadow-2xl p-1.5 z-50 animate-modalin flex flex-col gap-1">
+              <div className="absolute right-0 top-full mt-2 w-60 bg-[#0B1325] border border-slate-700 rounded-xl shadow-2xl p-2 z-50 animate-modalin flex flex-col gap-1.5">
                 {onReportPdf && (
                   <button
                     type="button"
-                    className="w-full text-left px-3 py-1.5 rounded-md text-[11px] font-sans text-emerald-300 hover:bg-emerald-500/15 flex items-center justify-between"
+                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-emerald-300 hover:bg-emerald-500/15 flex items-center justify-between transition-colors cursor-pointer"
                     onClick={() => {
                       sounds.playSuccess()
                       setShowExportMenu(false)
                       onReportPdf()
                     }}
                   >
-                    <span>Clearance PDF Certificate</span>
-                    <span className="font-mono text-[9px] opacity-70">.PDF</span>
+                    <span className="font-semibold">Flight Clearance Certificate</span>
+                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-300">.PDF</span>
                   </button>
                 )}
                 {onReportExcel && (
                   <button
                     type="button"
-                    className="w-full text-left px-3 py-1.5 rounded-md text-[11px] font-sans text-amber-300 hover:bg-amber-500/15 flex items-center justify-between"
+                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-amber-300 hover:bg-amber-500/15 flex items-center justify-between transition-colors cursor-pointer"
                     onClick={() => {
                       sounds.playSuccess()
                       setShowExportMenu(false)
                       onReportExcel()
                     }}
                   >
-                    <span>Screening Ledger CSV</span>
-                    <span className="font-mono text-[9px] opacity-70">.CSV</span>
+                    <span className="font-semibold">Screening Ledger CSV</span>
+                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 text-amber-300">.CSV</span>
                   </button>
                 )}
                 <button
                   type="button"
-
-                  className="w-full text-left px-3 py-1.5 rounded-md text-[11px] font-sans text-slate-300 hover:bg-slate-800 flex items-center justify-between"
+                  className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors cursor-pointer"
                   onClick={() => {
                     sounds.playClick()
                     setShowExportMenu(false)
                     onReport()
                   }}
                 >
-                  <span>Technical Markdown Report</span>
-                  <span className="font-mono text-[9px] opacity-70">.MD</span>
+                  <span className="font-semibold">Technical Markdown Report</span>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">.MD</span>
                 </button>
               </div>
             )}
@@ -216,9 +188,9 @@ export default function UploadBar({
       </div>
 
       {/* Dataset Status Ticker with interactive Lot-Wise Inspector */}
-      <div className="mt-2.5 pt-2.5 border-t border-slate-800/80 flex items-center justify-between gap-3 text-base md:text-lg text-slate-100">
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <span className="w-2.5 h-2.5 rounded-full bg-white led flex-shrink-0" />
+      <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-3 text-base md:text-lg text-slate-100 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="w-3 h-3 rounded-full bg-emerald-400 led flex-shrink-0" />
           <div
             className="flex items-center gap-2 flex-wrap text-sm md:text-base leading-snug cursor-pointer select-none font-medium"
             onClick={(e) => {
@@ -244,7 +216,7 @@ export default function UploadBar({
                 sounds.playClick()
                 onOpenLotsModal()
               }}
-              className="inline-flex items-center gap-1.5 text-xs md:text-sm font-mono font-bold bg-white/10 hover:bg-white/20 text-white hover:text-white px-3 py-1 rounded-md border border-white/20 hover:border-white/40 transition-all shadow-sm cursor-pointer ml-1 group"
+              className="inline-flex items-center gap-2 text-xs md:text-sm font-mono font-bold bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 hover:text-white px-4 py-1.5 rounded-lg border border-amber-500/60 hover:border-amber-400 transition-all shadow-sm cursor-pointer ml-1.5 group"
               title="Open dedicated Lot-Wise Classification Window"
             >
               <span>📦</span>
@@ -252,7 +224,7 @@ export default function UploadBar({
             </button>
           )}
         </div>
-        <span className="text-slate-300 text-xs uppercase font-mono tracking-wider bg-[#070D1A] px-3 py-1 rounded-md border border-slate-800 whitespace-nowrap hidden lg:inline-block">
+        <span className="text-slate-300 text-xs md:text-sm uppercase font-mono font-bold tracking-wider bg-[#070D1A] px-3.5 py-1.5 rounded-lg border border-slate-800 whitespace-nowrap hidden lg:inline-block shadow-sm">
           MIL-STD-883 HTOL 168H RELIABILITY SPEC
         </span>
       </div>

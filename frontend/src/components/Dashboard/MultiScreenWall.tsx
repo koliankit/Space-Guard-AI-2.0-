@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo } from 'react'
 import type { ComponentOut, MissionStatus, SubsystemStatus } from '../../types'
 import SatelliteScene from '../Satellite/SatelliteScene'
 import TelemetryChart from '../Charts/TelemetryChart'
@@ -21,19 +21,6 @@ interface MultiScreenWallProps {
   onOpenLotsModal?: () => void
   onNavigateToLotsTab?: () => void
 }
-
-const SAMPLE_CSV = `component_id,lot_id,subsystem,0h,24h,96h,168h,static_limit_ua
-FC-ASIC-088,LOT-PSLV-C58-01,FC,12.4,14.8,22.1,38.9,50.0
-FC-PROC-102,LOT-PSLV-C58-01,FC,11.2,11.5,12.0,12.6,50.0
-PWR-MOSFET-401,LOT-PSLV-C58-01,PWR,6.2,6.5,7.1,7.8,50.0
-PWR-REG-205,LOT-PSLV-C58-01,PWR,7.1,7.3,7.6,8.0,50.0
-COM-LNA-501,LOT-PSLV-C58-02,COM,9.1,9.4,9.8,10.2,50.0
-COM-TWTA-ANOM-02,LOT-PSLV-C58-02,COM,9.5,9.9,10.6,11.3,50.0
-NAV-GYRO-701,LOT-PSLV-C58-03,NAV,14.2,16.5,21.0,29.4,50.0
-NAV-GYRO-DRIFT-88,LOT-PSLV-C58-03,NAV,28.5,36.2,45.8,54.2,50.0
-BAT-CELL-101,LOT-PSLV-C58-04,BAT,8.0,8.2,8.5,8.9,50.0
-BAT-CELL-042,LOT-PSLV-C58-04,BAT,14.5,16.8,21.2,26.4,50.0`
-
 const DEFAULT_SUBSYSTEMS: SubsystemStatus[] = [
   { key: 'PWR', name: 'Power System', position: [0.55, 0.42, 0.62], count: 48, status: 'safe', avg_risk: 12, top_component: 'PWR-MOSFET-401' },
   { key: 'BAT', name: 'Battery Module', position: [0.55, -0.42, 0.62], count: 24, status: 'safe', avg_risk: 14, top_component: 'BAT-CELL-101' },
@@ -61,10 +48,6 @@ export default function MultiScreenWall({
   onOpenLotsModal,
   onNavigateToLotsTab,
 }: MultiScreenWallProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [showPasteBox, setShowPasteBox] = useState(false)
-  const [pasteText, setPasteText] = useState('')
-
   const rejected = useMemo(() => components.filter((c) => c.status === 'reject'), [components])
   const monitored = useMemo(() => components.filter((c) => c.status === 'monitor'), [components])
   const safe = useMemo(() => components.filter((c) => c.status === 'safe'), [components])
@@ -157,63 +140,44 @@ export default function MultiScreenWall({
 
   const subsystems: SubsystemStatus[] = mission?.subsystems ?? DEFAULT_SUBSYSTEMS
 
-  const handlePasteSubmit = () => {
-    if (!pasteText.trim() || !onUploadFile) return
-    const file = new File([pasteText.trim()], 'pasted_telemetry.csv', { type: 'text/csv' })
-    onUploadFile(file)
-    setShowPasteBox(false)
-    if (onRunScreening) {
-      setTimeout(() => onRunScreening(), 400)
-    }
-  }
-
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0] && onUploadFile) {
-      onUploadFile(e.target.files[0])
-      if (onRunScreening) {
-        setTimeout(() => onRunScreening(), 400)
-      }
-    }
-  }
-
   return (
     <div className="flex flex-col flex-1 bg-[#060B16] text-slate-100 font-sans select-none overflow-x-auto min-h-[calc(100vh-140px)] w-full">
       {/* Wall Header Banner: ISRO Sriharikota Mission Control Display Wall */}
-      <div className="bg-[#091120] border-b border-slate-800/90 px-4 md:px-6 py-2 flex flex-wrap items-center justify-between gap-3 w-full">
+      <div className="bg-[#091120] border-b border-slate-800/90 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 w-full">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 border border-amber-500/40 text-amber-300 text-xs font-display font-bold tracking-wider uppercase shadow-isro">
-            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-900 border border-amber-500/50 text-amber-300 text-xs md:text-sm font-display font-bold tracking-wider uppercase shadow-isro">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 led" />
             ISRO SDSC SHAR // Mission Operations Wall
           </div>
-          <span className="text-slate-400 text-xs hidden lg:inline font-sans">
+          <span className="text-slate-300 text-xs md:text-sm hidden lg:inline font-sans">
             Range Operations Directorate &bull; Launch Control Centre (LCC-01)
           </span>
         </div>
 
         {/* Live Synchronized MCC Status Banner & View Switcher */}
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded bg-[#070D1A] border border-slate-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="text-slate-400 text-[9.5px] font-display uppercase font-medium">Flight Batch:</span>
-            <span className="text-emerald-400 font-bold text-xs font-mono tabular-nums">{components.length} parts</span>
+        <div className="flex flex-wrap items-center gap-2.5 text-xs md:text-sm">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="text-slate-400 text-[11px] font-display uppercase font-semibold">Flight Batch:</span>
+            <span className="text-emerald-400 font-bold text-xs md:text-sm font-mono tabular-nums">{components.length} parts</span>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded bg-[#070D1A] border border-slate-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-            <span className="text-slate-400 text-[9.5px] font-display uppercase font-medium">Lots:</span>
-            <span className="text-amber-300 font-bold text-xs font-mono tabular-nums">{lotGroups.length} Qualification Lots</span>
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
+            <span className="text-slate-400 text-[11px] font-display uppercase font-semibold">Lots:</span>
+            <span className="text-amber-300 font-bold text-xs md:text-sm font-mono tabular-nums">{lotGroups.length} Qualification Lots</span>
           </div>
 
-          {/* Primary View Mode Switcher */}
-          <div className="flex items-center gap-1 bg-[#050914] p-0.5 rounded border border-slate-800">
-            <span className="text-slate-400 text-[9.5px] font-display uppercase font-semibold px-1.5">View:</span>
+          {/* Primary View Mode Switcher with enlarged buttons */}
+          <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-xl border border-slate-800 shadow-sm">
+            <span className="text-slate-400 text-[11px] font-display uppercase font-bold px-1.5">View:</span>
             <button
               type="button"
               onClick={() => setConsoleLayout('dual')}
-              className={`px-2.5 py-0.5 rounded text-xs font-display tracking-wide transition-all border ${
+              className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-display tracking-wide transition-all border cursor-pointer ${
                 consoleLayout === 'dual'
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/60 font-bold shadow-isro'
-                  : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/70 font-bold shadow-isro'
+                  : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-slate-800/70'
               }`}
               title="Split View: Module A (Anomaly Analysis) on Left + Module B (Future Drift) on Right"
             >
@@ -222,10 +186,10 @@ export default function MultiScreenWall({
             <button
               type="button"
               onClick={() => setConsoleLayout('moduleA')}
-              className={`px-2.5 py-0.5 rounded text-xs font-display tracking-wide transition-all border ${
+              className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-display tracking-wide transition-all border cursor-pointer ${
                 consoleLayout === 'moduleA'
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/60 font-bold shadow-isro'
-                  : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/70 font-bold shadow-isro'
+                  : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-slate-800/70'
               }`}
               title="Focus on Module A: Silicon Anomaly Detection & HTOL Analysis"
             >
@@ -234,10 +198,10 @@ export default function MultiScreenWall({
             <button
               type="button"
               onClick={() => setConsoleLayout('moduleB')}
-              className={`px-2.5 py-0.5 rounded text-xs font-display tracking-wide transition-all border ${
+              className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-display tracking-wide transition-all border cursor-pointer ${
                 consoleLayout === 'moduleB'
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/60 font-bold shadow-isro'
-                  : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/70 font-bold shadow-isro'
+                  : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-slate-800/70'
               }`}
               title="Focus on Module B: Future Drift & In-Flight Reliability Forecasting"
             >
@@ -246,10 +210,10 @@ export default function MultiScreenWall({
             <button
               type="button"
               onClick={() => setConsoleLayout('quad')}
-              className={`px-2.5 py-0.5 rounded text-xs font-display tracking-wide transition-all border ${
+              className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-display tracking-wide transition-all border cursor-pointer ${
                 consoleLayout === 'quad'
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/60 font-bold shadow-isro'
-                  : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/70 font-bold shadow-isro'
+                  : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-slate-800/70'
               }`}
               title="Switch to 2x2 Command Wall (3D Digital Twin, Orbit Dynamics, HTOL Oscilloscope, Lot Architecture)"
             >
@@ -259,141 +223,11 @@ export default function MultiScreenWall({
         </div>
       </div>
 
-      {/* CSV Ingestion & Direct Paste Command Strip */}
-      <div className="bg-[#070D1A] border-b border-slate-800 px-4 md:px-6 py-2 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] text-amber-400 font-display font-bold uppercase tracking-wider">
-            TELEMETRY INPUT:
-          </span>
-
-          {/* Trigger Upload File */}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="px-2.5 py-1 rounded bg-[#0A1224] hover:bg-[#111C36] border border-slate-700 hover:border-amber-500/50 text-slate-200 font-mono text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <span>📁</span>
-            <span>Upload CSV</span>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv,.tsv,text/csv"
-            onChange={handleFileInput}
-            className="hidden"
-          />
-
-          {/* Trigger Paste CSV Text */}
-          <button
-            type="button"
-            onClick={() => setShowPasteBox((v) => !v)}
-            className={`px-2.5 py-1 rounded border font-mono text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
-              showPasteBox
-                ? 'bg-amber-500/25 border-amber-500/60 text-amber-300 font-bold shadow-isro'
-                : 'bg-[#0A1224] hover:bg-[#111C36] border-slate-700 hover:border-amber-500/50 text-slate-200'
-            }`}
-          >
-            <span>📋</span>
-            <span>{showPasteBox ? '[-] Close Paste' : '[+] Paste Data'}</span>
-          </button>
-
-          {/* Insert Sample Flight CSV Button */}
-          <button
-            type="button"
-            onClick={() => {
-              if (onUploadFile) {
-                const file = new File([SAMPLE_CSV], 'isro_sample_flight.csv', { type: 'text/csv' })
-                onUploadFile(file)
-                if (onRunScreening) setTimeout(() => onRunScreening(), 400)
-              }
-            }}
-            className="px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-xs transition-colors cursor-pointer"
-            title="Load standard 10-part ISRO test telemetry batch"
-          >
-            <span>⚡ Load Sample Telemetry</span>
-          </button>
-        </div>
-
-        {/* AI Screening Action Button */}
-        <div className="flex items-center gap-2">
-          {onRunScreening && (
-            <button
-              type="button"
-              disabled={running}
-              onClick={() => onRunScreening()}
-              className="px-3.5 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white font-display font-bold text-xs uppercase shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 tracking-wider"
-            >
-              <span>{running ? '⚙️ Screening Pipeline Active...' : '⚡ Execute AI Screening'}</span>
-            </button>
-          )}
-
-          {onNavigateToLotsTab && (
-            <button
-              type="button"
-              onClick={onNavigateToLotsTab}
-              className="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-mono text-xs hidden md:inline-flex items-center gap-1"
-            >
-              <span>Full Lot Matrix ↗</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Expandable Inline Paste Textarea Box */}
-      {showPasteBox && (
-        <div className="bg-[#050B16] border-b border-amber-500/40 p-4 animate-fade-in flex flex-col gap-2.5 text-xs font-mono">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-200 font-bold flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400 led" />
-              Direct CSV / TSV Paste Input (Flight Telemetry)
-            </span>
-            <button
-              type="button"
-              onClick={() => setPasteText(SAMPLE_CSV)}
-              className="text-amber-400 hover:underline text-[11px]"
-            >
-              [+] Fill with Example Telemetry
-            </button>
-          </div>
-
-          <textarea
-            value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
-            placeholder="Paste your CSV text here (e.g. component_id,lot_id,subsystem,0h,24h,96h,168h,static_limit_ua)..."
-            rows={5}
-            className="w-full bg-[#081022] border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
-          />
-
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] text-slate-400">
-              Columns supported: <code className="text-amber-300">component_id, lot_id, subsystem, 0h, 24h, 168h, limit</code>
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setShowPasteBox(false)}
-                className="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={!pasteText.trim()}
-                onClick={handlePasteSubmit}
-                className="px-4 py-1 rounded bg-emerald-700 hover:bg-emerald-600 disabled:opacity-40 text-white font-bold text-xs uppercase cursor-pointer"
-              >
-                ⚡ Parse &amp; Screen Pasted CSV
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Lot Intelligence & Equipment Bay Quick Action Strip */}
-      <div className="bg-[#070C18] border-b border-slate-800/90 px-4 md:px-6 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
-          <span className="text-[10px] text-slate-400 uppercase font-display font-bold tracking-wider whitespace-nowrap">
-            Flight Lots:
+      {/* Lot Intelligence & Equipment Bay Quick Action Strip with enlarged boxes */}
+      <div className="bg-[#070C18] border-b border-slate-800/90 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm">
+        <div className="flex items-center gap-2 overflow-x-auto py-0.5">
+          <span className="text-xs text-slate-300 uppercase font-display font-bold tracking-wider whitespace-nowrap mr-1">
+            FLIGHT LOTS:
           </span>
           {lotGroups.map((lot) => {
             const isLotSelected = activeWallLot?.lot_id === lot.lot_id
@@ -409,16 +243,16 @@ export default function MultiScreenWall({
                     onSelectSubsystem(lot.parts[0].subsystem)
                   }
                 }}
-                className={`px-2 py-0.5 rounded text-[10.5px] font-mono whitespace-nowrap transition-all border flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-mono whitespace-nowrap transition-all border flex items-center gap-2 cursor-pointer shadow-sm ${
                   isLotSelected
-                    ? 'bg-amber-500/25 border-amber-500/60 text-amber-300 font-bold shadow-isro'
+                    ? 'bg-amber-500/25 border-amber-500/70 text-amber-300 font-bold shadow-isro'
                     : lot.rejects > 0
-                    ? 'border-rose-500/40 text-rose-300 bg-[#070D1A] hover:bg-rose-500/20'
+                    ? 'border-rose-500/50 text-rose-300 bg-rose-950/20 hover:bg-rose-500/20'
                     : 'border-slate-800 bg-[#070D1A] text-slate-300 hover:text-white hover:bg-slate-800'
                 }`}
               >
                 <span
-                  className={`w-1.5 h-1.5 rounded-full ${
+                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
                     lot.rejects > 0
                       ? 'bg-rose-500 led'
                       : lot.monitors > 0
@@ -428,27 +262,29 @@ export default function MultiScreenWall({
                       : 'bg-slate-400'
                   }`}
                 />
-                <span>{lot.lot_id}</span>
-                <span className="text-[9px] opacity-80 tabular-nums">({lot.parts.length})</span>
+                <span className="font-semibold">{lot.lot_id}</span>
+                <span className="text-[11px] px-1.5 py-0.5 rounded bg-black/50 opacity-90 tabular-nums font-bold">
+                  {lot.parts.length}
+                </span>
               </button>
             )
           })}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 flex-shrink-0">
           {onOpenLotsModal && (
             <button
               type="button"
               onClick={onOpenLotsModal}
-              className="px-2.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-mono border border-slate-700 flex items-center gap-1 transition-colors"
+              className="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs md:text-sm font-mono font-bold border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
               title="Open Lot-Wise Classification Modal"
             >
               <span>📦 Lots Modal</span>
             </button>
           )}
 
-          <div className="text-[11px] font-mono text-slate-400">
-            Selected: <b className="text-amber-300">{effectiveSelected?.component_id || 'None'}</b>
+          <div className="text-xs md:text-sm font-mono text-slate-300 bg-[#0A1224] px-3 py-1.5 rounded-lg border border-slate-800">
+            Selected Part: <b className="text-amber-300">{effectiveSelected?.component_id || 'None'}</b>
           </div>
         </div>
       </div>

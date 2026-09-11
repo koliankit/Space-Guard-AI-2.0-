@@ -100,27 +100,27 @@ export default function Header({
         </div>
 
         {/* Synchronized Mission Clocks & Ground Telemetry */}
-        <div className="flex items-center gap-2.5 text-xs font-mono">
-          <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 flex items-center gap-2">
-            <span className="text-[10.5px] text-slate-400 uppercase font-semibold">IST</span>
+        <div className="flex items-center gap-2.5 text-xs md:text-sm font-mono">
+          <div className="px-3.5 py-1.5 rounded-xl bg-[#070D1A] border border-slate-800 flex items-center gap-2 shadow-sm">
+            <span className="text-[11px] text-slate-400 uppercase font-semibold">IST</span>
             <span className="font-bold text-white text-xs md:text-sm tabular-nums">{istTime || '16:15:00'}</span>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-amber-500/40 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
-            <span className="text-[10.5px] text-amber-400 uppercase font-semibold">MET</span>
+          <div className="px-3.5 py-1.5 rounded-xl bg-[#070D1A] border border-amber-500/40 flex items-center gap-2 shadow-sm">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 led" />
+            <span className="text-[11px] text-amber-400 uppercase font-bold">MET</span>
             <span className="font-bold text-amber-300 text-xs md:text-sm tabular-nums">{formatMet(metSeconds)}</span>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 items-center gap-2 hidden lg:flex">
-            <span className={`w-2 h-2 rounded-full ${streamActive ? 'bg-emerald-400' : 'bg-slate-600'}`} />
-            <span className="text-[10.5px] text-slate-400 font-semibold">BYL-32 DSN</span>
-            <span className={`text-xs md:text-sm font-semibold ${streamActive ? 'text-emerald-300' : 'text-slate-500'}`}>
+          <div className="px-3.5 py-1.5 rounded-xl bg-[#070D1A] border border-slate-800 items-center gap-2 hidden lg:flex shadow-sm">
+            <span className={`w-2.5 h-2.5 rounded-full ${streamActive ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+            <span className="text-[11px] text-slate-400 font-semibold">BYL-32 DSN</span>
+            <span className={`text-xs md:text-sm font-bold ${streamActive ? 'text-emerald-300' : 'text-slate-500'}`}>
               {streamActive ? 'CARRIER LOCK' : 'STANDBY'}
             </span>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2 text-xs font-mono">
+        <div className="flex items-center gap-2.5 text-xs font-mono">
           {onOpenPitchModal && (
             <button
               type="button"
@@ -128,14 +128,14 @@ export default function Header({
                 sounds.playPing()
                 onOpenPitchModal()
               }}
-              className="text-[11px] font-sans font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-[#0F172A] text-slate-300 hover:border-amber-500/50 hover:text-amber-300 transition-all flex items-center gap-1.5"
+              className="text-xs font-sans font-semibold px-3.5 py-2 rounded-xl border border-slate-700 bg-[#0F172A] text-slate-200 hover:border-amber-500/70 hover:text-amber-300 transition-all flex items-center gap-2 cursor-pointer shadow-sm"
               title="View Official ISRO Briefing Deck (Press 'P')"
             >
-              <span>📑</span> ISRO Briefing
+              <span className="text-sm">📑</span> ISRO Briefing
             </button>
           )}
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => {
@@ -143,7 +143,7 @@ export default function Header({
                 setSoundOn(newState)
                 if (newState) sounds.playPing()
               }}
-              className="px-2 py-1.5 rounded-lg border border-slate-800 bg-[#070D1A] text-slate-400 hover:text-white text-xs flex items-center gap-1 transition-colors"
+              className="p-2 rounded-xl border border-slate-800 bg-[#070D1A] text-slate-300 hover:text-white hover:border-slate-700 text-sm flex items-center justify-center transition-colors cursor-pointer"
               title="Toggle Audio Feedback"
             >
               <span>{soundOn ? '🔊' : '🔇'}</span>
@@ -159,7 +159,7 @@ export default function Header({
                   document.exitFullscreen().catch(() => {})
                 }
               }}
-              className="px-2 py-1.5 rounded-lg border border-slate-800 bg-[#070D1A] text-slate-400 hover:text-white text-xs flex items-center gap-1 transition-colors"
+              className="p-2 rounded-xl border border-slate-800 bg-[#070D1A] text-slate-300 hover:text-white hover:border-slate-700 text-sm flex items-center justify-center transition-colors cursor-pointer"
               title="Toggle Fullscreen"
             >
               <span>⛶</span>
@@ -169,9 +169,9 @@ export default function Header({
       </div>
 
       {/* Secondary Navigation Bar: Edge-to-Edge Mission Console Tabs */}
-      <div className="flex items-center justify-between px-4 md:px-6 py-2 bg-[#070C18] border-t border-slate-800/80 overflow-x-auto select-none">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10.5px] text-slate-400 font-display font-bold uppercase tracking-wider mr-2 hidden md:inline">
+      <div className="flex items-center justify-between px-4 md:px-6 py-2.5 bg-[#070C18] border-t border-slate-800/80 overflow-x-auto select-none gap-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-slate-400 font-display font-bold uppercase tracking-wider mr-1 hidden sm:inline">
             CONSOLE:
           </span>
           {TABS.map((tab) => {
@@ -180,26 +180,29 @@ export default function Header({
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => onSelectTab(tab.id)}
-                className={`text-xs md:text-[13px] px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 font-display tracking-wide border ${
+                onClick={() => {
+                  sounds.playClick()
+                  onSelectTab(tab.id)
+                }}
+                className={`text-xs md:text-sm px-4 py-2 rounded-xl transition-all flex items-center gap-2 font-display tracking-wide border cursor-pointer ${
                   isActive
-                    ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-bold shadow-isro'
-                    : 'border-transparent text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-gradient-to-r from-amber-500/25 to-amber-600/20 border-amber-500/80 text-amber-300 font-bold shadow-isro ring-1 ring-amber-500/30'
+                    : 'bg-[#0A1122] border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/90 hover:border-slate-700 font-medium'
                 }`}
               >
                 {tab.icon && <span className="text-sm">{tab.icon}</span>}
-                <span className={`text-[10.5px] font-mono font-bold ${isActive ? 'text-amber-200' : 'text-slate-400'}`}>
+                <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${isActive ? 'bg-amber-500/20 text-amber-200 border border-amber-500/40' : 'bg-black/40 text-slate-400 border border-slate-700/60'}`}>
                   [{tab.tag}]
                 </span>
                 <span>{tab.label}</span>
                 {tab.id === 'matrix' && totalComponents > 0 && (
-                  <span className={`text-[10.5px] font-mono px-1.5 py-0.2 rounded font-bold ${isActive ? 'bg-amber-500/30 text-amber-200' : 'bg-slate-800 text-slate-300'}`}>
+                  <span className={`text-xs font-mono px-2 py-0.5 rounded-md font-bold ${isActive ? 'bg-amber-500/40 text-amber-100 border border-amber-400/50' : 'bg-slate-800 text-slate-300 border border-slate-700'}`}>
                     {totalComponents}
                   </span>
                 )}
                 {tab.id === 'report' && rejectCount > 0 && (
-                  <span className="text-[10.5px] font-mono px-1.5 py-0.2 rounded bg-rose-600 text-white font-bold">
-                    !
+                  <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-rose-600 text-white font-black animate-pulse">
+                    {rejectCount} REJ
                   </span>
                 )}
               </button>
@@ -207,9 +210,9 @@ export default function Header({
           })}
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-slate-400 hidden lg:flex font-mono">
-          <span className="px-2.5 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 text-[11px] flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+        <div className="flex items-center gap-3 text-xs md:text-sm text-slate-400 hidden xl:flex font-mono flex-shrink-0">
+          <span className="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 flex items-center gap-2 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
             Mission Profile: <span className="text-white font-bold">{activeMissionName}</span>
           </span>
         </div>
