@@ -388,15 +388,19 @@ export default function AIRecommendationSystem({
       {/* ================= COMPONENT SUMMARY STRIP ================= */}
       {component && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[#070D1A] border border-slate-800">
-          <div>
+          <div className="min-w-0">
             <span className="text-slate-400 block text-xs uppercase font-semibold">Target Component</span>
-            <span className="font-mono text-sm md:text-base font-bold text-white">{component.component_id}</span>
-            <span className="text-slate-300 text-xs block">[{component.subsystem}] {component.subsystem_name}</span>
+            <span className="font-mono text-sm md:text-base font-bold text-white truncate block" title={component.component_id}>
+              {component.component_id}
+            </span>
+            <span className="text-slate-300 text-xs block truncate">[{component.subsystem}] {component.subsystem_name}</span>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <span className="text-slate-400 block text-xs uppercase font-semibold">Qualification Lot</span>
-            <span className="font-mono text-sm md:text-base font-bold text-slate-200">{component.lot_id}</span>
+            <span className="font-mono text-sm md:text-base font-bold text-slate-200 truncate block" title={component.lot_id}>
+              {component.lot_id}
+            </span>
             <span className="text-slate-300 text-xs block">Method 1005 HTOL 168h</span>
           </div>
 
@@ -479,19 +483,19 @@ export default function AIRecommendationSystem({
 
       {/* ================= TAB 1: PRESCRIPTIVE ACTIONS ================= */}
       {activeTab === 'actions' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-3.5">
           {profile.actions.map((act, idx) => (
             <div
               key={idx}
               className="p-4 md:p-5 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col justify-between gap-3.5 hover:border-slate-600 transition-colors shadow-sm"
             >
               <div>
-                <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 mb-3">
+                <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 mb-3 gap-2">
                   <span className="text-xs font-mono uppercase font-bold text-slate-300 tracking-wider">
                     {act.category}
                   </span>
                   <span
-                    className={`text-xs font-bold px-2.5 py-0.5 rounded font-mono uppercase ${
+                    className={`text-xs font-bold px-2.5 py-0.5 rounded font-mono uppercase whitespace-nowrap flex-shrink-0 ${
                       act.urgency === 'IMMEDIATE'
                         ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
                         : act.urgency === 'PREVENTATIVE'
@@ -503,7 +507,7 @@ export default function AIRecommendationSystem({
                   </span>
                 </div>
 
-                <h4 className="text-sm md:text-base font-bold text-white mb-2">{act.title}</h4>
+                <h4 className="text-sm md:text-base font-bold text-white mb-2 leading-snug">{act.title}</h4>
                 <p className="text-xs md:text-sm text-slate-200 leading-relaxed mb-3.5 font-sans">
                   {act.action}
                 </p>
@@ -519,9 +523,11 @@ export default function AIRecommendationSystem({
                 </div>
               </div>
 
-              <div className="pt-2.5 border-t border-slate-800 text-xs md:text-sm text-slate-300 font-mono flex items-center justify-between">
-                <span>Timeframe:</span>
-                <span className="text-white font-bold">{act.timeframe}</span>
+              <div className="pt-2.5 border-t border-slate-800 text-xs md:text-sm text-slate-300 font-mono flex flex-wrap items-center justify-between gap-1.5">
+                <span className="text-slate-400 uppercase text-[11px] font-semibold">Timeframe:</span>
+                <span className="text-white font-bold bg-[#070D1A] px-2.5 py-1 rounded-md border border-slate-800 text-xs">
+                  {act.timeframe}
+                </span>
               </div>
             </div>
           ))}
@@ -538,7 +544,7 @@ export default function AIRecommendationSystem({
             <span className="text-xs font-mono text-emerald-400 font-bold">ISRO Mission Assurance Verified</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-3.5">
             {profile.operationalMeasures.map((measure, idx) => (
               <div
                 key={idx}
@@ -572,7 +578,7 @@ export default function AIRecommendationSystem({
             <span className="text-xs font-mono text-slate-200 font-bold">MIL-STD-883 Qualification</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-3.5">
             {profile.manufacturingCountermeasures.map((cm, idx) => (
               <div
                 key={idx}
@@ -597,13 +603,16 @@ export default function AIRecommendationSystem({
       )}
 
       {/* ================= INTERACTIVE ACTION EXECUTION BAR ================= */}
-      <div className="p-4 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-wrap items-center justify-between gap-3.5">
-        <div className="flex items-center gap-2 text-xs md:text-sm text-slate-200">
-          <span className="text-white font-bold">⚡ Prescriptive Execution:</span>
-          <span>Execute autonomous countermeasures or generate official ISRO quality directive</span>
+      <div className="p-4 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs md:text-sm text-slate-200">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
+            <span className="text-white font-bold">Prescriptive Autonomous Execution:</span>
+          </div>
+          <span className="text-slate-400 text-xs font-mono">ISRO Quality Protocol L-3</span>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
           <button
             type="button"
             onClick={() => {
@@ -613,13 +622,14 @@ export default function AIRecommendationSystem({
               }
               sounds.playPing()
             }}
-            className={`px-3.5 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
               effectiveIsolated
-                ? 'bg-rose-500 text-white border-rose-600 shadow-sm'
+                ? 'bg-rose-600 text-white border-rose-500 shadow-sm ring-1 ring-rose-400/50'
                 : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500 hover:text-white'
             }`}
           >
-            <span>⚡</span> {effectiveIsolated ? '✓ Power Bus Isolated' : 'Execute Bus Isolation'}
+            <span className="text-sm">⚡</span>
+            <span>{effectiveIsolated ? '✓ Power Bus Isolated' : 'Execute Bus Isolation'}</span>
           </button>
 
           <button
@@ -631,33 +641,36 @@ export default function AIRecommendationSystem({
               }
               sounds.playSuccess()
             }}
-            className={`px-3.5 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
               effectiveFailover
-                ? 'bg-slate-700 text-white border-white/40 shadow-sm'
+                ? 'bg-slate-700 text-white border-white/40 shadow-sm ring-1 ring-white/30'
                 : 'bg-white/10 text-white border-white/20 hover:bg-slate-700 hover:text-white'
             }`}
           >
-            <span>🔄</span> {effectiveFailover ? '✓ Cold Spare Active' : 'Switch to Cold Spare'}
+            <span className="text-sm">🔄</span>
+            <span>{effectiveFailover ? '✓ Cold Spare Active' : 'Switch to Cold Spare'}</span>
           </button>
 
           <button
             type="button"
             onClick={handleApplyDerating}
-            className={`px-3.5 py-2 rounded-lg text-xs md:text-sm font-bold transition-all border flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
               derated
-                ? 'bg-amber-500/30 text-amber-300 border-amber-500 shadow-sm'
+                ? 'bg-amber-500/30 text-amber-300 border-amber-500 shadow-sm ring-1 ring-amber-400/40'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
             }`}
           >
-            <span>🛡️</span> {derated ? '✓ -15% De-rating Applied' : 'Apply -15% Voltage De-rating'}
+            <span className="text-sm">🛡️</span>
+            <span>{derated ? '✓ -15% De-rating Applied' : 'Apply -15% Voltage De-rating'}</span>
           </button>
 
           <button
             type="button"
             onClick={handleExportDirective}
-            className="px-4 py-2 rounded-lg text-xs md:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+            className="px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer hover:shadow-emerald-950/60"
           >
-            <span>📋</span> {directiveExported ? '✓ Directive Logged' : 'Export ISRO Action Directive'}
+            <span className="text-sm">📋</span>
+            <span>{directiveExported ? '✓ Directive Logged' : 'Export ISRO Action Directive'}</span>
           </button>
         </div>
       </div>

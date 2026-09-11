@@ -260,19 +260,19 @@ export default function LotArchitectureView({
         </div>
       </div>
 
-      {/* Main 2-Column Work Area */}
-      <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] lg:grid-cols-[380px_1fr] gap-4 flex-1 items-start">
-        {/* Left Column: Qualification Lots Selector Cards + AI Lot Recommendation System */}
+      {/* Main 2-Column Work Area - Balanced 50/50 Ratio */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 flex-1 items-start w-full">
+        {/* Left Column (50%): Qualification Lots Grid + AI Recommendation System */}
         <div className="flex flex-col gap-4 w-full">
           <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
             <div className="bg-[#0F172A] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-display flex items-center gap-2">
                 <span>📦</span> Qualification Lots ({lotGroups.length})
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">Select lot to inspect</span>
+              <span className="text-[10px] text-slate-400 font-mono">Click lot to select &amp; inspect</span>
             </div>
 
-            <div className="p-3 overflow-y-auto flex-1 space-y-2.5 max-h-[380px]">
+            <div className="p-3 overflow-y-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[320px]">
               {lotGroups.length === 0 ? (
                 <div className="p-8 text-center text-slate-400 text-xs italic">
                   No qualification lots loaded. Upload a CSV file or load an ISRO flight batch to inspect.
@@ -545,8 +545,8 @@ export default function LotArchitectureView({
               </div>
 
               {/* Components Table with Full Satellite Location Columns */}
-              <div className="flex-1 overflow-y-auto">
-                <table className="w-full text-left border-collapse text-xs font-mono">
+              <div className="flex-1 overflow-y-auto overflow-x-auto max-h-[850px]">
+                <table className="w-full min-w-[700px] text-left border-collapse text-xs font-mono">
                   <thead className="bg-[#070D1A] text-[10px] text-slate-400 uppercase tracking-wider sticky top-0 z-10 border-b border-slate-800">
                     <tr>
                       <th className="py-2.5 px-3 font-semibold">Part ID</th>
