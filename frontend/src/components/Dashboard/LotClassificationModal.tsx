@@ -217,30 +217,30 @@ export default function LotClassificationModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/85 backdrop-blur-md animate-fade-in font-sans">
-      {/* Modal Container */}
-      <div className="bg-[#060B16] border border-isro-amber/40 rounded-lg w-full max-w-6xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden reticle-corner">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-3 md:p-4 bg-black/90 backdrop-blur-md animate-fade-in font-sans">
+      {/* Modal Container: Enlarged to utilize the full viewport */}
+      <div className="bg-[#060B16] border border-amber-500/50 rounded-xl w-[98vw] max-w-[1900px] h-[96vh] max-h-[96vh] flex flex-col shadow-2xl overflow-hidden reticle-corner">
         {/* Top Header Bar */}
         <div className="px-6 py-3.5 border-b border-line bg-[#091120] flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="w-3 h-3 rounded-full bg-isro-amber led shadow-sm" />
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="m-0 text-base font-bold text-white tracking-wide uppercase font-mono flex items-center gap-2">
+                <h2 className="m-0 text-base md:text-lg font-bold text-white tracking-wide uppercase font-mono flex items-center gap-2">
                   <span>📦 FLIGHT QUALIFICATION LOTS CLASSIFICATION</span>
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-isro-amber/20 text-isro-amber border border-isro-amber/40 font-bold">
+                <span className="text-xs font-mono px-2.5 py-0.5 rounded bg-isro-amber/20 text-isro-amber border border-isro-amber/40 font-bold">
                   {totalLots} FLIGHT LOTS &bull; {totalParts} TOTAL COMPONENTS
                 </span>
               </div>
-              <div className="text-[11px] text-slate-400 font-sans mt-0.5">
+              <div className="text-xs text-slate-400 font-sans mt-0.5">
                 MIL-STD-883 Method 1005 HTOL Burn-in Screening &bull; Lot-Wise Component Architecture &amp; Quarantine Breakdown
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-300 font-mono hidden sm:inline-block bg-[#070D1A] px-2.5 py-1 rounded border border-slate-800">
+            <span className="text-xs md:text-sm text-slate-300 font-mono hidden sm:inline-block bg-[#070D1A] px-3 py-1.5 rounded-lg border border-slate-800">
               🛰️ {activeMissionName}
             </span>
             <button
@@ -249,7 +249,7 @@ export default function LotClassificationModal({
                 sounds.playClick()
                 onClose()
               }}
-              className="w-8 h-8 rounded-lg bg-[#070D1A] border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white flex items-center justify-center text-lg transition-colors cursor-pointer"
+              className="w-9 h-9 rounded-lg bg-[#070D1A] border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white flex items-center justify-center text-xl transition-colors cursor-pointer"
               title="Close window (Esc)"
             >
               &times;
@@ -258,44 +258,47 @@ export default function LotClassificationModal({
         </div>
 
         {/* Global Dataset Metric Summary Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 px-6 py-2.5 bg-[#060B16] border-b border-slate-800/80 text-xs font-mono">
-          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-slate-800">
-            <span className="text-slate-400 text-[11px] font-sans">Total Lots:</span>
-            <span className="text-white font-bold text-sm">{totalLots} Lots</span>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 px-6 py-2.5 bg-[#060B16] border-b border-slate-800/80 text-xs md:text-sm font-mono">
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-slate-800">
+            <span className="text-slate-400 text-xs font-sans">Total Lots:</span>
+            <span className="text-white font-bold text-sm md:text-base">{totalLots} Lots</span>
           </div>
-          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-slate-800">
-            <span className="text-slate-400 text-[11px] font-sans">Classified Parts:</span>
-            <span className="text-slate-100 font-bold text-sm">{totalParts} Pts</span>
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-slate-800">
+            <span className="text-slate-400 text-xs font-sans">Classified Parts:</span>
+            <span className="text-slate-100 font-bold text-sm md:text-base">{totalParts} Pts</span>
           </div>
-          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-emerald-900/40">
-            <span className="text-emerald-400 text-[11px] font-sans">Flight Safe:</span>
-            <span className="text-emerald-300 font-bold text-sm">{totalSafe}</span>
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-emerald-900/40">
+            <span className="text-emerald-400 text-xs font-sans">Flight Safe:</span>
+            <span className="text-emerald-300 font-bold text-sm md:text-base">{totalSafe}</span>
           </div>
-          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-amber-900/40">
-            <span className="text-amber-400 text-[11px] font-sans">Drift Monitor:</span>
-            <span className="text-amber-300 font-bold text-sm">{totalMonitor}</span>
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-amber-900/40">
+            <span className="text-amber-400 text-xs font-sans">Drift Monitor:</span>
+            <span className="text-amber-300 font-bold text-sm md:text-base">{totalMonitor}</span>
           </div>
-          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-rose-900/40 col-span-2 sm:col-span-1">
-            <span className="text-rose-400 text-[11px] font-sans">Quarantined:</span>
-            <span className="text-rose-300 font-bold text-sm">{totalReject}</span>
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-rose-900/40 col-span-2 sm:col-span-1">
+            <span className="text-rose-400 text-xs font-sans">Quarantined:</span>
+            <span className="text-rose-300 font-bold text-sm md:text-base">{totalReject}</span>
           </div>
         </div>
 
-        {/* Main Body: 2-Panel Master-Detail Layout */}
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-          {/* Left Panel: Lots List & Selector */}
-          <div className="w-full md:w-[320px] lg:w-[360px] border-b md:border-b-0 md:border-r border-slate-800 bg-[#070D1A] flex flex-col overflow-hidden">
-            <div className="p-3 border-b border-slate-800 bg-[#0A1224] flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 font-mono">
-                <span>📦</span> QUALIFICATION LOTS ({lotGroups.length})
+        {/* Main Body: Stacked Layout (One after the other, not side-by-side) */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Section 1 (Top): Qualification Lots Matrix Selector across full width */}
+          <div className="bg-[#070D1A] border-b border-slate-800 flex flex-col flex-shrink-0">
+            <div className="px-6 py-2 bg-[#091122] border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-mono flex items-center gap-2">
+                <span>📦</span> QUALIFICATION FLIGHT LOTS ({lotGroups.length}) &mdash;{' '}
+                <span className="text-amber-400 font-normal hidden md:inline">Select any lot to inspect its constituent components below</span>
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">Select to inspect</span>
+              <span className="text-xs text-slate-300 font-mono">
+                Active Lot: <b className="text-white bg-amber-500/20 px-2.5 py-0.5 rounded border border-amber-500/40">{activeLot?.lot_id || 'None'}</b>
+              </span>
             </div>
 
-            {/* Lots Scroll List */}
-            <div className="flex-1 overflow-y-auto p-2.5 space-y-2">
+            {/* Grid of Lot Cards across full width */}
+            <div className="p-3 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 max-h-[160px]">
               {lotGroups.length === 0 ? (
-                <div className="p-6 text-center text-slate-400 text-xs italic">
+                <div className="p-6 text-center text-slate-400 text-xs italic col-span-full">
                   No qualification lots found in current telemetry dataset.
                 </div>
               ) : (
@@ -311,51 +314,53 @@ export default function LotClassificationModal({
                         sounds.playClick()
                         setSelectedLotId(lot.lot_id)
                       }}
-                      className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                      className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-white/10 border-white shadow-md ring-1 ring-white/30'
+                          ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/60 scale-[1.01]'
                           : isRej
-                          ? 'bg-[#150A10] border-rose-900/50 hover:border-rose-700 hover:bg-[#1A0C14]'
-                          : 'bg-[#0B1326] border-slate-800 hover:border-slate-700 hover:bg-[#0F1A33]'
+                          ? 'bg-[#180C14] border-rose-900/60 hover:border-rose-600 hover:bg-[#200E1A]'
+                          : isMon
+                          ? 'bg-[#19140B] border-amber-900/60 hover:border-amber-600 hover:bg-[#221B0F]'
+                          : 'bg-[#0B1326] border-slate-800 hover:border-slate-600 hover:bg-[#0F1A33]'
                       }`}
                     >
                       {/* Lot Header: ID and Status */}
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-1.5">
+                      <div className="flex items-center justify-between mb-1 gap-1">
+                        <div className="flex items-center gap-1.5 min-w-0">
                           <span
-                            className={`w-2 h-2 rounded-full ${
-                              isRej ? 'bg-rose-500' : isMon ? 'bg-amber-400' : 'bg-emerald-400'
+                            className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                              isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400 led' : 'bg-emerald-400'
                             }`}
                           />
-                          <span className="font-mono font-bold text-xs text-white">
+                          <span className="font-mono font-bold text-xs text-white truncate">
                             {lot.lot_id}
                           </span>
                         </div>
                         <span
-                          className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
+                          className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-black uppercase flex-shrink-0 ${
                             isRej
-                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50'
                               : isMon
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                              : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                              ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50'
+                              : 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/50'
                           }`}
                         >
-                          {isRej ? `${lot.rejectCount} REJECT` : isMon ? `${lot.monitorCount} MONITOR` : 'ALL SAFE'}
+                          {isRej ? `${lot.rejectCount} REJ` : isMon ? `${lot.monitorCount} MON` : 'NOM'}
                         </span>
                       </div>
 
                       {/* Metrics: Part count & Baseline */}
-                      <div className="flex items-center justify-between text-[10.5px] font-mono text-slate-300 mb-2">
+                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-300 mb-1.5">
                         <span>
-                          Total: <b className="text-white">{lot.total} components</b>
+                          <b className="text-white">{lot.total}</b> parts
                         </span>
                         <span className="text-slate-400">
-                          Mean: <b className="text-slate-100">{lot.mean.toFixed(1)} &mu;A</b>
+                          &mu; = <b className="text-amber-300">{lot.mean.toFixed(1)}</b> &micro;A
                         </span>
                       </div>
 
                       {/* Visual Health Distribution Bar */}
-                      <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden flex mb-1.5">
+                      <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden flex">
                         <div
                           style={{ width: `${(lot.safeCount / (lot.total || 1)) * 100}%` }}
                           className="bg-emerald-500 h-full"
@@ -372,13 +377,6 @@ export default function LotClassificationModal({
                           title={`${lot.rejectCount} Reject`}
                         />
                       </div>
-
-                      {/* Breakdown Text */}
-                      <div className="flex items-center justify-between text-[9.5px] font-mono text-slate-400">
-                        <span className="text-emerald-400">{lot.safeCount} Safe</span>
-                        <span className="text-amber-400">{lot.monitorCount} Mon</span>
-                        <span className="text-rose-400">{lot.rejectCount} Rej</span>
-                      </div>
                     </div>
                   )
                 })
@@ -386,7 +384,7 @@ export default function LotClassificationModal({
             </div>
           </div>
 
-          {/* Right Panel: Selected Lot Deep Dive & Components Table */}
+          {/* Section 2 (Bottom): Selected Lot Deep Dive & Components Table taking THE ENTIRE FULL WIDTH */}
           <div className="flex-1 bg-[#090F1E] flex flex-col overflow-hidden">
             {activeLot ? (
               <>
@@ -529,26 +527,26 @@ export default function LotClassificationModal({
                   </div>
                 </div>
 
-                {/* Components Table in Active Lot */}
-                <div className="flex-1 overflow-y-auto">
+                {/* Components Table in Active Lot - Full Width */}
+                <div className="flex-1 overflow-y-auto overflow-x-auto">
                   {displayedLotComponents.length === 0 ? (
-                    <div className="p-10 text-center text-slate-400 text-xs italic font-mono">
+                    <div className="p-12 text-center text-slate-400 text-sm italic font-mono">
                       No components match the selected filter in Lot {activeLot.lot_id}.
                     </div>
                   ) : (
-                    <table className="w-full text-left border-collapse text-xs font-mono">
+                    <table className="w-full text-left border-collapse text-xs md:text-sm font-mono">
                       <thead>
-                        <tr className="border-b border-slate-800 bg-[#070D1A] text-[10px] text-slate-400 uppercase tracking-wider sticky top-0 z-10 font-mono">
-                          <th className="py-2 px-3 font-semibold">Component ID</th>
-                          <th className="py-2 px-2 font-semibold">Subsystem &amp; Bay Location</th>
-                          <th className="py-2 px-2 font-semibold">3D Pos</th>
-                          <th className="py-2 px-2 font-semibold">0h (&mu;A)</th>
-                          <th className="py-2 px-2 font-semibold">24h (&mu;A)</th>
-                          <th className="py-2 px-2 font-semibold">168h (&mu;A)</th>
-                          <th className="py-2 px-2 font-semibold">&Delta; Drift</th>
-                          <th className="py-2 px-2 font-semibold">Z-Score</th>
-                          <th className="py-2 px-2 font-semibold">Classification</th>
-                          <th className="py-2 px-3 text-right font-semibold">Action</th>
+                        <tr className="border-b border-slate-800 bg-[#070D1A] text-xs text-slate-300 uppercase tracking-wider sticky top-0 z-10 font-mono">
+                          <th className="py-3 px-4 font-bold">Component ID</th>
+                          <th className="py-3 px-3 font-bold">Subsystem &amp; Bay Location</th>
+                          <th className="py-3 px-3 font-bold">3D Pos [X, Y, Z]</th>
+                          <th className="py-3 px-3 font-bold">0h (&mu;A)</th>
+                          <th className="py-3 px-3 font-bold">24h (&mu;A)</th>
+                          <th className="py-3 px-3 font-bold">168h (&mu;A)</th>
+                          <th className="py-3 px-3 font-bold">&Delta; Drift</th>
+                          <th className="py-3 px-3 font-bold">Z-Score</th>
+                          <th className="py-3 px-3 font-bold">Classification</th>
+                          <th className="py-3 px-4 text-right font-bold">Action</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/60">
@@ -561,50 +559,51 @@ export default function LotClassificationModal({
                           return (
                             <tr
                               key={c.component_id}
-                              className={`transition-colors hover:bg-slate-800/40 ${
-                                isRej ? 'bg-rose-950/15' : isMon ? 'bg-amber-950/10' : ''
+                              className={`transition-colors hover:bg-slate-800/50 ${
+                                isRej ? 'bg-rose-950/20' : isMon ? 'bg-amber-950/15' : ''
                               }`}
                             >
-                              <td className="py-2 px-3 font-bold text-white flex items-center gap-1.5">
+                              <td className="py-2.5 px-4 font-bold text-white flex items-center gap-2">
                                 <span
-                                  className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                                    isRej ? 'bg-rose-500' : isMon ? 'bg-amber-400' : 'bg-emerald-400'
+                                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                                    isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400 led' : 'bg-emerald-400'
                                   }`}
                                 />
-                                <span className="hover:text-white transition-colors">
+                                <span className="hover:text-amber-300 transition-colors font-bold">
                                   {c.component_id}
                                 </span>
                               </td>
-                              <td className="py-2 px-2 font-bold text-white whitespace-nowrap">
-                                [{c.subsystem}] {loc.name} &bull; <span className="text-slate-300 font-sans font-normal">{loc.bay}</span>
+                              <td className="py-2.5 px-3 font-bold text-white whitespace-nowrap">
+                                <span className="text-amber-400 font-bold mr-1">[{c.subsystem}]</span>
+                                <span>{loc.name}</span> &bull; <span className="text-slate-300 font-sans font-normal">{loc.bay}</span>
                               </td>
-                              <td className="py-2 px-2 text-slate-400 text-[10px] whitespace-nowrap">
+                              <td className="py-2.5 px-3 text-slate-300 text-xs whitespace-nowrap font-mono">
                                 {formatCoordinates(loc.pos)}
                               </td>
-                              <td className="py-2 px-2.5 text-slate-300">
+                              <td className="py-2.5 px-3 text-slate-300 font-mono">
                                 {c.v0?.toFixed(1) ?? '--'}
                               </td>
-                              <td className="py-2 px-2.5 text-slate-300">
+                              <td className="py-2.5 px-3 text-slate-300 font-mono">
                                 {c.v24?.toFixed(1) ?? '--'}
                               </td>
                               <td
-                                className={`py-2 px-2.5 font-bold ${
-                                  isRej ? 'text-rose-400' : isMon ? 'text-amber-400' : 'text-slate-100'
+                                className={`py-2.5 px-3 font-mono font-bold ${
+                                  isRej ? 'text-rose-400 text-sm' : isMon ? 'text-amber-300' : 'text-slate-100'
                                 }`}
                               >
                                 {c.v168?.toFixed(1) ?? '--'}&mu;A
                               </td>
                               <td
-                                className={`py-2 px-2.5 font-semibold ${
-                                  delta > 5 ? 'text-rose-400' : delta > 2 ? 'text-amber-400' : 'text-slate-300'
+                                className={`py-2.5 px-3 font-mono font-semibold ${
+                                  delta > 5 ? 'text-rose-400 font-bold' : delta > 2 ? 'text-amber-400' : 'text-slate-300'
                                 }`}
                               >
                                 {delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
                               </td>
                               <td
-                                className={`py-2 px-2.5 ${
+                                className={`py-2.5 px-3 font-mono ${
                                   Math.abs(c.z168 ?? 0) >= 3
-                                    ? 'text-rose-400 font-bold'
+                                    ? 'text-rose-400 font-black'
                                     : Math.abs(c.z168 ?? 0) >= 2
                                     ? 'text-amber-400 font-bold'
                                     : 'text-slate-300'
@@ -612,20 +611,20 @@ export default function LotClassificationModal({
                               >
                                 {c.z168 != null ? `${c.z168 > 0 ? '+' : ''}${c.z168.toFixed(2)}σ` : '--'}
                               </td>
-                              <td className="py-2 px-2.5">
+                              <td className="py-2.5 px-3">
                                 <span
-                                  className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                                  className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
                                     isRej
-                                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                                      ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50'
                                       : isMon
-                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                      ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50'
+                                      : 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/50'
                                   }`}
                                 >
                                   {c.status ? c.status.toUpperCase() : 'INGESTED'}
                                 </span>
                               </td>
-                              <td className="py-2 px-3 text-right">
+                              <td className="py-2.5 px-4 text-right">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -634,7 +633,7 @@ export default function LotClassificationModal({
                                     onFocusSubsystem?.(c.subsystem)
                                     onClose()
                                   }}
-                                  className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-white hover:text-white border border-white/20 text-[10px] font-medium transition-colors"
+                                  className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 hover:text-white border border-amber-500/40 text-xs font-bold transition-all cursor-pointer shadow-sm"
                                   title="Focus component in 3D satellite and telemetry oscilloscope"
                                 >
                                   Inspect 3D &rarr;
