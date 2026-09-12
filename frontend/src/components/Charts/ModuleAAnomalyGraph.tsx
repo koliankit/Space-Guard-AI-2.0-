@@ -22,6 +22,10 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
   const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (16s), 1x (8s slow), 2x (4s)
+  const [isExpanded, setIsExpanded] = useState<boolean>(false)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 420 })
 
   const pathRef = useRef<SVGPathElement>(null)
   const [pathLength, setPathLength] = useState<number>(800)
@@ -30,10 +34,49 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   const elapsedOffsetRef = useRef<number>(0)
   const lastPingHourRef = useRef<number>(-1)
 
-  const W = 720
-  const H = 280
-  const padL = 54
-  const padR = 28
+  // Measure container dimensions dynamically to fill full remaining space edge-to-edge
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const updateSize = () => {
+      const w = el.clientWidth || el.getBoundingClientRect().width
+      const h = el.clientHeight || el.getBoundingClientRect().height
+      if (w > 0 && h > 0) {
+        setChartDims({
+          width: Math.round(w),
+          height: Math.round(Math.max(420, h)),
+        })
+      }
+    }
+    updateSize()
+    const timer = setTimeout(updateSize, 40)
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const cr = entry.contentRect
+        const w = cr.width || el.clientWidth
+        const h = cr.height || el.clientHeight
+        if (w > 0 && h > 0) {
+          setChartDims({
+            width: Math.round(w),
+            height: Math.round(Math.max(420, h)),
+          })
+        }
+      }
+    })
+    ro.observe(el)
+    window.addEventListener('resize', updateSize)
+    return () => {
+      clearTimeout(timer)
+      ro.disconnect()
+      window.removeEventListener('resize', updateSize)
+    }
+  }, [isExpanded])
+
+  const W = Math.max(500, chartDims.width)
+  const H = Math.max(420, chartDims.height)
+  const padL = 50
+  const padR = 24
   const padT = 24
   const padB = 44
 
@@ -226,13 +269,17 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   }, [component, stageH, pathLength])
 
   // Signal spectrogram equalizer bars along the bottom (animating dynamically during sweep)
+  const numSpectrumBars = useMemo(() => {
+    return Math.min(54, Math.max(28, Math.floor((W - padL - padR) / 18)))
+  }, [W, padL, padR])
+
   const spectrumBars = useMemo(() => {
-    return Array.from({ length: 36 }, (_, i) => {
+    return Array.from({ length: numSpectrumBars }, (_, i) => {
       const wave = isSimulating && !isPaused ? Math.sin(animProgress * Math.PI * 6 + i * 0.4) * 5 : 0
-      const base = Math.abs(Math.sin((i / 36) * Math.PI * 3.2)) * 18 + 5
-      return Math.min(Math.max(4, base + wave), 24)
+      const base = Math.abs(Math.sin((i / numSpectrumBars) * Math.PI * 3.2)) * 18 + 5
+      return Math.min(Math.max(4, base + wave), 22)
     })
-  }, [isSimulating, isPaused, animProgress])
+  }, [isSimulating, isPaused, animProgress, numSpectrumBars])
 
   // Trigger audio pings at time milestones
   useEffect(() => {
@@ -249,7 +296,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   // If no component is selected, render empty state (all hooks have been unconditionally called above)
   if (!component) {
     return (
-      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2 flex-1 h-full min-h-[400px]">
         <div className="flex items-center justify-between text-xs">
           <span className="font-mono font-bold text-white flex items-center gap-1.5 text-[11px] uppercase">
             <span className="w-2 h-2 rounded-full bg-white led" />
@@ -257,7 +304,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
           </span>
           <span className="text-[10px] text-slate-400 font-mono">CHANNEL: 24-BIT SIGMA-DELTA ADC</span>
         </div>
-        <div className="h-[200px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
+        <div className="flex-1 min-h-[360px] md:min-h-[440px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
           [ AWAITING COMPONENT SELECTION TO DISPLAY SILICON OSCILLOSCOPE ]
         </div>
       </div>
@@ -275,7 +322,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   const displayedZ = animProgress >= 1 ? finalZ : (simVal - lotMean) / (lotStd || 1)
 
   return (
-    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none">
+    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
       {/* Top Header & Stage Scrubbing Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-800/80 pb-2.5">
         <div className="flex items-center gap-2">
@@ -359,12 +406,39 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
               </button>
             ))}
           </div>
+
+          {/* Full Space Expand / Restore Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded border text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm ${
+              isExpanded
+                ? 'bg-amber-500/30 text-amber-300 border-amber-500/60 shadow-isro'
+                : 'bg-[#050914] hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700'
+            }`}
+            title={isExpanded ? 'Restore Standard Height' : 'Expand Oscilloscope to Fill Maximum Vertical Screen Space'}
+          >
+            <span>{isExpanded ? '⤡' : '⤢'}</span>
+            <span>{isExpanded ? 'RESTORE' : 'EXPAND'}</span>
+          </button>
         </div>
       </div>
 
       {/* Main SVG Chart Canvas */}
-      <div className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812]">
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[260px] md:h-[290px] block">
+      <div
+        ref={containerRef}
+        className={`relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812] w-full flex-1 transition-all duration-300 ${
+          isExpanded
+            ? 'min-h-[640px] md:min-h-[740px] lg:min-h-[820px]'
+            : 'min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[600px]'
+        }`}
+      >
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          className="w-full h-full block"
+          style={{ width: '100%', height: '100%', display: 'block' }}
+        >
           <defs>
             <linearGradient id="area-grad-a" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={curveColor} stopOpacity="0.25" />
@@ -625,17 +699,18 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
           {/* Spectrogram Energy Bars along bottom margin */}
           <g transform={`translate(${padL}, ${H - padB + 22})`}>
             {spectrumBars.map((bh, idx) => {
-              const bw = (W - padL - padR) / spectrumBars.length - 2
+              const totalAvailW = W - padL - padR
+              const bw = Math.max(3.5, totalAvailW / spectrumBars.length - 2)
               const bx = idx * (bw + 2)
               return (
                 <rect
                   key={idx}
                   x={bx}
-                  y={18 - bh}
+                  y={20 - bh}
                   width={bw}
                   height={bh}
                   fill={isSimulating ? '#10B981' : '#F59E0B'}
-                  opacity={0.3 + (bh / 18) * 0.4}
+                  opacity={0.3 + (bh / 20) * 0.4}
                   rx={1}
                 />
               )

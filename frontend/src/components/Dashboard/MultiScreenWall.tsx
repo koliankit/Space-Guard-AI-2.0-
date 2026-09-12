@@ -290,12 +290,12 @@ export default function MultiScreenWall({
       </div>
 
       {/* Main Command Wall Content Area: Divided into Sector A and Sector B */}
-      <div className="p-4 flex flex-col gap-4">
+      <div className="p-4 flex-1 flex flex-col gap-4">
         {/* ================= PRIMARY LAYOUT: TWO SECTORS (MODULE A & MODULE B WITH GRAPHS BELOW) ================= */}
         {consoleLayout === 'dual' && (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch flex-1">
             {/* ================= SECTOR 1: MODULE A ================= */}
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full flex-1">
               <ModuleAAnomalyPanel
                 components={components}
                 selected={effectiveSelected}
@@ -305,7 +305,7 @@ export default function MultiScreenWall({
             </div>
 
             {/* ================= SECTOR 2: MODULE B ================= */}
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full flex-1">
               <ModuleBFutureDriftPanel
                 components={components}
                 selected={effectiveSelected}
@@ -319,7 +319,7 @@ export default function MultiScreenWall({
 
         {/* ================= MODE 2: MODULE A ONLY ================= */}
         {consoleLayout === 'moduleA' && (
-          <div className="w-full">
+          <div className="w-full flex-1 flex flex-col">
             <ModuleAAnomalyPanel
               components={components}
               selected={effectiveSelected}
@@ -331,7 +331,7 @@ export default function MultiScreenWall({
 
         {/* ================= MODE 3: MODULE B ONLY ================= */}
         {consoleLayout === 'moduleB' && (
-          <div className="w-full">
+          <div className="w-full flex-1 flex flex-col">
             <ModuleBFutureDriftPanel
               components={components}
               selected={effectiveSelected}

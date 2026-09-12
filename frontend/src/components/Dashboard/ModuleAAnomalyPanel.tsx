@@ -145,7 +145,7 @@ export default function ModuleAAnomalyPanel({
       </div>
 
       {/* Main Content Area */}
-      <div className="p-3.5 flex-1 flex flex-col gap-3 justify-between">
+      <div className="p-3.5 flex-1 flex flex-col gap-3.5">
         {/* Selected Component Header Profile */}
         {selected ? (
           <div className="p-3 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col gap-2.5">
@@ -321,7 +321,7 @@ export default function ModuleAAnomalyPanel({
         )}
 
         {/* Module A Dedicated Graph: Parametric Waveform Oscilloscope */}
-        <div className="mt-1 flex-1 flex flex-col">
+        <div className="mt-1 flex-1 flex flex-col min-h-[480px] w-full">
           <ModuleAAnomalyGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>

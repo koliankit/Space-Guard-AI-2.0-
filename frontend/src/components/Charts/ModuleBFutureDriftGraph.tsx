@@ -26,6 +26,10 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
   const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (17s), 1x (8.5s slow), 2x (4.2s)
+  const [isExpanded, setIsExpanded] = useState<boolean>(false)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 420 })
 
   const measuredPathRef = useRef<SVGPathElement>(null)
   const [measuredLen, setMeasuredLen] = useState<number>(600)
@@ -35,10 +39,49 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   const hasPinged168Ref = useRef<boolean>(false)
   const hasPingedHorizonRef = useRef<boolean>(false)
 
-  const W = 720
-  const H = 280
-  const padL = 54
-  const padR = 32
+  // Measure container dimensions dynamically to fill full remaining space edge-to-edge
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const updateSize = () => {
+      const w = el.clientWidth || el.getBoundingClientRect().width
+      const h = el.clientHeight || el.getBoundingClientRect().height
+      if (w > 0 && h > 0) {
+        setChartDims({
+          width: Math.round(w),
+          height: Math.round(Math.max(420, h)),
+        })
+      }
+    }
+    updateSize()
+    const timer = setTimeout(updateSize, 40)
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const cr = entry.contentRect
+        const w = cr.width || el.clientWidth
+        const h = cr.height || el.clientHeight
+        if (w > 0 && h > 0) {
+          setChartDims({
+            width: Math.round(w),
+            height: Math.round(Math.max(420, h)),
+          })
+        }
+      }
+    })
+    ro.observe(el)
+    window.addEventListener('resize', updateSize)
+    return () => {
+      clearTimeout(timer)
+      ro.disconnect()
+      window.removeEventListener('resize', updateSize)
+    }
+  }, [isExpanded])
+
+  const W = Math.max(500, chartDims.width)
+  const H = Math.max(420, chartDims.height)
+  const padL = 50
+  const padR = 24
   const padT = 24
   const padB = 44
 
@@ -288,7 +331,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   // If no component is selected, render empty state (all hooks have been unconditionally called above)
   if (!component) {
     return (
-      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2 flex-1 h-full min-h-[400px]">
         <div className="flex items-center justify-between text-xs">
           <span className="font-mono font-bold text-amber-400 flex items-center gap-1.5 text-[11px] uppercase">
             <span className="w-2 h-2 rounded-full bg-amber-400 led" />
@@ -296,7 +339,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
           </span>
           <span className="text-[10px] text-slate-400 font-mono">MODEL: POLYNOMIAL EXTENSION</span>
         </div>
-        <div className="h-[200px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
+        <div className="flex-1 min-h-[360px] md:min-h-[440px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
           [ AWAITING COMPONENT SELECTION TO DISPLAY DRIFT PROJECTION ]
         </div>
       </div>
@@ -304,7 +347,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   }
 
   return (
-    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg select-none">
+    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
       {/* Top Header & Extrapolation Horizon Selector */}
       <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs md:text-sm border-b border-slate-800/80 pb-2.5">
         <div className="flex items-center gap-2">
@@ -395,12 +438,39 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               </button>
             ))}
           </div>
+
+          {/* Full Space Expand / Restore Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded border text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm ${
+              isExpanded
+                ? 'bg-amber-500/30 text-amber-300 border-amber-500/60 shadow-isro'
+                : 'bg-[#050914] hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700'
+            }`}
+            title={isExpanded ? 'Restore Standard Height' : 'Expand Oscilloscope to Fill Maximum Vertical Screen Space'}
+          >
+            <span>{isExpanded ? '⤡' : '⤢'}</span>
+            <span>{isExpanded ? 'RESTORE' : 'EXPAND'}</span>
+          </button>
         </div>
       </div>
 
       {/* SVG Canvas Area */}
-      <div className="relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden">
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[260px] md:h-[290px] block select-none">
+      <div
+        ref={containerRef}
+        className={`relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden w-full flex-1 transition-all duration-300 ${
+          isExpanded
+            ? 'min-h-[640px] md:min-h-[740px] lg:min-h-[820px]'
+            : 'min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[600px]'
+        }`}
+      >
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          className="w-full h-full block select-none"
+          style={{ width: '100%', height: '100%', display: 'block' }}
+        >
           <defs>
             <linearGradient id="coneGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.05" />

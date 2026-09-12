@@ -84,7 +84,7 @@ export default function ModuleBFutureDriftPanel({
       </div>
 
       {/* Main Content Area */}
-      <div className="p-3.5 flex-1 flex flex-col gap-3 justify-between">
+      <div className="p-3.5 flex-1 flex flex-col gap-3.5">
         {selected ? (
           <div className="p-3 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col gap-2.5">
             {/* Top Identity & Drift Classification Row */}
@@ -229,7 +229,7 @@ export default function ModuleBFutureDriftPanel({
         )}
 
         {/* Module B Dedicated Graph: Future Drift Forecaster */}
-        <div className="mt-1 flex-1 flex flex-col">
+        <div className="mt-1 flex-1 flex flex-col min-h-[480px] w-full">
           <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>
