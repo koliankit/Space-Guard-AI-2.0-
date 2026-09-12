@@ -72,12 +72,12 @@ export default function ModuleAAnomalyPanel({
   return (
     <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[560px]">
       {/* Module A Top Bezel Bar */}
-      <div className="bg-[#0D162A] border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5">
-          <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold border border-amber-500/40">
+      <div className="bg-[#0D162A] border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex items-center gap-3">
+          <span className="px-3 py-1 rounded-md bg-amber-500/25 text-amber-300 text-sm sm:text-base font-mono font-black border border-amber-500/70 shadow-isro tracking-wider uppercase whitespace-nowrap">
             MODULE A
           </span>
-          <span className="text-xs font-display font-bold text-white tracking-wider uppercase">
+          <span className="text-xs sm:text-sm font-display font-bold text-white tracking-wider uppercase">
             Anomaly Detection &amp; Silicon Data Analysis
           </span>
         </div>
