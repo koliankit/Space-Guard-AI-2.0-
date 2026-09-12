@@ -24,7 +24,7 @@ import MultiScreenWall from './components/Dashboard/MultiScreenWall'
 import ISROPitchModal from './components/Dashboard/ISROPitchModal'
 import { ISRO_MISSIONS } from './offlineEngine'
 import { sounds } from './utils/soundEffects'
-import { generateCertificatePdf } from './utils/pdfGenerator'
+import { generateCertificatePdf, generateTechnicalReportPdf } from './utils/pdfGenerator'
 import { generateExcelReport } from './utils/excelGenerator'
 import * as api from './api'
 import type { ComponentOut, MissionStatus, UploadResult } from './types'
@@ -250,16 +250,8 @@ export default function App() {
   }
 
   function handleReport() {
-    const id = batchId ?? 1
-    const url = api.reportUrl(id)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `ISRO_SpaceGuard_Screening_Report_Batch_${id}.md`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
-    log('ISRO Flight Screening report generated and downloaded (.MD).', 'ok')
+    generateTechnicalReportPdf(mission, allComponents.length > 0 ? allComponents : flaggedList)
+    log('Official ISRO SDSC SHAR Technical Mission Report (.PDF) generated.', 'ok')
   }
 
   function handleReportPdf() {

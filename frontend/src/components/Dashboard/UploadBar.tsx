@@ -165,21 +165,21 @@ export default function UploadBar({
                       onReportExcel()
                     }}
                   >
-                    <span className="font-semibold">Screening Ledger CSV</span>
-                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 text-amber-300">.CSV</span>
+                    <span className="font-semibold">Screening Ledger Excel</span>
+                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 text-amber-300">.XLS</span>
                   </button>
                 )}
                 <button
                   type="button"
-                  className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-slate-300 hover:bg-slate-800 flex items-center justify-between transition-colors cursor-pointer"
+                  className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-sky-300 hover:bg-sky-500/15 flex items-center justify-between transition-colors cursor-pointer"
                   onClick={() => {
-                    sounds.playClick()
+                    sounds.playSuccess()
                     setShowExportMenu(false)
                     onReport()
                   }}
                 >
-                  <span className="font-semibold">Technical Markdown Report</span>
-                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">.MD</span>
+                  <span className="font-semibold">Technical Mission Report</span>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 border border-sky-500/30 text-sky-300">.PDF</span>
                 </button>
               </div>
             )}

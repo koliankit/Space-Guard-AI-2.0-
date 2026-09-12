@@ -366,7 +366,7 @@ export function generateExcelReport(
         <tr>
           <td class="sig-block" style="border-right: 2px solid #CBD5E1;">
             <div style="font-size: 9pt; color: #D97706; font-weight: bold;">SATELLITE MONITORING UNIT (SMU):</div>
-            <div style="font-size: 13pt; font-weight: bold; color: #0B1E3D; margin-top: 4px;">Dr. K. Ramanathan, Ph.D.</div>
+            <div style="font-size: 13pt; font-weight: bold; color: #0B1E3D; margin-top: 4px;">Dr. A. Rajesh Kumar, Ph.D.</div>
             <div style="font-size: 10pt; color: #334155;">Lead Satellite Monitoring Unit Officer</div>
             <div style="font-size: 9.5pt; color: #64748B;">ISTRAC Quality Assurance &amp; Reliability Division</div>
             <div style="font-size: 9.5pt; color: #64748B;">ISRO Telemetry, Tracking &amp; Command Network, Bengaluru</div>
@@ -376,7 +376,7 @@ export function generateExcelReport(
           </td>
           <td class="sig-block">
             <div style="font-size: 9pt; color: #D97706; font-weight: bold;">OPERATIONS CONTROLLER OFFICER (OCO):</div>
-            <div style="font-size: 13pt; font-weight: bold; color: #0B1E3D; margin-top: 4px;">Dr. V. Somnath, Outstanding Scientist</div>
+            <div style="font-size: 13pt; font-weight: bold; color: #0B1E3D; margin-top: 4px;">Dr. M. S. Suryanarayana, Distinguished Scientist</div>
             <div style="font-size: 10pt; color: #334155;">Operations Controller Officer</div>
             <div style="font-size: 9.5pt; color: #64748B;">Satish Dhawan Space Centre SHAR, Sriharikota</div>
             <div style="font-size: 9.5pt; color: #64748B;">Range Safety &amp; Launch Operations Directorate</div>

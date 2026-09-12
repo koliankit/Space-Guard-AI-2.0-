@@ -231,16 +231,16 @@ export default function MissionReportView({
         {/* Quality Assurance Sign-Off Block */}
         <div className="pt-6 border-t border-line grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-mono">
           <div className="p-3.5 rounded bg-[#0A1322] border border-line">
-            <div className="text-slate-400 uppercase text-[10px]">Lead Screening Engineer:</div>
-            <div className="text-slate-100 font-bold text-sm mt-1">Dr. K. Ramanathan, Ph.D.</div>
+            <div className="text-slate-400 uppercase text-[10px]">Lead Screening Engineer (SMU):</div>
+            <div className="text-slate-100 font-bold text-sm mt-1">Dr. A. Rajesh Kumar, Ph.D.</div>
             <div className="text-slate-400 text-[10px]">ISTRAC Quality Assurance &bull; ISRO Bengaluru</div>
             <div className="text-safe font-bold text-[10px] mt-2 flex items-center gap-1">
               <span>&#10003;</span> DIGITAL SIGNATURE VERIFIED: SHA256-8F4C2E9A-ISTRAC
             </div>
           </div>
           <div className="p-3.5 rounded bg-[#0A1322] border border-line">
-            <div className="text-slate-400 uppercase text-[10px]">Mission Reliability Director:</div>
-            <div className="text-slate-100 font-bold text-sm mt-1">Dr. V. Somnath, Outstanding Scientist</div>
+            <div className="text-slate-400 uppercase text-[10px]">Mission Reliability Director (OCO):</div>
+            <div className="text-slate-100 font-bold text-sm mt-1">Dr. M. S. Suryanarayana, Distinguished Scientist</div>
             <div className="text-slate-400 text-[10px]">
               Satish Dhawan Space Centre SHAR, Sriharikota &bull; Range Safety Directorate
             </div>

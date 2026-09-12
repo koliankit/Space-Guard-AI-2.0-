@@ -922,7 +922,7 @@ ${rejected
 ├──────────────────────────────────────────────────┬───────────────────────────────────────────────┤
 │ SATELLITE MONITORING UNIT (SMU):                 │ OPERATIONS CONTROLLER OFFICER (OCO):          │
 │                                                  │                                               │
-│ Dr. K. Ramanathan, Ph.D.                         │ Dr. V. Somnath, Outstanding Scientist         │
+│ Dr. A. Rajesh Kumar, Ph.D.                       │ Dr. M. S. Suryanarayana, Distinguished Sci.   │
 │ Lead Satellite Monitoring Unit Officer           │ Operations Controller Officer                 │
 │ ISTRAC Quality Assurance & Reliability Division  │ Satish Dhawan Space Centre SHAR, Sriharikota  │
 │ ISRO Telemetry, Tracking & Command Network       │ Range Operations & Flight Safety Directorate  │
