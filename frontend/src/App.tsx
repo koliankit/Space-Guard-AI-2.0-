@@ -8,7 +8,7 @@ import AuditLog, { type AuditEntry } from './components/Dashboard/AuditLog'
 import DataIngestModal from './components/Dashboard/DataIngestModal'
 import LotClassificationModal from './components/Dashboard/LotClassificationModal'
 import ComponentMonitor from './components/ComponentPanel/ComponentMonitor'
-import IntelligencePanel from './components/ComponentPanel/IntelligencePanel'
+import IntelligencePanel, { ComponentOverviewCard, MathematicalReadingsPanel } from './components/ComponentPanel/IntelligencePanel'
 import ComparePanel from './components/Charts/ComparePanel'
 import TelemetryChart from './components/Charts/TelemetryChart'
 import DataQuality from './components/Charts/DataQuality'
@@ -412,9 +412,12 @@ export default function App() {
 
           {/* Main Telemetry & Mission Intelligence Flow - Fills all available space, eliminates empty voids */}
           <div className="flex-1 min-w-0 flex flex-col gap-4 w-full">
-            {/* Row 1: 3D Interactive Satellite (Left) & Real-Time Intelligence Diagnostics (Right) */}
-            <div className="grid grid-cols-1 2xl:grid-cols-[1.3fr_1fr] xl:grid-cols-[1.2fr_1fr] gap-4 items-stretch">
-              <div className="relative min-h-[440px] rounded-xl border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle flex flex-col">
+            {/* Row 1: Two Equal Parts (50/50 Split) - Component Overview (Left) & 3D Interactive Satellite (Right) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch w-full">
+              <div className="flex flex-col h-full">
+                <ComponentOverviewCard component={selected} />
+              </div>
+              <div className="relative min-h-[480px] lg:min-h-[540px] rounded-xl border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle flex flex-col flex-1 h-full">
                 <SatelliteScene
                   subsystems={subsystems}
                   onSelect={selectSubsystem}
@@ -422,9 +425,11 @@ export default function App() {
                   selectedComponent={selected}
                 />
               </div>
-              <div className="flex flex-col">
-                <IntelligencePanel component={selected} />
-              </div>
+            </div>
+
+            {/* Below Row 1: Mathematical Telemetry Metrics Review & XAI Diagnostic Engine */}
+            <div className="w-full">
+              <MathematicalReadingsPanel component={selected} />
             </div>
 
             {/* Row 2: Enriched Telemetry Waveform Oscilloscope (Left) & Screening Paradigm Comparison (Right) */}
