@@ -45,6 +45,7 @@ export default function LotClassificationModal({
   const [subsystemFilter, setSubsystemFilter] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
   const [copiedLotId, setCopiedLotId] = useState<string | null>(null)
+  const [splitMode, setSplitMode] = useState<'sideBySide' | 'stacked'>('sideBySide')
 
   // Sync components from props
   useEffect(() => {
@@ -239,7 +240,35 @@ export default function LotClassificationModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* 50/50 Equal Halves Split Mode Toggle */}
+            <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-xs">
+              <button
+                type="button"
+                onClick={() => setSplitMode('sideBySide')}
+                className={`px-2.5 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                  splitMode === 'sideBySide'
+                    ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="Side-by-Side: 50% Left (Lots) + 50% Right (Components)"
+              >
+                ◫ 50/50 Split
+              </button>
+              <button
+                type="button"
+                onClick={() => setSplitMode('stacked')}
+                className={`px-2.5 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                  splitMode === 'stacked'
+                    ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="Stacked: 50% Top (Lots) + 50% Bottom (Components)"
+              >
+                ⬒ 50/50 Stacked
+              </button>
+            </div>
+
             <span className="text-xs md:text-sm text-slate-300 font-mono hidden sm:inline-block bg-[#070D1A] px-3 py-1.5 rounded-lg border border-slate-800">
               🛰️ {activeMissionName}
             </span>
@@ -258,45 +287,61 @@ export default function LotClassificationModal({
         </div>
 
         {/* Global Dataset Metric Summary Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 px-6 py-2.5 bg-[#060B16] border-b border-slate-800/80 text-xs md:text-sm font-mono">
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-slate-800">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 px-5 py-2 bg-[#060B16] border-b border-slate-800/80 text-xs md:text-sm font-mono flex-shrink-0">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-slate-800">
             <span className="text-slate-400 text-xs font-sans">Total Lots:</span>
             <span className="text-white font-bold text-sm md:text-base">{totalLots} Lots</span>
           </div>
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-slate-800">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-slate-800">
             <span className="text-slate-400 text-xs font-sans">Classified Parts:</span>
             <span className="text-slate-100 font-bold text-sm md:text-base">{totalParts} Pts</span>
           </div>
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-emerald-900/40">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-emerald-900/40">
             <span className="text-emerald-400 text-xs font-sans">Flight Safe:</span>
             <span className="text-emerald-300 font-bold text-sm md:text-base">{totalSafe}</span>
           </div>
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-amber-900/40">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-amber-900/40">
             <span className="text-amber-400 text-xs font-sans">Drift Monitor:</span>
             <span className="text-amber-300 font-bold text-sm md:text-base">{totalMonitor}</span>
           </div>
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0A1122] border border-rose-900/40 col-span-2 sm:col-span-1">
+          <div className="flex items-center justify-between p-2 rounded-lg bg-[#0A1122] border border-rose-900/40 col-span-2 sm:col-span-1">
             <span className="text-rose-400 text-xs font-sans">Quarantined:</span>
             <span className="text-rose-300 font-bold text-sm md:text-base">{totalReject}</span>
           </div>
         </div>
 
-        {/* Main Body: Stacked Layout (One after the other, not side-by-side) */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Section 1 (Top): Qualification Lots Matrix Selector across full width */}
-          <div className="bg-[#070D1A] border-b border-slate-800 flex flex-col flex-shrink-0">
-            <div className="px-6 py-2 bg-[#091122] border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
+        {/* Main Body: Divided into Two Equal Halves (50% / 50%) */}
+        <div
+          className={`flex-1 flex overflow-hidden ${
+            splitMode === 'sideBySide' ? 'flex-col lg:flex-row' : 'flex-col'
+          }`}
+        >
+          {/* Section 1 (50% Equal Half): Qualification Lots Matrix Selector */}
+          <div
+            className={`${
+              splitMode === 'sideBySide'
+                ? 'w-full lg:w-1/2 h-full border-b lg:border-b-0 lg:border-r'
+                : 'w-full h-1/2 border-b'
+            } border-slate-800 flex flex-col overflow-hidden bg-[#070D1A]`}
+          >
+            <div className="px-4 py-2 bg-[#091122] border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2 flex-shrink-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-mono flex items-center gap-2">
                 <span>📦</span> QUALIFICATION FLIGHT LOTS ({lotGroups.length}) &mdash;{' '}
-                <span className="text-amber-400 font-normal hidden md:inline">Select any lot to inspect its constituent components below</span>
+                <span className="text-amber-400 font-normal hidden sm:inline">Select lot to inspect components</span>
               </span>
               <span className="text-xs text-slate-300 font-mono">
-                Active Lot: <b className="text-white bg-amber-500/20 px-2.5 py-0.5 rounded border border-amber-500/40">{activeLot?.lot_id || 'None'}</b>
+                Active: <b className="text-white bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40">{activeLot?.lot_id || 'None'}</b>
               </span>
             </div>
 
-            {/* Grid of Lot Cards across full width */}
-            <div className="p-3 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 max-h-[160px]">
+            {/* Grid of Lot Cards in Section 1 */}
+            <div
+              className={`p-3 overflow-y-auto flex-1 grid ${
+                splitMode === 'sideBySide'
+                  ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
+                  : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
+              } gap-2.5`}
+            >
               {lotGroups.length === 0 ? (
                 <div className="p-6 text-center text-slate-400 text-xs italic col-span-full">
                   No qualification lots found in current telemetry dataset.
@@ -384,24 +429,28 @@ export default function LotClassificationModal({
             </div>
           </div>
 
-          {/* Section 2 (Bottom): Selected Lot Deep Dive & Components Table taking THE ENTIRE FULL WIDTH */}
-          <div className="flex-1 bg-[#090F1E] flex flex-col overflow-hidden">
+          {/* Section 2 (50% Equal Half): Selected Lot Deep Dive & Components Table */}
+          <div
+            className={`${
+              splitMode === 'sideBySide' ? 'w-full lg:w-1/2 h-full' : 'w-full h-1/2'
+            } bg-[#090F1E] flex flex-col overflow-hidden`}
+          >
             {activeLot ? (
               <>
                 {/* Active Lot Header Info Card */}
-                <div className="p-4 border-b border-slate-800 bg-[#0C152B]">
-                  <div className="flex flex-wrap items-center justify-between gap-3 mb-2.5">
+                <div className="p-3 border-b border-slate-800 bg-[#0C152B] flex-shrink-0">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                     <div>
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-sm font-mono font-bold text-white bg-white/10 px-2.5 py-0.5 rounded border border-white/20">
-                          QUALIFICATION LOT: {activeLot.lot_id}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs sm:text-sm font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded border border-white/20">
+                          LOT: {activeLot.lot_id}
                         </span>
                         <span className="text-xs font-mono text-slate-300">
                           &bull; <b className="text-emerald-400 font-bold">{activeLot.total} flight parts</b> allocated
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-400 mt-1 font-sans">
-                        MIL-STD-883 HTOL 168h Burn-In Baseline &mu; ={' '}
+                      <div className="text-[10.5px] text-slate-400 mt-0.5 font-sans">
+                        HTOL 168h Baseline &mu; ={' '}
                         <b className="text-isro-amber font-mono">{activeLot.mean.toFixed(2)} &micro;A</b> &bull; &sigma; ={' '}
                         <b className="text-slate-300 font-mono">{activeLot.std.toFixed(2)}</b> &bull; Subsystems:{' '}
                         <span className="text-white font-mono font-semibold">
@@ -414,18 +463,18 @@ export default function LotClassificationModal({
                       <button
                         type="button"
                         onClick={handleExportLotCSV}
-                        className="px-3 py-1.5 rounded-lg border border-slate-700 bg-[#070D1A] text-slate-200 hover:text-white hover:border-slate-500 text-xs font-medium transition-colors flex items-center gap-1.5"
+                        className="px-2.5 py-1 rounded-lg border border-slate-700 bg-[#070D1A] text-slate-200 hover:text-white hover:border-slate-500 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
                         title="Download CSV report of components in this lot"
                       >
-                        <span>📥</span> Export Lot CSV
+                        <span>📥</span> Export CSV
                       </button>
                     </div>
                   </div>
 
                   {/* Where Components Locate Breakdown Tags */}
-                  <div className="bg-[#070D1A] p-2 rounded-lg border border-slate-800 flex flex-wrap items-center gap-1.5 my-2">
+                  <div className="bg-[#070D1A] p-1.5 rounded-lg border border-slate-800 flex flex-wrap items-center gap-1 my-1 max-h-[62px] overflow-y-auto">
                     <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mr-1">
-                      Where Parts Locate:
+                      Locate:
                     </span>
                     {Object.entries(activeLot.subsystemCounts).map(([subKey, count]) => {
                       const loc = getSubsystemLocation(subKey)
@@ -435,7 +484,7 @@ export default function LotClassificationModal({
                           key={subKey}
                           type="button"
                           onClick={() => setSubsystemFilter(isFiltered ? 'ALL' : subKey)}
-                          className={`px-2 py-0.5 rounded text-[10.5px] font-mono transition-all border flex items-center gap-1 cursor-pointer ${
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-all border flex items-center gap-1 cursor-pointer ${
                             isFiltered
                               ? 'bg-isro-amber/30 border-isro-amber text-isro-amber font-bold'
                               : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-isro-amber hover:text-white'
@@ -444,7 +493,6 @@ export default function LotClassificationModal({
                         >
                           <span className="font-bold text-isro-amber">[{subKey}]</span>
                           <span>{count} in {loc.name}</span>
-                          <span className="text-[9px] text-slate-400">({loc.bay})</span>
                         </button>
                       )
                     })}
@@ -460,7 +508,7 @@ export default function LotClassificationModal({
                   </div>
 
                   {/* Component Filter Tools Bar */}
-                  <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-800/80">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
                     {/* Status Filter Pills */}
                     <div className="flex items-center gap-1 bg-[#060B16] p-0.5 rounded-lg border border-slate-800 text-xs font-mono">
                       {[
@@ -478,7 +526,7 @@ export default function LotClassificationModal({
                               sounds.playClick()
                               setStatusFilter(tab.id as any)
                             }}
-                            className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                            className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
                               isTabActive
                                 ? tab.id === 'SAFE'
                                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
@@ -497,12 +545,12 @@ export default function LotClassificationModal({
                     </div>
 
                     {/* Subsystem Filter Dropdown */}
-                    <div className="flex items-center gap-2 text-xs">
+                    <div className="flex items-center gap-1.5 text-xs">
                       <span className="text-[11px] text-slate-400 font-sans hidden sm:inline">Subsystem:</span>
                       <select
                         value={subsystemFilter}
                         onChange={(e) => setSubsystemFilter(e.target.value)}
-                        className="bg-[#060B16] border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-1 font-mono focus:border-white outline-none"
+                        className="bg-[#060B16] border border-slate-800 text-slate-200 text-xs rounded-lg px-2 py-0.5 font-mono focus:border-white outline-none"
                       >
                         <option value="ALL">All Subsystems</option>
                         {activeLot.subsystems.map((s) => (
@@ -514,14 +562,14 @@ export default function LotClassificationModal({
                     </div>
 
                     {/* Component Search Input */}
-                    <div className="relative flex-1 min-w-[200px] max-w-xs">
-                      <span className="absolute left-2.5 top-1.5 text-slate-500 text-xs">🔍</span>
+                    <div className="relative flex-1 min-w-[160px] max-w-xs">
+                      <span className="absolute left-2.5 top-1 text-slate-500 text-xs">🔍</span>
                       <input
                         type="text"
                         placeholder="Search Component ID..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-7 pr-3 py-1 bg-[#060B16] border border-slate-800 rounded-lg text-xs font-mono text-slate-100 placeholder:text-slate-500 focus:border-white outline-none transition-colors"
+                        className="w-full pl-7 pr-2.5 py-0.5 bg-[#060B16] border border-slate-800 rounded-lg text-xs font-mono text-slate-100 placeholder:text-slate-500 focus:border-white outline-none transition-colors"
                       />
                     </div>
                   </div>
