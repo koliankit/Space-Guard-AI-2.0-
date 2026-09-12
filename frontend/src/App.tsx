@@ -9,7 +9,6 @@ import DataIngestModal from './components/Dashboard/DataIngestModal'
 import LotClassificationModal from './components/Dashboard/LotClassificationModal'
 import ComponentMonitor from './components/ComponentPanel/ComponentMonitor'
 import IntelligencePanel, { ComponentOverviewCard, MathematicalReadingsPanel } from './components/ComponentPanel/IntelligencePanel'
-import ComparePanel from './components/Charts/ComparePanel'
 import TelemetryChart from './components/Charts/TelemetryChart'
 import DataQuality from './components/Charts/DataQuality'
 import MissionMap from './components/MissionMap/MissionMap'
@@ -432,14 +431,9 @@ export default function App() {
               <MathematicalReadingsPanel component={selected} />
             </div>
 
-            {/* Row 2: Enriched Telemetry Waveform Oscilloscope (Left) & Screening Paradigm Comparison (Right) */}
-            <div className="grid grid-cols-1 2xl:grid-cols-[1.3fr_1fr] xl:grid-cols-[1.2fr_1fr] gap-4 items-stretch">
-              <div className="rounded-xl border border-line bg-[#091120] overflow-hidden shadow-panel-subtle flex flex-col">
-                <TelemetryChart component={selected} />
-              </div>
-              <div className="flex flex-col">
-                <ComparePanel component={selected} />
-              </div>
+            {/* Row 2: Full-Width Parametric Waveform Telemetry Oscilloscope with Live Sweep & Multi-Channel HUD */}
+            <div className="w-full">
+              <TelemetryChart component={selected} />
             </div>
 
             {/* AI Prescriptive Actions & Root Cause Analysis (Full Width) */}
