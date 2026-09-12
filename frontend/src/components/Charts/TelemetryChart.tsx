@@ -342,7 +342,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             {component.component_id}
           </span>
           <span className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-[#070D1A] border border-slate-800 text-slate-400">
-            {component.name} &bull; {component.subsystem.toUpperCase()}
+            {component.subsystem_name || component.subsystem.toUpperCase()} &bull; LOT: {component.lot_id}
           </span>
         </div>
 
