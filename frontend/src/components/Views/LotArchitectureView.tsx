@@ -3,6 +3,7 @@ import type { ComponentOut, SubsystemStatus } from '../../types'
 import { getSubsystemLocation, formatCoordinates } from '../../utils/satelliteLocations'
 import { sounds } from '../../utils/soundEffects'
 import AIRecommendationSystem from '../Satellite/AIRecommendationSystem'
+import ModuleAAnomalyGraph from '../Charts/ModuleAAnomalyGraph'
 
 interface LotArchitectureViewProps {
   components: ComponentOut[]
@@ -28,6 +29,7 @@ export default function LotArchitectureView({
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'SAFE' | 'MONITOR' | 'REJECT'>('ALL')
   const [subsystemFilter, setSubsystemFilter] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
+  const [localSelectedId, setLocalSelectedId] = useState<string | null>(null)
 
   const isScreened = useMemo(() => {
     return components.some(
@@ -128,6 +130,26 @@ export default function LotArchitectureView({
 
     return list
   }, [activeLot, statusFilter, subsystemFilter, searchQuery])
+
+  // Currently inspected component in the active lot
+  const inspectedComponent = useMemo(() => {
+    if (!activeLot || activeLot.parts.length === 0) return null
+    const currentId = localSelectedId || selectedId
+    if (currentId) {
+      const found = activeLot.parts.find((p) => p.component_id === currentId)
+      if (found) return found
+    }
+    return (
+      activeLot.parts.find((p) => p.status === 'reject') ||
+      activeLot.parts.find((p) => p.status === 'monitor') ||
+      activeLot.parts[0] ||
+      null
+    )
+  }, [activeLot, localSelectedId, selectedId])
+
+  const inspectedLoc = useMemo(() => {
+    return inspectedComponent ? getSubsystemLocation(inspectedComponent.subsystem) : null
+  }, [inspectedComponent])
 
   // Overall totals across entire dataset
   const totalComponents = components.length
@@ -393,15 +415,10 @@ export default function LotArchitectureView({
             </div>
           </div>
 
-          {/* AI Prescriptive Recommendation & Wafer Quality Disposition Engine - Fills empty space */}
+          {/* AI Prescriptive Recommendation & Wafer Quality Disposition Engine */}
           <div className="w-full">
             <AIRecommendationSystem
-              component={
-                activeLot?.parts.find((p) => p.status === 'reject') ||
-                activeLot?.parts.find((p) => p.status === 'monitor') ||
-                activeLot?.parts[0] ||
-                null
-              }
+              component={inspectedComponent}
             />
           </div>
         </div>
@@ -545,7 +562,7 @@ export default function LotArchitectureView({
               </div>
 
               {/* Components Table with Full Satellite Location Columns */}
-              <div className="flex-1 overflow-y-auto overflow-x-auto max-h-[850px]">
+              <div className="overflow-y-auto overflow-x-auto max-h-[280px] xl:max-h-[320px] border-b border-slate-800">
                 <table className="w-full min-w-[700px] text-left border-collapse text-xs font-mono">
                   <thead className="bg-[#070D1A] text-[10px] text-slate-400 uppercase tracking-wider sticky top-0 z-10 border-b border-slate-800">
                     <tr>
@@ -579,7 +596,10 @@ export default function LotArchitectureView({
                         return (
                           <tr
                             key={c.component_id}
-                            onClick={() => onSelectComponent(c.component_id)}
+                            onClick={() => {
+                              setLocalSelectedId(c.component_id)
+                              onSelectComponent(c.component_id)
+                            }}
                             className={`cursor-pointer transition-colors ${
                               isSelected
                                 ? 'bg-amber-500/20 text-white font-bold'
@@ -678,6 +698,107 @@ export default function LotArchitectureView({
                   </tbody>
                 </table>
               </div>
+
+              {/* Active Component Silicon Telemetry & Spacecraft Bay Diagnostic Terminal - Fills Empty Space */}
+              {inspectedComponent && inspectedLoc && (
+                <div className="p-4 bg-[#070D1A] flex flex-col gap-3.5 flex-1 border-t border-slate-800">
+                  {/* Header Strip */}
+                  <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-slate-800/80">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          inspectedComponent.status === 'reject'
+                            ? 'bg-rose-500 led'
+                            : inspectedComponent.status === 'monitor'
+                            ? 'bg-amber-400 led'
+                            : 'bg-emerald-400'
+                        }`}
+                      />
+                      <span className="font-mono font-bold text-sm md:text-base text-white tracking-wide">
+                        {inspectedComponent.component_id}
+                      </span>
+                      <span className="text-slate-400 text-xs font-mono">&bull;</span>
+                      <span className="text-amber-400 font-bold font-mono text-xs">
+                        [{inspectedComponent.subsystem}] {inspectedLoc.name}
+                      </span>
+                      <span className="text-slate-400 text-xs font-sans">({inspectedLoc.bay})</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded border uppercase ${
+                          inspectedComponent.status === 'reject'
+                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                            : inspectedComponent.status === 'monitor'
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        }`}
+                      >
+                        {inspectedComponent.status.toUpperCase()} &bull; RISK {inspectedComponent.risk_score ?? '--'}/100
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sounds.playPing()
+                          onSelectComponent(inspectedComponent.component_id)
+                          if (onFocusIn3D) onFocusIn3D(inspectedComponent)
+                          else onFocusSubsystem(inspectedComponent.subsystem)
+                        }}
+                        className="px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 hover:text-white border border-amber-500/30 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1"
+                        title="Locate in 3D Spacecraft Model"
+                      >
+                        <span>🎯</span> Locate 3D
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Location & Bay Coordinates Strip */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-[#050B16] p-2.5 rounded-lg border border-slate-800/80">
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">Bay / Deck</span>
+                      <span className="text-white font-bold truncate block">{inspectedLoc.bay}</span>
+                      <span className="text-slate-400 text-[10px] block">{inspectedLoc.deck}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">3D Coordinates</span>
+                      <span className="text-amber-300 font-bold block">{formatCoordinates(inspectedLoc.pos)}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">Lot Z-Score</span>
+                      <span className={`font-bold block ${
+                        inspectedComponent.z168 != null && Math.abs(inspectedComponent.z168) >= 2
+                          ? 'text-rose-400'
+                          : 'text-emerald-400'
+                      }`}>
+                        {inspectedComponent.z168 != null ? `${inspectedComponent.z168 > 0 ? '+' : ''}${inspectedComponent.z168.toFixed(2)}σ` : '--'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">Future Projection</span>
+                      <span className="text-rose-400 font-bold block">
+                        {inspectedComponent.predicted_future?.toFixed(1) ?? '--'} &mu;A
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Failure Physics Callout */}
+                  {inspectedComponent.reason && (
+                    <div className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 text-xs text-slate-200 flex items-start gap-2">
+                      <span className="text-amber-400 font-bold uppercase whitespace-nowrap text-[11px] mt-0.5">
+                        Physics Diagnosis:
+                      </span>
+                      <span className="text-slate-200 font-sans leading-relaxed text-[12px]">
+                        {inspectedComponent.reason}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Oscilloscope Waveform */}
+                  <div className="flex-1 w-full min-h-[380px]">
+                    <ModuleAAnomalyGraph component={inspectedComponent} />
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <div className="p-12 text-center text-slate-400 text-xs italic">
