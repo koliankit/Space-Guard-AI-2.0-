@@ -44,7 +44,7 @@ export default function ModuleBFutureDriftPanel({
   const isAccelerating = selected?.drift_trend === 'ACCELERATING POSITIVE DRIFT'
 
   return (
-    <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[580px]">
+    <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden h-full">
       {/* Module B Top Bezel Bar */}
       <div className="bg-[#0D162A] border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-3">
@@ -67,8 +67,24 @@ export default function ModuleBFutureDriftPanel({
         </div>
       </div>
 
+      {/* Module B Predictive Engine & Horizon Sub-bar */}
+      <div className="p-3 bg-[#070D1A] border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 font-mono text-[11px]">PREDICTION ENGINE:</span>
+          <span className="text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30 text-[11px]">
+            EMPIRICAL ARRHENIUS DEGRADATION
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-[11px]">
+          <span className="text-slate-400">HORIZON:</span>
+          <span className="text-emerald-400 font-bold bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+            264H IN-FLIGHT (+96H EXTENSION)
+          </span>
+        </div>
+      </div>
+
       {/* Main Content Area */}
-      <div className="p-3.5 flex-1 flex flex-col gap-3">
+      <div className="p-3.5 flex-1 flex flex-col gap-3 justify-between">
         {selected ? (
           <div className="p-3 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col gap-2.5">
             {/* Top Identity & Drift Classification Row */}
@@ -213,7 +229,7 @@ export default function ModuleBFutureDriftPanel({
         )}
 
         {/* Module B Dedicated Graph: Future Drift Forecaster */}
-        <div className="mt-1">
+        <div className="mt-1 flex-1 flex flex-col">
           <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>
