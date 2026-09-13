@@ -22,10 +22,11 @@ interface ModuleBFutureDriftGraphProps {
 
 export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: ModuleBFutureDriftGraphProps) {
   const [activeHorizon, setActiveHorizon] = useState<216 | 264 | 336>(264)
-  const [animProgress, setAnimProgress] = useState<number>(1)
-  const [isSimulating, setIsSimulating] = useState<boolean>(false)
+  const [animProgress, setAnimProgress] = useState<number>(0)
+  const [isSimulating, setIsSimulating] = useState<boolean>(true)
   const [isPaused, setIsPaused] = useState<boolean>(false)
-  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1)
+  const [isLooping, setIsLooping] = useState<boolean>(true)
+  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(0.5)
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
   // Interactive mouse scrubbing & inspection state
@@ -115,39 +116,81 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     return h > 0 && h <= 500 ? h : null
   }, [slope, limitVal, v168])
 
-  // Base simulation duration
-  const baseDuration = 8500 / simSpeed
+  // Base simulation duration (8500ms at 1x; 17000ms at 0.5x slow inspection; 4250ms at 2x)
+  const simSpeedRef = useRef<number>(simSpeed)
+  simSpeedRef.current = simSpeed
+
+  const isLoopingRef = useRef<boolean>(isLooping)
+  isLoopingRef.current = isLooping
+
+  const lastPingHourRef = useRef<number>(-1)
+
+  const getDuration = useCallback((spd: number) => {
+    return 8500 / spd
+  }, [])
 
   const startSimulation = useCallback((resetOffset = true) => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     setIsSimulating(true)
     setIsPaused(false)
+
+    const curSpeed = simSpeedRef.current
+    const duration = getDuration(curSpeed)
+
     if (resetOffset) {
       setAnimProgress(0)
       elapsedOffsetRef.current = 0
+      lastPingHourRef.current = -1
+      startTimeRef.current = performance.now()
+    } else {
+      startTimeRef.current = performance.now() - elapsedOffsetRef.current
     }
-    sounds.playClick()
-    startTimeRef.current = performance.now() - elapsedOffsetRef.current
 
     const tick = (now: number) => {
+      const currentDuration = getDuration(simSpeedRef.current)
       const elapsed = now - startTimeRef.current
       elapsedOffsetRef.current = elapsed
-      const rawP = Math.min(1, elapsed / baseDuration)
-      setAnimProgress(rawP)
+      const rawP = elapsed / currentDuration
 
-      if (rawP < 1) {
-        animFrameRef.current = requestAnimationFrame(tick)
-      } else {
-        setAnimProgress(1)
-        setIsSimulating(false)
-        setIsPaused(false)
-        animFrameRef.current = null
+      if (rawP >= 1) {
+        if (isLoopingRef.current) {
+          const holdElapsed = now - (startTimeRef.current + currentDuration)
+          if (holdElapsed >= 750) {
+            startTimeRef.current = now
+            elapsedOffsetRef.current = 0
+            lastPingHourRef.current = -1
+            setAnimProgress(0)
+          } else {
+            setAnimProgress(1)
+          }
+          animFrameRef.current = requestAnimationFrame(tick)
+          return
+        } else {
+          setAnimProgress(1)
+          setIsSimulating(false)
+          setIsPaused(false)
+          animFrameRef.current = null
+          return
+        }
       }
+
+      const p = Math.max(0, Math.min(1, rawP))
+      setAnimProgress(p)
+
+      // Audio milestone ping when passing into in-flight zone (168h)
+      if (p >= 0.45 && lastPingHourRef.current < 168) {
+        lastPingHourRef.current = 168
+        sounds.playPing()
+      }
+
+      animFrameRef.current = requestAnimationFrame(tick)
     }
+
     animFrameRef.current = requestAnimationFrame(tick)
-  }, [baseDuration])
+  }, [getDuration])
 
   const togglePause = useCallback(() => {
+    sounds.playClick()
     if (isPaused) {
       startSimulation(false)
     } else {
@@ -155,6 +198,22 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
       setIsPaused(true)
     }
   }, [isPaused, startSimulation])
+
+  const handleSpeedChange = useCallback((spd: 0.5 | 1 | 2) => {
+    sounds.playClick()
+    setSimSpeed(spd)
+    simSpeedRef.current = spd
+    const newDuration = getDuration(spd)
+    const curP = animProgress >= 1 ? 0 : animProgress
+    elapsedOffsetRef.current = curP * newDuration
+    startTimeRef.current = performance.now() - elapsedOffsetRef.current
+
+    if (isPaused || !isSimulating) {
+      setIsPaused(false)
+      setIsSimulating(true)
+      startSimulation(false)
+    }
+  }, [animProgress, isPaused, isSimulating, getDuration, startSimulation])
 
   // Auto-trigger simulation only when component changes
   useEffect(() => {
@@ -321,7 +380,6 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
 
   const handleScrubberChange = (newHour: number) => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    setIsSimulating(false)
     setIsPaused(true)
 
     const clampedH = Math.min(activeHorizon, Math.max(0, newHour))
@@ -338,6 +396,17 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     }
 
     const clampedY = toY(val)
+
+    let newProgress = 0
+    if (clampedH <= 168) {
+      newProgress = (clampedH / 168) * 0.45
+    } else {
+      newProgress = 0.45 + ((clampedH - 168) / (activeHorizon - 168)) * 0.55
+    }
+    setAnimProgress(newProgress)
+    const duration = getDuration(simSpeedRef.current)
+    elapsedOffsetRef.current = newProgress * duration
+    startTimeRef.current = performance.now() - elapsedOffsetRef.current
 
     setIsHovering(true)
     setHoverData({
@@ -431,31 +500,67 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         {/* Live Simulation status, Speed Selector & Horizon Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
-            {isSimulating ? (
-              <button
-                type="button"
-                onClick={togglePause}
-                className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
-                title={isPaused ? 'Resume Simulation' : 'Pause Simulation'}
-              >
-                <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsHovering(false)
-                  setHoverData(null)
-                  startSimulation(true)
-                }}
-                className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
-                title="Replay in-flight drift simulation"
-              >
-                <span>↺</span> REPLAY
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={togglePause}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                !isPaused && isSimulating
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
+                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+              }`}
+              title={isPaused ? 'Resume Simulation' : 'Pause Simulation'}
+            >
+              <span className={`w-2 h-2 rounded-full ${!isPaused && isSimulating ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'}`} />
+              <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
+            </button>
 
-            <span className="text-[9.5px] font-mono font-bold text-amber-400 px-1">
+            <button
+              type="button"
+              onClick={() => {
+                setIsHovering(false)
+                setHoverData(null)
+                startSimulation(true)
+              }}
+              className="flex items-center gap-1 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
+              title="Replay in-flight drift simulation from 0h"
+            >
+              <span>↺</span> REPLAY
+            </button>
+
+            {/* Loop Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsLooping((prev) => !prev)}
+              className={`px-2 py-1 rounded text-[10px] font-mono font-bold border transition-all cursor-pointer ${
+                isLooping
+                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+              }`}
+              title={isLooping ? 'Auto-loop active: sweeps continuously' : 'Loop disabled: stops at horizon'}
+            >
+              🔁 {isLooping ? 'LOOP ON' : 'LOOP OFF'}
+            </button>
+
+            {/* Speed Selector */}
+            <div className="flex items-center gap-0.5 pl-1 border-l border-slate-700 text-[10px] font-mono">
+              {([0.5, 1, 2] as const).map((spd) => (
+                <button
+                  key={spd}
+                  type="button"
+                  onClick={() => handleSpeedChange(spd)}
+                  className={`px-1.5 py-0.5 rounded transition-all cursor-pointer font-bold ${
+                    simSpeed === spd
+                      ? 'bg-amber-500/40 text-amber-200 border border-amber-400'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  }`}
+                  title={spd === 0.5 ? '0.5x Slow' : spd === 1 ? '1x Normal' : '2x Fast'}
+                >
+                  {spd}x{spd === 0.5 ? ' SLOW' : ''}
+                </button>
+              ))}
+            </div>
+
+            <span className="text-[9.5px] font-mono font-bold text-amber-400 px-1 whitespace-nowrap">
               {isUserInspecting
                 ? activeHour > 168
                   ? `[FORECAST +${Math.round(activeHour - 168)}h]`
@@ -734,7 +839,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
           </g>
 
           {/* Crosshair Laser & Telemetry Probe (Interactive or Auto-simulating) */}
-          {(isSimulating || isUserInspecting) && (
+          {(isSimulating || isUserInspecting || isPaused) && (
             <g>
               <line
                 x1={activeProbeX}

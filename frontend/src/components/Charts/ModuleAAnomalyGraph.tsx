@@ -19,10 +19,11 @@ const STAGES = [0, 24, 96, 168]
 
 export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAAnomalyGraphProps) {
   const [stageH, setStageH] = useState<number>(168)
-  const [animProgress, setAnimProgress] = useState<number>(1)
-  const [isSimulating, setIsSimulating] = useState<boolean>(false)
+  const [animProgress, setAnimProgress] = useState<number>(0)
+  const [isSimulating, setIsSimulating] = useState<boolean>(true)
   const [isPaused, setIsPaused] = useState<boolean>(false)
-  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1)
+  const [isLooping, setIsLooping] = useState<boolean>(true)
+  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(0.5)
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
   // Interactive mouse hover state
@@ -159,28 +160,22 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
     return buildMonotoneCubicPath(mappedBaseline)
   }, [mappedBaseline])
 
-  // Probe tip coordinates along the path
-  const tipPoint = useMemo(() => {
-    if (!pathRef.current || pathLength <= 0) {
-      return { x: xFor(0), y: yFor(v0) }
-    }
-    const currentLen = Math.min(pathLength, Math.max(0, pathLength * animProgress))
-    try {
-      const pt = pathRef.current.getPointAtLength(currentLen)
-      return {
-        x: Math.max(padL, Math.min(W - padR, pt.x)),
-        y: Math.max(padT, Math.min(H - padB, pt.y)),
-      }
-    } catch {
-      return { x: xFor(0), y: yFor(v0) }
-    }
-  }, [animProgress, pathLength, v0, xFor, yFor, padL, padR, padT, padB, W, H])
-
-  // Current simulated hour and telemetry value from probe position
+  // Current simulated hour and telemetry value along monotone spline
   const simHour = useMemo(() => {
-    const rawH = ((tipPoint.x - padL) / (W - padL - padR)) * 168
-    return Math.min(stageH, Math.max(0, rawH))
-  }, [tipPoint.x, stageH, padL, padR, W])
+    return Math.min(stageH, Math.max(0, animProgress * stageH))
+  }, [animProgress, stageH])
+
+  const tipPoint = useMemo(() => {
+    if (mappedPoints.length < 2) {
+      return { x: xFor(0), y: yFor(v0) }
+    }
+    const x = xFor(simHour)
+    const y = evaluateMonotoneSpline(mappedPoints, x)
+    return {
+      x: Math.max(padL, Math.min(W - padR, x)),
+      y: Math.max(padT, Math.min(H - padB, y)),
+    }
+  }, [simHour, mappedPoints, xFor, yFor, v0, padL, padR, padT, padB, W, H])
 
   const simVal = useMemo(() => {
     const fraction = (H - padB - tipPoint.y) / (H - padT - padB || 1)
@@ -190,45 +185,93 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
   // Active coordinates (Hover overrides auto-simulation)
   const isUserInspecting = isHovering && hoverData !== null
-  const activeHour = isUserInspecting ? hoverData.hour : isSimulating ? simHour : (lastPoint ? lastPoint[0] : 168)
-  const activeVal = isUserInspecting ? hoverData.val : isSimulating ? simVal : (lastPoint ? lastPoint[1] : v168)
+  const activeHour = isUserInspecting ? hoverData.hour : simHour
+  const activeVal = isUserInspecting ? hoverData.val : simVal
   const activeProbeX = isUserInspecting ? hoverData.x : tipPoint.x
   const activeProbeY = isUserInspecting ? hoverData.y : tipPoint.y
 
-  // Base simulation duration
-  const baseDuration = 8000 / simSpeed
+  const simSpeedRef = useRef<number>(simSpeed)
+  simSpeedRef.current = simSpeed
+
+  const isLoopingRef = useRef<boolean>(isLooping)
+  isLoopingRef.current = isLooping
+
+  const stageHRef = useRef<number>(stageH)
+  stageHRef.current = stageH
+
+  const lastPingHourRef = useRef<number>(-1)
+
+  const getDuration = useCallback((spd: number) => {
+    return 8000 / spd
+  }, [])
 
   // Live simulation telemetry sweep callback
   const startSweepAnimation = useCallback((resetOffset = true) => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     setIsSimulating(true)
     setIsPaused(false)
+
+    const curSpeed = simSpeedRef.current
+    const duration = getDuration(curSpeed)
+
     if (resetOffset) {
       setAnimProgress(0)
       elapsedOffsetRef.current = 0
+      lastPingHourRef.current = -1
+      startTimeRef.current = performance.now()
+    } else {
+      startTimeRef.current = performance.now() - elapsedOffsetRef.current
     }
-    sounds.playClick()
-    startTimeRef.current = performance.now() - elapsedOffsetRef.current
 
     const tick = (now: number) => {
+      const currentDuration = getDuration(simSpeedRef.current)
       const elapsed = now - startTimeRef.current
       elapsedOffsetRef.current = elapsed
-      const rawP = Math.min(1, elapsed / baseDuration)
-      setAnimProgress(rawP)
+      const rawP = elapsed / currentDuration
 
-      if (rawP < 1) {
-        animFrameRef.current = requestAnimationFrame(tick)
-      } else {
-        setAnimProgress(1)
-        setIsSimulating(false)
-        setIsPaused(false)
-        animFrameRef.current = null
+      if (rawP >= 1) {
+        if (isLoopingRef.current) {
+          const holdElapsed = now - (startTimeRef.current + currentDuration)
+          if (holdElapsed >= 750) {
+            startTimeRef.current = now
+            elapsedOffsetRef.current = 0
+            lastPingHourRef.current = -1
+            setAnimProgress(0)
+          } else {
+            setAnimProgress(1)
+          }
+          animFrameRef.current = requestAnimationFrame(tick)
+          return
+        } else {
+          setAnimProgress(1)
+          setIsSimulating(false)
+          setIsPaused(false)
+          animFrameRef.current = null
+          return
+        }
       }
+
+      const p = Math.max(0, Math.min(1, rawP))
+      setAnimProgress(p)
+
+      // Milestone audio radar ping
+      const curHour = p * stageHRef.current
+      for (const m of [24, 96, 168]) {
+        if (curHour >= m && lastPingHourRef.current < m && m <= stageHRef.current) {
+          lastPingHourRef.current = m
+          sounds.playPing()
+          break
+        }
+      }
+
+      animFrameRef.current = requestAnimationFrame(tick)
     }
+
     animFrameRef.current = requestAnimationFrame(tick)
-  }, [baseDuration])
+  }, [getDuration])
 
   const togglePause = useCallback(() => {
+    sounds.playClick()
     if (isPaused) {
       startSweepAnimation(false)
     } else {
@@ -237,7 +280,23 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
     }
   }, [isPaused, startSweepAnimation])
 
-  // Auto-trigger sweep only when component changes
+  const handleSpeedChange = useCallback((spd: 0.5 | 1 | 2) => {
+    sounds.playClick()
+    setSimSpeed(spd)
+    simSpeedRef.current = spd
+    const newDuration = getDuration(spd)
+    const curP = animProgress >= 1 ? 0 : animProgress
+    elapsedOffsetRef.current = curP * newDuration
+    startTimeRef.current = performance.now() - elapsedOffsetRef.current
+
+    if (isPaused || !isSimulating) {
+      setIsPaused(false)
+      setIsSimulating(true)
+      startSweepAnimation(false)
+    }
+  }, [animProgress, isPaused, isSimulating, getDuration, startSweepAnimation])
+
+  // Auto-trigger sweep when component changes
   useEffect(() => {
     if (component?.component_id) {
       startSweepAnimation(true)
@@ -247,7 +306,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
     }
   }, [component?.component_id, startSweepAnimation])
 
-  // Notify parent dashboard with throttled state
+  // Notify parent dashboard with live state
   useEffect(() => {
     if (onSimUpdate) {
       onSimUpdate({
@@ -302,7 +361,6 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
   const handleScrubberChange = (newHour: number) => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    setIsSimulating(false)
     setIsPaused(true)
     const clampedH = Math.min(stageH, Math.max(0, newHour))
     const clampedX = xFor(clampedH)
@@ -310,6 +368,12 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
     const clampedY = Math.max(padT, Math.min(H - padB, y))
     const fraction = (H - padB - clampedY) / (H - padT - padB || 1)
     const val = minY + fraction * (maxY - minY)
+
+    const newProgress = clampedH / (stageH || 1)
+    setAnimProgress(newProgress)
+    const duration = getDuration(simSpeedRef.current)
+    elapsedOffsetRef.current = newProgress * duration
+    startTimeRef.current = performance.now() - elapsedOffsetRef.current
 
     setIsHovering(true)
     setHoverData({
@@ -364,32 +428,72 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
         {/* Live Controls */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
-            {isSimulating ? (
-              <button
-                type="button"
-                onClick={togglePause}
-                className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
-                title={isPaused ? 'Resume Sweep' : 'Pause Sweep'}
-              >
-                <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsHovering(false)
-                  setHoverData(null)
-                  startSweepAnimation(true)
-                }}
-                className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
-                title="Replay oscilloscope telemetry sweep"
-              >
-                <span>↺</span> REPLAY
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={togglePause}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                !isPaused && isSimulating
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
+                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+              }`}
+              title={isPaused ? 'Resume Sweep' : 'Pause Sweep'}
+            >
+              <span className={`w-2 h-2 rounded-full ${!isPaused && isSimulating ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'}`} />
+              <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
+            </button>
 
-            <span className="text-[9.5px] font-mono font-bold text-emerald-400 px-1">
-              {isUserInspecting ? `[INSPECT T+${Math.round(activeHour)}h]` : isPaused ? '[PAUSED]' : `[T+${Math.round(activeHour)}h]`}
+            <button
+              type="button"
+              onClick={() => {
+                setIsHovering(false)
+                setHoverData(null)
+                startSweepAnimation(true)
+              }}
+              className="flex items-center gap-1 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
+              title="Replay oscilloscope telemetry sweep from 0h"
+            >
+              <span>↺</span> REPLAY
+            </button>
+
+            {/* Loop Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsLooping((prev) => !prev)}
+              className={`px-2 py-1 rounded text-[10px] font-mono font-bold border transition-all cursor-pointer ${
+                isLooping
+                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+              }`}
+              title={isLooping ? 'Auto-loop active: sweeps continuously' : 'Loop disabled: stops at 168h'}
+            >
+              🔁 {isLooping ? 'LOOP ON' : 'LOOP OFF'}
+            </button>
+
+            {/* Speed Selector */}
+            <div className="flex items-center gap-0.5 pl-1 border-l border-slate-700 text-[10px] font-mono">
+              {([0.5, 1, 2] as const).map((spd) => (
+                <button
+                  key={spd}
+                  type="button"
+                  onClick={() => handleSpeedChange(spd)}
+                  className={`px-1.5 py-0.5 rounded transition-all cursor-pointer font-bold ${
+                    simSpeed === spd
+                      ? 'bg-amber-500/40 text-amber-200 border border-amber-400'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  }`}
+                  title={spd === 0.5 ? '0.5x Slow' : spd === 1 ? '1x Normal' : '2x Fast'}
+                >
+                  {spd}x{spd === 0.5 ? ' SLOW' : ''}
+                </button>
+              ))}
+            </div>
+
+            <span className="text-[9.5px] font-mono font-bold text-emerald-400 px-1 whitespace-nowrap">
+              {isUserInspecting
+                ? `[INSPECT T+${Math.round(activeHour)}h]`
+                : isPaused
+                ? `[PAUSED T+${Math.round(activeHour)}h]`
+                : `[SWEEP T+${Math.round(activeHour)}h]`}
             </span>
           </div>
 
@@ -657,7 +761,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
           })}
 
           {/* Crosshair Laser & HUD Probe */}
-          {(isSimulating || isUserInspecting) && (
+          {(isSimulating || isUserInspecting || isPaused) && (
             <g>
               <line
                 x1={activeProbeX}
