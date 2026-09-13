@@ -325,6 +325,18 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
 
     // Percentage deviation from lot average
     const lotPctDev = stats.mean168 > 0 ? ((p.v168 - stats.mean168) / stats.mean168) * 100 : 0
+    
+    // Percentile rank & Anomaly score
+    const sortedLotV168 = (byLot[p.lot_id]?.v168s || []).slice().sort((a, b) => a - b)
+    const rank = sortedLotV168.indexOf(p.v168) + 1
+    const lotRankPercentile = sortedLotV168.length > 0 ? (rank / sortedLotV168.length) * 100 : 0
+    const lotAnomalyScore = Math.min(100, Math.max(0, Math.abs(z168) * 25))
+
+    // Safety slope
+    const predictedDrift168 = predicted168Early - p.v0
+    const predictedDriftRate = predictedDrift168 / 168
+    const safetySlope = 0.040
+    const safetySlopeExceeded = predictedDriftRate > safetySlope
 
     // Unsupervised anomaly score (continuous 0-100 scale based on multivariate deviation)
     const normDev = Math.sqrt(z168 * z168 + zSlope * zSlope + Math.pow(lotPctDev / 40, 2))
@@ -335,8 +347,9 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
     const sZ = Math.min(1.0, zMax / 4.0)
     const sFuture = Math.min(1.5, Math.max(0, predictedFuture / p.limit_ua))
     const sIso = isoScore / 100.0
+    const sSafetySlope = safetySlopeExceeded ? 1.0 : 0.0
 
-    let calculatedRisk = Math.round(sZ * 40 + sFuture * 30 + sIso * 18 + sLimit * 12)
+    let calculatedRisk = Math.round(sZ * 35 + sFuture * 25 + sIso * 18 + sLimit * 12 + sSafetySlope * 10)
     if (p.v168 > p.limit_ua) {
       calculatedRisk = Math.min(100, Math.round(92 + ((p.v168 - p.limit_ua) / p.limit_ua) * 20))
     }
@@ -361,6 +374,15 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
       explanationPoints.push(`Drift slope (+${slope.toFixed(4)} µA/hr) confirms active parametric degradation.`)
       explanationPoints.push(`Immediate physical quarantine required. Traditional: FAIL. Flight integration prohibited.`)
       reason = `Static datasheet limit violation: 168h leakage (${p.v168.toFixed(2)} µA) exceeds specification threshold (${p.limit_ua} µA) by +${(p.v168 - p.limit_ua).toFixed(2)} µA. Traditional: FAIL. Immediate quarantine required.`
+    } else if (safetySlopeExceeded) {
+      status = 'reject'
+      behavioralHealth = 'CRITICAL'
+      anomalyCategory = 'predicted_exceedance'
+      explanationPoints.push(`Passes datasheet limit (${p.v168.toFixed(2)} µA < ${p.limit_ua} µA) but fails early drift safety check.`)
+      explanationPoints.push(`Predicted 168h drift rate (+${predictedDriftRate.toFixed(4)} µA/hr) exceeds safety slope (+${safetySlope.toFixed(4)} µA/hr).`)
+      explanationPoints.push(`Component diverges +${Math.abs(z168).toFixed(1)}σ from lot mean (${stats.mean168.toFixed(2)} µA) and is in ${lotRankPercentile.toFixed(1)}th percentile.`)
+      explanationPoints.push(`Early rejection recommended to prevent latent on-orbit failure.`)
+      reason = `Passes datasheet limit (${p.v168.toFixed(2)} µA < ${p.limit_ua} µA) but diverges +${Math.abs(z168).toFixed(1)}σ from lot mean (${stats.mean168.toFixed(2)} µA). Predicted 168h drift rate (${predictedDriftRate.toFixed(3)} µA/hr) exceeds safety slope (${safetySlope.toFixed(3)} µA/hr). Early rejection recommended.`
     } else if (predictedFuture > p.limit_ua) {
       status = 'reject'
       behavioralHealth = 'CRITICAL'
@@ -369,7 +391,7 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
       explanationPoints.push(`Measured burn-in drift (+${slope.toFixed(4)} µA/hr) indicates ${driftTrend.toLowerCase()}.`)
       explanationPoints.push(`Early 0h+24h prediction projected 168h to ${predicted168Early.toFixed(2)} µA (error: ±${predictionError168.toFixed(2)} µA).`)
       explanationPoints.push(`Projected 264h leakage (${predictedFuture.toFixed(2)} µA) crosses specification limit (${p.limit_ua} µA). Latent dielectric breakdown detected.`)
-      reason = `Within datasheet limit (${p.v168.toFixed(2)} < ${p.limit_ua} µA) but ${Math.abs(z168).toFixed(1)}σ above lot average (${stats.mean168.toFixed(2)} µA). Measured drift rate (+${slope.toFixed(4)} µA/hr) projects 264h leakage to ${predictedFuture.toFixed(2)} µA, exceeding safety threshold. Latent dielectric breakdown detected.`
+      reason = `Within datasheet limit (${p.v168.toFixed(2)} µA < ${p.limit_ua} µA) but ${Math.abs(z168).toFixed(1)}σ above lot average (${stats.mean168.toFixed(2)} µA). Measured drift rate (+${slope.toFixed(4)} µA/hr) projects 264h leakage to ${predictedFuture.toFixed(2)} µA, exceeding safety threshold. Latent dielectric breakdown detected.`
     } else if (zMax >= 3.0 || riskScore >= 75) {
       status = 'reject'
       behavioralHealth = riskScore >= 80 ? 'CRITICAL' : 'DEGRADING'
@@ -420,13 +442,21 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
       v168: p.v168,
       limit_ua: p.limit_ua,
       lot_mean: Math.round(stats.mean168 * 100) / 100,
+      lot_median: Math.round(stats.median168 * 100) / 100,
       lot_std: Math.round(stats.std168 * 100) / 100,
+      lot_mad: Math.round(stats.mad168 * 100) / 100,
       lot_pct_dev: Math.round(lotPctDev * 10) / 10,
+      lot_rank_percentile: Math.round(lotRankPercentile * 10) / 10,
+      lot_anomaly_score: Math.round(lotAnomalyScore * 10) / 10,
       ground_truth: p.ground_truth,
       slope,
       drift168,
       pct_drift: pctDrift,
       drift_rate_early: earlySlope,
+      predicted_drift_168: predictedDrift168,
+      predicted_drift_rate: predictedDriftRate,
+      safety_slope: safetySlope,
+      safety_slope_exceeded: safetySlopeExceeded,
       drift_trend: driftTrend,
       drift_classification: driftClassification,
       predicted168_from_early: predicted168Early,
@@ -618,6 +648,7 @@ class ClientISROEngine {
     let maeDrift = 0
     let rmseDrift = 0
     let meanErrorPct = 0
+    let r2Drift = 0
 
     if (this.scoredParts.length > 0) {
       const errs = this.scoredParts.map((c) => c.prediction_error_168 ?? 0)
@@ -628,6 +659,12 @@ class ClientISROEngine {
       if (pcts.length > 0) {
         meanErrorPct = Math.round((pcts.reduce((a, b) => a + b, 0) / pcts.length) * 10) / 10
       }
+      
+      const v168s = this.scoredParts.map(c => c.v168)
+      const meanV168 = v168s.reduce((a,b)=>a+b,0) / v168s.length
+      const ssTot = v168s.reduce((a,b)=>a + Math.pow(b - meanV168, 2), 0)
+      const ssRes = this.scoredParts.reduce((a,c) => a + Math.pow(c.v168 - (c.predicted168_from_early || 0), 2), 0)
+      r2Drift = ssTot > 0 ? Math.round((1 - (ssRes / ssTot)) * 1000) / 1000 : 0
     }
 
     const labeledParts = this.scoredParts.filter((c) => c.ground_truth != null)
@@ -638,12 +675,16 @@ class ClientISROEngine {
     let f1: number | undefined
     let fpr: number | undefined
     let fnr: number | undefined
+    let tp: number | undefined
+    let fp: number | undefined
+    let tn: number | undefined
+    let fn: number | undefined
 
     if (hasGt) {
-      const tp = labeledParts.filter((c) => c.status === 'reject' && c.ground_truth === 1).length
-      const fp = labeledParts.filter((c) => c.status === 'reject' && c.ground_truth === 0).length
-      const tn = labeledParts.filter((c) => c.status !== 'reject' && c.ground_truth === 0).length
-      const fn = labeledParts.filter((c) => c.status !== 'reject' && c.ground_truth === 1).length
+      tp = labeledParts.filter((c) => c.status === 'reject' && c.ground_truth === 1).length
+      fp = labeledParts.filter((c) => c.status === 'reject' && c.ground_truth === 0).length
+      tn = labeledParts.filter((c) => c.status !== 'reject' && c.ground_truth === 0).length
+      fn = labeledParts.filter((c) => c.status !== 'reject' && c.ground_truth === 1).length
 
       precision = tp + fp > 0 ? Math.round((tp / (tp + fp)) * 1000) / 1000 : 0
       recall = tp + fn > 0 ? Math.round((tp / (tp + fn)) * 1000) / 1000 : 0
@@ -673,8 +714,13 @@ class ClientISROEngine {
         f1,
         fpr,
         fnr,
+        tp,
+        fp,
+        tn,
+        fn,
         mae_drift: maeDrift,
         rmse_drift: rmseDrift,
+        r2_drift: r2Drift,
         mean_error_pct: meanErrorPct,
       },
       top_flagged: topFlagged,

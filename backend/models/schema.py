@@ -31,13 +31,21 @@ class ComponentOut(BaseModel):
     v168: float
     limit_ua: float
     lot_mean: Optional[float] = None
+    lot_median: Optional[float] = None
     lot_std: Optional[float] = None
+    lot_mad: Optional[float] = None
     lot_pct_dev: Optional[float] = None
+    lot_rank_percentile: Optional[float] = None
+    lot_anomaly_score: Optional[float] = None
     ground_truth: Optional[float] = None
     slope: float
     drift168: float
     pct_drift: float
     drift_rate_early: Optional[float] = None
+    predicted_drift_168: Optional[float] = None
+    predicted_drift_rate: Optional[float] = None
+    safety_slope: Optional[float] = None
+    safety_slope_exceeded: Optional[bool] = False
     drift_trend: Optional[str] = None
     drift_classification: Optional[str] = None
     predicted168_from_early: float

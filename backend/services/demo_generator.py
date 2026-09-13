@@ -57,79 +57,87 @@ def generate(seed: int = 42) -> pd.DataFrame:
             rows.append({
                 "component_id": comp_id,
                 "lot_id": lot,
-                "value_0h_uA": round(v0, 3),
-                "value_24h_uA": round(v24, 3),
-                "value_96h_uA": round(v96, 3),
-                "value_168h_uA": round(v168, 3),
-                "static_limit_uA": 50,
+                "v0": round(v0, 3),
+                "v24": round(v24, 3),
+                "v96": round(v96, 3),
+                "v168": round(v168, 3),
+                "limit": 50,
+                "ground_truth": 0,
             })
             part_counter += 1
 
     # Inject Flagship ISRO Latent Defect & Anomaly Demonstrator Components
-    # 1. COMP-FC-03 (Flight Computer rad-hard DSP with anomalous latent gate-oxide breakdown drift)
-    rows.append({
-        "component_id": "COMP-FC-03",
-        "lot_id": "ISRO-LOT-2026A-01",
-        "value_0h_uA": 21.4,
-        "value_24h_uA": 25.2,
-        "value_96h_uA": 31.7,
-        "value_168h_uA": 38.9,
-        "static_limit_uA": 50,
-    })
-
-    # 2. ISRO-SAT-PWR-MOSFET-099 (Power PCDU MOSFET with severe latent drift slope)
-    rows.append({
-        "component_id": "ISRO-SAT-PWR-MOSFET-099",
-        "lot_id": "ISRO-LOT-2026A-02",
-        "value_0h_uA": 19.8,
-        "value_24h_uA": 24.1,
-        "value_96h_uA": 32.5,
-        "value_168h_uA": 42.1,
-        "static_limit_uA": 50,
-    })
-
-    # 3. ISRO-SAT-BAT-CELL-042 (Li-Ion Battery Cell balancer trending abnormal)
-    rows.append({
-        "component_id": "ISRO-SAT-BAT-CELL-042",
-        "lot_id": "ISRO-LOT-2026B-01",
-        "value_0h_uA": 14.5,
-        "value_24h_uA": 16.8,
-        "value_96h_uA": 21.2,
-        "value_168h_uA": 26.4,
-        "static_limit_uA": 50,
-    })
-
-    # 4. COMP-PWR-01 (Nominal baseline reference)
+    
+    # CASE 1: Normal component -> SAFE
     rows.append({
         "component_id": "COMP-PWR-01",
         "lot_id": "ISRO-LOT-2026A-01",
-        "value_0h_uA": 12.0,
-        "value_24h_uA": 12.6,
-        "value_96h_uA": 13.9,
-        "value_168h_uA": 15.2,
-        "static_limit_uA": 50,
+        "v0": 12.0,
+        "v24": 12.6,
+        "v96": 13.9,
+        "v168": 15.2,
+        "limit": 50,
+        "ground_truth": 0,
     })
 
-    # 5. COMP-COM-02 (Communications LNA nominal baseline)
-    rows.append({
-        "component_id": "COMP-COM-02",
-        "lot_id": "ISRO-LOT-2026B-02",
-        "value_0h_uA": 9.5,
-        "value_24h_uA": 9.9,
-        "value_96h_uA": 10.6,
-        "value_168h_uA": 11.3,
-        "static_limit_uA": 50,
-    })
-
-    # 6. ISRO-SAT-NAV-GYRO-088 (Navigation AOCS rate sensor exceeding datasheet limit)
+    # CASE 2: Component exceeds absolute limit -> REJECT
     rows.append({
         "component_id": "ISRO-SAT-NAV-GYRO-088",
         "lot_id": "ISRO-LOT-SPACE-01",
-        "value_0h_uA": 28.5,
-        "value_24h_uA": 36.2,
-        "value_96h_uA": 45.8,
-        "value_168h_uA": 54.2,
-        "static_limit_uA": 50,
+        "v0": 28.5,
+        "v24": 36.2,
+        "v96": 45.8,
+        "v168": 54.2,
+        "limit": 50,
+        "ground_truth": 1,
+    })
+
+    # CASE 3: Within datasheet limit but abnormal relative to lot -> Module A Anomaly
+    rows.append({
+        "component_id": "COMP-FC-03",
+        "lot_id": "ISRO-LOT-2026A-01",
+        "v0": 21.4,
+        "v24": 25.2,
+        "v96": 31.7,
+        "v168": 38.9,
+        "limit": 50,
+        "ground_truth": 1,
+    })
+
+    # CASE 4: Acceptable at 0h/24h but early drift predicts safety slope violation at 168h -> Module B Future Risk
+    rows.append({
+        "component_id": "ISRO-SAT-PWR-MOSFET-099",
+        "lot_id": "ISRO-LOT-2026A-02",
+        "v0": 19.8,
+        "v24": 22.0,
+        "v96": 28.5,
+        "v168": 35.1,
+        "limit": 50,
+        "ground_truth": 1,
+    })
+
+    # CASE 5: Borderline monitor component -> MONITOR + human review
+    rows.append({
+        "component_id": "ISRO-SAT-BAT-CELL-042",
+        "lot_id": "ISRO-LOT-2026B-01",
+        "v0": 14.5,
+        "v24": 16.8,
+        "v96": 21.2,
+        "v168": 41.5,
+        "limit": 50,
+        "ground_truth": 0,
+    })
+
+    # CASE 6: Difficult borderline component demonstrating multi-factor evaluation
+    rows.append({
+        "component_id": "COMP-COM-02",
+        "lot_id": "ISRO-LOT-2026B-02",
+        "v0": 30.5,
+        "v24": 31.5,
+        "v96": 34.6,
+        "v168": 38.3,
+        "limit": 50,
+        "ground_truth": 1,
     })
 
     return pd.DataFrame(rows)

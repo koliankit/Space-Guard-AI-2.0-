@@ -278,14 +278,14 @@ export default function ModuleAAnomalyPanel({
             </div>
 
             {/* Outlier & Statistical Analysis Row (Live synchronized) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs md:text-sm font-mono text-slate-200 pt-1.5 border-t border-slate-800/80">
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
-                <span className="text-slate-400">Lot &mu; / &sigma;:</span>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2.5 text-xs md:text-sm font-mono text-slate-200 pt-1.5 border-t border-slate-800/80">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col sm:flex-row items-center sm:items-start text-center sm:text-left">
+                <span className="text-slate-400">Median / MAD:</span>
                 <span className="text-slate-100 font-bold tabular-nums">
-                  {selected.lot_mean?.toFixed(1) ?? '--'} &mu;A &bull; {selected.lot_std?.toFixed(2) ?? '--'}
+                  {selected.lot_median?.toFixed(1) ?? selected.lot_mean?.toFixed(1) ?? '--'} &mu;A &bull; {selected.lot_mad?.toFixed(2) ?? selected.lot_std?.toFixed(2) ?? '--'}
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col sm:flex-row items-center sm:items-start text-center sm:text-left">
                 <span className="text-slate-400">Lot z-Score:</span>
                 <span className={`font-bold tabular-nums ${
                   liveZ != null && Math.abs(liveZ) > 2 ? 'text-rose-400' : 'text-amber-300'
@@ -294,10 +294,16 @@ export default function ModuleAAnomalyPanel({
                   {isSim && ' (live)'}
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
-                <span className="text-slate-400">Isolation Score:</span>
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col sm:flex-row items-center sm:items-start text-center sm:text-left">
+                <span className="text-slate-400">Rank %ile:</span>
+                <span className="text-amber-300 font-bold tabular-nums">
+                  {selected.lot_rank_percentile != null ? `${selected.lot_rank_percentile.toFixed(1)}%` : '--'}
+                </span>
+              </div>
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col sm:flex-row items-center sm:items-start text-center sm:text-left">
+                <span className="text-slate-400">Anomaly:</span>
                 <span className="text-purple-300 font-bold tabular-nums">
-                  {selected.iso_score != null ? `${(selected.iso_score * 100).toFixed(1)}%` : '--'}
+                  {selected.lot_anomaly_score != null ? `${selected.lot_anomaly_score.toFixed(1)}/100` : selected.iso_score != null ? `${(selected.iso_score * 100).toFixed(1)}/100` : '--'}
                 </span>
               </div>
             </div>

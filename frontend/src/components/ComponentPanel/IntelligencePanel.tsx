@@ -194,22 +194,22 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
 
         {/* Metric 2 */}
         <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[11px] uppercase font-semibold">Lot Average (&mu;)</span>
+          <span className="text-slate-400 text-[11px] uppercase font-semibold">Lot Median</span>
           <span className="font-mono text-base font-bold text-slate-100">
-            {component.lot_mean != null ? `${component.lot_mean.toFixed(2)} µA` : '--'}
+            {component.lot_median != null ? `${component.lot_median.toFixed(2)} µA` : component.lot_mean != null ? `${component.lot_mean.toFixed(2)} µA` : '--'}
           </span>
           <span className="text-[10px] text-amber-300 truncate">
-            {component.lot_pct_dev != null ? `${component.lot_pct_dev > 0 ? '+' : ''}${component.lot_pct_dev.toFixed(1)}% vs lot mean` : 'Lot baseline mean'}
+            {component.lot_pct_dev != null ? `${component.lot_pct_dev > 0 ? '+' : ''}${component.lot_pct_dev.toFixed(1)}% vs lot median` : 'Lot baseline median'}
           </span>
         </div>
 
         {/* Metric 3 */}
         <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[11px] uppercase font-semibold">Lot Deviation (&sigma;)</span>
+          <span className="text-slate-400 text-[11px] uppercase font-semibold">Lot MAD</span>
           <span className="font-mono text-base font-bold text-slate-100">
-            {component.lot_std != null ? `±${component.lot_std.toFixed(2)} µA` : '--'}
+            {component.lot_mad != null ? `±${component.lot_mad.toFixed(2)} µA` : component.lot_std != null ? `±${component.lot_std.toFixed(2)} µA` : '--'}
           </span>
-          <span className="text-[10px] text-slate-400">Sample variance standard</span>
+          <span className="text-[10px] text-slate-400">Robust absolute deviation</span>
         </div>
 
         {/* Metric 4 */}
@@ -268,8 +268,10 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         {/* Metric 9 */}
         <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Anomaly Score</span>
-          <span className="font-mono text-base font-bold text-purple-300">{component.iso_score.toFixed(1)} / 100</span>
-          <span className="text-[10px] text-slate-400">Isolation Forest score</span>
+          <span className="font-mono text-base font-bold text-purple-300">
+            {component.lot_anomaly_score != null ? `${component.lot_anomaly_score.toFixed(1)}` : (component.iso_score * 100).toFixed(1)} / 100
+          </span>
+          <span className="text-[10px] text-slate-400">Robust Anomaly Rating</span>
         </div>
 
         {/* Metric 10 */}

@@ -184,22 +184,30 @@ export default function ModuleBFutureDriftPanel({
               </div>
             </div>
 
-            {/* Early-to-Late Validation & Model Accuracy */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs md:text-sm font-mono text-slate-200 pt-1.5 border-t border-slate-800/80">
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
+            {/* Early Drift Extrapolation & Safety Slope Validation */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs md:text-sm font-mono text-slate-200 pt-1.5 border-t border-slate-800/80">
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col items-start">
                 <span className="text-slate-400">Early 0-24h Model:</span>
                 <span className="text-slate-100 font-bold tabular-nums">
                   {selected.predicted168_from_early.toFixed(1)} &mu;A
                 </span>
               </div>
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
-                <span className="text-slate-400">Actual 168h Reading:</span>
-                <span className="text-slate-100 font-bold tabular-nums">{selected.v168.toFixed(1)} &mu;A</span>
-              </div>
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg">
-                <span className="text-slate-400">Prediction Error:</span>
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col items-start">
+                <span className="text-slate-400">Pred. Drift Rate:</span>
                 <span className="text-amber-300 font-bold tabular-nums">
-                  &plusmn;{(selected.prediction_error_168 ?? Math.abs(selected.v168 - selected.predicted168_from_early)).toFixed(2)} &mu;A
+                  {(selected.predicted_drift_rate ?? ((selected.predicted168_from_early - selected.v0) / 168)).toFixed(4)} &mu;A/hr
+                </span>
+              </div>
+              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col items-start">
+                <span className="text-slate-400">Safety Slope Limit:</span>
+                <span className="text-slate-100 font-bold tabular-nums">
+                  {(selected.safety_slope ?? 0.040).toFixed(4)} &mu;A/hr
+                </span>
+              </div>
+              <div className={`flex justify-between px-3 py-1.5 rounded-lg flex-col items-start ${selected.safety_slope_exceeded ? 'bg-rose-500/20' : 'bg-emerald-500/20'}`}>
+                <span className={`${selected.safety_slope_exceeded ? 'text-rose-300' : 'text-emerald-300'}`}>Safety Check:</span>
+                <span className={`font-bold tabular-nums ${selected.safety_slope_exceeded ? 'text-rose-400' : 'text-emerald-400'}`}>
+                  {selected.safety_slope_exceeded ? 'FAIL (REJECT)' : 'PASS'}
                 </span>
               </div>
             </div>

@@ -41,8 +41,13 @@ export interface EvaluationMetrics {
   f1?: number
   fpr?: number
   fnr?: number
+  tp?: number
+  tn?: number
+  fp?: number
+  fn?: number
   mae_drift: number
   rmse_drift: number
+  r2_drift?: number
   mean_error_pct: number
   status_message?: string
 }
@@ -59,13 +64,21 @@ export interface ComponentOut {
   v168: number
   limit_ua: number
   lot_mean?: number
+  lot_median?: number
   lot_std?: number
+  lot_mad?: number
   lot_pct_dev?: number
+  lot_rank_percentile?: number
+  lot_anomaly_score?: number
   ground_truth: number | null
   slope: number
   drift168: number
   pct_drift: number
   drift_rate_early?: number
+  predicted_drift_168?: number
+  predicted_drift_rate?: number
+  safety_slope?: number
+  safety_slope_exceeded?: boolean
   drift_trend?: DriftTrend
   drift_classification?: DriftClassification
   predicted168_from_early: number

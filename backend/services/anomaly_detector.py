@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import r2_score
 
 try:
     from xgboost import XGBClassifier
@@ -79,6 +80,13 @@ def compute_evaluation_metrics(df: pd.DataFrame) -> dict:
             if valid.sum() > 0:
                 pcts = (errors[valid] / v168_vals[valid]) * 100.0
                 metrics["mean_error_pct"] = round(float(pcts.mean()), 2)
+            preds = df.loc[errors.index, "predicted168_from_early"]
+            if len(v168_vals) > 1:
+                try:
+                    r2 = r2_score(v168_vals, preds)
+                    metrics["r2_drift"] = round(float(r2), 3)
+                except Exception:
+                    metrics["r2_drift"] = 0.0
 
     # Classification metrics (ground truth)
     if "ground_truth" in df.columns and "status" in df.columns:

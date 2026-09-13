@@ -20,22 +20,25 @@ def score_and_decide(df: pd.DataFrame, has_ml: bool) -> pd.DataFrame:
     s_z = np.clip(z_max / 4.0, 0.0, 1.0)
     s_future = np.clip(df["predicted_future"] / df["limit"], 0.0, 1.5)
     s_iso = np.clip(df.get("iso_score", 0.0) / 100.0, 0.0, 1.0)
+    s_safety_slope = np.where(df.get("safety_slope_exceeded", False), 1.0, 0.0)
 
     # Multi-factor composite risk formula (0-100)
     if has_ml and "ml_prob" in df.columns and df["ml_prob"].notna().any():
         risk = (
-            s_z * 35.0
-            + s_future * 25.0
+            s_z * 30.0
+            + s_future * 20.0
             + s_iso * 15.0
             + s_limit * 10.0
+            + s_safety_slope * 10.0
             + df["ml_prob"].fillna(0.0) * 15.0
-        ) * 100.0 / 100.0
+        )
     else:
         risk = (
-            s_z * 40.0
-            + s_future * 30.0
+            s_z * 35.0
+            + s_future * 25.0
             + s_iso * 18.0
             + s_limit * 12.0
+            + s_safety_slope * 10.0
         )
 
     # If exceeding static limit, risk is minimum 90
@@ -66,6 +69,11 @@ def score_and_decide(df: pd.DataFrame, has_ml: bool) -> pd.DataFrame:
         zm = z_max.iloc[i]
         r_score = df["risk_score"].iloc[i]
         trend = row.get("drift_trend", "NOMINAL / STABLE")
+        
+        safety_exceeded = row.get("safety_slope_exceeded", False)
+        predicted_drift_rate = row.get("predicted_drift_rate", 0.0)
+        safety_slope = row.get("safety_slope", 0.0)
+        lot_rank_percentile = row.get("lot_rank_percentile", 0.0)
 
         points = []
 
@@ -81,6 +89,18 @@ def score_and_decide(df: pd.DataFrame, has_ml: bool) -> pd.DataFrame:
             reason = (
                 f"Static datasheet limit violation: 168h leakage ({v168:.2f} µA) exceeds specification threshold "
                 f"({limit:.0f} µA) by +{(v168 - limit):.2f} µA. Traditional: FAIL. Immediate quarantine required."
+            )
+        elif safety_exceeded:
+            cat = "safety_slope_violation"
+            status = "reject"
+            b_health = "CRITICAL"
+            points.append(f"Passes datasheet limit ({v168:.2f} µA < {limit:.0f} µA) but fails early drift safety check.")
+            points.append(f"Predicted 168h drift rate (+{predicted_drift_rate:.4f} µA/hr) exceeds safety slope (+{safety_slope:.4f} µA/hr).")
+            points.append(f"Component diverges +{z168:.1f}σ from lot mean ({lot_mean:.2f} µA) and is in {lot_rank_percentile:.1f}th percentile.")
+            points.append(f"Early rejection recommended to prevent latent on-orbit failure.")
+            reason = (
+                f"Passes datasheet limit ({v168:.2f} µA < {limit:.0f} µA) but diverges +{z168:.1f}σ from lot mean ({lot_mean:.2f} µA). "
+                f"Predicted 168h drift rate ({predicted_drift_rate:.3f} µA/hr) exceeds safety slope ({safety_slope:.3f} µA/hr). Early rejection recommended."
             )
         elif pred_future > limit:
             cat = "predicted_exceedance"

@@ -29,6 +29,11 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     df["predicted168_from_early"] = predicted168_early
     df["prediction_error_168"] = (df["v168"] - predicted168_early).abs()
 
+    df["predicted_drift_168"] = df["predicted168_from_early"] - df["v0"]
+    df["predicted_drift_rate"] = df["predicted_drift_168"] / 168.0
+    df["safety_slope"] = 0.040
+    df["safety_slope_exceeded"] = df["predicted_drift_rate"] > df["safety_slope"]
+
     # Future projection at 264h (+96h beyond 168h) using overall measured drift slope
     df["predicted_future"] = df["v168"] + df["slope"] * 96.0
 
