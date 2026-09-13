@@ -22,6 +22,7 @@ import MissionReportView from './components/Views/MissionReportView'
 import LotArchitectureView from './components/Views/LotArchitectureView'
 import MultiScreenWall from './components/Dashboard/MultiScreenWall'
 import ISROPitchModal from './components/Dashboard/ISROPitchModal'
+import ISROOnboardingFlow from './components/Onboarding/ISROOnboardingFlow'
 import { ISRO_MISSIONS } from './offlineEngine'
 import { sounds } from './utils/soundEffects'
 import { generateCertificatePdf, generateTechnicalReportPdf } from './utils/pdfGenerator'
@@ -30,11 +31,12 @@ import * as api from './api'
 import type { ComponentOut, MissionStatus, UploadResult } from './types'
 
 export default function App() {
+  const [operationalPhase, setOperationalPhase] = useState<'onboarding' | 'dashboard'>('onboarding')
   const [activeTab, setActiveTab] = useState<DashboardTab>('wall')
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
   const [dataMetaText, setDataMetaText] = useState(
-    '<span class="text-slate-200 font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry or load ISRO flight batch.</span>'
+    '<span class="text-slate-200 font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry to commence qualification clearance.</span>'
   )
 
   const [activeMissionId, setActiveMissionId] = useState<string>('GAGANYAAN')
@@ -154,10 +156,25 @@ export default function App() {
     }
   }
 
-  // On initial website load, automatically acquire the Gaganyaan flight batch
-  useEffect(() => {
-    handleDemo('GAGANYAAN', false)
-  }, [])
+  function resetWorkflow() {
+    api.resetTelemetryState()
+    if (modalTimerId) clearTimeout(modalTimerId)
+    setBatchId(null)
+    setUploadMeta(null)
+    setMission(null)
+    setFlaggedList([])
+    setAllComponents([])
+    setSelected(null)
+    setFocusKey(null)
+    setAlertComponent(null)
+    setQuarantineToast(null)
+    setAnalysisRun(false)
+    setDataMetaText(
+      '<span class="text-slate-200 font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry to commence qualification clearance.</span>'
+    )
+    setOperationalPhase('onboarding')
+    log('Flight telemetry purged. System reset to Window 1 CSV Ingest.', 'ok')
+  }
 
   // Keyboard shortcut listener for ISRO Briefing Deck (Press 'P')
   useEffect(() => {
@@ -277,6 +294,44 @@ export default function App() {
     setActiveTab('telemetry')
   }
 
+  if (operationalPhase === 'onboarding') {
+    return (
+      <>
+        <ISROOnboardingFlow
+          onFileUploaded={handleFile}
+          onLoadOfficialBatch={handleDemo}
+          batchId={batchId}
+          uploadMeta={uploadMeta}
+          mission={mission}
+          allComponents={allComponents}
+          flaggedList={flaggedList}
+          onRunScreening={async () => {
+            await onPipelineDone()
+          }}
+          onCompleteToDashboard={() => {
+            setOperationalPhase('dashboard')
+            log('ISRO Flight Clearance Order Confirmed \u2014 Launching Mission Control Dashboard.', 'ok')
+          }}
+          activeMissionName={activeMission.name}
+          activeMissionId={activeMissionId}
+          onSelectMission={handleSelectMission}
+        />
+        {mappingModal && mappingModal.detected_headers && (
+          <MappingModal
+            headers={mappingModal.detected_headers}
+            autoMapping={mappingModal.auto_mapping ?? {}}
+            missingFields={mappingModal.missing_fields ?? []}
+            onApply={applyMapping}
+            onCancel={() => {
+              setMappingModal(null)
+              setPendingFile(null)
+            }}
+          />
+        )}
+      </>
+    )
+  }
+
   return (
     <div className="min-h-screen text-slate-100 flex flex-col bg-bg">
       <div className="grid-overlay" />
@@ -289,6 +344,7 @@ export default function App() {
         onOpenPitchModal={() => setPitchModalOpen(true)}
         onOpenIngestModal={() => setIngestModalOpen(true)}
         activeMissionName={activeMission.name}
+        onResetWorkflow={resetWorkflow}
       />
       <UploadBar
         metaText={dataMetaText}
@@ -305,6 +361,7 @@ export default function App() {
         onSelectMission={handleSelectMission}
         onOpenIngestModal={() => setIngestModalOpen(true)}
         onOpenLotsModal={() => setLotModalOpen(true)}
+        onResetWorkflow={resetWorkflow}
       />
 
       {/* Horizontal Health Metrics Bar — only appears after data has been loaded and screened */}

@@ -12,6 +12,7 @@ interface HeaderProps {
   onOpenPitchModal?: () => void
   onOpenIngestModal?: () => void
   activeMissionName?: string
+  onResetWorkflow?: () => void
 }
 
 export default function Header({
@@ -23,6 +24,7 @@ export default function Header({
   onOpenPitchModal,
   onOpenIngestModal,
   activeMissionName = 'Gaganyaan H1 Crew Module',
+  onResetWorkflow,
 }: HeaderProps) {
   const [istTime, setIstTime] = useState('')
   const [utcTime, setUtcTime] = useState('')
@@ -182,6 +184,21 @@ export default function Header({
               title="View Official ISRO Briefing Deck (Press 'P')"
             >
               <span className="text-sm">📑</span> ISRO Briefing
+            </button>
+          )}
+
+          {onResetWorkflow && (
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playClick()
+                onResetWorkflow()
+              }}
+              className="text-xs font-mono font-bold px-3 py-2 rounded-xl border border-rose-500/40 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              title="Reset telemetry and return to Window 1 CSV Ingest"
+            >
+              <span>🔄</span>
+              <span className="hidden sm:inline">NEW INTAKE</span>
             </button>
           )}
 

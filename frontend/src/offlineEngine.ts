@@ -625,9 +625,15 @@ class ClientISROEngine {
     }
   }
 
+  clearState(): void {
+    this.rawParts = []
+    this.scoredParts = []
+    this.analyzed = false
+  }
+
   analyze(batchId: number): AnalyzeResult {
     if (this.rawParts.length === 0) {
-      this.initDemo()
+      throw new Error('No flight telemetry loaded. Please upload an ISRO qualification CSV before screening.')
     }
     this.scoredParts = processAndScoreParts(this.rawParts)
     this.analyzed = true
@@ -728,6 +734,25 @@ class ClientISROEngine {
   }
 
   getMissionStatus(batchId: number): MissionStatus {
+    if (this.rawParts.length === 0) {
+      return {
+        batch_id: batchId,
+        mission_health: 100,
+        safe: 0,
+        monitor: 0,
+        reject: 0,
+        subsystems: SUBSYSTEMS.map((s) => ({
+          key: s.key,
+          name: s.name,
+          position: s.pos,
+          count: 0,
+          status: 'idle',
+          avg_risk: 0,
+          top_component: null,
+        })),
+      }
+    }
+
     if (!this.analyzed || this.scoredParts.length === 0) {
       this.analyze(batchId)
     }
@@ -785,6 +810,10 @@ class ClientISROEngine {
     _batchId: number,
     opts: { status?: string; search?: string; limit?: number } = {}
   ): { total: number; components: ComponentOut[] } {
+    if (this.rawParts.length === 0) {
+      return { total: 0, components: [] }
+    }
+
     if (!this.analyzed || this.scoredParts.length === 0) {
       this.analyze(this.currentBatchId)
     }
@@ -812,7 +841,9 @@ class ClientISROEngine {
 
     return { total, components: list }
   }
+
   getComponentDetail(_batchId: number, componentId: string): ComponentOut | null {
+    if (this.rawParts.length === 0) return null
     if (!this.analyzed || this.scoredParts.length === 0) {
       this.analyze(this.currentBatchId)
     }
@@ -981,3 +1012,25 @@ ${rejected
 }
 
 export const offlineISRO = new ClientISROEngine()
+
+export function generateSampleCSVText(missionId = 'GAGANYAAN'): string {
+  const parts = generateRawISROParts(missionId)
+  const header = 'component_id,lot_id,subsystem,value_0h_ua,value_24h_ua,value_96h_ua,value_168h_ua,static_limit_ua,ground_truth\n'
+  const rows = parts.map(
+    (p) => `${p.component_id},${p.lot_id},${p.subsystem},${p.v0},${p.v24},${p.v96 ?? ''},${p.v168},${p.limit_ua},${p.ground_truth ?? ''}`
+  )
+  return header + rows.join('\n')
+}
+
+export function downloadSampleCSV(missionId = 'GAGANYAAN'): void {
+  const csv = generateSampleCSVText(missionId)
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.setAttribute('href', url)
+  link.setAttribute('download', `isro_flight_telemetry_${missionId.toLowerCase()}_template.csv`)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}

@@ -14,6 +14,7 @@ export default function UploadBar({
   onReportExcel,
   onOpenIngestModal,
   onOpenLotsModal,
+  onResetWorkflow,
 }: {
   metaText: string
   canRun: boolean
@@ -29,6 +30,7 @@ export default function UploadBar({
   onSelectMission?: (missionId: string) => void
   onOpenIngestModal?: () => void
   onOpenLotsModal?: () => void
+  onResetWorkflow?: () => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [drag, setDrag] = useState(false)
@@ -98,6 +100,21 @@ export default function UploadBar({
             <span className="text-amber-400 text-base">▶</span>
             <span>LOAD FLIGHT BATCH</span>
           </button>
+
+          {onResetWorkflow && (
+            <button
+              type="button"
+              className="text-sm font-display font-bold px-3.5 py-2.5 rounded-xl border border-rose-500/40 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 hover:text-white hover:border-rose-400 transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+              onClick={() => {
+                sounds.playClick()
+                onResetWorkflow()
+              }}
+              title="Reset flight telemetry and return to Window 1 CSV Ingestion"
+            >
+              <span>🔄</span>
+              <span>NEW CSV INTAKE</span>
+            </button>
+          )}
         </div>
 
         {/* Right Section: Core Execution & Export Actions */}
