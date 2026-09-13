@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { ComponentOut } from '../../types'
 import { sounds } from '../../utils/soundEffects'
+import { buildMonotoneCubicPath, evaluateMonotoneSpline, type Point2D } from '../../utils/splineUtils'
 
 const STAGES = [0, 24, 96, 168, 216]
 
@@ -9,10 +10,20 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   const [animProgress, setAnimProgress] = useState<number>(1)
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
-  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (16s), 1x (8s), 2x (4s)
+  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1)
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
+  // Interactive mouse hover & manual scrub state (User in 100% control)
+  const [isHovering, setIsHovering] = useState<boolean>(false)
+  const [hoverData, setHoverData] = useState<{
+    hour: number
+    val: number
+    x: number
+    y: number
+  } | null>(null)
+
   const containerRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 920, height: 460 })
 
   const pathRef = useRef<SVGPathElement>(null)
@@ -20,9 +31,8 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   const animFrameRef = useRef<number | null>(null)
   const startTimeRef = useRef<number>(0)
   const elapsedOffsetRef = useRef<number>(0)
-  const lastPingHourRef = useRef<number>(-1)
 
-  // Measure container dimensions dynamically to fill 100% of the newly available space
+  // Measure container dimensions dynamically
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -65,10 +75,10 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   const H = Math.max(440, chartDims.height)
   const padL = 60
   const padR = 36
-  const padT = 28
+  const padT = 32
   const padB = 48
 
-  // Fallback defaults if no component is selected
+  // Component values & defaults
   const limitVal = component?.limit_ua || 50
   const lotMean = component?.lot_mean ?? (component?.v168 ? component.v168 * 0.92 : 12.0)
   const lotStd = component?.lot_std ?? 1.8
@@ -82,15 +92,25 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   const v168 = component?.v168 ?? 16.5
   const predFuture = component?.predicted_future ?? (v168 + (v168 - v96) * 0.6)
 
+  // Safe padded Y bounds so lines never clip
   const allVals = [v0, v24, v96, v168, limitVal, bandLow, bandHigh, predFuture]
-  const minY = Math.max(0, Math.min(...allVals) * 0.78)
-  const maxY = Math.max(...allVals) * 1.15
+  const minY = Math.max(0, Math.min(...allVals) * 0.75)
+  const maxY = Math.max(...allVals) * 1.20
 
   const maxHorizon = 216
-  const xFor = (h: number) => padL + (h / maxHorizon) * (W - padL - padR)
-  const yFor = (v: number) => H - padB - ((v - minY) / (maxY - minY || 1)) * (H - padT - padB)
+  const xFor = useCallback(
+    (h: number) => padL + (Math.max(0, Math.min(maxHorizon, h)) / maxHorizon) * (W - padL - padR),
+    [padL, padR, W, maxHorizon]
+  )
+  const yFor = useCallback(
+    (v: number) => {
+      const clampedV = Math.max(minY, Math.min(maxY, v))
+      return H - padB - ((clampedV - minY) / (maxY - minY || 1)) * (H - padT - padB)
+    },
+    [minY, maxY, H, padB, padT]
+  )
 
-  // Stage points
+  // Stage points definition
   const stages: [number, number][] = useMemo(() => {
     const list: [number, number][] = [
       [0, v0],
@@ -104,36 +124,25 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
 
   const shown = useMemo(() => stages.filter(([h]) => h <= stageH), [stages, stageH])
 
-  // Smooth Catmull-Rom spline curve for component
+  // Points mapped to pixel coordinates for Fritsch-Carlson Monotonic Spline
+  const mappedPoints: Point2D[] = useMemo(() => {
+    return shown.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
+  }, [shown, xFor, yFor])
+
+  // Fritsch-Carlson Monotone Cubic Spline (Guarantees NO overshoot, NO wild loops)
   const smoothCurve = useMemo(() => {
-    if (shown.length < 2) return ''
-    const mapped = shown.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
-    let d = `M ${mapped[0].x} ${mapped[0].y}`
-    for (let i = 0; i < mapped.length - 1; i++) {
-      const p0 = i > 0 ? mapped[i - 1] : mapped[i]
-      const p1 = mapped[i]
-      const p2 = mapped[i + 1]
-      const p3 = i !== mapped.length - 2 ? mapped[i + 2] : p2
-
-      const cp1x = p1.x + (p2.x - p0.x) / 6
-      const cp1y = p1.y + (p2.y - p0.y) / 6
-      const cp2x = p2.x - (p3.x - p1.x) / 6
-      const cp2y = p2.y - (p3.y - p1.y) / 6
-
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
-    }
-    return d
-  }, [shown, minY, maxY, W, H])
+    return buildMonotoneCubicPath(mappedPoints)
+  }, [mappedPoints])
 
   const lastPoint = shown[shown.length - 1]
 
   const areaD = useMemo(() => {
     if (shown.length <= 1 || !smoothCurve || !lastPoint) return ''
     return `${smoothCurve} L ${xFor(lastPoint[0])} ${H - padB} L ${xFor(shown[0][0])} ${H - padB} Z`
-  }, [smoothCurve, shown, lastPoint, H, padB])
+  }, [smoothCurve, shown, lastPoint, H, padB, xFor])
 
-  // Lot peer baseline curve
-  const baselineCurve = useMemo(() => {
+  // Lot peer baseline curve using monotonic spline
+  const mappedBaseline: Point2D[] = useMemo(() => {
     const baselinePts: [number, number][] = [
       [0, v0 * 0.96],
       [24, v0 + (lotMean - v0) * 0.2],
@@ -142,43 +151,35 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
       [216, lotMean + (lotMean - v0) * 0.08],
     ].filter(([h]) => h <= stageH) as [number, number][]
 
-    if (baselinePts.length < 2) return ''
-    const mapped = baselinePts.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
-    let d = `M ${mapped[0].x} ${mapped[0].y}`
-    for (let i = 0; i < mapped.length - 1; i++) {
-      const p0 = i > 0 ? mapped[i - 1] : mapped[i]
-      const p1 = mapped[i]
-      const p2 = mapped[i + 1]
-      const p3 = i !== mapped.length - 2 ? mapped[i + 2] : p2
+    return baselinePts.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
+  }, [v0, lotMean, stageH, xFor, yFor])
 
-      const cp1x = p1.x + (p2.x - p0.x) / 6
-      const cp1y = p1.y + (p2.y - p0.y) / 6
-      const cp2x = p2.x - (p3.x - p1.x) / 6
-      const cp2y = p2.y - (p3.y - p1.y) / 6
+  const baselineCurve = useMemo(() => {
+    return buildMonotoneCubicPath(mappedBaseline)
+  }, [mappedBaseline])
 
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
-    }
-    return d
-  }, [v0, lotMean, stageH, minY, maxY, W, H])
-
-  // Probe tip coordinates along the path
+  // Probe tip coordinates along the path when auto-simulating
   const tipPoint = useMemo(() => {
     if (!pathRef.current || pathLength <= 0) {
       return { x: xFor(0), y: yFor(v0) }
     }
     const currentLen = Math.min(pathLength, Math.max(0, pathLength * animProgress))
     try {
-      return pathRef.current.getPointAtLength(currentLen)
+      const pt = pathRef.current.getPointAtLength(currentLen)
+      return {
+        x: Math.max(padL, Math.min(W - padR, pt.x)),
+        y: Math.max(padT, Math.min(H - padB, pt.y)),
+      }
     } catch {
       return { x: xFor(0), y: yFor(v0) }
     }
-  }, [animProgress, pathLength, v0, minY, maxY, W, H])
+  }, [animProgress, pathLength, v0, xFor, yFor, padL, padR, padT, padB, W, H])
 
   // Simulated live instantaneous values calculated along probe trajectory
   const simHour = useMemo(() => {
     const rawH = ((tipPoint.x - padL) / (W - padL - padR)) * maxHorizon
     return Math.min(stageH, Math.max(0, rawH))
-  }, [tipPoint.x, stageH, padL, padR, W])
+  }, [tipPoint.x, stageH, padL, padR, W, maxHorizon])
 
   const simVal = useMemo(() => {
     const fraction = (H - padB - tipPoint.y) / (H - padT - padB || 1)
@@ -186,7 +187,14 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     return Math.max(minY, Math.min(maxY, val))
   }, [tipPoint.y, minY, maxY, H, padT, padB])
 
-  // Simulation speed & duration (8000ms base for clear real-time monitoring)
+  // Effective Active Probing State (User Hover overrides auto-simulation)
+  const isUserInspecting = isHovering && hoverData !== null
+  const activeHour = isUserInspecting ? hoverData.hour : isSimulating ? simHour : (lastPoint ? lastPoint[0] : 168)
+  const activeVal = isUserInspecting ? hoverData.val : isSimulating ? simVal : (lastPoint ? lastPoint[1] : v168)
+  const activeProbeX = isUserInspecting ? hoverData.x : tipPoint.x
+  const activeProbeY = isUserInspecting ? hoverData.y : tipPoint.y
+
+  // Base simulation duration
   const baseDuration = 8000 / simSpeed
 
   const startSweepAnimation = useCallback((resetOffset = true) => {
@@ -196,7 +204,6 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     if (resetOffset) {
       setAnimProgress(0)
       elapsedOffsetRef.current = 0
-      lastPingHourRef.current = -1
     }
     sounds.playClick()
     startTimeRef.current = performance.now() - elapsedOffsetRef.current
@@ -205,8 +212,8 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
       const elapsed = now - startTimeRef.current
       elapsedOffsetRef.current = elapsed
       const rawP = Math.min(1, elapsed / baseDuration)
-      const easeP = rawP < 0.2 ? 2.5 * rawP * rawP : rawP > 0.8 ? 1 - 2.5 * Math.pow(1 - rawP, 2) : rawP
-      setAnimProgress(easeP)
+      // Smooth linear pacing without wild jerking
+      setAnimProgress(rawP)
 
       if (rawP < 1) {
         animFrameRef.current = requestAnimationFrame(tick)
@@ -229,7 +236,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     }
   }, [isPaused, startSweepAnimation])
 
-  // Trigger sweep on component or stage change
+  // Trigger sweep on component change only (NOT on stage change to prevent runaway loops)
   useEffect(() => {
     if (component?.component_id) {
       startSweepAnimation(true)
@@ -237,7 +244,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     }
-  }, [component?.component_id, stageH, startSweepAnimation])
+  }, [component?.component_id, startSweepAnimation])
 
   // Measure path length
   useEffect(() => {
@@ -249,81 +256,91 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     }
   }, [component, stageH, pathLength, smoothCurve])
 
-  // Audio radar pings at milestone intervals
-  useEffect(() => {
-    if (!isSimulating) return
-    for (const h of [0, 24, 96, 168, 216]) {
-      if (h <= stageH && simHour >= h && lastPingHourRef.current < h) {
-        lastPingHourRef.current = h
-        sounds.playPing()
-        break
-      }
-    }
-  }, [simHour, isSimulating, stageH])
+  // Mouse handlers for interactive scrubbing & inspection
+  const handleSvgMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const svg = svgRef.current
+    if (!svg || mappedPoints.length < 2) return
+    const rect = svg.getBoundingClientRect()
+    const clientX = e.clientX - rect.left
+    const svgX = (clientX / rect.width) * W
 
-  // Dynamic spectrogram energy equalizer bars
-  const numSpectrumBars = useMemo(() => {
-    return Math.min(60, Math.max(32, Math.floor((W - padL - padR) / 18)))
-  }, [W, padL, padR])
+    // Clamp within chart boundaries
+    const clampedX = Math.max(padL, Math.min(W - padR, svgX))
+    const hour = ((clampedX - padL) / (W - padL - padR)) * maxHorizon
+    const clampedHour = Math.min(stageH, Math.max(0, hour))
 
-  const spectrumBars = useMemo(() => {
-    return Array.from({ length: numSpectrumBars }, (_, i) => {
-      const wave = isSimulating && !isPaused ? Math.sin(animProgress * Math.PI * 6 + i * 0.35) * 6 : 0
-      const base = Math.abs(Math.sin((i / numSpectrumBars) * Math.PI * 3.4)) * 20 + 6
-      return Math.min(Math.max(4, base + wave), 26)
+    // Evaluate exact Y on monotonic curve
+    const y = evaluateMonotoneSpline(mappedPoints, clampedX)
+    const clampedY = Math.max(padT, Math.min(H - padB, y))
+    const fraction = (H - padB - clampedY) / (H - padT - padB || 1)
+    const val = minY + fraction * (maxY - minY)
+
+    setIsHovering(true)
+    setHoverData({
+      hour: clampedHour,
+      val: Math.max(minY, Math.min(maxY, val)),
+      x: clampedX,
+      y: clampedY,
     })
-  }, [isSimulating, isPaused, animProgress, numSpectrumBars])
+  }
 
-  const isRej = component?.status === 'reject'
-  const isMon = component?.status === 'monitor'
-  const curveColor = isRej ? '#EF4444' : isMon ? '#F59E0B' : '#10B981'
+  const handleSvgMouseLeave = () => {
+    setIsHovering(false)
+    setHoverData(null)
+  }
 
-  // Live interpolated readouts in sync with sweep (matching Module A & B)
-  const finalDelta = (component?.v168 ?? 0) - (component?.v0 ?? 0)
-  const displayedDelta = animProgress >= 1 ? finalDelta : simVal - v0
-  const finalZ = component?.z168 ?? 0
-  const displayedZ = animProgress >= 1 ? finalZ : (simVal - lotMean) / (lotStd || 1)
-  const marginToSpec = component ? component.limit_ua - simVal : 0
+  const handleScrubberChange = (newHour: number) => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+    setIsSimulating(false)
+    setIsPaused(true)
+    const clampedH = Math.min(stageH, Math.max(0, newHour))
+    const clampedX = xFor(clampedH)
+    const y = evaluateMonotoneSpline(mappedPoints, clampedX)
+    const clampedY = Math.max(padT, Math.min(H - padB, y))
+    const fraction = (H - padB - clampedY) / (H - padT - padB || 1)
+    const val = minY + fraction * (maxY - minY)
+
+    setIsHovering(true)
+    setHoverData({
+      hour: clampedH,
+      val: Math.max(minY, Math.min(maxY, val)),
+      x: clampedX,
+      y: clampedY,
+    })
+  }
+
+  const curveColor = useMemo(() => {
+    if (!component) return '#10B981'
+    if (component.status === 'reject') return '#EF4444'
+    if (component.status === 'monitor') return '#F59E0B'
+    return '#10B981'
+  }, [component])
+
+  // Derived metrics based on active probe position
+  const displayedDelta = activeVal - v0
+  const displayedZ = (activeVal - lotMean) / (lotStd || 1)
+  const marginToSpec = limitVal - activeVal
+
+  // Fixed deterministic RF Spectrogram Bars
+  const spectrumBars = useMemo(() => {
+    const bars = [14, 18, 12, 22, 19, 26, 15, 28, 20, 16, 24, 21, 13, 27, 23, 17, 25, 19, 14, 22]
+    return bars
+  }, [])
 
   if (!component) {
-    // Multi-channel spacecraft bus waveforms when idle
-    const busPts1 = Array.from({ length: 36 }, (_, i) => {
-      const x = padL + (i / 35) * (W - padL - padR)
-      const y = H / 2 - 40 + Math.sin(i * 0.65) * 28 + Math.cos(i * 1.3) * 12
-      return `${x.toFixed(1)},${y.toFixed(1)}`
-    }).join(' ')
-
-    const busPts2 = Array.from({ length: 36 }, (_, i) => {
-      const x = padL + (i / 35) * (W - padL - padR)
-      const y = H / 2 + 40 + Math.cos(i * 0.55) * 26 + Math.sin(i * 1.1) * 14
-      return `${x.toFixed(1)},${y.toFixed(1)}`
-    }).join(' ')
-
     return (
-      <div className="bg-[#0B1120] p-4 md:p-5 rounded-xl border border-slate-800 relative overflow-hidden font-sans w-full flex flex-col gap-3">
+      <div className="bg-[#0B1120] p-4 md:p-5 rounded-xl border border-slate-800 relative overflow-hidden font-sans w-full flex flex-col gap-3 shadow-panel-subtle select-none">
         <div className="flex items-center justify-between">
           <h3 className="m-0 text-sm md:text-base font-bold font-display tracking-wider uppercase text-amber-400 flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 led" />
             Burn-In Waveform Telemetry Oscilloscope (Full Spectrum)
           </h3>
-          <span className="font-mono text-xs text-slate-300 tracking-wider">
-            CHANNEL: <span className="text-emerald-400 font-bold">OSC-CH1 / CH2 / CH3</span>
+          <span className="font-mono text-xs text-slate-400 tracking-wider">
+            STATUS: <span className="text-emerald-400 font-bold">READY FOR TELEMETRY INTAKE</span>
           </span>
         </div>
-        <div ref={containerRef} className="w-full flex-1 min-h-[440px]">
-          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="w-full h-full block bg-[#060B16] rounded-xl border border-slate-800 select-none">
-            {/* Reticle Grid */}
-            {[0.2, 0.4, 0.6, 0.8].map((pct, i) => (
-              <line key={`h-${i}`} x1={padL} y1={padT + pct * (H - padT - padB)} x2={W - padR} y2={padT + pct * (H - padT - padB)} stroke="#94A3B8" strokeOpacity="0.12" strokeDasharray="4 4" />
-            ))}
-            {/* Channel 1 */}
-            <polyline points={busPts1} fill="none" stroke="#10B981" strokeWidth="2.5" style={{ filter: 'drop-shadow(0 0 8px rgba(16,185,129,0.6))' }} />
-            {/* Channel 2 */}
-            <polyline points={busPts2} fill="none" stroke="#FFFFFF" strokeWidth="2" strokeDasharray="4 3" style={{ filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.6))' }} />
-            <text x={W / 2} y={H / 2} textAnchor="middle" className="fill-amber-300 text-xs font-mono font-bold tracking-wider">
-              [ LIVE SPACECRAFT BUS STREAM &bull; SELECT COMPONENT TO INSPECT WAVEFORM ]
-            </text>
-          </svg>
+        <div ref={containerRef} className="w-full flex-1 min-h-[440px] flex items-center justify-center bg-[#060B16] rounded-xl border border-slate-800 text-slate-400 text-xs font-mono">
+          [ SELECT COMPONENT OR LOAD BATCH TO INSPECT OSCILLOSCOPE WAVEFORM ]
         </div>
       </div>
     )
@@ -333,10 +350,10 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     <div className="bg-[#0B1120] p-4 md:p-5 rounded-xl border border-slate-800 relative overflow-hidden font-sans w-full flex flex-col gap-3 shadow-panel-subtle select-none">
       {/* Top Header & Live Sweep Controls Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-800">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <span className="w-2.5 h-2.5 rounded-full led" style={{ backgroundColor: curveColor }} />
           <h3 className="m-0 text-sm md:text-base font-bold font-display tracking-wider uppercase text-amber-400 flex items-center gap-2">
-            Burn-In Waveform Telemetry Oscilloscope
+            Burn-In Waveform Oscilloscope
           </h3>
           <span className="text-xs font-mono px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-100 font-bold">
             {component.component_id}
@@ -348,7 +365,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
 
         {/* Live Sweep Playback & Horizon Filter Controls */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Playback Controls & Speed Toggle */}
+          {/* Playback Controls */}
           <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
             {isSimulating ? (
               <button
@@ -362,7 +379,11 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             ) : (
               <button
                 type="button"
-                onClick={() => startSweepAnimation(true)}
+                onClick={() => {
+                  setIsHovering(false)
+                  setHoverData(null)
+                  startSweepAnimation(true)
+                }}
                 className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[11px] font-mono font-bold transition-all cursor-pointer shadow-sm"
                 title="Replay oscilloscope telemetry sweep"
               >
@@ -389,22 +410,23 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
               ))}
             </div>
 
-            {/* Live Timestamp Indicator */}
-            {isSimulating && (
-              <span className="text-[10px] font-mono font-bold text-emerald-400 px-1.5 animate-pulse">
-                {isPaused ? '[PAUSED]' : `[T+${Math.round(simHour)}h]`}
-              </span>
-            )}
+            {/* Probe Position Indicator */}
+            <span className="text-[10px] font-mono font-bold text-emerald-400 px-1.5">
+              {isUserInspecting ? `[INSPECT T+${Math.round(activeHour)}h]` : isPaused ? '[PAUSED]' : isSimulating ? `[T+${Math.round(activeHour)}h]` : `[100% NOMINAL]`}
+            </span>
           </div>
 
-          {/* Stage Scrubbing Selectors */}
+          {/* Stage Filtering Buttons */}
           <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800">
             <span className="text-xs font-mono text-slate-400 px-1.5 uppercase font-bold">Horizon:</span>
             {STAGES.map((h) => (
               <button
                 key={h}
                 type="button"
-                onClick={() => setStageH(h)}
+                onClick={() => {
+                  sounds.playClick()
+                  setStageH(h)
+                }}
                 className={`px-2.5 py-1 text-center font-mono text-xs rounded border transition-all cursor-pointer ${
                   stageH === h
                     ? 'border-amber-500 bg-amber-500/25 text-amber-300 font-bold shadow-sm'
@@ -432,24 +454,49 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
         </div>
       </div>
 
-      {/* Main Full-Width SVG Oscilloscope Canvas */}
+      {/* Manual Timeline Scrubber Slider (Gives user 100% control anytime) */}
+      <div className="bg-[#070D1A] border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center justify-between gap-3 text-xs font-mono">
+        <span className="text-slate-400 whitespace-nowrap text-[11px] flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+          MANUAL SCRUBBER:
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={stageH}
+          step={1}
+          value={Math.round(activeHour)}
+          onChange={(e) => handleScrubberChange(parseFloat(e.target.value))}
+          className="flex-1 accent-amber-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+          title="Drag slider to inspect waveform at any hour"
+        />
+        <span className="text-amber-300 font-bold text-xs min-w-[70px] text-right">
+          T+{Math.round(activeHour)} hrs
+        </span>
+      </div>
+
+      {/* Main Full-Width SVG Oscilloscope Canvas with Interactive Hover */}
       <div
         ref={containerRef}
-        className={`relative rounded-xl overflow-hidden border border-slate-800 bg-[#040812] w-full transition-all duration-300 ${
+        className={`relative rounded-xl overflow-hidden border border-slate-800 bg-[#040812] w-full transition-all duration-300 cursor-crosshair ${
           isExpanded
             ? 'min-h-[620px] md:min-h-[700px] lg:min-h-[760px]'
             : 'min-h-[440px] md:min-h-[480px] lg:min-h-[520px]'
         }`}
       >
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="none"
-          className="w-full h-full block"
+          className="w-full h-full block select-none"
           style={{ width: '100%', height: '100%', display: 'block' }}
+          onMouseMove={handleSvgMouseMove}
+          onMouseLeave={handleSvgMouseLeave}
+          onClick={handleSvgMouseMove}
         >
           <defs>
             <filter id="telemetryGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feGaussianBlur stdDeviation="3" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -457,7 +504,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             </filter>
 
             <filter id="steelGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feGaussianBlur stdDeviation="1.8" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -474,17 +521,12 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
               <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.02" />
             </linearGradient>
 
-            <linearGradient id="specGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.85" />
-              <stop offset="100%" stopColor="#64748B" stopOpacity="0.2" />
-            </linearGradient>
-
-            {/* Sweep Clip Path so area fill follows the leading probe in real-time */}
+            {/* Sweep Clip Path */}
             <clipPath id="sweepClipTelemetry">
               <rect
                 x={0}
                 y={0}
-                width={animProgress >= 1 ? W : Math.max(padL, tipPoint.x)}
+                width={animProgress >= 1 || isUserInspecting ? W : Math.max(padL, tipPoint.x)}
                 height={H}
               />
             </clipPath>
@@ -544,7 +586,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
               height={Math.max(0, yFor(bandLow) - yFor(bandHigh))}
               fill="url(#lotBandGrad)"
               stroke="#FFFFFF"
-              strokeOpacity="0.25"
+              strokeOpacity="0.22"
               strokeDasharray="3 3"
             />
           )}
@@ -575,14 +617,14 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
               d={baselineCurve}
               fill="none"
               stroke="#FFFFFF"
-              strokeWidth={2.0}
+              strokeWidth={1.8}
               filter="url(#steelGlow)"
               strokeDasharray="4 3"
               opacity={0.85}
             />
           )}
 
-          {/* Under-Curve Gradient Fill (Clipped to Sweep Probe) */}
+          {/* Under-Curve Gradient Fill */}
           {areaD && (
             <path
               d={areaD}
@@ -591,7 +633,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             />
           )}
 
-          {/* Primary Measured Component Current Waveform Spline (Hidden SVG path for coordinate extraction) */}
+          {/* Primary Measured Component Current Waveform Spline (Hidden SVG path for length extraction) */}
           {smoothCurve && (
             <path
               ref={pathRef}
@@ -602,43 +644,43 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             />
           )}
 
-          {/* Visible Spline Clipped to Animated Probe Progress */}
+          {/* Visible Spline with Monotone Curvature */}
           {smoothCurve && (
             <path
               d={smoothCurve}
               fill="none"
               stroke={curveColor}
-              strokeWidth={3}
+              strokeWidth={2.8}
               filter="url(#telemetryGlow)"
               clipPath="url(#sweepClipTelemetry)"
             />
           )}
 
-          {/* Discrete Milestone Markers */}
+          {/* Discrete Milestone Data Points */}
           {shown.map(([h, v]) => {
             const isFuture = h > 168
-            const isPast = animProgress >= 1 || simHour >= h
-            if (!isPast) return null
+            const cx = xFor(h)
+            const cy = yFor(v)
             return (
               <g key={h}>
                 <circle
-                  cx={xFor(h)}
-                  cy={yFor(v)}
-                  r={5.5}
+                  cx={cx}
+                  cy={cy}
+                  r={5}
                   fill="#060B16"
                   stroke={isFuture ? '#F59E0B' : curveColor}
-                  strokeWidth={2.2}
+                  strokeWidth={2}
                   filter="url(#telemetryGlow)"
                 />
                 <circle
-                  cx={xFor(h)}
-                  cy={yFor(v)}
+                  cx={cx}
+                  cy={cy}
                   r={2.5}
                   fill={isFuture ? '#F59E0B' : curveColor}
                 />
                 <text
-                  x={xFor(h)}
-                  y={yFor(v) - 10}
+                  x={cx}
+                  y={cy - 10}
                   textAnchor="middle"
                   fill={isFuture ? '#F59E0B' : curveColor}
                   className="text-[10px] font-mono font-bold"
@@ -649,53 +691,37 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             )
           })}
 
-          {/* Projected Vector (+96h to 216h Future Drift) */}
-          {stageH >= 168 && lastPoint && (
-            <>
-              <line
-                x1={xFor(168)}
-                y1={yFor(v168)}
-                x2={xFor(216)}
-                y2={yFor(predFuture)}
-                stroke="#F59E0B"
-                strokeWidth={2.2}
-                strokeDasharray="5 3"
-                clipPath="url(#sweepClipTelemetry)"
-                style={{ filter: 'drop-shadow(0 0 4px rgba(245,158,11,0.6))' }}
-              />
-              {animProgress >= 0.95 && (
-                <text
-                  x={xFor(216)}
-                  y={yFor(predFuture) - 10}
-                  textAnchor="end"
-                  fill="#F59E0B"
-                  className="text-[10px] font-mono font-bold"
-                >
-                  +96h Projected: {predFuture.toFixed(2)} µA
-                </text>
-              )}
-            </>
-          )}
-
-          {/* Live Telemetry Traveling Laser Probe & Real-Time Tooltip Chip */}
-          {isSimulating && (
+          {/* Interactive Inspection / Live Probe Crosshair & Laser */}
+          {(isSimulating || isUserInspecting) && (
             <g>
-              {/* Vertical Laser Line passing through the probe */}
+              {/* Vertical Laser Crosshair Beam */}
               <line
-                x1={tipPoint.x}
-                x2={tipPoint.x}
+                x1={activeProbeX}
+                x2={activeProbeX}
                 y1={padT}
                 y2={H - padB}
                 stroke={curveColor}
-                strokeWidth={1.2}
+                strokeWidth={1.4}
                 strokeDasharray="3 2"
-                opacity={0.7}
+                opacity={0.8}
               />
 
-              {/* Pulsing Radar Rings */}
+              {/* Horizontal Reference Line to Y-Axis */}
+              <line
+                x1={padL}
+                x2={activeProbeX}
+                y1={activeProbeY}
+                y2={activeProbeY}
+                stroke={curveColor}
+                strokeWidth={0.8}
+                strokeDasharray="2 2"
+                opacity={0.5}
+              />
+
+              {/* Probe Scanner Head */}
               <circle
-                cx={tipPoint.x}
-                cy={tipPoint.y}
+                cx={activeProbeX}
+                cy={activeProbeY}
                 r={10}
                 fill="none"
                 stroke={curveColor}
@@ -704,48 +730,48 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                 className="animate-ping"
               />
               <circle
-                cx={tipPoint.x}
-                cy={tipPoint.y}
+                cx={activeProbeX}
+                cy={activeProbeY}
                 r={5}
                 fill={curveColor}
                 stroke="#FFFFFF"
                 strokeWidth={1.5}
               />
               <circle
-                cx={tipPoint.x}
-                cy={tipPoint.y}
-                r={1.8}
+                cx={activeProbeX}
+                cy={activeProbeY}
+                r={2}
                 fill="#FFFFFF"
               />
 
-              {/* Floating Live Telemetry Chip above the probe */}
+              {/* Floating Real-Time HUD Chip */}
               <g
                 transform={`translate(${Math.min(
-                  W - padR - 65,
-                  Math.max(padL + 65, tipPoint.x)
-                )}, ${Math.max(padT + 18, tipPoint.y - 22)})`}
+                  W - padR - 75,
+                  Math.max(padL + 75, activeProbeX)
+                )}, ${Math.max(padT + 20, activeProbeY - 24)})`}
               >
                 <rect
-                  x="-62"
-                  y="-13"
-                  width="124"
-                  height="22"
-                  rx="5"
+                  x="-72"
+                  y="-14"
+                  width="144"
+                  height="24"
+                  rx="6"
                   fill="#0B1528"
                   stroke={curveColor}
                   strokeWidth="1.4"
-                  filter="drop-shadow(0 3px 6px rgba(0,0,0,0.7))"
+                  filter="drop-shadow(0 4px 8px rgba(0,0,0,0.8))"
                 />
                 <text
                   x="0"
-                  y="2.5"
+                  y="3"
                   textAnchor="middle"
                   fill="#FFFFFF"
-                  fontSize="9.5"
+                  fontSize="10"
                   fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight="bold"
                 >
-                  T+{Math.round(simHour)}h: {simVal.toFixed(2)} µA
+                  T+{Math.round(activeHour)}h: {activeVal.toFixed(2)} µA
                 </text>
               </g>
             </g>
@@ -774,16 +800,16 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
         </svg>
       </div>
 
-      {/* Live Reading Telemetry HUD Cards (Showing Real-Time Dynamic Readings as per Module A & B) */}
+      {/* Live Reading Telemetry HUD Cards (Dynamically driven by probe or manual scrubber) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
         {/* Card 1: Live Measured Current */}
         <div className="p-2.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[10.5px] uppercase font-semibold">Live Reading</span>
-          <span className={`font-mono text-base font-bold tabular-nums ${isSimulating ? 'text-amber-300' : 'text-emerald-400'}`}>
-            {simVal.toFixed(2)} µA
+          <span className="text-slate-400 text-[10.5px] uppercase font-semibold">Live Probe</span>
+          <span className={`font-mono text-base font-bold tabular-nums ${isUserInspecting ? 'text-sky-400' : isSimulating ? 'text-amber-300' : 'text-emerald-400'}`}>
+            {activeVal.toFixed(2)} µA
           </span>
           <span className="text-[9.5px] text-slate-400">
-            {isSimulating ? `Probe at T+${Math.round(simHour)}h` : '168h end-of-test'}
+            Probe at T+{Math.round(activeHour)}h
           </span>
         </div>
 
@@ -858,7 +884,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
         <div className="flex items-center gap-5 flex-wrap">
           <span className="flex items-center gap-2">
             <span className="inline-block w-3.5 h-1.5 rounded-full" style={{ backgroundColor: curveColor }} />
-            <span className="text-white font-bold">CH1: Component Measured Current (µA)</span>
+            <span className="text-white font-bold">CH1: Measured Current (µA)</span>
           </span>
           <span className="flex items-center gap-2">
             <span className="inline-block w-3 h-1 bg-white border-t border-dashed border-white" />
@@ -870,16 +896,14 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
           </span>
           <span className="flex items-center gap-2">
             <span className="inline-block w-3 h-1 border-t-2 border-dashed border-amber-400" />
-            <span className="text-amber-300 font-bold">Projected Future Drift Vector</span>
+            <span className="text-amber-300 font-bold">Monotone Spline Projection</span>
           </span>
         </div>
 
         <div className="flex items-center gap-3 text-[11px] text-slate-400">
-          <span>ADC: 24-BIT DELTA-SIGMA</span>
+          <span>INTERACTION: MOUSE SCRUBBABLE</span>
           <span>&bull;</span>
-          <span>SAMPLE RATE: 10 KS/s</span>
-          <span>&bull;</span>
-          <span className="text-emerald-400 font-bold">ONLINE</span>
+          <span className="text-emerald-400 font-bold">STRICTLY BOUNDED</span>
         </div>
       </div>
     </div>

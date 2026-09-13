@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { ComponentOut } from '../../types'
 import { sounds } from '../../utils/soundEffects'
+import { buildMonotoneCubicPath, evaluateMonotoneSpline, type Point2D } from '../../utils/splineUtils'
 
 export interface ModuleBSimData {
   progress: number
@@ -21,14 +22,24 @@ interface ModuleBFutureDriftGraphProps {
 
 export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: ModuleBFutureDriftGraphProps) {
   const [activeHorizon, setActiveHorizon] = useState<216 | 264 | 336>(264)
-  const [hoveredPoint, setHoveredPoint] = useState<{ hour: number; val: number; label: string } | null>(null)
   const [animProgress, setAnimProgress] = useState<number>(1)
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
-  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (17s), 1x (8.5s slow), 2x (4.2s)
+  const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1)
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
+  // Interactive mouse scrubbing & inspection state
+  const [isHovering, setIsHovering] = useState<boolean>(false)
+  const [hoverData, setHoverData] = useState<{
+    hour: number
+    val: number
+    x: number
+    y: number
+    label: string
+  } | null>(null)
+
   const containerRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 420 })
 
   const measuredPathRef = useRef<SVGPathElement>(null)
@@ -36,10 +47,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   const animFrameRef = useRef<number | null>(null)
   const startTimeRef = useRef<number>(0)
   const elapsedOffsetRef = useRef<number>(0)
-  const hasPinged168Ref = useRef<boolean>(false)
-  const hasPingedHorizonRef = useRef<boolean>(false)
 
-  // Measure container dimensions dynamically to fill full remaining space edge-to-edge
+  // Measure container dimensions dynamically
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -80,10 +89,10 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
 
   const W = Math.max(500, chartDims.width)
   const H = Math.max(420, chartDims.height)
-  const padL = 50
-  const padR = 24
-  const padT = 24
-  const padB = 44
+  const padL = 55
+  const padR = 28
+  const padT = 28
+  const padB = 46
 
   const limitVal = component?.limit_ua || 50
   const v0 = component?.v0 ?? 10
@@ -93,23 +102,22 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   const slope = component?.slope || (v168 - v0) / 168
   const future264 = component?.predicted_future || v168 + slope * 96
 
-  // Projected value at horizon (Hook called unconditionally)
+  // Projected value at horizon
   const projectedAtHorizon = useMemo(() => {
     const deltaH = activeHorizon - 168
     return v168 + slope * deltaH
   }, [v168, slope, activeHorizon])
 
-  // Calculate breach hour if slope > 0 (Hook called unconditionally)
+  // Calculate breach hour if slope > 0
   const breachHour = useMemo(() => {
     if (slope <= 0) return null
     const h = 168 + (limitVal - v168) / slope
     return h > 0 && h <= 500 ? h : null
   }, [slope, limitVal, v168])
 
-  // Base simulation duration: 8500ms (Very slow and deliberate for clear observation)
+  // Base simulation duration
   const baseDuration = 8500 / simSpeed
 
-  // Start two-phase live telemetry simulation
   const startSimulation = useCallback((resetOffset = true) => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     setIsSimulating(true)
@@ -117,8 +125,6 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     if (resetOffset) {
       setAnimProgress(0)
       elapsedOffsetRef.current = 0
-      hasPinged168Ref.current = false
-      hasPingedHorizonRef.current = false
     }
     sounds.playClick()
     startTimeRef.current = performance.now() - elapsedOffsetRef.current
@@ -127,9 +133,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
       const elapsed = now - startTimeRef.current
       elapsedOffsetRef.current = elapsed
       const rawP = Math.min(1, elapsed / baseDuration)
-      // Smooth linear pacing for steady flight tracking
-      const easeP = rawP < 0.15 ? 2.5 * rawP * rawP : rawP > 0.85 ? 1 - 2.5 * Math.pow(1 - rawP, 2) : rawP
-      setAnimProgress(easeP)
+      setAnimProgress(rawP)
 
       if (rawP < 1) {
         animFrameRef.current = requestAnimationFrame(tick)
@@ -152,7 +156,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     }
   }, [isPaused, startSimulation])
 
-  // Auto-trigger simulation when component or horizon changes
+  // Auto-trigger simulation only when component changes
   useEffect(() => {
     if (component?.component_id) {
       startSimulation(true)
@@ -160,7 +164,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     }
-  }, [component?.component_id, activeHorizon, startSimulation])
+  }, [component?.component_id, startSimulation])
 
   // Measure ground measured path length
   useEffect(() => {
@@ -172,27 +176,27 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     }
   }, [component, measuredLen])
 
-  // Uncertainty cone variance (+/- 1.5 sigma drift model)
+  // Uncertainty cone variance
   const lotStd = component?.lot_std || 1.8
   const coneSpread = Math.max(2.5, lotStd * 1.6)
   const coneUpper = projectedAtHorizon + coneSpread
   const coneLower = Math.max(0, projectedAtHorizon - coneSpread)
 
-  // Bounds for Y
-  const maxVal = Math.max(limitVal * 1.12, v0, v24, v96, v168, future264, coneUpper)
-  const minVal = Math.max(0, Math.min(v0, v24, v96, v168, coneLower) * 0.85)
+  // Bounds for Y with safety margin
+  const maxVal = Math.max(limitVal * 1.15, v0, v24, v96, v168, future264, coneUpper) * 1.05
+  const minVal = Math.max(0, Math.min(v0, v24, v96, v168, coneLower) * 0.8)
 
-  // Max X is active horizon (e.g. 264h or 336h)
+  // Max X is active horizon
   const maxX = Math.max(activeHorizon, breachHour && breachHour <= 336 ? breachHour + 20 : 280)
 
   const toX = useCallback(
-    (hour: number) => padL + (hour / maxX) * (W - padL - padR),
+    (hour: number) => padL + (Math.max(0, Math.min(maxX, hour)) / maxX) * (W - padL - padR),
     [maxX, padL, padR, W]
   )
   const toY = useCallback(
     (val: number) => {
-      const range = maxVal - minVal || 1
-      return H - padB - ((val - minVal) / range) * (H - padT - padB)
+      const clamped = Math.max(minVal, Math.min(maxVal, val))
+      return H - padB - ((clamped - minVal) / (maxVal - minVal || 1)) * (H - padT - padB)
     },
     [maxVal, minVal, H, padB, padT]
   )
@@ -205,7 +209,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     return ticks
   }, [minVal, maxVal, limitVal])
 
-  // Measured points (0h, 24h, 96h, 168h)
+  // Measured ground points
   const measuredPoints = useMemo(
     () => [
       { h: 0, v: v0, label: '0h Initial' },
@@ -216,32 +220,20 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     [v0, v24, v96, v168]
   )
 
-  const measuredPathD = useMemo(
-    () =>
-      measuredPoints
-        .map((p, i) => `${i === 0 ? 'M' : 'L'} ${toX(p.h).toFixed(1)} ${toY(p.v).toFixed(1)}`)
-        .join(' '),
+  const measuredSplinePoints: Point2D[] = useMemo(
+    () => measuredPoints.map((p) => ({ x: toX(p.h), y: toY(p.v) })),
     [measuredPoints, toX, toY]
   )
 
+  // Monotone Cubic Spline for past burn-in data
+  const measuredPathD = useMemo(
+    () => buildMonotoneCubicPath(measuredSplinePoints),
+    [measuredSplinePoints]
+  )
+
   // Simulation Phase Calculations
-  // Phase 1 (0 -> 0.45): Ground Burn-in sweep (0h -> 168h)
-  // Phase 2 (0.45 -> 1.0): In-Flight Extrapolation & Cone Expansion (168h -> activeHorizon)
   const p1 = Math.min(1, animProgress / 0.45)
   const p2 = animProgress <= 0.45 ? 0 : (animProgress - 0.45) / 0.55
-
-  // Trigger audio milestone pings inside useEffect
-  useEffect(() => {
-    if (!isSimulating) return
-    if (p1 >= 1 && !hasPinged168Ref.current) {
-      hasPinged168Ref.current = true
-      sounds.playPing()
-    }
-    if (p2 >= 0.98 && !hasPingedHorizonRef.current) {
-      hasPingedHorizonRef.current = true
-      sounds.playPing()
-    }
-  }, [p1, p2, isSimulating])
 
   // Dynamic In-Flight extrapolation hour & value
   const currentExtrapH = 168 + p2 * (activeHorizon - 168)
@@ -263,43 +255,107 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   )
 
   // Shaded variance cone polygon dynamically expanding with p2
-  const currentSpread = coneSpread * p2
-  const currentUpper = currentExtrapVal + currentSpread
-  const currentLower = Math.max(0, currentExtrapVal - currentSpread)
+  const currentSpread = coneSpread * (isHovering ? 1 : p2)
+  const coneTargetH = isHovering ? activeHorizon : currentExtrapH
+  const coneTargetVal = isHovering ? projectedAtHorizon : currentExtrapVal
+  const currentUpper = coneTargetVal + currentSpread
+  const currentLower = Math.max(0, coneTargetVal - currentSpread)
 
   const conePolygonD = useMemo(() => {
-    if (p2 <= 0.05) return ''
+    if (p2 <= 0.05 && !isHovering) return ''
     return (
       `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} ` +
-      `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentUpper).toFixed(1)} ` +
-      `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentLower).toFixed(1)} Z`
+      `L ${toX(coneTargetH).toFixed(1)} ${toY(currentUpper).toFixed(1)} ` +
+      `L ${toX(coneTargetH).toFixed(1)} ${toY(currentLower).toFixed(1)} Z`
     )
-  }, [p2, toX, toY, v168, currentExtrapH, currentUpper, currentLower])
+  }, [p2, isHovering, toX, toY, v168, coneTargetH, currentUpper, currentLower])
 
   const willBreach = component?.future_limit_breach || projectedAtHorizon >= limitVal
   const marginFuture = component?.margin_future ?? (limitVal - projectedAtHorizon)
   const predError = component?.prediction_error_168 ?? Math.abs(v168 - early168)
 
   // Live interpolated metric card values synchronized with sweep
-  const liveDriftVelocity = animProgress >= 1 ? slope * 1000 : (slope * 1000) * Math.min(1, p1 * 1.2)
-  const livePredError = animProgress >= 1 ? predError : predError * Math.min(1, p1 * 1.5)
-  const liveProjection = animProgress >= 1 ? projectedAtHorizon : v168 + (projectedAtHorizon - v168) * p2
-  const liveMargin =
-    animProgress >= 1
-      ? marginFuture
-      : (limitVal - v168) + (marginFuture - (limitVal - v168)) * p2
+  const liveDriftVelocity = slope * 1000
+  const liveProjection = isHovering && hoverData ? hoverData.val : animProgress >= 1 ? projectedAtHorizon : currentExtrapVal
+  const liveMargin = limitVal - liveProjection
+
+  // Interactive mouse scrubbing handler
+  const handleSvgMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const svg = svgRef.current
+    if (!svg) return
+    const rect = svg.getBoundingClientRect()
+    const clientX = e.clientX - rect.left
+    const svgX = (clientX / rect.width) * W
+
+    const clampedX = Math.max(padL, Math.min(W - padR, svgX))
+    const hour = ((clampedX - padL) / (W - padL - padR)) * maxX
+    const clampedH = Math.min(activeHorizon, Math.max(0, hour))
+
+    let val = v0
+    let label = ''
+
+    if (clampedH <= 168) {
+      val = evaluateMonotoneSpline(measuredSplinePoints, clampedX)
+      label = `Ground Burn-In (T+${Math.round(clampedH)}h)`
+    } else {
+      val = v168 + slope * (clampedH - 168)
+      label = `In-Flight Forecast (+${Math.round(clampedH - 168)}h)`
+    }
+
+    const clampedY = toY(val)
+
+    setIsHovering(true)
+    setHoverData({
+      hour: clampedH,
+      val: Math.max(minVal, Math.min(maxVal, val)),
+      x: clampedX,
+      y: clampedY,
+      label,
+    })
+  }
+
+  const handleSvgMouseLeave = () => {
+    setIsHovering(false)
+    setHoverData(null)
+  }
+
+  const handleScrubberChange = (newHour: number) => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+    setIsSimulating(false)
+    setIsPaused(true)
+
+    const clampedH = Math.min(activeHorizon, Math.max(0, newHour))
+    const clampedX = toX(clampedH)
+    let val = v0
+    let label = ''
+
+    if (clampedH <= 168) {
+      val = evaluateMonotoneSpline(measuredSplinePoints, clampedX)
+      label = `Ground Burn-In (T+${Math.round(clampedH)}h)`
+    } else {
+      val = v168 + slope * (clampedH - 168)
+      label = `In-Flight Forecast (+${Math.round(clampedH - 168)}h)`
+    }
+
+    const clampedY = toY(val)
+
+    setIsHovering(true)
+    setHoverData({
+      hour: clampedH,
+      val: Math.max(minVal, Math.min(maxVal, val)),
+      x: clampedX,
+      y: clampedY,
+      label,
+    })
+  }
 
   // Probe Tip in Phase 1 vs Phase 2
   const probeTip = useMemo(() => {
     if (animProgress <= 0.45) {
       const curH = p1 * 168
-      const curV =
-        curH <= 24
-          ? v0 + ((v24 - v0) / 24) * curH
-          : curH <= 96
-          ? v24 + ((v96 - v24) / 72) * (curH - 24)
-          : v96 + ((v168 - v96) / 72) * (curH - 96)
-      return { x: toX(curH), y: toY(curV), h: curH, v: curV, isExtrap: false }
+      const curX = toX(curH)
+      const curV = evaluateMonotoneSpline(measuredSplinePoints, curX)
+      return { x: curX, y: toY(curV), h: curH, v: curV, isExtrap: false }
     } else {
       return {
         x: toX(currentExtrapH),
@@ -309,54 +365,60 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         isExtrap: true,
       }
     }
-  }, [animProgress, p1, v0, v24, v96, v168, currentExtrapH, currentExtrapVal, toX, toY])
+  }, [animProgress, p1, measuredSplinePoints, currentExtrapH, currentExtrapVal, toX, toY])
 
-  // Notify parent dashboard panel of live simulation telemetry
+  // Active Coordinates
+  const isUserInspecting = isHovering && hoverData !== null
+  const activeHour = isUserInspecting ? hoverData.hour : isSimulating ? probeTip.h : activeHorizon
+  const activeVal = isUserInspecting ? hoverData.val : isSimulating ? probeTip.v : projectedAtHorizon
+  const activeProbeX = isUserInspecting ? hoverData.x : probeTip.x
+  const activeProbeY = isUserInspecting ? hoverData.y : probeTip.y
+
+  // Notify parent dashboard
   useEffect(() => {
     if (onSimUpdate) {
       onSimUpdate({
         progress: animProgress,
         p1,
         p2,
-        currentH: probeTip.h,
-        currentVal: probeTip.v,
+        currentH: activeHour,
+        currentVal: activeVal,
         liveVelocity: liveDriftVelocity,
         liveProjection,
         liveMargin,
         isSimulating,
       })
     }
-  }, [animProgress, p1, p2, probeTip.h, probeTip.v, liveDriftVelocity, liveProjection, liveMargin, isSimulating, onSimUpdate])
+  }, [animProgress, p1, p2, activeHour, activeVal, liveDriftVelocity, liveProjection, liveMargin, isSimulating, onSimUpdate])
 
-  // If no component is selected, render empty state (all hooks have been unconditionally called above)
   if (!component) {
     return (
-      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2 flex-1 h-full min-h-[400px]">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-mono font-bold text-amber-400 flex items-center gap-1.5 text-[11px] uppercase">
-            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
-            Module B &bull; Future Drift Forecaster (+96h Projection)
+      <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
+        <div className="flex items-center justify-between text-xs border-b border-slate-800/80 pb-2">
+          <span className="font-display font-bold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-slate-500" />
+            MODULE B &bull; IN-FLIGHT DRIFT FORECASTING
           </span>
           <span className="text-[10px] text-slate-400 font-mono">MODEL: POLYNOMIAL EXTENSION</span>
         </div>
-        <div className="flex-1 min-h-[360px] md:min-h-[440px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
-          [ AWAITING COMPONENT SELECTION TO DISPLAY DRIFT PROJECTION ]
+        <div className="flex-1 min-h-[360px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
+          [ SELECT COMPONENT OR LOAD BATCH TO DISPLAY IN-FLIGHT DRIFT FORECAST ]
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
+    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2.5 relative shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
       {/* Top Header & Extrapolation Horizon Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs md:text-sm border-b border-slate-800/80 pb-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs border-b border-slate-800/80 pb-2">
         <div className="flex items-center gap-2">
-          <span className="font-display font-bold text-amber-400 flex items-center gap-1.5 text-xs md:text-sm uppercase tracking-wider">
-            <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
+          <span className="font-display font-bold text-amber-400 flex items-center gap-1.5 text-xs uppercase tracking-wider">
+            <span className={`w-2 h-2 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
             MODULE B &bull; IN-FLIGHT DRIFT FORECASTING
           </span>
           <span
-            className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold border ${
+            className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold border ${
               willBreach
                 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                 : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
@@ -368,7 +430,6 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
 
         {/* Live Simulation status, Speed Selector & Horizon Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Playback Controls & Speed Toggle */}
           <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
             {isSimulating ? (
               <button
@@ -382,7 +443,11 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             ) : (
               <button
                 type="button"
-                onClick={() => startSimulation(true)}
+                onClick={() => {
+                  setIsHovering(false)
+                  setHoverData(null)
+                  startSimulation(true)
+                }}
                 className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
                 title="Replay in-flight drift simulation"
               >
@@ -390,45 +455,30 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               </button>
             )}
 
-            {/* Speed Selector */}
-            <div className="flex items-center gap-0.5 pl-1 border-l border-slate-700 text-[9.5px] font-mono">
-              {([0.5, 1, 2] as const).map((spd) => (
-                <button
-                  key={spd}
-                  type="button"
-                  onClick={() => setSimSpeed(spd)}
-                  className={`px-1.5 py-0.5 rounded ${
-                    simSpeed === spd
-                      ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                  title={spd === 0.5 ? 'Ultra Slow (17s)' : spd === 1 ? 'Slow Observation (8.5s)' : 'Fast (4s)'}
-                >
-                  {spd === 0.5 ? '0.5x' : spd === 1 ? '1x' : '2x'}
-                </button>
-              ))}
-            </div>
-
-            {/* Live Phase Pill */}
-            {isSimulating && (
-              <span className="text-[9.5px] font-mono font-bold text-amber-400 px-1 animate-pulse">
-                {isPaused
-                  ? 'PAUSED'
-                  : p2 > 0
-                  ? `+${Math.round(currentExtrapH - 168)}h`
-                  : `${Math.round(probeTip.h)}h`}
-              </span>
-            )}
+            <span className="text-[9.5px] font-mono font-bold text-amber-400 px-1">
+              {isUserInspecting
+                ? activeHour > 168
+                  ? `[FORECAST +${Math.round(activeHour - 168)}h]`
+                  : `[GROUND ${Math.round(activeHour)}h]`
+                : isPaused
+                ? '[PAUSED]'
+                : p2 > 0
+                ? `[+${Math.round(currentExtrapH - 168)}h]`
+                : `[${Math.round(probeTip.h)}h]`}
+            </span>
           </div>
 
-          <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-xs">
-            <span className="text-slate-400 px-1 uppercase text-xs font-bold">HORIZON:</span>
+          <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-[11px]">
+            <span className="text-slate-400 px-1 uppercase text-[10px] font-bold">HORIZON:</span>
             {([216, 264, 336] as const).map((h) => (
               <button
                 key={h}
                 type="button"
-                onClick={() => setActiveHorizon(h)}
-                className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                onClick={() => {
+                  sounds.playClick()
+                  setActiveHorizon(h)
+                }}
+                className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
                   activeHorizon === h
                     ? 'bg-amber-500/30 text-amber-300 border border-amber-500/60 font-bold shadow-isro'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -439,7 +489,6 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             ))}
           </div>
 
-          {/* Full Space Expand / Restore Toggle */}
           <button
             type="button"
             onClick={() => setIsExpanded((prev) => !prev)}
@@ -448,53 +497,73 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 ? 'bg-amber-500/30 text-amber-300 border-amber-500/60 shadow-isro'
                 : 'bg-[#050914] hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700'
             }`}
-            title={isExpanded ? 'Restore Standard Height' : 'Expand Oscilloscope to Fill Maximum Vertical Screen Space'}
+            title={isExpanded ? 'Restore Standard Height' : 'Expand Forecast Canvas'}
           >
-            <span>{isExpanded ? '⤡' : '⤢'}</span>
-            <span>{isExpanded ? 'RESTORE' : 'EXPAND'}</span>
+            <span>{isExpanded ? '⤡ RESTORE' : '⤢ EXPAND'}</span>
           </button>
         </div>
       </div>
 
-      {/* SVG Canvas Area */}
+      {/* Manual Timeline Scrubber */}
+      <div className="bg-[#070D1A] border border-slate-800/80 rounded-lg px-3 py-1 flex items-center justify-between gap-3 text-xs font-mono">
+        <span className="text-slate-400 whitespace-nowrap text-[11px] flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+          FORECAST SCRUBBER:
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={activeHorizon}
+          step={1}
+          value={Math.round(activeHour)}
+          onChange={(e) => handleScrubberChange(parseFloat(e.target.value))}
+          className="flex-1 accent-amber-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+          title="Drag slider to inspect in-flight drift forecast at any hour"
+        />
+        <span className="text-amber-300 font-bold text-xs min-w-[85px] text-right">
+          {activeHour > 168 ? `+${Math.round(activeHour - 168)}h (${Math.round(activeHour)}h)` : `T+${Math.round(activeHour)}h`}
+        </span>
+      </div>
+
+      {/* SVG Canvas Container */}
       <div
         ref={containerRef}
-        className={`relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden w-full flex-1 transition-all duration-300 ${
+        className={`relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812] w-full flex-1 transition-all duration-300 cursor-crosshair ${
           isExpanded
             ? 'min-h-[640px] md:min-h-[740px] lg:min-h-[820px]'
-            : 'min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[600px]'
+            : 'min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[580px]'
         }`}
       >
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="none"
           className="w-full h-full block select-none"
           style={{ width: '100%', height: '100%', display: 'block' }}
+          onMouseMove={handleSvgMouseMove}
+          onMouseLeave={handleSvgMouseLeave}
+          onClick={handleSvgMouseMove}
         >
           <defs>
             <linearGradient id="coneGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.05" />
+              <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.15" />
               <stop offset="100%" stopColor={willBreach ? '#ef4444' : '#f59e0b'} stopOpacity="0.25" />
             </linearGradient>
-            <linearGradient id="flightZoneGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.03" />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.07" />
-            </linearGradient>
-            <pattern id="gridPatternB" width="30" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 30 0 L 0 0 0 20" fill="none" stroke="#162238" strokeWidth="0.5" strokeOpacity="0.7" />
-            </pattern>
+
+            <clipPath id="groundClip">
+              <rect x={0} y={0} width={isUserInspecting ? W : toX(168)} height={H} />
+            </clipPath>
           </defs>
 
-          {/* Background Grid Pattern */}
-          <rect x={padL} y={padT} width={W - padL - padR} height={H - padT - padB} fill="url(#gridPatternB)" />
-
-          {/* Flight Phase Shading: Ground Burn-in vs In-Flight Operations */}
+          {/* Shaded Flight Region Background (168h -> maxX) */}
           <rect
             x={toX(168)}
             y={padT}
-            width={toX(activeHorizon) - toX(168)}
+            width={W - padR - toX(168)}
             height={H - padT - padB}
-            fill="url(#flightZoneGrad)"
+            fill="#0b1528"
+            opacity={0.5}
           />
           <text
             x={toX(168) + 8}
@@ -539,7 +608,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             )
           })}
 
-          {/* X Axis Time Marks (0, 24, 96, 168, horizon) */}
+          {/* X Axis Time Marks */}
           {[0, 24, 96, 168, activeHorizon].map((h) => {
             const xPos = toX(h)
             return (
@@ -585,26 +654,24 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
           <g transform={`translate(${W - padR - 105}, ${toY(limitVal) - 9})`}>
             <rect width="102" height="15" rx="3" fill="#881337" opacity="0.8" />
             <text x="51" y="10.5" textAnchor="middle" fill="#fda4af" fontSize="8" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
-              SPEC LIMIT {limitVal.toFixed(1)} &mu;A
+              SPEC LIMIT {limitVal.toFixed(1)} µA
             </text>
           </g>
 
-          {/* Dynamic Predictive Uncertainty Cone (expanding with p2) */}
+          {/* Dynamic Predictive Uncertainty Cone */}
           {conePolygonD && <path d={conePolygonD} fill="url(#coneGrad)" />}
 
           {/* Early Prediction Checkpoint Trace (24h -> 168h projection) */}
-          {p1 >= 0.14 && (
-            <path
-              d={earlyPredPathD}
-              fill="none"
-              stroke="#94a3b8"
-              strokeWidth="1"
-              strokeDasharray="2 3"
-              opacity={Math.min(0.6, (p1 - 0.14) * 2)}
-            />
-          )}
+          <path
+            d={earlyPredPathD}
+            fill="none"
+            stroke="#94a3b8"
+            strokeWidth="1"
+            strokeDasharray="2 3"
+            opacity={0.6}
+          />
 
-          {/* Measured Past Telemetry Line (0h -> 168h, drawn live via strokeDashoffset) */}
+          {/* Measured Past Telemetry Line (Monotone Cubic Spline) */}
           <path
             ref={measuredPathRef}
             d={measuredPathD}
@@ -613,255 +680,167 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeDasharray={measuredLen}
-            strokeDashoffset={measuredLen * (1 - p1)}
           />
 
-          {/* Future Extrapolation Line (168h -> Horizon, drawn dynamically in Phase 2) */}
-          {extrapPathD && (
-            <path
-              d={extrapPathD}
-              fill="none"
+          {/* Future Extrapolation Line (168h -> Horizon) */}
+          {(extrapPathD || isUserInspecting) && (
+            <line
+              x1={toX(168)}
+              y1={toY(v168)}
+              x2={toX(activeHorizon)}
+              y2={toY(projectedAtHorizon)}
               stroke={willBreach ? '#ef4444' : '#f59e0b'}
-              strokeWidth="2.2"
+              strokeWidth={2.2}
               strokeDasharray="4 3"
               strokeLinecap="round"
             />
           )}
 
-          {/* Nodes for Measured Points (Sequentially appearing as reached) */}
+          {/* Nodes for Measured Points */}
           {measuredPoints.map((p) => {
-            const isReached = p1 >= p.h / 168 || animProgress >= 1
-            if (!isReached) return null
-
             const cx = toX(p.h)
             const cy = toY(p.v)
             return (
-              <g
-                key={p.h}
-                className="cursor-pointer transition-opacity duration-300"
-                onMouseEnter={() => setHoveredPoint({ hour: p.h, val: p.v, label: p.label })}
-                onMouseLeave={() => setHoveredPoint(null)}
-              >
+              <g key={p.h}>
                 <circle cx={cx} cy={cy} r="4" fill="#0f172a" stroke="#ffffff" strokeWidth="1.5" />
                 <circle cx={cx} cy={cy} r="1.5" fill="#ffffff" />
               </g>
             )
           })}
 
-          {/* Early Prediction 168h Point & Error Delta Bar */}
-          {p1 >= 1 && (
-            <g>
+          {/* Future Projection Node at Horizon */}
+          <g>
+            {willBreach && (
               <circle
-                cx={toX(168)}
-                cy={toY(early168)}
-                r="3.5"
-                fill="#0f172a"
-                stroke="#94a3b8"
-                strokeWidth="1.2"
-                strokeDasharray="2 2"
+                cx={toX(activeHorizon)}
+                cy={toY(projectedAtHorizon)}
+                r="10"
+                fill="none"
+                stroke="#ef4444"
+                strokeWidth="1.5"
+                className="animate-ping"
+                opacity={0.6}
+              />
+            )}
+            <circle
+              cx={toX(activeHorizon)}
+              cy={toY(projectedAtHorizon)}
+              r="5"
+              fill={willBreach ? '#be123c' : '#d97706'}
+              stroke={willBreach ? '#fda4af' : '#fde68a'}
+              strokeWidth="2"
+            />
+            <circle cx={toX(activeHorizon)} cy={toY(projectedAtHorizon)} r="2" fill="#ffffff" />
+          </g>
+
+          {/* Crosshair Laser & Telemetry Probe (Interactive or Auto-simulating) */}
+          {(isSimulating || isUserInspecting) && (
+            <g>
+              <line
+                x1={activeProbeX}
+                x2={activeProbeX}
+                y1={padT}
+                y2={H - padB}
+                stroke={activeHour > 168 ? '#f59e0b' : '#38bdf8'}
+                strokeWidth={1.4}
+                strokeDasharray="3 2"
+                opacity={0.8}
               />
               <line
-                x1={toX(168)}
-                y1={toY(v168)}
-                x2={toX(168)}
-                y2={toY(early168)}
-                stroke="#f59e0b"
-                strokeWidth="1.2"
+                x1={padL}
+                x2={activeProbeX}
+                y1={activeProbeY}
+                y2={activeProbeY}
+                stroke={activeHour > 168 ? '#f59e0b' : '#38bdf8'}
+                strokeWidth={0.8}
                 strokeDasharray="2 2"
+                opacity={0.5}
               />
-            </g>
-          )}
-
-          {/* Future Projection Node at Horizon (activates in Phase 2) */}
-          {p2 > 0 && (
-            <g
-              className="cursor-pointer"
-              onMouseEnter={() =>
-                setHoveredPoint({
-                  hour: activeHorizon,
-                  val: projectedAtHorizon,
-                  label: `Projected @ +${activeHorizon - 168}h`,
-                })
-              }
-              onMouseLeave={() => setHoveredPoint(null)}
-            >
-              {p2 >= 0.98 && (
-                <circle
-                  cx={toX(activeHorizon)}
-                  cy={toY(projectedAtHorizon)}
-                  r="10"
-                  fill="none"
-                  stroke={willBreach ? '#ef4444' : '#f59e0b'}
-                  strokeWidth="1.5"
-                  className="animate-ping"
-                  opacity={0.6}
-                />
-              )}
               <circle
-                cx={toX(currentExtrapH)}
-                cy={toY(currentExtrapVal)}
-                r="5"
-                fill={willBreach ? '#be123c' : '#d97706'}
-                stroke={willBreach ? '#fda4af' : '#fde68a'}
-                strokeWidth="2"
-              />
-              <circle cx={toX(currentExtrapH)} cy={toY(currentExtrapVal)} r="2" fill="#ffffff" />
-            </g>
-          )}
-
-          {/* Live Probe Scanner Head & Telemetry Badge */}
-          {isSimulating && animProgress < 1 && (
-            <g>
-              {/* Probe Pulse Circle */}
-              <circle
-                cx={probeTip.x}
-                cy={probeTip.y}
+                cx={activeProbeX}
+                cy={activeProbeY}
                 r={9}
-                fill={probeTip.isExtrap ? '#f59e0b' : '#ffffff'}
+                fill={activeHour > 168 ? '#f59e0b' : '#ffffff'}
                 opacity={0.35}
               />
               <circle
-                cx={probeTip.x}
-                cy={probeTip.y}
+                cx={activeProbeX}
+                cy={activeProbeY}
                 r={4.5}
-                fill={probeTip.isExtrap ? '#f59e0b' : '#38bdf8'}
+                fill={activeHour > 168 ? '#f59e0b' : '#38bdf8'}
                 stroke="#ffffff"
                 strokeWidth={1.5}
               />
-              <circle cx={probeTip.x} cy={probeTip.y} r={1.5} fill="#ffffff" />
 
-              {/* Floating HUD Telemetry Badge */}
+              {/* Floating Tooltip Chip */}
               <g
                 transform={`translate(${Math.min(
-                  W - padR - 55,
-                  Math.max(padL + 55, probeTip.x)
-                )}, ${Math.max(padT + 16, probeTip.y - 18)})`}
+                  W - padR - 70,
+                  Math.max(padL + 70, activeProbeX)
+                )}, ${Math.max(padT + 18, activeProbeY - 22)})`}
               >
                 <rect
-                  x="-50"
-                  y="-12"
-                  width="100"
-                  height="20"
-                  rx="4"
+                  x="-65"
+                  y="-13"
+                  width="130"
+                  height="22"
+                  rx="5"
                   fill="#0B1528"
-                  stroke={probeTip.isExtrap ? '#f59e0b' : '#38bdf8'}
+                  stroke={activeHour > 168 ? '#f59e0b' : '#38bdf8'}
                   strokeWidth="1.2"
-                  filter="drop-shadow(0 2px 5px rgba(0,0,0,0.6))"
+                  filter="drop-shadow(0 3px 6px rgba(0,0,0,0.8))"
                 />
                 <text
                   x="0"
-                  y="2"
+                  y="2.5"
                   textAnchor="middle"
                   fill="#ffffff"
-                  fontSize="8.5"
+                  fontSize="9"
                   fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight="bold"
                 >
-                  T+{Math.round(probeTip.h)}h: {probeTip.v.toFixed(2)} &mu;A
+                  {activeHour > 168
+                    ? `+${Math.round(activeHour - 168)}h: ${activeVal.toFixed(2)} µA`
+                    : `T+${Math.round(activeHour)}h: ${activeVal.toFixed(2)} µA`}
                 </text>
               </g>
             </g>
           )}
-
-          {/* Breach Crosshair & Annotation if within visible range and reached by sweep */}
-          {breachHour && breachHour <= maxX && (p2 === 1 || currentExtrapH >= breachHour) && (
-            <g transform={`translate(${toX(breachHour)}, ${toY(limitVal)})`}>
-              <circle r="7" fill="none" stroke="#ef4444" strokeWidth="1.5" className="animate-ping" opacity="0.75" />
-              <circle r="5" fill="#ef4444" fillOpacity="0.3" stroke="#ef4444" strokeWidth="1.8" />
-              <line x1="-8" y1="0" x2="8" y2="0" stroke="#ef4444" strokeWidth="1.5" />
-              <line x1="0" y1="-8" x2="0" y2="8" stroke="#ef4444" strokeWidth="1.5" />
-              <text x="0" y="-11" textAnchor="middle" fill="#ef4444" fontSize="7.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
-                BREACH T+{Math.round(breachHour)}H
-              </text>
-            </g>
-          )}
-
-          {/* Active Hover Tooltip */}
-          {hoveredPoint && (
-            <g transform={`translate(${toX(hoveredPoint.hour)}, ${Math.max(padT + 15, toY(hoveredPoint.val) - 18)})`}>
-              <rect
-                x="-42"
-                y="-14"
-                width="84"
-                height="22"
-                rx="4"
-                fill="#0f172a"
-                stroke="#f59e0b"
-                strokeWidth="1"
-                filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"
-              />
-              <text x="0" y="-2" textAnchor="middle" fill="#94a3b8" fontSize="7.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif">
-                {hoveredPoint.label}
-              </text>
-              <text x="0" y="6" textAnchor="middle" fill="#f59e0b" fontSize="8.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
-                {hoveredPoint.val.toFixed(2)} &mu;A
-              </text>
-            </g>
-          )}
-
-          {/* Y Axis Unit Label */}
-          <text
-            x={padL - 6}
-            y={padT - 6}
-            textAnchor="end"
-            fill="#64748b"
-            fontSize="8"
-            fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
-          >
-            &mu;A
-          </text>
         </svg>
       </div>
 
-      {/* Metric Callouts & Flight Advisory Bottom Row (Live Count-Up Synchronized with Sweep) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
-            {isSimulating && (
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-            )}
-          </div>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${liveDriftVelocity > 50 ? 'text-rose-400' : 'text-amber-400'}`}>
-            {liveDriftVelocity.toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
+      {/* Module B Live Metric HUD */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono">
+        <div className="p-2 rounded-lg bg-[#050A14] border border-slate-800 flex flex-col">
+          <span className="text-slate-400 text-[10px] uppercase">Drift Velocity</span>
+          <span className="text-amber-300 text-sm font-bold tabular-nums">
+            {liveDriftVelocity.toFixed(1)} nA/h
           </span>
+          <span className="text-[9px] text-slate-500">Arrhenius kinetic rate</span>
         </div>
 
-        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">Early Pred Error</span>
-            {isSimulating && (
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-            )}
-          </div>
-          <span className="text-base font-bold text-amber-300 mt-0.5 tabular-nums">
-            &plusmn;{livePredError.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+        <div className="p-2 rounded-lg bg-[#050A14] border border-slate-800 flex flex-col">
+          <span className="text-slate-400 text-[10px] uppercase">Forecast (+{activeHorizon - 168}h)</span>
+          <span className={`text-sm font-bold tabular-nums ${liveProjection >= limitVal ? 'text-rose-400' : 'text-slate-200'}`}>
+            {liveProjection.toFixed(2)} µA
           </span>
+          <span className="text-[9px] text-slate-500">at T+{activeHorizon}h</span>
         </div>
 
-        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">+{activeHorizon - 168}h Projection</span>
-            {isSimulating && (
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-            )}
-          </div>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'}`}>
-            {liveProjection.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+        <div className="p-2 rounded-lg bg-[#050A14] border border-slate-800 flex flex-col">
+          <span className="text-slate-400 text-[10px] uppercase">Flight Margin</span>
+          <span className={`text-sm font-bold tabular-nums ${liveMargin < 0 ? 'text-rose-400' : liveMargin < 8 ? 'text-amber-400' : 'text-emerald-400'}`}>
+            {liveMargin > 0 ? '+' : ''}{liveMargin.toFixed(1)} µA
           </span>
+          <span className="text-[9px] text-slate-500">Limit: {limitVal} µA</span>
         </div>
 
-        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">Future Margin</span>
-            {isSimulating && (
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-            )}
-          </div>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${liveMargin < 5 ? 'text-rose-400' : liveMargin < 15 ? 'text-amber-400' : 'text-emerald-400'}`}>
-            {liveMargin.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+        <div className="p-2 rounded-lg bg-[#050A14] border border-slate-800 flex flex-col">
+          <span className="text-slate-400 text-[10px] uppercase">Breach Horizon</span>
+          <span className={`text-sm font-bold tabular-nums ${breachHour && breachHour < 1000 ? 'text-rose-400' : 'text-emerald-400'}`}>
+            {breachHour && breachHour < 1000 ? `T+${Math.round(breachHour)}h` : '> 10k hrs'}
           </span>
+          <span className="text-[9px] text-slate-500">{breachHour ? 'Projected limit breach' : 'Nominal lifetime'}</span>
         </div>
       </div>
     </div>
