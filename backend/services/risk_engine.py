@@ -136,7 +136,7 @@ def score_and_decide(
 
         row = df.iloc[i]
         val_168 = float(row["v168"])
-        lim = float(row["limit"])
+        lim = float(row.get("limit") if "limit" in row and pd.notna(row["limit"]) else row.get("datasheet_max", 50.0))
         ds_min = float(row.get("datasheet_min", 0.0))
         lot_med = float(row.get("lot_median", val_168))
         lot_mean = float(row.get("lot_mean", val_168))

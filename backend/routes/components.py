@@ -116,6 +116,7 @@ def component_detail(batch_id: int, component_id: str, db: Session = Depends(get
     return _to_dict(row)
 
 
+@router.get("/components/{component_id}")
 @router.get("/screening/component/{component_id}")
 def component_detail_latest(component_id: str, db: Session = Depends(get_db)):
     row = (

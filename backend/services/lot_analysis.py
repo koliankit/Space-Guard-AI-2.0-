@@ -105,6 +105,11 @@ def add_lot_relative_scores(df: pd.DataFrame) -> pd.DataFrame:
     z_slope_list = []
     lot_anomaly_scores = []
     is_latent_defects = []
+    dev_from_medians = []
+    dev_from_means = []
+    ds_margins = []
+    ds_violated_list = []
+    screening_categories = []
 
     for _, row in df.iterrows():
         lot_id = row["lot_id"]
@@ -141,11 +146,27 @@ def add_lot_relative_scores(df: pd.DataFrame) -> pd.DataFrame:
         # Anomaly score (0 - 100 scale)
         anomaly_score = min(100.0, max(0.0, abs(z_r) * 22.0 + abs(z_slope) * 6.0))
 
-        # Check Traditional Datasheet compliance
-        trad_pass = (v168 >= ds_min) and (v168 <= ds_max)
+        # Deviation from lot median and mean
+        dev_med = v168 - st["med_v"]
+        dev_mean = v168 - st["mean_v"]
+        ds_margin = ds_max - v168
+        ds_violated = bool((v168 > ds_max) or (v168 < ds_min))
 
-        # Flag Latent Defect: Passes static spec but is statistically anomalous to cohort
+        # Check Traditional Datasheet compliance
+        trad_pass = not ds_violated
+
+        # Flag Latent Defect: Passes static spec but is statistically abnormal relative to cohort
         latent = trad_pass and (abs(z_r) >= 3.0 or abs(pct_dev) >= 35.0 or abs(z_slope) >= 3.5)
+
+        # Explicit 4-tier Module A Category
+        if ds_violated:
+            cat = "DATASHEET_FAILURE"
+        elif latent:
+            cat = "LATENT_ANOMALY"
+        elif abs(z_r) >= 2.0 or abs(pct_dev) >= 20.0:
+            cat = "LOT_RELATIVE_ANOMALY"
+        else:
+            cat = "NORMAL"
 
         lot_means.append(round(st["mean_v"], 3))
         lot_stds.append(round(st["std_v"], 3))
@@ -158,11 +179,22 @@ def add_lot_relative_scores(df: pd.DataFrame) -> pd.DataFrame:
         lot_anomaly_scores.append(round(anomaly_score, 1))
         is_latent_defects.append(bool(latent))
 
+        dev_from_medians.append(round(dev_med, 4))
+        dev_from_means.append(round(dev_mean, 4))
+        ds_margins.append(round(ds_margin, 4))
+        ds_violated_list.append(ds_violated)
+        screening_categories.append(cat)
+
     df["lot_mean"] = lot_means
     df["lot_std"] = lot_stds
     df["lot_median"] = lot_medians
     df["lot_mad"] = lot_mads
     df["lot_pct_dev"] = lot_pct_devs
+    df["dev_from_lot_median"] = dev_from_medians
+    df["dev_from_lot_mean"] = dev_from_means
+    df["datasheet_margin"] = ds_margins
+    df["datasheet_violated"] = ds_violated_list
+    df["lot_screening_category"] = screening_categories
     df["z168"] = z168_robust
     df["robust_z168"] = z168_robust
     df["z168_std"] = z168_std

@@ -1,24 +1,83 @@
 version: "3.9"
 
 services:
+  # ----------------------------------------------------------------------------
+  # Dedicated PostgreSQL Database (Air-gapped internal network)
+  # ----------------------------------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: astra_vigil_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-astra}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-astra_secure_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-astra_vigil}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - astra_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-astra} -d ${POSTGRES_DB:-astra_vigil}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ----------------------------------------------------------------------------
+  # FastAPI AI Core & Screening Backend
+  # ----------------------------------------------------------------------------
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: astra_vigil_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-astra}:${POSTGRES_PASSWORD:-astra_secure_pass_2026}@db:5432/${POSTGRES_DB:-astra_vigil}
+      ASTRA_SECRET_KEY: ${ASTRA_SECRET_KEY:-isro-astra-vigil-flight-qualification-key-2026-secret}
+      ASTRA_ADMIN_PWD: ${ASTRA_ADMIN_PWD:-admin123}
+      ASTRA_ENG_PWD: ${ASTRA_ENG_PWD:-engineer123}
+      ASTRA_ANALYST_PWD: ${ASTRA_ANALYST_PWD:-analyst123}
+      ASTRA_VIEWER_PWD: ${ASTRA_VIEWER_PWD:-viewer123}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - astra_network
+    expose:
+      - "8000"
     ports:
       - "8000:8000"
-    volumes:
-      - backend_data:/app  # keeps spaceguard.db between restarts
-    environment:
-      - DATABASE_URL=sqlite:///./spaceguard.db
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # ----------------------------------------------------------------------------
+  # High-Performance Nginx Web Portal & Reverse Proxy
+  # ----------------------------------------------------------------------------
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
       args:
-        VITE_API_BASE_URL: http://localhost:8000
+        VITE_API_BASE_URL: ""
+    container_name: astra_vigil_frontend
+    restart: unless-stopped
     ports:
+      - "80:80"
       - "5173:80"
     depends_on:
       - backend
+    networks:
+      - astra_network
+
+networks:
+  astra_network:
+    driver: bridge
 
 volumes:
+  postgres_data:
   backend_data:

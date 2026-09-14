@@ -484,6 +484,9 @@ class PreprocessingEngine:
     @classmethod
     def process(cls, df: pd.DataFrame) -> pd.DataFrame:
         """Runs the complete preprocessing transformation."""
+        df = df.copy()
+        if "limit" not in df.columns:
+            df["limit"] = df["datasheet_max"] if "datasheet_max" in df.columns else 50.0
         df = cls.preserve_raw_measurements(df)
         df = cls.handle_missing_and_impute(df)
         df = cls.calculate_temporal_metrics(df)

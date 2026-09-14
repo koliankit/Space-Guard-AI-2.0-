@@ -11,6 +11,8 @@ STATUS_RANK = {"safe": 0, "monitor": 1, "reject": 2}
 
 
 @router.get("/mission-status/{batch_id}")
+@router.get("/mission/status/{batch_id}")
+@router.get("/screening/mission-status/{batch_id}")
 def mission_status(batch_id: int, db: Session = Depends(get_db)):
     batch = db.query(Batch).filter(Batch.id == batch_id).first()
     if not batch:

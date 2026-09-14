@@ -86,3 +86,28 @@ class ComponentRecord(Base):
     explanation_points = Column(JSON, nullable=True)
 
     batch = relationship("Batch", back_populates="components")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=True)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, default="ENGINEER", nullable=False)  # ADMIN | ENGINEER | ANALYST | VIEWER
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    username = Column(String, nullable=True)
+    action = Column(String, nullable=False)  # UPLOAD | ANALYZE | EXPORT | LOGIN | CONFIG
+    details = Column(String, nullable=True)
+    ip_address = Column(String, nullable=True)
+

@@ -261,6 +261,26 @@ def compute_evaluation_metrics(df: pd.DataFrame) -> Dict[str, Any]:
         else:
             metrics["status_message"] = f"Insufficient labeled components ({labeled_count} < 5) for reliable classification metrics."
 
+    # 3. Direct Comparison: Traditional Datasheet Screening vs ASTRA VIGIL Screening
+    if len(df) > 0:
+        lim = df["limit"].to_numpy(dtype=float) if "limit" in df.columns else (
+            df["datasheet_max"].to_numpy(dtype=float) if "datasheet_max" in df.columns else np.full(len(df), 50.0)
+        )
+        ds_min = df["datasheet_min"].to_numpy(dtype=float) if "datasheet_min" in df.columns else np.zeros(len(df))
+        v168 = df["v168"].to_numpy(dtype=float) if "v168" in df.columns else np.zeros(len(df))
+
+        trad_failures = int(((v168 > lim) | (v168 < ds_min)).sum())
+        ai_flagged = int((df["status"] != "safe").sum()) if "status" in df.columns else 0
+        latent_detected = int(df.get("is_latent_defect", pd.Series([False] * len(df))).sum())
+
+        metrics.update({
+            "traditional_failures": trad_failures,
+            "astra_vigil_flagged": ai_flagged,
+            "latent_anomalies_detected": latent_detected,
+            "traditional_detection_rate_pct": round((trad_failures / max(1, len(df))) * 100.0, 1),
+            "astra_vigil_detection_rate_pct": round((ai_flagged / max(1, len(df))) * 100.0, 1),
+        })
+
     return metrics
 
 

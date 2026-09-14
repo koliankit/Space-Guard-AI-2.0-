@@ -11,8 +11,9 @@ Interactive API docs live at http://localhost:8000/docs
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import init_db
-from routes import upload, analysis, components, mission, report, demo
+from database import init_db, SessionLocal
+from routes import upload, analysis, components, mission, report, demo, auth
+from services.auth import init_default_users
 
 app = FastAPI(
     title="ASTRA VIGIL",
@@ -35,11 +36,14 @@ app.include_router(components.router)
 app.include_router(mission.router)
 app.include_router(report.router)
 app.include_router(demo.router)
+app.include_router(auth.router)
 
 
 @app.on_event("startup")
 def on_startup():
     init_db()
+    with SessionLocal() as db:
+        init_default_users(db)
 
 
 @app.get("/api/health")
