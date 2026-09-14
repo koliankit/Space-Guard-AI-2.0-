@@ -44,8 +44,8 @@ export default function LotClassificationModal({
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'SAFE' | 'MONITOR' | 'REJECT'>('ALL')
   const [subsystemFilter, setSubsystemFilter] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
-  const [copiedLotId, setCopiedLotId] = useState<string | null>(null)
   const [splitMode, setSplitMode] = useState<'sideBySide' | 'stacked'>('sideBySide')
+  const [isLotsCollapsed, setIsLotsCollapsed] = useState(false)
 
   // Sync components from props
   useEffect(() => {
@@ -241,31 +241,55 @@ export default function LotClassificationModal({
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* 50/50 Equal Halves Split Mode Toggle */}
+            {/* View Mode Toggle: Table Focus (Expanded Right Section) vs Stacked */}
             <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-xs">
               <button
                 type="button"
-                onClick={() => setSplitMode('sideBySide')}
-                className={`px-2.5 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
-                  splitMode === 'sideBySide'
+                onClick={() => {
+                  sounds.playClick()
+                  setSplitMode('sideBySide')
+                  setIsLotsCollapsed(false)
+                }}
+                className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  splitMode === 'sideBySide' && !isLotsCollapsed
                     ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
-                title="Side-by-Side: 50% Left (Lots) + 50% Right (Components)"
+                title="Table Focus: Compact Left Lots (~24% Width) + Expanded Right Table (~76% Width)"
               >
-                ◫ 50/50 Split
+                <span>◫</span> Table Focus (Wide)
               </button>
               <button
                 type="button"
-                onClick={() => setSplitMode('stacked')}
-                className={`px-2.5 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                onClick={() => {
+                  sounds.playClick()
+                  setSplitMode('stacked')
+                  setIsLotsCollapsed(false)
+                }}
+                className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   splitMode === 'stacked'
                     ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
-                title="Stacked: 50% Top (Lots) + 50% Bottom (Components)"
+                title="Stacked: Top Lot Selector + Bottom Component Table"
               >
-                ⬒ 50/50 Stacked
+                <span>⬒</span> Stacked
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.playClick()
+                  setSplitMode('sideBySide')
+                  setIsLotsCollapsed(!isLotsCollapsed)
+                }}
+                className={`px-2.5 py-1 rounded text-xs font-bold transition-all cursor-pointer hidden md:flex items-center gap-1.5 ${
+                  isLotsCollapsed
+                    ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title={isLotsCollapsed ? "Expand Lots Panel" : "Maximize Table to 100% Full Width"}
+              >
+                <span>{isLotsCollapsed ? '◨ Show Lots' : '⛶ 100% Table'}</span>
               </button>
             </div>
 
@@ -310,129 +334,156 @@ export default function LotClassificationModal({
           </div>
         </div>
 
-        {/* Main Body: Divided into Two Equal Halves (50% / 50%) */}
+        {/* Main Body: Master-Detail Layout with Compact Lots Sidebar (~24%) and Expanded Component Table (~76%) */}
         <div
           className={`flex-1 flex overflow-hidden ${
             splitMode === 'sideBySide' ? 'flex-col lg:flex-row' : 'flex-col'
           }`}
         >
-          {/* Section 1 (50% Equal Half): Qualification Lots Matrix Selector */}
-          <div
-            className={`${
-              splitMode === 'sideBySide'
-                ? 'w-full lg:w-1/2 h-full border-b lg:border-b-0 lg:border-r'
-                : 'w-full h-1/2 border-b'
-            } border-slate-800 flex flex-col overflow-hidden bg-[#070D1A]`}
-          >
-            <div className="px-4 py-2 bg-[#091122] border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2 flex-shrink-0">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-mono flex items-center gap-2">
-                <span>📦</span> QUALIFICATION FLIGHT LOTS ({lotGroups.length}) &mdash;{' '}
-                <span className="text-amber-400 font-normal hidden sm:inline">Select lot to inspect components</span>
-              </span>
-              <span className="text-xs text-slate-300 font-mono">
-                Active: <b className="text-white bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40">{activeLot?.lot_id || 'None'}</b>
+          {/* Section 1: Qualification Lots Selector Sidebar */}
+          {isLotsCollapsed && splitMode === 'sideBySide' ? (
+            <div className="hidden lg:flex flex-col items-center py-3 px-1.5 bg-[#070D1A] border-r border-slate-800 gap-3">
+              <button
+                type="button"
+                onClick={() => setIsLotsCollapsed(false)}
+                className="p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold cursor-pointer"
+                title="Expand Lot Selector Sidebar"
+              >
+                ▶
+              </button>
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest [writing-mode:vertical-lr] rotate-180 font-bold py-2">
+                QUALIFICATION LOTS ({lotGroups.length})
               </span>
             </div>
-
-            {/* Grid of Lot Cards in Section 1 */}
+          ) : (
             <div
-              className={`p-3 overflow-y-auto flex-1 grid ${
+              className={`${
                 splitMode === 'sideBySide'
-                  ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
-                  : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
-              } gap-2.5`}
+                  ? 'w-full lg:w-[26%] xl:w-[24%] 2xl:w-[22%] min-w-[270px] max-w-[360px] h-full border-b lg:border-b-0 lg:border-r'
+                  : 'w-full h-[28%] min-h-[170px] max-h-[220px] border-b'
+              } border-slate-800 flex flex-col overflow-hidden bg-[#070D1A] flex-shrink-0`}
             >
-              {lotGroups.length === 0 ? (
-                <div className="p-6 text-center text-slate-400 text-xs italic col-span-full">
-                  No qualification lots found in current telemetry dataset.
-                </div>
-              ) : (
-                lotGroups.map((lot) => {
-                  const isSelected = activeLot?.lot_id === lot.lot_id
-                  const isRej = lot.rejectCount > 0
-                  const isMon = lot.monitorCount > 0
-
-                  return (
-                    <div
-                      key={lot.lot_id}
-                      onClick={() => {
-                        sounds.playClick()
-                        setSelectedLotId(lot.lot_id)
-                      }}
-                      className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all ${
-                        isSelected
-                          ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/60 scale-[1.01]'
-                          : isRej
-                          ? 'bg-[#180C14] border-rose-900/60 hover:border-rose-600 hover:bg-[#200E1A]'
-                          : isMon
-                          ? 'bg-[#19140B] border-amber-900/60 hover:border-amber-600 hover:bg-[#221B0F]'
-                          : 'bg-[#0B1326] border-slate-800 hover:border-slate-600 hover:bg-[#0F1A33]'
-                      }`}
+              <div className="px-3.5 py-2 bg-[#091122] border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2 flex-shrink-0">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-mono flex items-center gap-1.5">
+                  <span>📦</span> FLIGHT LOTS ({lotGroups.length})
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-slate-300 font-mono">
+                    Active: <b className="text-white bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/40">{activeLot?.lot_id || 'None'}</b>
+                  </span>
+                  {splitMode === 'sideBySide' && (
+                    <button
+                      type="button"
+                      onClick={() => setIsLotsCollapsed(true)}
+                      className="hidden lg:inline-flex text-slate-400 hover:text-white text-xs px-1.5 py-0.5 rounded hover:bg-slate-800 cursor-pointer"
+                      title="Collapse lot panel to give 100% width to component table"
                     >
-                      {/* Lot Header: ID and Status */}
-                      <div className="flex items-center justify-between mb-1 gap-1">
-                        <div className="flex items-center gap-1.5 min-w-0">
+                      ◀
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Grid of Lot Cards in Section 1 */}
+              <div
+                className={`p-2.5 overflow-y-auto flex-1 grid ${
+                  splitMode === 'sideBySide'
+                    ? 'grid-cols-1 gap-2'
+                    : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2'
+                }`}
+              >
+                {lotGroups.length === 0 ? (
+                  <div className="p-6 text-center text-slate-400 text-xs italic col-span-full">
+                    No qualification lots found in current telemetry dataset.
+                  </div>
+                ) : (
+                  lotGroups.map((lot) => {
+                    const isSelected = activeLot?.lot_id === lot.lot_id
+                    const isRej = lot.rejectCount > 0
+                    const isMon = lot.monitorCount > 0
+
+                    return (
+                      <div
+                        key={lot.lot_id}
+                        onClick={() => {
+                          sounds.playClick()
+                          setSelectedLotId(lot.lot_id)
+                        }}
+                        className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/60 scale-[1.01]'
+                            : isRej
+                            ? 'bg-[#180C14] border-rose-900/60 hover:border-rose-600 hover:bg-[#200E1A]'
+                            : isMon
+                            ? 'bg-[#19140B] border-amber-900/60 hover:border-amber-600 hover:bg-[#221B0F]'
+                            : 'bg-[#0B1326] border-slate-800 hover:border-slate-600 hover:bg-[#0F1A33]'
+                        }`}
+                      >
+                        {/* Lot Header: ID and Status */}
+                        <div className="flex items-center justify-between mb-1 gap-1">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span
+                              className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                                isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400 led' : 'bg-emerald-400'
+                              }`}
+                            />
+                            <span className="font-mono font-bold text-xs text-white truncate">
+                              {lot.lot_id}
+                            </span>
+                          </div>
                           <span
-                            className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                              isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400 led' : 'bg-emerald-400'
+                            className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-black uppercase flex-shrink-0 ${
+                              isRej
+                                ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50'
+                                : isMon
+                                ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50'
+                                : 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/50'
                             }`}
-                          />
-                          <span className="font-mono font-bold text-xs text-white truncate">
-                            {lot.lot_id}
+                          >
+                            {isRej ? `${lot.rejectCount} REJ` : isMon ? `${lot.monitorCount} MON` : 'NOM'}
                           </span>
                         </div>
-                        <span
-                          className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-black uppercase flex-shrink-0 ${
-                            isRej
-                              ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50'
-                              : isMon
-                              ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50'
-                              : 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/50'
-                          }`}
-                        >
-                          {isRej ? `${lot.rejectCount} REJ` : isMon ? `${lot.monitorCount} MON` : 'NOM'}
-                        </span>
-                      </div>
 
-                      {/* Metrics: Part count & Baseline */}
-                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-300 mb-1.5">
-                        <span>
-                          <b className="text-white">{lot.total}</b> parts
-                        </span>
-                        <span className="text-slate-400">
-                          &mu; = <b className="text-amber-300">{lot.mean.toFixed(1)}</b> &micro;A
-                        </span>
-                      </div>
+                        {/* Metrics: Part count & Baseline */}
+                        <div className="flex items-center justify-between text-[11px] font-mono text-slate-300 mb-1.5">
+                          <span>
+                            <b className="text-white">{lot.total}</b> parts
+                          </span>
+                          <span className="text-slate-400">
+                            &mu; = <b className="text-amber-300">{lot.mean.toFixed(1)}</b> &micro;A
+                          </span>
+                        </div>
 
-                      {/* Visual Health Distribution Bar */}
-                      <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden flex">
-                        <div
-                          style={{ width: `${(lot.safeCount / (lot.total || 1)) * 100}%` }}
-                          className="bg-emerald-500 h-full"
-                          title={`${lot.safeCount} Safe`}
-                        />
-                        <div
-                          style={{ width: `${(lot.monitorCount / (lot.total || 1)) * 100}%` }}
-                          className="bg-amber-500 h-full"
-                          title={`${lot.monitorCount} Monitor`}
-                        />
-                        <div
-                          style={{ width: `${(lot.rejectCount / (lot.total || 1)) * 100}%` }}
-                          className="bg-rose-500 h-full"
-                          title={`${lot.rejectCount} Reject`}
-                        />
+                        {/* Visual Health Distribution Bar */}
+                        <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden flex">
+                          <div
+                            style={{ width: `${(lot.safeCount / (lot.total || 1)) * 100}%` }}
+                            className="bg-emerald-500 h-full"
+                            title={`${lot.safeCount} Safe`}
+                          />
+                          <div
+                            style={{ width: `${(lot.monitorCount / (lot.total || 1)) * 100}%` }}
+                            className="bg-amber-500 h-full"
+                            title={`${lot.monitorCount} Monitor`}
+                          />
+                          <div
+                            style={{ width: `${(lot.rejectCount / (lot.total || 1)) * 100}%` }}
+                            className="bg-rose-500 h-full"
+                            title={`${lot.rejectCount} Reject`}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )
-                })
-              )}
+                    )
+                  })
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Section 2 (50% Equal Half): Selected Lot Deep Dive & Components Table */}
+          {/* Section 2: Selected Lot Deep Dive & Components Table (Expanded to ~76% Width / flex-1) */}
           <div
             className={`${
-              splitMode === 'sideBySide' ? 'w-full lg:w-1/2 h-full' : 'w-full h-1/2'
+              splitMode === 'sideBySide' ? 'flex-1 h-full min-w-0' : 'w-full flex-1 min-h-0'
             } bg-[#090F1E] flex flex-col overflow-hidden`}
           >
             {activeLot ? (
@@ -585,16 +636,16 @@ export default function LotClassificationModal({
                     <table className="w-full text-left border-collapse text-xs md:text-sm font-mono">
                       <thead>
                         <tr className="border-b border-slate-800 bg-[#070D1A] text-xs text-slate-300 uppercase tracking-wider sticky top-0 z-10 font-mono">
-                          <th className="py-3 px-4 font-bold">Component ID</th>
-                          <th className="py-3 px-3 font-bold">Subsystem &amp; Bay Location</th>
-                          <th className="py-3 px-3 font-bold">3D Pos [X, Y, Z]</th>
-                          <th className="py-3 px-3 font-bold">0h (&mu;A)</th>
-                          <th className="py-3 px-3 font-bold">24h (&mu;A)</th>
-                          <th className="py-3 px-3 font-bold">168h (&mu;A)</th>
-                          <th className="py-3 px-3 font-bold">&Delta; Drift</th>
-                          <th className="py-3 px-3 font-bold">Z-Score</th>
-                          <th className="py-3 px-3 font-bold">Classification</th>
-                          <th className="py-3 px-4 text-right font-bold">Action</th>
+                          <th className="py-3 px-4 font-bold whitespace-nowrap">Component ID</th>
+                          <th className="py-3 px-3 font-bold whitespace-nowrap">Subsystem &amp; Bay Location</th>
+                          <th className="py-3 px-3 font-bold whitespace-nowrap">3D Pos [X, Y, Z]</th>
+                          <th className="py-3 px-3 font-bold whitespace-nowrap">0h (&mu;A)</th>
+                          <th className="py-3 px-3 font-bold whitespace-nowrap">24h (&mu;A)</th>
+                          <th className="py-3 px-3 font-bold whitespace-nowrap">168h (&mu;A)</th>
+                          <th className="py-3 px-3 font-bold whitespace-nowrap">&Delta; Drift</th>
+                          <th className="py-3 px-3 font-bold whitespace-nowrap">Z-Score</th>
+                          <th className="py-3 px-3 font-bold whitespace-nowrap">Classification</th>
+                          <th className="py-3 px-4 text-right font-bold whitespace-nowrap">Action</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/60">

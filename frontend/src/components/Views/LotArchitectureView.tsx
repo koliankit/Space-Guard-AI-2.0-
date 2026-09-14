@@ -282,10 +282,10 @@ export default function LotArchitectureView({
         </div>
       </div>
 
-      {/* Main 2-Column Work Area - Balanced 50/50 Ratio */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 flex-1 items-start w-full">
-        {/* Left Column (50%): Qualification Lots Grid + AI Recommendation System */}
-        <div className="flex flex-col gap-4 w-full">
+      {/* Main Work Area - Left Lot Sidebar (28%) + Right Wide Component Table (72%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-start w-full">
+        {/* Left Column: Qualification Lots Grid + AI Recommendation System */}
+        <div className="flex flex-col gap-4 w-full lg:col-span-4 xl:col-span-3.5">
           <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
             <div className="bg-[#0F172A] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-display flex items-center gap-2">
@@ -423,8 +423,8 @@ export default function LotArchitectureView({
           </div>
         </div>
 
-        {/* Right Column: Selected Lot Deep Dive & Component Location Table */}
-        <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+        {/* Right Column: Selected Lot Deep Dive & Component Location Table (Expanded ~72%) */}
+        <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg lg:col-span-8 xl:col-span-8.5 w-full">
           {activeLot ? (
             <>
               {/* Active Lot Header & Location Allocation Summary */}
