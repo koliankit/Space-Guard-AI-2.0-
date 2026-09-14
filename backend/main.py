@@ -1,11 +1,12 @@
 """
-SPACEGUARD AI backend.
+ASTRA VIGIL backend.
+AI-Driven Anomaly Detection in Component Burn-In & Screening
+(ISRO / Aerospace Component Qualification & Reliability)
 
 Run locally:
-    pip install -r requirements.txt
     uvicorn main:app --reload --port 8000
 
-Interactive API docs then live at http://localhost:8000/docs
+Interactive API docs live at http://localhost:8000/docs
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,9 +15,9 @@ from database import init_db
 from routes import upload, analysis, components, mission, report, demo
 
 app = FastAPI(
-    title="SPACEGUARD AI",
-    description="AI detects abnormal component behavior, predicts future degradation, explains the risk, and localizes the exact component on the spacecraft.",
-    version="2.0.0",
+    title="ASTRA VIGIL",
+    description="AI-Driven Anomaly Detection in Component Burn-In & Screening for Space Electronics and Flight Qualification.",
+    version="2.5.0",
 )
 
 # In production, replace "*" with your deployed frontend's exact origin.
@@ -43,4 +44,10 @@ def on_startup():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "engine": "SpaceGuard AI reliability engine"}
+    return {
+        "status": "ok",
+        "system": "ASTRA VIGIL",
+        "engine": "ASTRA VIGIL AI Reliability Screening Engine",
+        "version": "2.5.0",
+        "domain": "ISRO Aerospace / Space Electronics Screening"
+    }

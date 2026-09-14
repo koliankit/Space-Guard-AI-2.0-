@@ -2,6 +2,21 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
 
+class ValidationErrorItem(BaseModel):
+    row: Optional[int] = None
+    column: Optional[str] = None
+    message: str
+    severity: str = "error"  # error | warning
+
+
+class ValidationSummary(BaseModel):
+    is_valid: bool
+    total_rows: int
+    valid_rows: int
+    error_count: int
+    issues: List[ValidationErrorItem] = []
+
+
 class UploadResponse(BaseModel):
     batch_id: int
     rows: int
@@ -10,6 +25,7 @@ class UploadResponse(BaseModel):
     lots: int
     has_ground_truth: bool
     columns_detected: Dict[str, str]
+    validation: Optional[ValidationSummary] = None
 
 
 class MappingRequired(BaseModel):
@@ -17,6 +33,7 @@ class MappingRequired(BaseModel):
     detected_headers: List[str]
     auto_mapping: Dict[str, str]
     missing_fields: List[str]
+    validation_issues: Optional[List[ValidationErrorItem]] = None
 
 
 class ComponentOut(BaseModel):
@@ -24,12 +41,17 @@ class ComponentOut(BaseModel):
     lot_id: str
     subsystem: str
     subsystem_name: str
+    component_type: Optional[str] = "Integrated Circuit"
     parameter: Optional[str] = "Leakage Current (µA)"
+    unit: Optional[str] = "µA"
     v0: float
     v24: float
     v96: Optional[float] = None
     v168: float
+    datasheet_min: Optional[float] = 0.0
+    datasheet_max: Optional[float] = 50.0
     limit_ua: float
+    temperature_c: Optional[float] = 125.0
     lot_mean: Optional[float] = None
     lot_median: Optional[float] = None
     lot_std: Optional[float] = None
@@ -59,6 +81,7 @@ class ComponentOut(BaseModel):
     iso_score: float
     ml_prob: Optional[float] = None
     risk_score: int
+    risk_level: Optional[str] = "LOW"
     status: str
     behavioral_health: Optional[str] = "NORMAL"
     traditional_decision: str
@@ -70,6 +93,23 @@ class ComponentOut(BaseModel):
         from_attributes = True
 
 
+class LotDetail(BaseModel):
+    lot_id: str
+    component_type: Optional[str] = "Integrated Circuit"
+    count: int
+    median: float
+    mad: float
+    mean: float
+    std: float
+    min_val: float
+    max_val: float
+    safe_count: int
+    monitor_count: int
+    reject_count: int
+    anomaly_rate_pct: float
+    status: str  # NOMINAL | CAUTION | ELEVATED_RISK
+
+
 class AnalyzeResponse(BaseModel):
     batch_id: int
     safe: int
@@ -79,6 +119,8 @@ class AnalyzeResponse(BaseModel):
     ml_meta: Optional[Dict[str, Any]] = None
     evaluation_metrics: Optional[Dict[str, Any]] = None
     top_flagged: Optional[ComponentOut] = None
+    risk_distribution: Optional[Dict[str, int]] = None
+    lot_summaries: Optional[List[LotDetail]] = None
 
 
 class SubsystemStatus(BaseModel):

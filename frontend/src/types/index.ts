@@ -1,5 +1,12 @@
 export type Status = 'safe' | 'monitor' | 'reject' | 'idle'
 
+export interface ValidationIssue {
+  row: number | null
+  column: string
+  message: string
+  severity: 'error' | 'warning'
+}
+
 export interface UploadResult {
   batch_id: number
   rows: number
@@ -8,7 +15,9 @@ export interface UploadResult {
   lots: number
   has_ground_truth: boolean
   columns_detected?: Record<string, string>
-  error?: 'column_mapping_required'
+  error?: 'column_mapping_required' | 'validation_failed'
+  message?: string
+  validation_issues?: ValidationIssue[]
   detected_headers?: string[]
   auto_mapping?: Record<string, string>
   missing_fields?: string[]
@@ -34,6 +43,8 @@ export type DriftClassification =
 
 export type BehavioralHealth = 'NORMAL' | 'MONITOR' | 'DEGRADING' | 'CRITICAL'
 
+export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+
 export interface EvaluationMetrics {
   has_ground_truth: boolean
   precision?: number
@@ -45,10 +56,11 @@ export interface EvaluationMetrics {
   tn?: number
   fp?: number
   fn?: number
+  accuracy?: number
   mae_drift: number
   rmse_drift: number
   r2_drift?: number
-  mean_error_pct: number
+  mean_error_pct?: number
   status_message?: string
 }
 
@@ -57,12 +69,17 @@ export interface ComponentOut {
   lot_id: string
   subsystem: string
   subsystem_name: string
+  component_type?: string
   parameter?: string
+  unit?: string
   v0: number
   v24: number
   v96: number | null
   v168: number
   limit_ua: number
+  datasheet_min?: number
+  datasheet_max?: number
+  temperature_c?: number
   lot_mean?: number
   lot_median?: number
   lot_std?: number
@@ -70,6 +87,7 @@ export interface ComponentOut {
   lot_pct_dev?: number
   lot_rank_percentile?: number
   lot_anomaly_score?: number
+  is_latent_defect?: boolean
   ground_truth: number | null
   slope: number
   drift168: number
@@ -87,11 +105,14 @@ export interface ComponentOut {
   margin_168?: number
   margin_future?: number
   future_limit_breach?: boolean
+  breach_probability?: number
   z168: number
+  robust_z168?: number
   z_slope: number
   iso_score: number
   ml_prob: number | null
   risk_score: number
+  risk_level?: RiskLevel
   status: Status
   behavioral_health?: BehavioralHealth
   traditional_decision: 'PASS' | 'FAIL'
@@ -105,8 +126,15 @@ export interface AnalyzeResult {
   safe: number
   monitor: number
   reject: number
+  risk_distribution?: {
+    LOW: number
+    MEDIUM: number
+    HIGH: number
+    CRITICAL: number
+  }
   mission_health: number
   ml_meta: Record<string, unknown> | null
+  lot_summaries?: Record<string, any>
   evaluation_metrics?: EvaluationMetrics
   top_flagged: ComponentOut | null
 }

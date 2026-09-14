@@ -12,6 +12,7 @@ export default function UploadBar({
   onReport,
   onReportPdf,
   onReportExcel,
+  onReportCsv,
   onOpenIngestModal,
   onOpenLotsModal,
   onResetWorkflow,
@@ -26,6 +27,7 @@ export default function UploadBar({
   onReport: () => void
   onReportPdf?: () => void
   onReportExcel?: () => void
+  onReportCsv?: () => void
   activeMissionId?: string
   onSelectMission?: (missionId: string) => void
   onOpenIngestModal?: () => void
@@ -184,6 +186,20 @@ export default function UploadBar({
                   >
                     <span className="font-semibold">Screening Ledger Excel</span>
                     <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 text-amber-300">.XLS</span>
+                  </button>
+                )}
+                {onReportCsv && (
+                  <button
+                    type="button"
+                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-cyan-300 hover:bg-cyan-500/15 flex items-center justify-between transition-colors cursor-pointer"
+                    onClick={() => {
+                      sounds.playSuccess()
+                      setShowExportMenu(false)
+                      onReportCsv()
+                    }}
+                  >
+                    <span className="font-semibold">Screening Dataset Export</span>
+                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/30 text-cyan-300">.CSV</span>
                   </button>
                 )}
                 <button

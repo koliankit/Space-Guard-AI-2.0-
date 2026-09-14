@@ -131,6 +131,41 @@ export async function missionStatus(batchId: number): Promise<MissionStatus> {
   return offlineISRO.getMissionStatus(batchId)
 }
 
+export async function fetchLotCohort(lotId: string, batchId?: number): Promise<any> {
+  if (backendReachable) {
+    try {
+      const url = batchId
+        ? `${API_BASE}/api/lots/${batchId}/${encodeURIComponent(lotId)}`
+        : `${API_BASE}/api/screening/lot/${encodeURIComponent(lotId)}`
+      const res = await fetch(url)
+      return await asJson(res)
+    } catch (e) {
+      console.warn('Backend fetchLotCohort failed:', e)
+    }
+  }
+  return null
+}
+
+export async function fetchMetrics(batchId?: number): Promise<any> {
+  if (backendReachable) {
+    try {
+      const url = batchId ? `${API_BASE}/api/metrics?batch_id=${batchId}` : `${API_BASE}/api/metrics`
+      const res = await fetch(url)
+      return await asJson(res)
+    } catch (e) {
+      console.warn('Backend fetchMetrics failed:', e)
+    }
+  }
+  return null
+}
+
+export function downloadCsvReportUrl(batchId?: number | null): string {
+  if (backendReachable && batchId) {
+    return `${API_BASE}/api/screening/export/${batchId}`
+  }
+  return reportUrl(batchId)
+}
+
 export function reportUrl(batchId?: number | null): string {
   const md = offlineISRO.generateMarkdownReport()
   const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' })

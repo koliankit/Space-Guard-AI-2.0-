@@ -57,11 +57,17 @@ def generate(seed: int = 42) -> pd.DataFrame:
             rows.append({
                 "component_id": comp_id,
                 "lot_id": lot,
+                "component_type": "Space-Grade Microcircuit",
+                "parameter": "Leakage Current",
+                "unit": "µA",
                 "v0": round(v0, 3),
                 "v24": round(v24, 3),
                 "v96": round(v96, 3),
                 "v168": round(v168, 3),
-                "limit": 50,
+                "datasheet_min": 0.0,
+                "datasheet_max": 50.0,
+                "limit": 50.0,
+                "temperature_c": 125.0,
                 "ground_truth": 0,
             })
             part_counter += 1

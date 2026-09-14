@@ -1,168 +1,259 @@
 """
-SIH26170 Risk Engine & Explainable AI Module:
-Combines fixed-limit status, lot-relative z-scores, percentage deviation,
-early drift rate (0h+24h), projected future margin, and unsupervised anomaly
-score into an explainable 0-100 risk score and flight screening verdict.
+ASTRA VIGIL Unified Risk Engine & Explainable AI (XAI) Architecture.
+
+Synthesizes multiple orthogonal evidence signals into an explainable 0-100 risk score:
+  1. Lot-Relative Anomaly Factor (|z_robust|, lot median % deviation)
+  2. Temporal Drift Velocity & Acceleration (burn-in drift slope, late acceleration)
+  3. Datasheet Limit Proximity & Boundary Margin
+  4. Future Mission Operating Life Projection (264h+ extrapolation & breach prob)
+  5. Temperature Stress Context (MIL-STD-883 Arrhenius acceleration context)
+  6. Supervised Flight Defect Probability (XGBoost when ground-truth available)
+
+Produces:
+  - Risk Score (0 - 100)
+  - Configurable Risk Level:
+      0 - 29:   LOW
+      30 - 59:  MEDIUM
+      60 - 79:  HIGH
+      80 - 100: CRITICAL
+  - Screening Status: 'safe' | 'monitor' | 'reject'
+  - Behavioral Health: 'NORMAL' | 'MONITOR' | 'DEGRADING' | 'CRITICAL'
+  - Traditional Verdict: 'PASS' | 'FAIL'
+  - Contextual Human-Readable Reason & Attribution Points
 """
+from typing import Dict, Any, List, Optional
 import numpy as np
 import pandas as pd
 
-Z_REJECT = 3.0
-Z_MONITOR = 2.0
+# Default Configurable Thresholds
+DEFAULT_RISK_THRESHOLDS = {
+    "LOW_MAX": 29,
+    "MEDIUM_MAX": 59,
+    "HIGH_MAX": 79,
+    "CRITICAL_MIN": 80,
+}
 
 
-def score_and_decide(df: pd.DataFrame, has_ml: bool) -> pd.DataFrame:
+def classify_risk_level(score: int, thresholds: Optional[Dict[str, int]] = None) -> str:
+    th = thresholds or DEFAULT_RISK_THRESHOLDS
+    if score <= th["LOW_MAX"]:
+        return "LOW"
+    elif score <= th["MEDIUM_MAX"]:
+        return "MEDIUM"
+    elif score <= th["HIGH_MAX"]:
+        return "HIGH"
+    else:
+        return "CRITICAL"
+
+
+def score_and_decide(
+    df: pd.DataFrame,
+    has_ml: bool = False,
+    thresholds: Optional[Dict[str, int]] = None
+) -> pd.DataFrame:
+    """
+    Computes unified composite risk score, risk level, flight status, and granular
+    human-readable explainability for each component.
+    """
     df = df.copy()
+    th = thresholds or DEFAULT_RISK_THRESHOLDS
 
-    # Feature factors
-    z_max = np.maximum(df["z168"].abs(), df["z_slope"].abs())
-    s_limit = np.clip(df["v168"] / df["limit"], 0.0, 1.5)
-    s_z = np.clip(z_max / 4.0, 0.0, 1.0)
-    s_future = np.clip(df["predicted_future"] / df["limit"], 0.0, 1.5)
+    # 1. Feature Signal Factors
+    z168_abs = df["z168"].abs() if "z168" in df.columns else (df["robust_z168"].abs() if "robust_z168" in df.columns else pd.Series(0.0, index=df.index))
+    z_slope_abs = df["z_slope"].abs() if "z_slope" in df.columns else pd.Series(0.0, index=df.index)
+    z_max = np.maximum(z168_abs, z_slope_abs)
+
+    limit = df["limit"].to_numpy(dtype=float) if "limit" in df.columns else df["datasheet_max"].to_numpy(dtype=float)
+    v168 = df["v168"].to_numpy(dtype=float)
+    pred_future = df["predicted_future"].to_numpy(dtype=float)
+    breach_prob = df["breach_probability"].to_numpy(dtype=float) if "breach_probability" in df.columns else np.zeros(len(df))
+
+    # Normalized evidence terms (0.0 to 1.0)
+    s_z = np.clip(z_max / 3.5, 0.0, 1.2)
+    s_limit_prox = np.clip(v168 / limit, 0.0, 1.5)
+    s_future = np.clip(pred_future / limit, 0.0, 1.5)
     s_iso = np.clip(df.get("iso_score", 0.0) / 100.0, 0.0, 1.0)
     s_safety_slope = np.where(df.get("safety_slope_exceeded", False), 1.0, 0.0)
+    s_breach_prob = breach_prob
 
-    # Multi-factor composite risk formula (0-100)
+    # Temperature thermal stress factor (if above standard 125C HTOL)
+    if "temperature_c" in df.columns:
+        temp = df["temperature_c"].to_numpy(dtype=float)
+        s_thermal = np.clip((temp - 125.0) / 25.0, 0.0, 1.0) * 0.05
+    else:
+        s_thermal = np.zeros(len(df))
+
+    # Multi-factor composite weighting (Total = 100 points)
     if has_ml and "ml_prob" in df.columns and df["ml_prob"].notna().any():
-        risk = (
-            s_z * 30.0
-            + s_future * 20.0
-            + s_iso * 15.0
-            + s_limit * 10.0
-            + s_safety_slope * 10.0
-            + df["ml_prob"].fillna(0.0) * 15.0
+        ml_term = df["ml_prob"].fillna(0.0).to_numpy(dtype=float)
+        raw_risk = (
+            s_z * 28.0               # Lot-relative deviation weight
+            + s_future * 20.0        # Future projection weight
+            + s_iso * 15.0           # Unsupervised anomaly weight
+            + s_breach_prob * 12.0   # Probability of breach
+            + s_safety_slope * 10.0  # Early trajectory check
+            + ml_term * 15.0         # Supervised defect probability
+            + s_thermal * 100.0      # Temperature stress
         )
     else:
-        risk = (
-            s_z * 35.0
-            + s_future * 25.0
-            + s_iso * 18.0
-            + s_limit * 12.0
-            + s_safety_slope * 10.0
+        raw_risk = (
+            s_z * 34.0               # Lot-relative deviation weight
+            + s_future * 24.0        # Future projection weight
+            + s_iso * 18.0           # Unsupervised anomaly weight
+            + s_breach_prob * 14.0   # Probability of breach
+            + s_safety_slope * 10.0  # Early trajectory check
+            + s_thermal * 100.0      # Temperature stress
         )
 
-    # If exceeding static limit, risk is minimum 90
-    static_fail = df["v168"] > df["limit"]
-    risk = np.where(static_fail, np.maximum(92.0, 90.0 + (df["v168"] - df["limit"]) / df["limit"] * 20.0), risk)
-    df["risk_score"] = risk.clip(0, 100).round().astype(int)
+    # Static limit violations guarantee critical severity (minimum 92/100)
+    static_fail = v168 > limit
+    if "datasheet_min" in df.columns:
+        ds_min = df["datasheet_min"].to_numpy(dtype=float)
+        static_fail = static_fail | (v168 < ds_min)
 
+    raw_risk = np.where(
+        static_fail,
+        np.maximum(92.0, 90.0 + (np.maximum(0.0, v168 - limit) / limit) * 20.0),
+        raw_risk
+    )
+
+    risk_scores = np.clip(np.round(raw_risk), 0, 100).astype(int)
+    df["risk_score"] = risk_scores
     df["traditional_decision"] = np.where(static_fail, "FAIL", "PASS")
 
-    statuses = []
-    behavioral_healths = []
-    anomaly_categories = []
-    reasons = []
-    explanation_points_list = []
+    # Classify Risk Levels, Flight Status, Behavioral Health, and Detailed Explainability
+    risk_levels: List[str] = []
+    statuses: List[str] = []
+    behavioral_healths: List[str] = []
+    anomaly_categories: List[str] = []
+    reasons: List[str] = []
+    explanation_points_list: List[List[str]] = []
 
-    for i, row in df.iterrows():
-        v0 = row.get("v0", 0.0)
-        v24 = row.get("v24", 0.0)
-        v168 = row["v168"]
-        limit = row["limit"]
-        lot_mean = row.get("lot_mean", v168)
-        lot_std = row.get("lot_std", 0.5)
-        lot_pct_dev = row.get("lot_pct_dev", 0.0)
-        z168 = row["z168"]
-        slope = row["slope"]
-        pred_early = row.get("predicted168_from_early", v168)
-        pred_future = row["predicted_future"]
-        zm = z_max.iloc[i]
-        r_score = df["risk_score"].iloc[i]
-        trend = row.get("drift_trend", "NOMINAL / STABLE")
-        
-        safety_exceeded = row.get("safety_slope_exceeded", False)
-        predicted_drift_rate = row.get("predicted_drift_rate", 0.0)
-        safety_slope = row.get("safety_slope", 0.0)
-        lot_rank_percentile = row.get("lot_rank_percentile", 0.0)
+    for i in range(len(df)):
+        r_score = risk_scores[i]
+        r_level = classify_risk_level(r_score, th)
+        risk_levels.append(r_level)
 
-        points = []
+        row = df.iloc[i]
+        val_168 = float(row["v168"])
+        lim = float(row["limit"])
+        ds_min = float(row.get("datasheet_min", 0.0))
+        lot_med = float(row.get("lot_median", val_168))
+        lot_mean = float(row.get("lot_mean", val_168))
+        lot_mad = float(row.get("lot_mad", 0.05))
+        lot_pct = float(row.get("lot_pct_dev", 0.0))
+        z168 = float(row["z168"])
+        slope = float(row.get("slope", 0.0))
+        pred_early = float(row.get("predicted168_from_early", val_168))
+        fut = float(row.get("predicted_future", val_168))
+        trend = str(row.get("drift_trend", "NOMINAL / STABLE"))
+        safety_exceeded = bool(row.get("safety_slope_exceeded", False))
+        is_latent = bool(row.get("is_latent_defect", False))
+        temp_val = float(row.get("temperature_c", 125.0))
 
-        # 5 Anomaly Categories and Behavioral Health:
-        if v168 > limit:
+        points: List[str] = []
+
+        # 1. Physical Datasheet Breach
+        if val_168 > lim or val_168 < ds_min:
             cat = "outside_spec"
             status = "reject"
             b_health = "CRITICAL"
-            points.append(f"Datasheet limit violation: 168h reading ({v168:.2f} µA) exceeds specification limit ({limit:.0f} µA) by +{(v168 - limit):.2f} µA.")
-            points.append(f"Component is {abs(z168):.1f}σ from lot baseline average ({lot_mean:.2f} µA).")
-            points.append(f"Drift slope (+{slope:.4f} µA/hr) confirms active parametric degradation.")
-            points.append(f"Immediate physical quarantine required. Traditional: FAIL. Flight integration prohibited.")
+            diff = val_168 - lim if val_168 > lim else ds_min - val_168
             reason = (
-                f"Static datasheet limit violation: 168h leakage ({v168:.2f} µA) exceeds specification threshold "
-                f"({limit:.0f} µA) by +{(v168 - limit):.2f} µA. Traditional: FAIL. Immediate quarantine required."
+                f"Datasheet limit violation: 168h measurement ({val_168:.2f} uA) breaches specification threshold "
+                f"([{ds_min:.1f} - {lim:.1f}] uA) by {diff:+.2f} uA. Traditional: FAIL. Physical quarantine mandatory."
             )
+            points.append(f"Datasheet limit violation: 168h reading ({val_168:.2f} uA) breaches specification limit ({lim:.1f} uA).")
+            points.append(f"Component is {abs(z168):.1f} robust deviations from lot median ({lot_med:.2f} uA).")
+            points.append(f"Burn-in drift slope (+{slope:.5f} uA/hr) indicates uncontained parametric breakdown.")
+            points.append(f"Quarantine protocol activated: Traditional FAIL, flight integration prohibited.")
+
+        # 2. Predicted Future Exceedance (Dielectric / Wear-Out Breach)
+        elif fut > lim:
+            cat = "predicted_exceedance"
+            status = "reject"
+            b_health = "CRITICAL"
+            reason = (
+                f"PASS by datasheet spec ({val_168:.2f} uA <= {lim:.1f} uA) but PREDICTED LIMIT EXCEEDANCE: "
+                f"burn-in drift slope (+{slope:.5f} uA/hr) projects operating leakage to {fut:.2f} uA at 264h, "
+                f"breaching the flight threshold. Component is {abs(z168):.1f} sigma above lot median ({lot_med:.2f} uA)."
+            )
+            points.append(f"Passes current static datasheet limit ({val_168:.2f} uA <= {lim:.1f} uA) with margin of {(lim - val_168):.2f} uA.")
+            points.append(f"Statistically abnormal to production lot: {abs(z168):.1f} robust MAD deviations above lot median ({lot_med:.2f} uA).")
+            points.append(f"Drift trajectory classified as: {trend} (slope +{slope:.5f} uA/hr).")
+            points.append(f"Projected 264h mission value reaches {fut:.2f} uA (crosses {lim:.1f} uA limit). Latent wearout detected.")
+
+        # 3. Early Trajectory Safety Slope Exceeded
         elif safety_exceeded:
             cat = "safety_slope_violation"
             status = "reject"
             b_health = "CRITICAL"
-            points.append(f"Passes datasheet limit ({v168:.2f} µA < {limit:.0f} µA) but fails early drift safety check.")
-            points.append(f"Predicted 168h drift rate (+{predicted_drift_rate:.4f} µA/hr) exceeds safety slope (+{safety_slope:.4f} µA/hr).")
-            points.append(f"Component diverges +{z168:.1f}σ from lot mean ({lot_mean:.2f} µA) and is in {lot_rank_percentile:.1f}th percentile.")
-            points.append(f"Early rejection recommended to prevent latent on-orbit failure.")
             reason = (
-                f"Passes datasheet limit ({v168:.2f} µA < {limit:.0f} µA) but diverges +{z168:.1f}σ from lot mean ({lot_mean:.2f} µA). "
-                f"Predicted 168h drift rate ({predicted_drift_rate:.3f} µA/hr) exceeds safety slope ({safety_slope:.3f} µA/hr). Early rejection recommended."
+                f"PASS by datasheet spec ({val_168:.2f} uA <= {lim:.1f} uA) but early 0h->24h drift velocity "
+                f"predicted a safety threshold breach at 168h (projected {pred_early:.2f} uA). "
+                f"Diverges +{lot_pct:.1f}% from lot peers."
             )
-        elif pred_future > limit:
-            cat = "predicted_exceedance"
-            status = "reject"
-            b_health = "CRITICAL"
-            points.append(f"Within specification ({v168:.2f} µA < {limit:.0f} µA) but abnormal relative to lot: {abs(z168):.1f}σ above lot mean ({lot_mean:.2f} µA).")
-            points.append(f"Measured burn-in drift (+{slope:.4f} µA/hr) indicates {trend.lower()}.")
-            points.append(f"Early 0h+24h prediction projected 168h to {pred_early:.2f} µA.")
-            points.append(f"Projected 264h leakage ({pred_future:.2f} µA) crosses specification limit ({limit:.0f} µA). Latent dielectric breakdown detected.")
-            reason = (
-                f"Within datasheet limit ({v168:.2f} µA < {limit:.0f} µA) but {abs(z168):.1f}σ above lot average "
-                f"({lot_mean:.2f} µA). Measured drift rate (+{slope:.4f} µA/hr) projects 264h leakage to {pred_future:.2f} µA, "
-                f"exceeding the safety threshold. Latent dielectric breakdown detected."
-            )
-        elif zm >= Z_REJECT or r_score >= 75:
+            points.append(f"Passes static datasheet check ({val_168:.2f} uA <= {lim:.1f} uA).")
+            points.append(f"Early burn-in drift velocity (0h->24h) triggered safety slope exceedance check.")
+            points.append(f"Component is in the {row.get('lot_rank_percentile', 99):.1f}th percentile of lot {row['lot_id']}.")
+            points.append(f"Early rejection recommended to prevent mission-phase infant mortality on-orbit.")
+
+        # 4. Latent Cohort Outlier (Within Spec but Abnormal Relative to Lot)
+        elif is_latent or r_score >= th["CRITICAL_MIN"] or abs(z168) >= 3.0:
             cat = "abnormal_within_spec"
             status = "reject"
-            b_health = "CRITICAL" if r_score >= 80 else "DEGRADING"
-            points.append(f"Component reading ({v168:.2f} µA) is significantly above lot average ({lot_mean:.2f} µA, +{lot_pct_dev:.1f}% deviation).")
-            points.append(f"Behavior is statistically abnormal relative to lot: {abs(z168):.1f}σ from lot baseline.")
-            points.append(f"Burn-in drift slope (+{slope:.4f} µA/hr) deviates from lot peer trajectory.")
-            points.append(f"Projected future drift threatens orbital mission life. Component quarantined despite passing datasheet limit.")
+            b_health = "CRITICAL" if r_score >= th["CRITICAL_MIN"] else "DEGRADING"
             reason = (
-                f"PASS by specification ({v168:.2f} µA < {limit:.0f} µA) but ABNORMAL RELATIVE TO LOT: component is "
-                f"{abs(z168):.1f}σ from lot mean ({lot_mean:.2f} µA). Peer deviation indicates abnormal degradation rate."
+                f"PASS by datasheet specification ({val_168:.2f} uA <= {lim:.1f} uA) but ABNORMAL RELATIVE TO LOT: "
+                f"component is {abs(z168):.1f} robust MAD deviations from lot median ({lot_med:.2f} uA, {lot_pct:+.1f}% shift). "
+                f"Peer outlier indicates latent manufacturing defect."
             )
-        elif v168 > 0.80 * limit or pred_future > 0.90 * limit:
+            points.append(f"Complies with static datasheet threshold ({val_168:.2f} uA <= {lim:.1f} uA).")
+            points.append(f"Severe peer deviation: {abs(z168):.1f} robust deviations from lot median ({lot_med:.2f} uA, {lot_pct:+.1f}% shift).")
+            points.append(f"Thermal HTOL at {temp_val:.0f} deg C confirms parametric divergence from peer cohort.")
+            points.append(f"Latent defect identified: quarantined to preserve mission reliability margin.")
+
+        # 5. Approaching Specification Limit / Elevated Drift Rate
+        elif val_168 >= 0.80 * lim or fut >= 0.85 * lim or r_score >= th["MEDIUM_MAX"]:
             cat = "approaching_limit"
             status = "monitor"
-            b_health = "DEGRADING" if trend == "ACCELERATING POSITIVE DRIFT" or slope > 0.012 else "MONITOR"
-            points.append(f"Reading ({v168:.2f} µA) approaches datasheet limit ({limit:.0f} µA) with margin of only {(limit - v168):.2f} µA.")
-            points.append(f"Component is {abs(z168):.1f}σ from lot mean ({lot_mean:.2f} µA).")
-            points.append(f"Drift trend classified as: {trend}.")
-            points.append(f"Projected 264h value reaches {pred_future:.2f} µA (within 10% of limit). Active telemetry monitoring scheduled.")
+            b_health = "DEGRADING" if "ACCELERATING" in trend or slope > 0.015 else "MONITOR"
             reason = (
-                f"Approaching specification limit: reading ({v168:.2f} µA) is within 20% of datasheet limit ({limit:.0f} µA). "
-                f"{abs(z168):.1f}σ from lot baseline ({lot_mean:.2f} µA). Scheduled for active in-flight telemetry monitoring."
+                f"Approaching datasheet boundary: 168h reading ({val_168:.2f} uA) is within 20% of limit ({lim:.1f} uA). "
+                f"Component is {abs(z168):.1f} sigma from lot baseline ({lot_med:.2f} uA). Active telemetry monitoring scheduled."
             )
-        elif zm >= Z_MONITOR or r_score >= 40:
+            points.append(f"Reading ({val_168:.2f} uA) approaches datasheet boundary with {(lim - val_168):.2f} uA safety margin remaining.")
+            points.append(f"Elevated relative to lot peers: {abs(z168):.1f} robust deviations from median ({lot_med:.2f} uA).")
+            points.append(f"Drift trend classified as: {trend}.")
+            points.append(f"Telemetry tracking scheduled: flag for flight-qualification secondary review.")
+
+        # 6. Moderate Peer Divergence -> Monitor
+        elif abs(z168) >= 2.0 or r_score >= th["LOW_MAX"] + 1:
             cat = "abnormal_within_spec"
             status = "monitor"
-            b_health = "DEGRADING" if slope > 0.015 else "MONITOR"
-            points.append(f"PASS by datasheet spec ({v168:.2f} µA < {limit:.0f} µA) but trending unusual relative to lot peers.")
-            points.append(f"{abs(z168):.1f}σ peer deviation from lot mean ({lot_mean:.2f} µA).")
-            points.append(f"Drift slope (+{slope:.4f} µA/hr) exceeds standard lot peer rate.")
-            points.append(f"Projected 264h value: {pred_future:.2f} µA. Flagged for secondary screening review.")
+            b_health = "MONITOR"
             reason = (
-                f"PASS by specification but trending abnormal: {abs(z168):.1f}σ deviation from lot mean ({lot_mean:.2f} µA). "
-                f"Drift slope (+{slope:.4f} µA/hr) exceeds normal lot baseline; flagged for monitoring."
+                f"Passes static spec but exhibiting moderate cohort divergence: {abs(z168):.1f} sigma from lot median "
+                f"({lot_med:.2f} uA). Scheduled for secondary screening and telemetry monitoring."
             )
+            points.append(f"Passes datasheet specification ({val_168:.2f} uA <= {lim:.1f} uA).")
+            points.append(f"Moderate peer deviation: {abs(z168):.1f} robust deviations from lot median ({lot_med:.2f} uA).")
+            points.append(f"Burn-in drift slope (+{slope:.5f} uA/hr) is within operational bounds.")
+            points.append(f"Assigned to MONITOR status: flight clearance conditional on mission profile review.")
+
+        # 7. Nominal Spaceflight Component -> Safe
         else:
             cat = "normal_within_spec"
             status = "safe"
             b_health = "NORMAL"
-            points.append(f"Normal lot-relative behavior: reading ({v168:.2f} µA) follows expected distribution ({abs(z168):.1f}σ from mean {lot_mean:.2f} µA).")
-            points.append(f"Drift rate (+{slope:.4f} µA/hr) is nominal and stable over 168h HTOL.")
-            points.append(f"Early prediction error is minimal (predicted {pred_early:.2f} µA vs actual {v168:.2f} µA).")
-            points.append(f"Projected 264h value ({pred_future:.2f} µA) preserves ample safety margin. Component flight-ready.")
             reason = (
-                f"Normal and within specification: reading ({v168:.2f} µA) is within nominal lot distribution "
-                f"({abs(z168):.1f}σ from lot mean {lot_mean:.2f} µA). Drift rate is stable; component flight-ready."
+                f"Nominal lot-relative behavior: reading ({val_168:.2f} uA) conforms tightly to lot distribution "
+                f"({abs(z168):.1f} sigma from median {lot_med:.2f} uA). Drift rate is stable; component flight-ready."
             )
+            points.append(f"Conforms to datasheet specification ({val_168:.2f} uA within [{ds_min:.1f} - {lim:.1f}] uA).")
+            points.append(f"Conforms to lot distribution ({abs(z168):.1f} robust MAD deviations from median {lot_med:.2f} uA).")
+            points.append(f"Parametric drift is stable (+{slope:.5f} uA/hr) across 168h HTOL.")
+            points.append(f"Flight qualification cleared: ample operating margins preserved.")
 
         statuses.append(status)
         behavioral_healths.append(b_health)
@@ -170,9 +261,11 @@ def score_and_decide(df: pd.DataFrame, has_ml: bool) -> pd.DataFrame:
         reasons.append(reason)
         explanation_points_list.append(points)
 
+    df["risk_level"] = risk_levels
     df["status"] = statuses
     df["behavioral_health"] = behavioral_healths
     df["anomaly_category"] = anomaly_categories
     df["reason"] = reasons
     df["explanation_points"] = explanation_points_list
+
     return df

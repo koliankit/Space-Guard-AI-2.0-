@@ -18,6 +18,8 @@ class Batch(Base):
     has_ground_truth = Column(Boolean, default=False)
     analyzed = Column(Boolean, default=False)
     ml_meta = Column(JSON, nullable=True)  # supervised-model metadata, if trained
+    validation_report = Column(JSON, nullable=True)  # detailed validation issues
+    lot_summary = Column(JSON, nullable=True)  # per-lot aggregated statistics
 
     components = relationship("ComponentRecord", back_populates="batch", cascade="all, delete-orphan")
 
@@ -31,13 +33,18 @@ class ComponentRecord(Base):
     component_id = Column(String, index=True)
     lot_id = Column(String, index=True)
     subsystem = Column(String, index=True, nullable=True)
+    component_type = Column(String, default="Integrated Circuit", nullable=True)
     parameter = Column(String, default="Leakage Current (µA)", nullable=True)
+    unit = Column(String, default="µA", nullable=True)
 
     v0 = Column(Float)
     v24 = Column(Float)
     v96 = Column(Float, nullable=True)
     v168 = Column(Float)
+    datasheet_min = Column(Float, default=0.0, nullable=True)
+    datasheet_max = Column(Float, nullable=True)
     limit_ua = Column(Float)
+    temperature_c = Column(Float, default=125.0, nullable=True)
     lot_mean = Column(Float, nullable=True)
     lot_median = Column(Float, nullable=True)
     lot_std = Column(Float, nullable=True)
@@ -70,10 +77,12 @@ class ComponentRecord(Base):
     ml_prob = Column(Float, nullable=True)
 
     risk_score = Column(Integer, nullable=True)
+    risk_level = Column(String, default="LOW", nullable=True)  # LOW | MEDIUM | HIGH | CRITICAL
     status = Column(String, nullable=True)  # safe | monitor | reject
     behavioral_health = Column(String, default="NORMAL", nullable=True)  # NORMAL | MONITOR | DEGRADING | CRITICAL
     traditional_decision = Column(String, nullable=True)  # PASS | FAIL
     anomaly_category = Column(String, nullable=True)
     reason = Column(String, nullable=True)
+    explanation_points = Column(JSON, nullable=True)
 
     batch = relationship("Batch", back_populates="components")

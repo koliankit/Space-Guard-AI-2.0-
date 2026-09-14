@@ -281,6 +281,15 @@ export default function App() {
     log('Official ISRO SDSC SHAR Flight Clearance Excel Ledger (.CSV) generated.', 'ok')
   }
 
+  function handleReportCsv() {
+    if (batchId) {
+      window.open(api.downloadCsvReportUrl(batchId), '_blank')
+      log(`Official Screening CSV Dataset Export (Batch #${batchId}) initiated.`, 'ok')
+    } else {
+      handleReportExcel()
+    }
+  }
+
   const subsystems = mission?.subsystems ?? EMPTY_SUBSYSTEMS
 
   function focusIn3D(comp: ComponentOut) {
@@ -357,6 +366,7 @@ export default function App() {
         onReport={handleReport}
         onReportPdf={handleReportPdf}
         onReportExcel={handleReportExcel}
+        onReportCsv={handleReportCsv}
         activeMissionId={activeMissionId}
         onSelectMission={handleSelectMission}
         onOpenIngestModal={() => setIngestModalOpen(true)}
