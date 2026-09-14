@@ -431,19 +431,19 @@ export default function LotArchitectureView({
               <div className="bg-[#0F172A] p-4 border-b border-slate-800 flex flex-col gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-sm font-mono font-bold text-white bg-amber-500/20 px-2.5 py-0.5 rounded border border-amber-500/40">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span className="text-sm sm:text-base font-mono font-bold text-white bg-amber-500/20 px-3 py-1 rounded-lg border border-amber-500/40 shadow-sm">
                         ACTIVE QUALIFICATION LOT: {activeLot.lot_id}
                       </span>
-                      <span className="text-xs font-mono text-slate-300">
+                      <span className="text-xs sm:text-sm font-mono text-slate-200">
                         &bull; <b className="text-emerald-400 font-bold">{activeLot.total} components</b> across{' '}
                         <b className="text-amber-300">{activeLot.subsystems.length} equipment bays</b>
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-1 font-sans">
+                    <div className="text-xs sm:text-sm text-slate-300 mt-1.5 font-sans">
                       MIL-STD-883 HTOL 168h Burn-In Baseline &mu; ={' '}
                       <b className="text-amber-400 font-mono">{activeLot.mean.toFixed(2)} &micro;A</b> &bull; &sigma; ={' '}
-                      <b className="text-slate-300 font-mono">{activeLot.std.toFixed(2)}</b> &bull; Status:{' '}
+                      <b className="text-slate-200 font-mono">{activeLot.std.toFixed(2)}</b> &bull; Status:{' '}
                       <span className="font-mono font-bold text-white">
                         {activeLot.rejectCount > 0
                           ? `⚠️ ${activeLot.rejectCount} DEFECTS QUARANTINED`
@@ -460,7 +460,7 @@ export default function LotArchitectureView({
                     <button
                       type="button"
                       onClick={handleExportLotCSV}
-                      className="px-3 py-1.5 rounded-lg border border-slate-700 bg-[#070D1A] text-slate-200 hover:text-white hover:border-slate-500 text-xs font-medium transition-colors flex items-center gap-1.5"
+                      className="px-3.5 py-1.5 rounded-lg border border-slate-600 bg-[#070D1A] text-slate-100 hover:text-white hover:border-slate-400 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
                       title="Download CSV report of components in this lot"
                     >
                       <span>📥</span> Export Lot CSV
@@ -469,9 +469,9 @@ export default function LotArchitectureView({
                 </div>
 
                 {/* Subsystem Location Allocation Breakdown Pills */}
-                <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800 flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
-                    Where Components Locate:
+                <div className="bg-[#070D1A] p-2.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-2 max-h-[96px] overflow-y-auto">
+                  <span className="text-xs text-slate-300 uppercase font-bold tracking-wider">
+                    WHERE COMPONENTS LOCATE:
                   </span>
                   {Object.entries(activeLot.subsystemCounts).map(([subKey, count]) => {
                     const loc = getSubsystemLocation(subKey)
@@ -493,7 +493,7 @@ export default function LotArchitectureView({
                       >
                         <span className="font-bold text-amber-400">[{subKey}]</span>
                         <span className="text-white font-semibold">{count} in {loc.name}</span>
-                        <span className="text-[10px] text-slate-400 hidden xl:inline">({loc.bay})</span>
+                        <span className="text-xs text-slate-400 hidden xl:inline">({loc.bay})</span>
                       </button>
                     )
                   })}
@@ -501,7 +501,7 @@ export default function LotArchitectureView({
                     <button
                       type="button"
                       onClick={() => setSubsystemFilter('ALL')}
-                      className="text-[10px] text-amber-400 hover:underline px-1"
+                      className="text-xs text-amber-400 hover:underline px-1.5 font-bold"
                     >
                       Reset Filter
                     </button>
@@ -509,10 +509,10 @@ export default function LotArchitectureView({
                 </div>
 
                 {/* Filter & Search Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1.5">
                   {/* Status Filters (if screened) */}
                   {isScreened && (
-                    <div className="flex items-center gap-1 bg-[#060B16] p-0.5 rounded-lg border border-slate-800 text-xs font-mono">
+                    <div className="flex items-center gap-1.5 bg-[#060B16] p-1 rounded-lg border border-slate-800 text-xs sm:text-sm font-mono">
                       {[
                         { id: 'ALL', label: `ALL (${activeLot.total})` },
                         { id: 'SAFE', label: `SAFE (${activeLot.safeCount})` },
@@ -528,15 +528,15 @@ export default function LotArchitectureView({
                               sounds.playClick()
                               setStatusFilter(tab.id as any)
                             }}
-                            className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                            className={`px-3 py-1 rounded-md text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                               isTabActive
                                 ? tab.id === 'SAFE'
-                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
+                                  ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/60 shadow-sm'
                                   : tab.id === 'REJECT'
-                                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50'
+                                  ? 'bg-rose-500/25 text-rose-300 border border-rose-500/60 shadow-sm'
                                   : tab.id === 'MONITOR'
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50'
-                                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/50'
+                                  ? 'bg-amber-500/25 text-amber-300 border border-amber-500/60 shadow-sm'
+                                  : 'bg-amber-500/25 text-amber-300 border border-amber-500/60 shadow-sm'
                                 : 'text-slate-400 hover:text-white'
                             }`}
                           >
@@ -549,13 +549,13 @@ export default function LotArchitectureView({
 
                   {/* Component Search Input */}
                   <div className="relative flex-1 min-w-[220px] max-w-sm">
-                    <span className="absolute left-2.5 top-2 text-slate-500 text-xs">🔍</span>
+                    <span className="absolute left-3 top-2.5 text-slate-400 text-xs sm:text-sm">🔍</span>
                     <input
                       type="text"
                       placeholder="Search Part ID or Location..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-8 pr-3 py-1.5 bg-[#060B16] border border-slate-800 rounded-lg text-xs font-mono text-slate-100 placeholder:text-slate-500 focus:border-amber-500 outline-none transition-colors"
+                      className="w-full pl-9 pr-3 py-2 bg-[#060B16] border border-slate-700 rounded-lg text-xs sm:text-sm font-mono text-slate-100 placeholder:text-slate-500 focus:border-amber-500 outline-none transition-colors"
                     />
                   </div>
                 </div>

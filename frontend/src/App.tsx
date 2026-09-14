@@ -455,7 +455,7 @@ export default function App() {
       {activeTab === 'telemetry' && (
         <div className="flex flex-col xl:flex-row gap-4 p-4 bg-[#060B16] flex-1 w-full items-start">
           {/* Sticky Left Sidebar: Component Monitor is pinned so selection is NEVER lost on scroll */}
-          <div className="w-full xl:w-[320px] 2xl:w-[350px] flex-shrink-0 xl:sticky xl:top-2 xl:h-[calc(100vh-80px)] flex flex-col rounded-xl overflow-hidden border border-slate-800 bg-[#0B1120] shadow-md z-10">
+          <div className="w-full xl:w-[380px] 2xl:w-[420px] flex-shrink-0 xl:sticky xl:top-2 xl:h-[calc(100vh-80px)] flex flex-col rounded-xl overflow-hidden border border-slate-800 bg-[#0B1120] shadow-md z-10">
             <ComponentMonitor
               subsystems={subsystems}
               components={allComponents.length > 0 ? allComponents : flaggedList}
