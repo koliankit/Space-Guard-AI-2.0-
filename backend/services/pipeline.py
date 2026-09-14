@@ -25,7 +25,7 @@ Orchestrates the complete screening flow:
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from services import feature_engineering, lot_analysis, anomaly_detector, risk_engine, satellite_mapper
+from services import preprocessing, feature_engineering, lot_analysis, anomaly_detector, risk_engine, satellite_mapper
 from models.orm_models import Batch, ComponentRecord
 
 
@@ -34,6 +34,8 @@ def run_pipeline(df: pd.DataFrame):
     Executes the end-to-end ASTRA VIGIL screening pipeline.
     Returns (result_df, ml_meta, eval_metrics, lot_summaries).
     """
+    # 0. Preprocessing: Clean inputs, preserve raw measurements, impute missing intervals, calculate temporal deltas/slopes
+    df = preprocessing.preprocess_screening_data(df)
     # 1. Module B: Drift and temporal behavior
     df = feature_engineering.add_features(df)
     # 2. Module A: Lot-relative statistics and peer normalization

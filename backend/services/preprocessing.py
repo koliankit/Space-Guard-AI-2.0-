@@ -399,3 +399,118 @@ def build_dataframe(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple[pd.D
     }
 
     return clean, meta
+
+
+class PreprocessingEngine:
+    """
+    Aerospace-grade preprocessing layer for space electronics screening.
+    Ensures clear separation between RAW DATA and PROCESSED DATA while preserving
+    strict traceability to original component_id and lot_id.
+    """
+
+    @staticmethod
+    def preserve_raw_measurements(df: pd.DataFrame) -> pd.DataFrame:
+        """Stores unaltered original readings into raw_ columns."""
+        df = df.copy()
+        for col in ["v0", "v24", "v96", "v168"]:
+            if col in df.columns and f"raw_{col}" not in df.columns:
+                df[f"raw_{col}"] = df[col].copy()
+        return df
+
+    @staticmethod
+    def handle_missing_and_impute(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Handles missing measurement time points.
+        If v96 is missing, performs deterministic linear burn-in interpolation:
+        v96 = v24 + 0.5 * (v168 - v24)
+        Records v96_imputed flag.
+        """
+        df = df.copy()
+        if "v96" not in df.columns:
+            df["v96"] = np.nan
+
+        v96_missing = df["v96"].isna()
+        df["v96_imputed"] = v96_missing
+
+        if v96_missing.any():
+            interpolated = df.loc[v96_missing, "v24"] + 0.5 * (df.loc[v96_missing, "v168"] - df.loc[v96_missing, "v24"])
+            df.loc[v96_missing, "v96"] = np.round(interpolated, 4)
+
+        return df
+
+    @staticmethod
+    def calculate_temporal_metrics(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Computes absolute changes, percentage changes, and temporal slopes across:
+          - 0h to 24h (early burn-in infant mortality window)
+          - 24h to 96h (mid-stage burn-in stabilization)
+          - 96h to 168h (late burn-in wearout / oxide breakdown window)
+          - 0h to 168h (full qualification duration)
+        """
+        df = df.copy()
+        v0 = df["v0"].to_numpy(dtype=float)
+        v24 = df["v24"].to_numpy(dtype=float)
+        v96 = df["v96"].to_numpy(dtype=float)
+        v168 = df["v168"].to_numpy(dtype=float)
+
+        # 1. Absolute Changes (in original measurement units, e.g. µA)
+        df["delta_0_24"] = np.round(v24 - v0, 4)
+        df["delta_24_96"] = np.round(v96 - v24, 4)
+        df["delta_96_168"] = np.round(v168 - v96, 4)
+        df["delta_0_168"] = np.round(v168 - v0, 4)
+
+        # 2. Percentage Changes (%)
+        eps = 1e-6
+        df["pct_change_0_24"] = np.round(((v24 - v0) / np.maximum(eps, np.abs(v0))) * 100.0, 2)
+        df["pct_change_24_96"] = np.round(((v96 - v24) / np.maximum(eps, np.abs(v24))) * 100.0, 2)
+        df["pct_change_96_168"] = np.round(((v168 - v96) / np.maximum(eps, np.abs(v96))) * 100.0, 2)
+        df["pct_change_0_168"] = np.round(((v168 - v0) / np.maximum(eps, np.abs(v0))) * 100.0, 2)
+
+        # 3. Temporal Slopes (rate of change per hour)
+        df["slope_0_24"] = np.round((v24 - v0) / 24.0, 6)
+        df["slope_24_96"] = np.round((v96 - v24) / 72.0, 6)
+        df["slope_96_168"] = np.round((v168 - v96) / 72.0, 6)
+        df["slope_0_168"] = np.round((v168 - v0) / 168.0, 6)
+
+        # 4. Limit Normalization (unitless ratio against upper spec limit)
+        limit = df["datasheet_max"].to_numpy(dtype=float) if "datasheet_max" in df.columns else (
+            df["limit"].to_numpy(dtype=float) if "limit" in df.columns else np.full(len(df), 50.0)
+        )
+        df["v0_ratio"] = np.round(v0 / np.maximum(eps, limit), 4)
+        df["v168_ratio"] = np.round(v168 / np.maximum(eps, limit), 4)
+
+        return df
+
+    @classmethod
+    def process(cls, df: pd.DataFrame) -> pd.DataFrame:
+        """Runs the complete preprocessing transformation."""
+        df = cls.preserve_raw_measurements(df)
+        df = cls.handle_missing_and_impute(df)
+        df = cls.calculate_temporal_metrics(df)
+        return df
+
+    @classmethod
+    def get_raw_and_processed(cls, df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+        """
+        Returns cleanly separated RAW and PROCESSED representations,
+        guaranteeing traceability via component_id and lot_id.
+        """
+        processed_df = cls.process(df)
+        raw_cols = [
+            c for c in [
+                "component_id", "lot_id", "subsystem", "component_type", "parameter",
+                "unit", "raw_v0", "raw_v24", "raw_v96", "raw_v168",
+                "datasheet_min", "datasheet_max", "temperature_c", "ground_truth"
+            ] if c in processed_df.columns
+        ]
+        raw_df = processed_df[raw_cols].copy()
+        return {
+            "raw": raw_df,
+            "processed": processed_df,
+        }
+
+
+def preprocess_screening_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Public helper function for the core pipeline."""
+    return PreprocessingEngine.process(df)
+
