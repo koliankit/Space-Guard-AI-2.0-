@@ -70,6 +70,33 @@ COLUMN_SYNONYMS = {
 
 REQUIRED_FIELDS = ["component_id", "lot_id", "v0", "v24", "v168"]
 
+CANONICAL_FIELD_ALIASES = {
+    "value_0h": "v0",
+    "value_24h": "v24",
+    "value_96h": "v96",
+    "value_168h": "v168",
+    "spec_min": "datasheet_min",
+    "spec_max": "datasheet_max",
+    "limit": "datasheet_max",
+    "temp": "temperature_c",
+    "temperature": "temperature_c",
+}
+
+
+def normalize_mapping_keys(mapping: Dict[str, str]) -> Dict[str, str]:
+    """
+    Normalizes mapping keys so that expected standard field names
+    (e.g., 'value_0h', 'datasheet_max') resolve to internal identifiers ('v0', 'datasheet_max').
+    """
+    if not mapping:
+        return {}
+    normalized: Dict[str, str] = {}
+    for k, v in mapping.items():
+        k_clean = str(k).strip()
+        alias_k = CANONICAL_FIELD_ALIASES.get(k_clean.lower(), k_clean)
+        normalized[alias_k] = v
+    return normalized
+
 
 def _norm(h: str) -> str:
     h = str(h).lower().strip()
@@ -129,12 +156,13 @@ def auto_detect_mapping(columns: List[str]) -> Dict[str, str]:
             if field in mapping:
                 break
 
-    return mapping
+    return normalize_mapping_keys(mapping)
 
 
 def missing_required(mapping: Dict[str, str]) -> List[str]:
     """Identify required fields that have not been mapped."""
-    return [f for f in REQUIRED_FIELDS if f not in mapping]
+    norm_map = normalize_mapping_keys(mapping)
+    return [f for f in REQUIRED_FIELDS if f not in norm_map]
 
 
 def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple[bool, List[Dict[str, Any]]]:
@@ -143,17 +171,18 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
       1. Empty dataset check
       2. Missing required columns
       3. Null or non-numeric burn-in time point values
-      4. Duplicate component IDs
-      5. Empty or whitespace-only lot IDs
-      6. Inconsistent datasheet min/max (min > max)
-      7. Temperature range checks (-55°C to 200°C)
-      8. Time-series continuity checks (non-negative, finite numbers)
+      4. Infinite / non-finite reading checks
+      5. Duplicate component IDs
+      6. Empty or whitespace-only lot IDs
+      7. Inconsistent datasheet min/max (min >= max)
+      8. Temperature range checks (-55°C to 200°C)
+      9. Single component / small cohort warnings
 
     Returns (is_valid, list_of_issues).
     """
     issues: List[Dict[str, Any]] = []
 
-    if len(raw_df) == 0:
+    if raw_df is None or len(raw_df) == 0:
         issues.append({
             "row": None,
             "column": None,
@@ -161,6 +190,8 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
             "severity": "error",
         })
         return False, issues
+
+    mapping = normalize_mapping_keys(mapping)
 
     # 1. Missing required mapped columns
     missing = missing_required(mapping)
@@ -220,6 +251,18 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
                 "message": f"Non-numeric values found in '{col}' at rows {[r+1 for r in bad_idx]}.",
                 "severity": "error",
             })
+        
+        # Infinite value check
+        inf_mask = np.isinf(numeric_series)
+        if inf_mask.any():
+            bad_inf = raw_df.index[inf_mask].tolist()[:3]
+            issues.append({
+                "row": bad_inf[0] + 1,
+                "column": col,
+                "message": f"Infinite or non-finite measurement values found in '{col}' at rows {[r+1 for r in bad_inf]}.",
+                "severity": "error",
+            })
+
         missing_count = numeric_series.isna().sum()
         if missing_count > 0 and field in REQUIRED_FIELDS:
             issues.append({
@@ -259,6 +302,15 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
                 "severity": "warning",
             })
 
+    # 7. Single component / small cohort warning
+    if len(raw_df) == 1:
+        issues.append({
+            "row": 1,
+            "column": comp_col,
+            "message": "Dataset contains only 1 component; lot-relative cohort screening operates best on cohorts (>= 3 components).",
+            "severity": "warning",
+        })
+
     # Decide overall validity: errors block, warnings alert
     has_blocking_errors = any(issue["severity"] == "error" for issue in issues)
     return (not has_blocking_errors), issues
@@ -269,7 +321,8 @@ def build_dataframe(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple[pd.D
     Transforms and validates raw dataframe using column mapping.
     Produces canonical DataFrame ready for Module A and Module B screening.
     """
-    rows = len(raw_df)
+    mapping = normalize_mapping_keys(mapping)
+    rows = len(raw_df) if raw_df is not None else 0
     is_valid, issues = validate_raw_dataset(raw_df, mapping)
 
     out = pd.DataFrame()

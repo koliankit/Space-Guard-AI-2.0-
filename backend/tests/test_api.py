@@ -97,3 +97,45 @@ ISRO-TEST-003,LOT-TEST,25.0,28.0,32.0,42.0,0.0,50.0,125.0
     up_data = upload_res.json()
     assert up_data["valid"] == 3
     assert up_data["lots"] == 1
+
+
+def test_api_upload_isro_standard_dataset():
+    with open("data/isro_standard_screening_sample.csv", "rb") as f:
+        content = f.read()
+    files = {"file": ("isro_standard_screening_sample.csv", io.BytesIO(content), "text/csv")}
+    upload_res = client.post("/api/screening/upload", files=files)
+    assert upload_res.status_code == 200
+    up_data = upload_res.json()
+    assert up_data["valid"] == 18
+    assert up_data["lots"] == 4
+    assert up_data["batch_id"] > 0
+
+    # Run analysis on the newly uploaded real CSV batch
+    batch_id = up_data["batch_id"]
+    analyze_res = client.post(f"/api/screening/analyze/{batch_id}")
+    assert analyze_res.status_code == 200
+    analysis = analyze_res.json()
+    assert analysis["safe"] + analysis["monitor"] + analysis["reject"] == 18
+    assert "risk_distribution" in analysis
+
+
+def test_api_upload_empty_file_rejected():
+    files = {"file": ("empty.csv", io.BytesIO(b""), "text/csv")}
+    res = client.post("/api/screening/upload", files=files)
+    assert res.status_code == 400
+    assert "empty" in res.json()["detail"].lower()
+
+
+def test_api_upload_invalid_extension_rejected():
+    files = {"file": ("malicious.exe", io.BytesIO(b"binary content"), "application/octet-stream")}
+    res = client.post("/api/screening/upload", files=files)
+    assert res.status_code == 400
+    assert "csv" in res.json()["detail"].lower()
+
+
+def test_api_upload_binary_content_rejected():
+    files = {"file": ("bad.csv", io.BytesIO(b"\x00\x01\x02\x03\x04corrupt"), "text/csv")}
+    res = client.post("/api/screening/upload", files=files)
+    assert res.status_code == 400
+    assert "binary" in res.json()["detail"].lower() or "corrupt" in res.json()["detail"].lower()
+

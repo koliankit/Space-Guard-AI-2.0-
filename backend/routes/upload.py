@@ -30,10 +30,29 @@ async def upload_dataset(
     if len(raw_bytes) > 50 * 1024 * 1024:
         raise HTTPException(413, "Uploaded file exceeds maximum authorized size of 50MB.")
 
-    try:
-        raw_df = pd.read_csv(io.BytesIO(raw_bytes))
-    except Exception as e:
-        raise HTTPException(400, f"Could not parse file as CSV: {e}")
+    if len(raw_bytes) == 0:
+        raise HTTPException(400, "Uploaded file is empty (0 bytes). Please upload a valid CSV flight screening dataset.")
+
+    if b"\x00" in raw_bytes[:4096]:
+        raise HTTPException(400, "Binary or corrupt file content detected. Please upload a plain text CSV file.")
+
+    raw_df = None
+    parse_exc = None
+    for enc in ("utf-8", "utf-8-sig", "latin-1"):
+        try:
+            raw_df = pd.read_csv(io.BytesIO(raw_bytes), encoding=enc)
+            break
+        except UnicodeDecodeError:
+            continue
+        except Exception as e:
+            parse_exc = e
+            break
+
+    if raw_df is None:
+        try:
+            raw_df = pd.read_csv(io.BytesIO(raw_bytes), sep=None, engine="python")
+        except Exception as e:
+            raise HTTPException(400, f"Could not parse file as CSV: {parse_exc or e}")
 
     if column_mapping:
         try:
@@ -42,6 +61,23 @@ async def upload_dataset(
             mapping = preprocessing.auto_detect_mapping(raw_df.columns.tolist())
     else:
         mapping = preprocessing.auto_detect_mapping(raw_df.columns.tolist())
+
+    mapping = preprocessing.normalize_mapping_keys(mapping)
+
+    if len(raw_df) == 0:
+        return {
+            "error": "validation_failed",
+            "message": "Uploaded CSV dataset is completely empty (0 rows).",
+            "validation_issues": [{
+                "row": None,
+                "column": None,
+                "message": "Uploaded dataset is completely empty (0 rows).",
+                "severity": "error",
+            }],
+            "detected_headers": raw_df.columns.tolist(),
+            "auto_mapping": mapping,
+            "missing_fields": [],
+        }
 
     missing = preprocessing.missing_required(mapping)
     if missing:
