@@ -26,13 +26,13 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
   const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (17s), 1x (8.5s slow), 2x (4.2s)
-  const [isExpanded, setIsExpanded] = useState<boolean>(false)
+  const [manualInspectHour, setManualInspectHour] = useState<number | null>(null)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 280 })
+  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 350 })
 
   const measuredPathRef = useRef<SVGPathElement>(null)
-  const [measuredLen, setMeasuredLen] = useState<number>(600)
+  const [measuredLen, setMeasuredLen] = useState<number>(800)
   const animFrameRef = useRef<number | null>(null)
   const startTimeRef = useRef<number>(0)
   const elapsedOffsetRef = useRef<number>(0)
@@ -49,7 +49,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
       if (w > 0 && h > 0) {
         setChartDims({
           width: Math.round(w),
-          height: Math.round(Math.max(260, h)),
+          height: Math.round(Math.max(340, h)),
         })
       }
     }
@@ -64,7 +64,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         if (w > 0 && h > 0) {
           setChartDims({
             width: Math.round(w),
-            height: Math.round(Math.max(260, h)),
+            height: Math.round(Math.max(340, h)),
           })
         }
       }
@@ -76,10 +76,10 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
       ro.disconnect()
       window.removeEventListener('resize', updateSize)
     }
-  }, [isExpanded])
+  }, [])
 
   const W = Math.max(500, chartDims.width)
-  const H = Math.max(260, chartDims.height)
+  const H = Math.max(340, chartDims.height)
   const padL = 50
   const padR = 24
   const padT = 24
@@ -162,15 +162,35 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     }
   }, [component?.component_id, activeHorizon, startSimulation])
 
-  // Measure ground measured path length
+  // Piecewise value interpolation along curve and projection zone for manual checking
+  const getValAtHourB = useCallback(
+    (h: number) => {
+      if (h <= 24) {
+        return v0 + ((v24 - v0) / 24) * h
+      } else if (h <= 96) {
+        return v24 + ((v96 - v24) / 72) * (h - 24)
+      } else if (h <= 168) {
+        return v96 + ((v168 - v96) / 72) * (h - 96)
+      } else {
+        return v168 + slope * (h - 168)
+      }
+    },
+    [v0, v24, v96, v168, slope]
+  )
+
+  // Measure ground measured path length whenever path geometry updates
   useEffect(() => {
     if (measuredPathRef.current) {
-      const len = measuredPathRef.current.getTotalLength()
-      if (len > 0 && Math.abs(len - measuredLen) > 1) {
-        setMeasuredLen(len)
+      try {
+        const len = measuredPathRef.current.getTotalLength()
+        if (len > 0 && Math.abs(len - measuredLen) > 1) {
+          setMeasuredLen(len)
+        }
+      } catch {
+        // ignore
       }
     }
-  }, [component, measuredLen])
+  }, [measuredPathD, W, H, measuredLen])
 
   // Uncertainty cone variance (+/- 1.5 sigma drift model)
   const lotStd = component?.lot_std || 1.8
@@ -243,17 +263,20 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     }
   }, [p1, p2, isSimulating])
 
-  // Dynamic In-Flight extrapolation hour & value
+  // In-Flight extrapolation target hour & value
   const currentExtrapH = 168 + p2 * (activeHorizon - 168)
   const currentExtrapVal = v168 + slope * (p2 * (activeHorizon - 168))
+  const targetExtrapH = isSimulating && animProgress < 1 ? currentExtrapH : activeHorizon
+  const targetExtrapVal = isSimulating && animProgress < 1 ? currentExtrapVal : projectedAtHorizon
+  const targetSpread = isSimulating && animProgress < 1 ? coneSpread * p2 : coneSpread
 
-  // Dynamic extrapolation path
+  // Dynamic extrapolation path (solid & complete when static/paused or sweeping in phase 2)
   const extrapPathD = useMemo(() => {
-    if (p2 <= 0) return ''
-    return `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} L ${toX(currentExtrapH).toFixed(1)} ${toY(
-      currentExtrapVal
+    if (isSimulating && p2 <= 0) return ''
+    return `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} L ${toX(targetExtrapH).toFixed(1)} ${toY(
+      targetExtrapVal
     ).toFixed(1)}`
-  }, [p2, toX, toY, v168, currentExtrapH, currentExtrapVal])
+  }, [isSimulating, p2, toX, toY, v168, targetExtrapH, targetExtrapVal])
 
   // Early prediction checkpoint (0-24h projection to 168h)
   const early168 = component?.predicted168_from_early ?? (v24 + (v24 - v0) * 6)
@@ -262,19 +285,17 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     [toX, toY, v24, early168]
   )
 
-  // Shaded variance cone polygon dynamically expanding with p2
-  const currentSpread = coneSpread * p2
-  const currentUpper = currentExtrapVal + currentSpread
-  const currentLower = Math.max(0, currentExtrapVal - currentSpread)
-
+  // Shaded variance cone polygon dynamically expanding with p2 or fully rendered when static
   const conePolygonD = useMemo(() => {
-    if (p2 <= 0.05) return ''
+    if (isSimulating && p2 <= 0.05) return ''
+    const upper = targetExtrapVal + targetSpread
+    const lower = Math.max(0, targetExtrapVal - targetSpread)
     return (
       `M ${toX(168).toFixed(1)} ${toY(v168).toFixed(1)} ` +
-      `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentUpper).toFixed(1)} ` +
-      `L ${toX(currentExtrapH).toFixed(1)} ${toY(currentLower).toFixed(1)} Z`
+      `L ${toX(targetExtrapH).toFixed(1)} ${toY(upper).toFixed(1)} ` +
+      `L ${toX(targetExtrapH).toFixed(1)} ${toY(lower).toFixed(1)} Z`
     )
-  }, [p2, toX, toY, v168, currentExtrapH, currentUpper, currentLower])
+  }, [isSimulating, p2, toX, toY, v168, targetExtrapH, targetExtrapVal, targetSpread])
 
   const willBreach = component?.future_limit_breach || projectedAtHorizon >= limitVal
   const marginFuture = component?.margin_future ?? (limitVal - projectedAtHorizon)
@@ -327,6 +348,34 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
       })
     }
   }, [animProgress, p1, p2, probeTip.h, probeTip.v, liveDriftVelocity, liveProjection, liveMargin, isSimulating, onSimUpdate])
+
+  // Interactive manual inspection mouse handlers
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    if (!rect.width) return
+    const mouseX = ((e.clientX - rect.left) / rect.width) * W
+    if (mouseX >= padL && mouseX <= W - padR) {
+      const h = Math.max(0, Math.min(activeHorizon, ((mouseX - padL) / (W - padL - padR)) * maxX))
+      setManualInspectHour(h)
+    } else {
+      setManualInspectHour(null)
+    }
+  }
+
+  const handleMouseLeave = () => {
+    setManualInspectHour(null)
+  }
+
+  const isInspecting = manualInspectHour !== null
+  const inspectH = manualInspectHour ?? (isSimulating ? probeTip.h : activeHorizon)
+  const inspectVal = manualInspectHour !== null ? getValAtHourB(manualInspectHour) : (isSimulating ? probeTip.v : projectedAtHorizon)
+  const isInspectExtrap = inspectH > 168
+  const inspectMargin = limitVal - inspectVal
+
+  const displayedDriftVelocity = liveDriftVelocity
+  const displayedPredError = livePredError
+  const displayedProjection = isInspecting ? inspectVal : liveProjection
+  const displayedMargin = isInspecting ? inspectMargin : liveMargin
 
   // If no component is selected, render empty state (all hooks have been unconditionally called above)
   if (!component) {
@@ -439,37 +488,27 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             ))}
           </div>
 
-          {/* Full Space Expand / Restore Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsExpanded((prev) => !prev)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded border text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm ${
-              isExpanded
-                ? 'bg-amber-500/30 text-amber-300 border-amber-500/60 shadow-isro'
-                : 'bg-[#050914] hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700'
-            }`}
-            title={isExpanded ? 'Restore Standard Height' : 'Expand Oscilloscope to Fill Maximum Vertical Screen Space'}
-          >
-            <span>{isExpanded ? '⤡' : '⤢'}</span>
-            <span>{isExpanded ? 'RESTORE' : 'EXPAND'}</span>
-          </button>
+          {/* Manual Inspection Active Badge */}
+          {isInspecting && (
+            <span className="text-[10px] font-mono font-bold text-sky-300 bg-sky-950/80 px-2 py-1 rounded border border-sky-500/40">
+              PROBE: T+{Math.round(inspectH)}h &bull; {inspectVal.toFixed(2)} &mu;A
+            </span>
+          )}
         </div>
       </div>
 
-      {/* SVG Canvas Area */}
+      {/* SVG Canvas Area with Manual Inspection Crosshair */}
       <div
         ref={containerRef}
-        className={`relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden w-full flex-1 transition-all duration-300 ${
-          isExpanded
-            ? 'min-h-[540px] md:min-h-[640px] lg:min-h-[720px]'
-            : 'min-h-[260px] md:min-h-[280px] h-[270px] md:h-[290px]'
-        }`}
+        className="relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden w-full flex-1 transition-all duration-300 min-h-[340px] md:min-h-[360px] h-[350px] md:h-[370px]"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="none"
-          className="w-full h-full block select-none"
+          className="w-full h-full block select-none cursor-crosshair"
           style={{ width: '100%', height: '100%', display: 'block' }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
           <defs>
             <linearGradient id="coneGrad" x1="0" y1="0" x2="1" y2="0">
@@ -602,9 +641,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               strokeDasharray="2 3"
               opacity={Math.min(0.6, (p1 - 0.14) * 2)}
             />
-          )}
-
-          {/* Measured Past Telemetry Line (0h -> 168h, drawn live via strokeDashoffset) */}
+                  {/* Measured Past Telemetry Line (0h -> 168h, drawn live via strokeDashoffset) */}
           <path
             ref={measuredPathRef}
             d={measuredPathD}
@@ -613,8 +650,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeDasharray={measuredLen}
-            strokeDashoffset={measuredLen * (1 - p1)}
+            strokeDasharray={isSimulating && p1 < 1 ? measuredLen : undefined}
+            strokeDashoffset={isSimulating && p1 < 1 ? measuredLen * (1 - p1) : undefined}
           />
 
           {/* Future Extrapolation Line (168h -> Horizon, drawn dynamically in Phase 2) */}
@@ -673,8 +710,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             </g>
           )}
 
-          {/* Future Projection Node at Horizon (activates in Phase 2) */}
-          {p2 > 0 && (
+          {/* Future Projection Node at Horizon (activates in Phase 2 or when static) */}
+          {(p2 > 0 || !isSimulating) && (
             <g
               className="cursor-pointer"
               onMouseEnter={() =>
@@ -686,11 +723,11 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               }
               onMouseLeave={() => setHoveredPoint(null)}
             >
-              {p2 >= 0.98 && (
+              {(p2 >= 0.98 || !isSimulating) && (
                 <circle
                   cx={toX(activeHorizon)}
                   cy={toY(projectedAtHorizon)}
-                  r="10"
+                  r={10}
                   fill="none"
                   stroke={willBreach ? '#ef4444' : '#f59e0b'}
                   strokeWidth="1.5"
@@ -699,14 +736,14 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 />
               )}
               <circle
-                cx={toX(currentExtrapH)}
-                cy={toY(currentExtrapVal)}
-                r="5"
+                cx={toX(targetExtrapH)}
+                cy={toY(targetExtrapVal)}
+                r={5}
                 fill={willBreach ? '#be123c' : '#d97706'}
                 stroke={willBreach ? '#fda4af' : '#fde68a'}
                 strokeWidth="2"
               />
-              <circle cx={toX(currentExtrapH)} cy={toY(currentExtrapVal)} r="2" fill="#ffffff" />
+              <circle cx={toX(targetExtrapH)} cy={toY(targetExtrapVal)} r="2" fill="#ffffff" />
             </g>
           )}
 
@@ -777,6 +814,91 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             </g>
           )}
 
+          {/* Interactive Manual Inspection Line Section & Crosshair */}
+          {isInspecting && (
+            <g>
+              {/* Vertical Inspection Line across full height */}
+              <line
+                x1={toX(inspectH)}
+                x2={toX(inspectH)}
+                y1={padT}
+                y2={H - padB}
+                stroke={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
+                strokeWidth={1.5}
+                strokeDasharray="3 2"
+                opacity={0.9}
+              />
+              {/* Horizontal line to Y-axis */}
+              <line
+                x1={padL}
+                x2={toX(inspectH)}
+                y1={toY(inspectVal)}
+                y2={toY(inspectVal)}
+                stroke={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
+                strokeWidth={0.8}
+                strokeDasharray="2 2"
+                opacity={0.5}
+              />
+              {/* Reticle Target on the line */}
+              <circle
+                cx={toX(inspectH)}
+                cy={toY(inspectVal)}
+                r={7}
+                fill={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
+                opacity={0.3}
+              />
+              <circle
+                cx={toX(inspectH)}
+                cy={toY(inspectVal)}
+                r={4}
+                fill={isInspectExtrap ? '#d97706' : '#0284c7'}
+                stroke="#ffffff"
+                strokeWidth={1.5}
+              />
+
+              {/* Floating Manual Inspection Chip */}
+              <g
+                transform={`translate(${Math.min(
+                  W - padR - 65,
+                  Math.max(padL + 65, toX(inspectH))
+                )}, ${Math.max(padT + 18, toY(inspectVal) - 22)})`}
+              >
+                <rect
+                  x="-64"
+                  y="-14"
+                  width="128"
+                  height="24"
+                  rx="4"
+                  fill="#030712"
+                  stroke={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
+                  strokeWidth="1.4"
+                  filter="drop-shadow(0 3px 6px rgba(0,0,0,0.8))"
+                />
+                <text
+                  x="0"
+                  y="-1"
+                  textAnchor="middle"
+                  fill="#94a3b8"
+                  fontSize="8"
+                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
+                >
+                  MANUAL PROBE &bull; T+{Math.round(inspectH)}h {isInspectExtrap ? '(FLIGHT)' : '(HTOL)'}
+                </text>
+                <text
+                  x="0"
+                  y="8"
+                  textAnchor="middle"
+                  fill={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
+                  fontSize="9.5"
+                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
+                  fontWeight="bold"
+                >
+                  {inspectVal.toFixed(2)} &mu;A
+                </text>
+              </g>
+            </g>
+          )}
+
           {/* Active Hover Tooltip */}
           {hoveredPoint && (
             <g transform={`translate(${toX(hoveredPoint.hour)}, ${Math.max(padT + 15, toY(hoveredPoint.val) - 18)})`}>
@@ -814,7 +936,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         </svg>
       </div>
 
-      {/* Metric Callouts & Flight Advisory Bottom Row (Live Count-Up Synchronized with Sweep) */}
+      {/* Metric Callouts & Flight Advisory Bottom Row (Live Count-Up Synchronized with Sweep or Manual Inspection) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
         <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
           <div className="flex items-center justify-between">
@@ -823,8 +945,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
             )}
           </div>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${liveDriftVelocity > 50 ? 'text-rose-400' : 'text-amber-400'}`}>
-            {liveDriftVelocity.toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${displayedDriftVelocity > 50 ? 'text-rose-400' : 'text-amber-400'}`}>
+            {displayedDriftVelocity.toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
           </span>
         </div>
 
@@ -836,31 +958,49 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             )}
           </div>
           <span className="text-base font-bold text-amber-300 mt-0.5 tabular-nums">
-            &plusmn;{livePredError.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+            &plusmn;{displayedPredError.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
 
-        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+        <div className={`p-2.5 rounded-lg bg-[#050B16] border flex flex-col transition-colors ${
+          isInspecting ? 'border-sky-500/50 bg-sky-950/20' : 'border-slate-800'
+        }`}>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">+{activeHorizon - 168}h Projection</span>
-            {isSimulating && (
+            <span className="text-xs text-slate-400 uppercase font-semibold">
+              {isInspecting ? `Probe @ T+${Math.round(inspectH)}h` : `+${activeHorizon - 168}h Projection`}
+            </span>
+            {isSimulating && !isInspecting && (
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
             )}
+            {isInspecting && (
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+            )}
           </div>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'}`}>
-            {liveProjection.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${
+            isInspecting ? 'text-sky-300 font-bold' : willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'
+          }`}>
+            {displayedProjection.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
 
-        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+        <div className={`p-2.5 rounded-lg bg-[#050B16] border flex flex-col transition-colors ${
+          isInspecting ? 'border-sky-500/50 bg-sky-950/20' : 'border-slate-800'
+        }`}>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">Future Margin</span>
-            {isSimulating && (
+            <span className="text-xs text-slate-400 uppercase font-semibold">
+              {isInspecting ? 'Probe Safety Margin' : 'Future Margin'}
+            </span>
+            {isSimulating && !isInspecting && (
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
             )}
+            {isInspecting && (
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+            )}
           </div>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${liveMargin < 5 ? 'text-rose-400' : liveMargin < 15 ? 'text-amber-400' : 'text-emerald-400'}`}>
-            {liveMargin.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${
+            displayedMargin < 5 ? 'text-rose-400' : displayedMargin < 15 ? 'text-amber-400' : 'text-emerald-400'
+          }`}>
+            {displayedMargin.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
           </span>
         </div>
       </div>

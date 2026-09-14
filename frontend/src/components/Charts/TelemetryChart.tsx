@@ -10,10 +10,9 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
   const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (16s), 1x (8s), 2x (4s)
-  const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 920, height: 320 })
+  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 920, height: 350 })
 
   const pathRef = useRef<SVGPathElement>(null)
   const [pathLength, setPathLength] = useState<number>(850)
@@ -32,7 +31,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
       if (w > 0 && h > 0) {
         setChartDims({
           width: Math.round(w),
-          height: Math.round(Math.max(300, h)),
+          height: Math.round(Math.max(340, h)),
         })
       }
     }
@@ -47,7 +46,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
         if (w > 0 && h > 0) {
           setChartDims({
             width: Math.round(w),
-            height: Math.round(Math.max(300, h)),
+            height: Math.round(Math.max(340, h)),
           })
         }
       }
@@ -59,10 +58,10 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
       ro.disconnect()
       window.removeEventListener('resize', updateSize)
     }
-  }, [isExpanded])
+  }, [])
 
   const W = Math.max(500, chartDims.width)
-  const H = Math.max(300, chartDims.height)
+  const H = Math.max(340, chartDims.height)
   const padL = 60
   const padR = 36
   const padT = 28
@@ -417,31 +416,13 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
               </button>
             ))}
           </div>
-
-          {/* Full Space Expand / Restore Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsExpanded((prev) => !prev)}
-            className={`flex items-center gap-1 px-3 py-1 rounded border text-xs font-mono font-bold transition-all cursor-pointer shadow-sm ${
-              isExpanded
-                ? 'bg-amber-500/30 text-amber-300 border-amber-500/60 shadow-isro'
-                : 'bg-[#050914] hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700'
-            }`}
-            title={isExpanded ? 'Restore Standard Height' : 'Expand Oscilloscope to Maximize Vertical Space'}
-          >
-            <span>{isExpanded ? '⤡ RESTORE' : '⤢ EXPAND'}</span>
-          </button>
         </div>
       </div>
 
       {/* Main Full-Width SVG Oscilloscope Canvas */}
       <div
         ref={containerRef}
-        className={`relative rounded-xl overflow-hidden border border-slate-800 bg-[#040812] w-full transition-all duration-300 ${
-          isExpanded
-            ? 'min-h-[540px] md:min-h-[640px] lg:min-h-[720px]'
-            : 'min-h-[300px] md:min-h-[340px]'
-        }`}
+        className="relative rounded-xl overflow-hidden border border-slate-800 bg-[#040812] w-full transition-all duration-300 min-h-[340px] md:min-h-[360px] h-[350px] md:h-[370px]"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}

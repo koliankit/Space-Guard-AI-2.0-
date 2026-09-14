@@ -327,7 +327,7 @@ export default function ModuleAAnomalyPanel({
         )}
 
         {/* Module A Dedicated Graph: Parametric Waveform Oscilloscope */}
-        <div className="mt-1 flex flex-col min-h-[270px] md:min-h-[290px] w-full">
+        <div className="mt-1 flex flex-col h-[350px] md:h-[370px] min-h-[340px] md:min-h-[360px] w-full">
           <ModuleAAnomalyGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>

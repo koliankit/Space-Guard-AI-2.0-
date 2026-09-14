@@ -22,10 +22,10 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
   const [simSpeed, setSimSpeed] = useState<0.5 | 1 | 2>(1) // 0.5x (16s), 1x (8s slow), 2x (4s)
-  const [isExpanded, setIsExpanded] = useState<boolean>(false)
+  const [manualInspectHour, setManualInspectHour] = useState<number | null>(null)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 280 })
+  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 350 })
 
   const pathRef = useRef<SVGPathElement>(null)
   const [pathLength, setPathLength] = useState<number>(800)
@@ -44,7 +44,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       if (w > 0 && h > 0) {
         setChartDims({
           width: Math.round(w),
-          height: Math.round(Math.max(260, h)),
+          height: Math.round(Math.max(340, h)),
         })
       }
     }
@@ -59,7 +59,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
         if (w > 0 && h > 0) {
           setChartDims({
             width: Math.round(w),
-            height: Math.round(Math.max(260, h)),
+            height: Math.round(Math.max(340, h)),
           })
         }
       }
@@ -71,10 +71,10 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       ro.disconnect()
       window.removeEventListener('resize', updateSize)
     }
-  }, [isExpanded])
+  }, [])
 
   const W = Math.max(500, chartDims.width)
-  const H = Math.max(260, chartDims.height)
+  const H = Math.max(340, chartDims.height)
   const padL = 50
   const padR = 24
   const padT = 24
@@ -90,15 +90,22 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
   const v0 = component?.v0 ?? 10
   const v24 = component?.v24 ?? 10.2
-  const v96 = component?.v96 ?? 10.8
+  const v96 = component?.v96 ?? (v0 + (v24 - v0) * 4)
   const v168 = component?.v168 ?? 11.4
 
   const allVals = [v0, v24, v96, v168, limitVal, bandLow, bandHigh]
   const minY = Math.max(0, Math.min(...allVals) * 0.8)
   const maxY = Math.max(...allVals) * 1.15
 
-  const xFor = (h: number) => padL + (h / 168) * (W - padL - padR)
-  const yFor = (v: number) => H - padB - ((v - minY) / (maxY - minY || 1)) * (H - padT - padB)
+  const xFor = useCallback((h: number) => padL + (h / 168) * (W - padL - padR), [padL, padR, W])
+  const yFor = useCallback((v: number) => H - padB - ((v - minY) / (maxY - minY || 1)) * (H - padT - padB), [H, padB, minY, maxY, padT])
+
+  // Piecewise value interpolation along curve for manual checking
+  const getValAtHour = useCallback((h: number) => {
+    if (h <= 24) return v0 + ((v24 - v0) / 24) * h
+    if (h <= 96) return v24 + ((v96 - v24) / 72) * (h - 24)
+    return v96 + ((v168 - v96) / 72) * (h - 96)
+  }, [v0, v24, v96, v168])
 
   const stages: [number, number][] = useMemo(() => {
     const list: [number, number][] = [[0, v0], [24, v24]]
@@ -109,11 +116,11 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
   const shown = useMemo(() => stages.filter(([h]) => h <= stageH), [stages, stageH])
 
-  // Smooth Catmull-Rom curve
+  // Smooth Catmull-Rom curve (with full dependencies so coordinates are never stale)
   const smoothCurve = useMemo(() => {
     if (shown.length < 2) return ''
     const mapped = shown.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
-    let d = `M ${mapped[0].x} ${mapped[0].y}`
+    let d = `M ${mapped[0].x.toFixed(1)} ${mapped[0].y.toFixed(1)}`
     for (let i = 0; i < mapped.length - 1; i++) {
       const p0 = i > 0 ? mapped[i - 1] : mapped[i]
       const p1 = mapped[i]
@@ -125,17 +132,17 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       const cp2x = p2.x - (p3.x - p1.x) / 6
       const cp2y = p2.y - (p3.y - p1.y) / 6
 
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
+      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`
     }
     return d
-  }, [shown, minY, maxY])
+  }, [shown, xFor, yFor])
 
   const lastPoint = shown[shown.length - 1]
 
   const areaD = useMemo(() => {
     if (shown.length <= 1 || !smoothCurve) return ''
-    return `${smoothCurve} L ${xFor(lastPoint[0])} ${H - padB} L ${xFor(shown[0][0])} ${H - padB} Z`
-  }, [smoothCurve, shown, lastPoint, H, padB])
+    return `${smoothCurve} L ${xFor(lastPoint[0]).toFixed(1)} ${H - padB} L ${xFor(shown[0][0]).toFixed(1)} ${H - padB} Z`
+  }, [smoothCurve, shown, lastPoint, xFor, H, padB])
 
   const baselineCurve = useMemo(() => {
     const lotBase0 = Math.min(lotMean * 0.75, v0 < lotMean ? v0 * 0.95 : lotMean * 0.75)
@@ -319,9 +326,28 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
   // Live interpolated readouts for dashboard synchronization
   const finalDelta = (component.v168 ?? 0) - (component.v0 ?? 0)
-  const displayedDelta = animProgress >= 1 ? finalDelta : simVal - component.v0
+  const isInspecting = manualInspectHour !== null
+  const activeInspectHour = manualInspectHour ?? (isSimulating ? simHour : 168)
+  const activeInspectVal = manualInspectHour !== null ? getValAtHour(manualInspectHour) : (isSimulating ? simVal : (component.v168 ?? 0))
+  const displayedDelta = isInspecting ? activeInspectVal - component.v0 : (animProgress >= 1 ? finalDelta : simVal - component.v0)
   const finalZ = component.z168
-  const displayedZ = animProgress >= 1 ? finalZ : (simVal - lotMean) / (lotStd || 1)
+  const displayedZ = isInspecting ? (activeInspectVal - lotMean) / (lotStd || 1) : (animProgress >= 1 ? finalZ : (simVal - lotMean) / (lotStd || 1))
+
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    if (!rect.width) return
+    const mouseX = ((e.clientX - rect.left) / rect.width) * W
+    if (mouseX >= padL && mouseX <= W - padR) {
+      const h = Math.max(0, Math.min(168, ((mouseX - padL) / (W - padL - padR)) * 168))
+      setManualInspectHour(h)
+    } else {
+      setManualInspectHour(null)
+    }
+  }
+
+  const handleMouseLeave = () => {
+    setManualInspectHour(null)
+  }
 
   return (
     <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
@@ -383,16 +409,17 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
               ))}
             </div>
 
-            {/* Live Progress Pill */}
+            {/* Live Telemetry Progress Pill */}
             {isSimulating && (
               <span className="text-[9.5px] font-mono font-bold text-emerald-400 px-1 animate-pulse">
-                {isPaused ? 'PAUSED' : `[T+${Math.round(simHour)}h]`}
+                {isPaused ? 'PAUSED' : `T+${Math.round(simHour)}h`}
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800">
-            <span className="text-xs font-mono text-slate-400 px-1.5 uppercase font-bold">Stage:</span>
+          {/* Scrub Stage Filters */}
+          <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 text-xs">
+            <span className="text-slate-400 font-mono text-[10px] uppercase mr-1">STAGE:</span>
             {STAGES.map((h) => (
               <button
                 key={h}
@@ -408,38 +435,21 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
               </button>
             ))}
           </div>
-
-          {/* Full Space Expand / Restore Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsExpanded((prev) => !prev)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded border text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm ${
-              isExpanded
-                ? 'bg-amber-500/30 text-amber-300 border-amber-500/60 shadow-isro'
-                : 'bg-[#050914] hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700'
-            }`}
-            title={isExpanded ? 'Restore Standard Height' : 'Expand Oscilloscope to Fill Maximum Vertical Screen Space'}
-          >
-            <span>{isExpanded ? '⤡' : '⤢'}</span>
-            <span>{isExpanded ? 'RESTORE' : 'EXPAND'}</span>
-          </button>
         </div>
       </div>
 
-      {/* Main SVG Chart Canvas */}
+      {/* Main SVG Chart Canvas with Interactive Manual Line Section & Cursor */}
       <div
         ref={containerRef}
-        className={`relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812] w-full flex-1 transition-all duration-300 ${
-          isExpanded
-            ? 'min-h-[540px] md:min-h-[640px] lg:min-h-[720px]'
-            : 'min-h-[260px] md:min-h-[280px] h-[270px] md:h-[290px]'
-        }`}
+        className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812] w-full flex-1 transition-all duration-300 min-h-[340px] md:min-h-[360px] h-[350px] md:h-[370px]"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="none"
-          className="w-full h-full block"
+          className="w-full h-full block cursor-crosshair"
           style={{ width: '100%', height: '100%', display: 'block' }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
           <defs>
             <linearGradient id="area-grad-a" x1="0" y1="0" x2="0" y2="1">
@@ -584,8 +594,8 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
               fill="none"
               stroke={curveColor}
               strokeWidth={2.4}
-              strokeDasharray={pathLength}
-              strokeDashoffset={pathLength * (1 - animProgress)}
+              strokeDasharray={isSimulating && animProgress < 1 ? pathLength : undefined}
+              strokeDashoffset={isSimulating && animProgress < 1 ? pathLength * (1 - animProgress) : undefined}
               filter="url(#glow-a)"
             />
           )}
@@ -698,6 +708,91 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
             </g>
           )}
 
+          {/* Interactive Manual Line Section & Cursor */}
+          {isInspecting && (
+            <g>
+              {/* Vertical Inspection Line across full height */}
+              <line
+                x1={xFor(activeInspectHour)}
+                x2={xFor(activeInspectHour)}
+                y1={padT}
+                y2={H - padB}
+                stroke="#38BDF8"
+                strokeWidth={1.5}
+                strokeDasharray="3 2"
+                opacity={0.9}
+              />
+              {/* Horizontal line to Y-axis */}
+              <line
+                x1={padL}
+                x2={xFor(activeInspectHour)}
+                y1={yFor(activeInspectVal)}
+                y2={yFor(activeInspectVal)}
+                stroke="#38BDF8"
+                strokeWidth={0.8}
+                strokeDasharray="2 2"
+                opacity={0.5}
+              />
+              {/* Reticle Target on the line */}
+              <circle
+                cx={xFor(activeInspectHour)}
+                cy={yFor(activeInspectVal)}
+                r={7}
+                fill="#38BDF8"
+                opacity={0.3}
+              />
+              <circle
+                cx={xFor(activeInspectHour)}
+                cy={yFor(activeInspectVal)}
+                r={4}
+                fill="#0284C7"
+                stroke="#FFFFFF"
+                strokeWidth={1.5}
+              />
+
+              {/* Floating Manual Inspection Chip */}
+              <g
+                transform={`translate(${Math.min(
+                  W - padR - 65,
+                  Math.max(padL + 65, xFor(activeInspectHour))
+                )}, ${Math.max(padT + 18, yFor(activeInspectVal) - 22)})`}
+              >
+                <rect
+                  x="-62"
+                  y="-14"
+                  width="124"
+                  height="24"
+                  rx="4"
+                  fill="#030712"
+                  stroke="#38BDF8"
+                  strokeWidth="1.4"
+                  filter="drop-shadow(0 3px 6px rgba(0,0,0,0.8))"
+                />
+                <text
+                  x="0"
+                  y="-1"
+                  textAnchor="middle"
+                  fill="#94A3B8"
+                  fontSize="8"
+                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
+                >
+                  MANUAL PROBE &bull; T+{Math.round(activeInspectHour)}h
+                </text>
+                <text
+                  x="0"
+                  y="8"
+                  textAnchor="middle"
+                  fill="#38BDF8"
+                  fontSize="9.5"
+                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
+                  fontWeight="bold"
+                >
+                  {activeInspectVal.toFixed(2)} &mu;A
+                </text>
+              </g>
+            </g>
+          )}
+
           {/* Spectrogram Energy Bars along bottom margin */}
           <g transform={`translate(${padL}, ${H - padB + 22})`}>
             {spectrumBars.map((bh, idx) => {
@@ -721,7 +816,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
         </svg>
       </div>
 
-      {/* Legend & Telemetry Readouts (Updating live in sync with sweep) */}
+      {/* Legend & Telemetry Readouts (Updating live in sync with sweep or manual inspection) */}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm font-mono text-slate-200 pt-2 border-t border-slate-800/80">
         <div className="flex items-center gap-4 flex-wrap">
           <span className="flex items-center gap-2">
@@ -743,13 +838,17 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5">
-            <span className="text-slate-400">Delta Drift:</span>
-            <b className={`font-bold tabular-nums ${isSimulating ? 'text-amber-300' : 'text-white'}`}>
+            <span className="text-slate-400">
+              {isInspecting ? `Inspecting T+${Math.round(activeInspectHour)}h:` : 'Delta Drift:'}
+            </span>
+            <b className={`font-bold tabular-nums ${isInspecting ? 'text-sky-300' : isSimulating ? 'text-amber-300' : 'text-white'}`}>
               {displayedDelta.toFixed(2)} &micro;A
             </b>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="text-slate-400">Lot Z-Score:</span>
+            <span className="text-slate-400">
+              {isInspecting ? 'Z-Score @ Probe:' : 'Lot Z-Score:'}
+            </span>
             <b
               className={`tabular-nums ${
                 displayedZ != null && Math.abs(displayedZ) >= 3
