@@ -794,7 +794,7 @@ export default function LotArchitectureView({
                   )}
 
                   {/* Oscilloscope Waveform */}
-                  <div className="flex-1 w-full min-h-[380px]">
+                  <div className="flex-1 w-full min-h-[280px]">
                     <ModuleAAnomalyGraph component={inspectedComponent} />
                   </div>
                 </div>

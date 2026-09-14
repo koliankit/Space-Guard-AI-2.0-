@@ -293,9 +293,9 @@ export default function MultiScreenWall({
       <div className="p-4 flex-1 flex flex-col gap-4">
         {/* ================= PRIMARY LAYOUT: TWO SECTORS (MODULE A & MODULE B WITH GRAPHS BELOW) ================= */}
         {consoleLayout === 'dual' && (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch flex-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch flex-1 w-full">
             {/* ================= SECTOR 1: MODULE A ================= */}
-            <div className="flex flex-col h-full flex-1">
+            <div className="flex flex-col h-full flex-1 min-w-0">
               <ModuleAAnomalyPanel
                 components={components}
                 selected={effectiveSelected}
@@ -305,7 +305,7 @@ export default function MultiScreenWall({
             </div>
 
             {/* ================= SECTOR 2: MODULE B ================= */}
-            <div className="flex flex-col h-full flex-1">
+            <div className="flex flex-col h-full flex-1 min-w-0">
               <ModuleBFutureDriftPanel
                 components={components}
                 selected={effectiveSelected}

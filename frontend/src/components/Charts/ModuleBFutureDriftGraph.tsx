@@ -29,7 +29,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 420 })
+  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 280 })
 
   const measuredPathRef = useRef<SVGPathElement>(null)
   const [measuredLen, setMeasuredLen] = useState<number>(600)
@@ -49,7 +49,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
       if (w > 0 && h > 0) {
         setChartDims({
           width: Math.round(w),
-          height: Math.round(Math.max(420, h)),
+          height: Math.round(Math.max(260, h)),
         })
       }
     }
@@ -64,7 +64,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         if (w > 0 && h > 0) {
           setChartDims({
             width: Math.round(w),
-            height: Math.round(Math.max(420, h)),
+            height: Math.round(Math.max(260, h)),
           })
         }
       }
@@ -79,7 +79,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   }, [isExpanded])
 
   const W = Math.max(500, chartDims.width)
-  const H = Math.max(420, chartDims.height)
+  const H = Math.max(260, chartDims.height)
   const padL = 50
   const padR = 24
   const padT = 24
@@ -461,8 +461,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         ref={containerRef}
         className={`relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden w-full flex-1 transition-all duration-300 ${
           isExpanded
-            ? 'min-h-[640px] md:min-h-[740px] lg:min-h-[820px]'
-            : 'min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[600px]'
+            ? 'min-h-[540px] md:min-h-[640px] lg:min-h-[720px]'
+            : 'min-h-[260px] md:min-h-[280px] h-[270px] md:h-[290px]'
         }`}
       >
         <svg

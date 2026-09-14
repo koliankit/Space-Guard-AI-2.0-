@@ -13,7 +13,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 920, height: 460 })
+  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 920, height: 320 })
 
   const pathRef = useRef<SVGPathElement>(null)
   const [pathLength, setPathLength] = useState<number>(850)
@@ -32,7 +32,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
       if (w > 0 && h > 0) {
         setChartDims({
           width: Math.round(w),
-          height: Math.round(Math.max(440, h)),
+          height: Math.round(Math.max(300, h)),
         })
       }
     }
@@ -47,7 +47,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
         if (w > 0 && h > 0) {
           setChartDims({
             width: Math.round(w),
-            height: Math.round(Math.max(440, h)),
+            height: Math.round(Math.max(300, h)),
           })
         }
       }
@@ -62,7 +62,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   }, [isExpanded])
 
   const W = Math.max(500, chartDims.width)
-  const H = Math.max(440, chartDims.height)
+  const H = Math.max(300, chartDims.height)
   const padL = 60
   const padR = 36
   const padT = 28
@@ -439,8 +439,8 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
         ref={containerRef}
         className={`relative rounded-xl overflow-hidden border border-slate-800 bg-[#040812] w-full transition-all duration-300 ${
           isExpanded
-            ? 'min-h-[620px] md:min-h-[700px] lg:min-h-[760px]'
-            : 'min-h-[440px] md:min-h-[480px] lg:min-h-[520px]'
+            ? 'min-h-[540px] md:min-h-[640px] lg:min-h-[720px]'
+            : 'min-h-[300px] md:min-h-[340px]'
         }`}
       >
         <svg

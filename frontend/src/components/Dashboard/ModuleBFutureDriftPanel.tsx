@@ -237,7 +237,7 @@ export default function ModuleBFutureDriftPanel({
         )}
 
         {/* Module B Dedicated Graph: Future Drift Forecaster */}
-        <div className="mt-1 flex-1 flex flex-col min-h-[480px] w-full">
+        <div className="mt-1 flex flex-col min-h-[270px] md:min-h-[290px] w-full">
           <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>
