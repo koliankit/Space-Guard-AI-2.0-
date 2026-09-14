@@ -203,6 +203,20 @@ export default function ISROOnboardingFlow({
           </div>
 
           <div className="flex items-center gap-3 text-xs font-mono">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!batchId) {
+                  await onLoadOfficialBatch(activeMissionId)
+                }
+                onCompleteToDashboard()
+              }}
+              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/25 to-sky-500/25 text-amber-300 hover:text-white border border-amber-500/50 hover:border-amber-400 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title="Launch Mission Control Dashboard Directly"
+            >
+              <span>🚀</span>
+              <span>LAUNCH DASHBOARD</span>
+            </button>
             <div className="bg-[#0c162b] border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-slate-300">SYSTEM OPERATIONAL</span>

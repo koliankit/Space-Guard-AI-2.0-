@@ -178,20 +178,6 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     [v0, v24, v96, v168, slope]
   )
 
-  // Measure ground measured path length whenever path geometry updates
-  useEffect(() => {
-    if (measuredPathRef.current) {
-      try {
-        const len = measuredPathRef.current.getTotalLength()
-        if (len > 0 && Math.abs(len - measuredLen) > 1) {
-          setMeasuredLen(len)
-        }
-      } catch {
-        // ignore
-      }
-    }
-  }, [measuredPathD, W, H, measuredLen])
-
   // Uncertainty cone variance (+/- 1.5 sigma drift model)
   const lotStd = component?.lot_std || 1.8
   const coneSpread = Math.max(2.5, lotStd * 1.6)
@@ -243,6 +229,20 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         .join(' '),
     [measuredPoints, toX, toY]
   )
+
+  // Measure ground measured path length whenever path geometry updates
+  useEffect(() => {
+    if (measuredPathRef.current) {
+      try {
+        const len = measuredPathRef.current.getTotalLength()
+        if (len > 0 && Math.abs(len - measuredLen) > 1) {
+          setMeasuredLen(len)
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }, [measuredPathD, W, H, measuredLen])
 
   // Simulation Phase Calculations
   // Phase 1 (0 -> 0.45): Ground Burn-in sweep (0h -> 168h)
@@ -641,7 +641,9 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               strokeDasharray="2 3"
               opacity={Math.min(0.6, (p1 - 0.14) * 2)}
             />
-                  {/* Measured Past Telemetry Line (0h -> 168h, drawn live via strokeDashoffset) */}
+          )}
+
+          {/* Measured Past Telemetry Line (0h -> 168h, drawn live via strokeDashoffset) */}
           <path
             ref={measuredPathRef}
             d={measuredPathD}

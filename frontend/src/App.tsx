@@ -31,7 +31,7 @@ import * as api from './api'
 import type { ComponentOut, MissionStatus, UploadResult } from './types'
 
 export default function App() {
-  const [operationalPhase, setOperationalPhase] = useState<'onboarding' | 'dashboard'>('onboarding')
+  const [operationalPhase, setOperationalPhase] = useState<'onboarding' | 'dashboard'>('dashboard')
   const [activeTab, setActiveTab] = useState<DashboardTab>('wall')
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
@@ -93,6 +93,7 @@ export default function App() {
       const list = await api.listComponents(result.batch_id, { limit: 1000 })
       if (list?.components?.length) {
         setAllComponents(list.components)
+        setSelected((prev) => prev || list.components[0])
       }
     } catch {
       // fallback
@@ -186,6 +187,11 @@ export default function App() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // Initial mount: load flight batch so Mission Control Dashboard is pre-populated
+  useEffect(() => {
+    handleDemo('GAGANYAAN', false)
   }, [])
 
   async function runScreening(idOverride?: number) {
