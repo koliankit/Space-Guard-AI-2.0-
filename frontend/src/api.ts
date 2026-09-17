@@ -69,6 +69,14 @@ export async function createDemoBatch(missionId?: string): Promise<UploadResult>
   return offlineISRO.initDemo(missionId)
 }
 
+export function getRawParts() {
+  return offlineISRO.getRawParts()
+}
+
+export function getDataValidationAudit() {
+  return offlineISRO.getDataValidationAudit()
+}
+
 export function getActiveMission() {
   return offlineISRO.getActiveMission()
 }

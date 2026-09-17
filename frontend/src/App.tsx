@@ -31,7 +31,7 @@ import * as api from './api'
 import type { ComponentOut, MissionStatus, UploadResult } from './types'
 
 export default function App() {
-  const [operationalPhase, setOperationalPhase] = useState<'onboarding' | 'dashboard'>('dashboard')
+  const [operationalPhase, setOperationalPhase] = useState<'onboarding' | 'dashboard'>('onboarding')
   const [activeTab, setActiveTab] = useState<DashboardTab>('wall')
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
@@ -360,6 +360,7 @@ export default function App() {
         onOpenIngestModal={() => setIngestModalOpen(true)}
         activeMissionName={activeMission.name}
         onResetWorkflow={resetWorkflow}
+        onOpenOnboarding={() => setOperationalPhase('onboarding')}
       />
       <UploadBar
         metaText={dataMetaText}

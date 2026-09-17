@@ -13,6 +13,7 @@ interface HeaderProps {
   onOpenIngestModal?: () => void
   activeMissionName?: string
   onResetWorkflow?: () => void
+  onOpenOnboarding?: () => void
 }
 
 export default function Header({
@@ -25,6 +26,7 @@ export default function Header({
   onOpenIngestModal,
   activeMissionName = 'Gaganyaan H1 Crew Module',
   onResetWorkflow,
+  onOpenOnboarding,
 }: HeaderProps) {
   const [istTime, setIstTime] = useState('')
   const [utcTime, setUtcTime] = useState('')
@@ -184,6 +186,21 @@ export default function Header({
               title="View Official ISRO Briefing Deck (Press 'P')"
             >
               <span className="text-sm">📑</span> ISRO Briefing
+            </button>
+          )}
+
+          {onOpenOnboarding && (
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playClick()
+                onOpenOnboarding()
+              }}
+              className="text-xs font-mono font-bold px-3 py-2 rounded-xl border border-slate-700 bg-slate-800/90 text-slate-200 hover:border-slate-500 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              title="Return to 3-Stage Intake & Clearance Gateway (Upload CSV / AI Screening)"
+            >
+              <span>🛰️</span>
+              <span className="hidden sm:inline">PRE-FLIGHT GATE</span>
             </button>
           )}
 

@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import type { ComponentOut, MissionStatus, UploadResult } from '../../types'
-import { downloadSampleCSV } from '../../offlineEngine'
+import { downloadSampleCSV, ISRO_MISSIONS, type RawPart } from '../../offlineEngine'
 import { sounds } from '../../utils/soundEffects'
 import * as api from '../../api'
 
@@ -24,15 +24,15 @@ export type OnboardingStep = 'csv_upload' | 'ai_screening' | 'final_screening'
 const SCREENING_STAGES = [
   {
     title: 'DATA STREAM INGESTION & FORMAT VALIDATION',
-    detail: 'Acquiring 0h, 24h, 96h, 168h high-precision silicon telemetry & MIL-STD-883 standards',
+    detail: 'Acquiring 0h, 24h, 96h, 168h silicon burn-in telemetry per MIL-STD-883 standards',
   },
   {
     title: 'OUTLIER & MISSING VALUE PREPROCESSING',
-    detail: 'Filtering sensor noise & performing robust variance imputation across all qualification lots',
+    detail: 'Imputing missing timepoints and regularizing sensor noise across qualification lots',
   },
   {
     title: 'POLYNOMIAL DRIFT & ARRHENIUS DEGRADATION EXTRACTION',
-    detail: 'Fitting Arrhenius thermal acceleration models & parametric curvature rates',
+    detail: 'Fitting Arrhenius thermal acceleration models and parametric curvature rates',
   },
   {
     title: 'LOT-RELATIVE MEDIAN & MAD STATISTICAL ANALYSIS',
@@ -52,11 +52,11 @@ const SCREENING_STAGES = [
   },
   {
     title: '3D SPACECRAFT HARDWARE LOCALIZATION',
-    detail: 'Mapping identified silicon components to satellite equipment bays and 3D coordinates',
+    detail: 'Mapping identified silicon components to satellite equipment bays and coordinates',
   },
   {
     title: 'DYNAMIC SCREENING VERDICT (SAFE / MONITOR / REJECT)',
-    detail: 'Finalizing MIL-STD-883 qualification gates & quarantine directives',
+    detail: 'Finalizing MIL-STD-883 qualification gates and quarantine directives',
   },
 ]
 
@@ -78,51 +78,120 @@ export default function ISROOnboardingFlow({
   const [dragActive, setDragActive] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // AI Screening animation state in Window 2
+  // AI Screening state in Window 2
   const [screeningActive, setScreeningActive] = useState(false)
   const [screeningStageIdx, setScreeningStageIdx] = useState(0)
   const [screeningDone, setScreeningDone] = useState(false)
   const [screeningLogs, setScreeningLogs] = useState<string[]>([])
 
-  // Final screening authorization command in Window 3
+  // Final screening authorization in Window 3
   const [commandAuthorized, setCommandAuthorized] = useState(false)
 
-  // Automatically advance to Window 2 when upload completes
-  useEffect(() => {
-    if (batchId && uploadMeta && currentStep === 'csv_upload') {
-      setCurrentStep('ai_screening')
+  // Basic Readings Table pagination/view state
+  const [tablePage, setTablePage] = useState(0)
+  const ROWS_PER_PAGE = 10
+
+  // Acquire raw parts or fallback to allComponents
+  const rawParts: RawPart[] = useMemo(() => {
+    const raw = api.getRawParts()
+    if (raw && raw.length > 0) return raw
+    if (allComponents && allComponents.length > 0) {
+      return allComponents.map((c) => ({
+        component_id: c.component_id,
+        lot_id: c.lot_id,
+        subsystem: c.subsystem,
+        v0: c.v0,
+        v24: c.v24,
+        v96: c.v96,
+        v168: c.v168,
+        limit_ua: c.limit_ua,
+        ground_truth: c.ground_truth ?? null,
+      }))
     }
-  }, [batchId, uploadMeta, currentStep])
+    return []
+  }, [allComponents, batchId, uploadMeta])
+
+  // Data Validation Audit metrics
+  const validationAudit = useMemo(() => {
+    return api.getDataValidationAudit()
+  }, [rawParts, batchId, uploadMeta])
+
+  // Summary statistics for Basic Readings
+  const telemetrySummary = useMemo(() => {
+    if (rawParts.length === 0) {
+      return {
+        count: 0,
+        lotsCount: 0,
+        avg0h: 0,
+        avg24h: 0,
+        avg96h: 0,
+        avg168h: 0,
+        maxDrift: 0,
+        limit: 50,
+      }
+    }
+    const count = rawParts.length
+    const lots = new Set(rawParts.map((p) => p.lot_id)).size
+    const avg0h = rawParts.reduce((a, b) => a + b.v0, 0) / count
+    const avg24h = rawParts.reduce((a, b) => a + b.v24, 0) / count
+    const v96s = rawParts.map((p) => (p.v96 != null ? p.v96 : p.v24 + 0.5 * (p.v168 - p.v24)))
+    const avg96h = v96s.reduce((a, b) => a + b, 0) / count
+    const avg168h = rawParts.reduce((a, b) => a + b.v168, 0) / count
+    const maxDrift = Math.max(...rawParts.map((p) => Math.abs(p.v168 - p.v0)))
+    const limit = rawParts[0]?.limit_ua || 50
+
+    return {
+      count,
+      lotsCount: lots,
+      avg0h: Number(avg0h.toFixed(2)),
+      avg24h: Number(avg24h.toFixed(2)),
+      avg96h: Number(avg96h.toFixed(2)),
+      avg168h: Number(avg168h.toFixed(2)),
+      maxDrift: Number(maxDrift.toFixed(2)),
+      limit,
+    }
+  }, [rawParts])
+
+  // Set screeningDone if mission status already exists
+  useEffect(() => {
+    if (mission && (mission.safe > 0 || mission.monitor > 0 || mission.reject > 0)) {
+      setScreeningDone(true)
+    }
+  }, [mission])
 
   async function handleFileInput(file: File) {
     setUploadError(null)
     setUploading(true)
+    setUploadedFileName(file.name)
     try {
       sounds.playClick()
       await onFileUploaded(file)
       sounds.playSuccess()
-      setCurrentStep('ai_screening')
+      // Keep on Step 1 so the operator can inspect the Basic Readings in clean format!
     } catch (err: any) {
       sounds.playAlert()
-      setUploadError(err?.message || 'Failed to parse CSV file. Please verify format.')
+      setUploadError(err?.message || 'Failed to parse CSV file. Please verify schema.')
     } finally {
       setUploading(false)
     }
   }
 
-  async function handleLoadOfficialDemo() {
+  async function handleLoadOfficialDemo(mId: string) {
     setUploadError(null)
     setUploading(true)
+    setUploadedFileName(`isro_${mId.toLowerCase()}_official_flight_batch.csv`)
     try {
       sounds.playClick()
-      await onLoadOfficialBatch(activeMissionId)
+      onSelectMission(mId)
+      await onLoadOfficialBatch(mId)
       sounds.playSuccess()
-      setCurrentStep('ai_screening')
+      // Stays on Step 1 so user can review the basic readings
     } catch (err: any) {
       sounds.playAlert()
-      setUploadError(err?.message || 'Failed to load official batch.')
+      setUploadError(err?.message || 'Failed to load official flight batch.')
     } finally {
       setUploading(false)
     }
@@ -132,10 +201,10 @@ export default function ISROOnboardingFlow({
     setScreeningActive(true)
     setScreeningStageIdx(0)
     setScreeningDone(false)
-    setScreeningLogs(['[SYSTEM] Initializing SpaceGuard AI screening engine &bull; MIL-STD-883 Method 1005'])
+    setScreeningLogs(['[SYSTEM] Initializing SpaceGuard AI screening engine - MIL-STD-883 Method 1005'])
     sounds.playPing()
 
-    const stepDuration = 350
+    const stepDuration = 320
     let step = 0
     const interval = setInterval(() => {
       step += 1
@@ -147,7 +216,6 @@ export default function ISROOnboardingFlow({
         ])
       } else {
         clearInterval(interval)
-        // Execute real scoring
         onRunScreening().then(() => {
           setScreeningDone(true)
           setScreeningActive(false)
@@ -161,245 +229,304 @@ export default function ISROOnboardingFlow({
     }, stepDuration)
   }
 
-  function handleFinalScreeningLaunch() {
+  function handleFinalLaunch() {
     sounds.playSuccess()
     setCommandAuthorized(true)
     setTimeout(() => {
       onCompleteToDashboard()
-    }, 600)
+    }, 450)
   }
 
   const worstPart = flaggedList.find((c) => c.status === 'reject') || flaggedList[0] || allComponents[0] || null
+  const paginatedParts = rawParts.slice(tablePage * ROWS_PER_PAGE, (tablePage + 1) * ROWS_PER_PAGE)
+  const totalPages = Math.ceil(rawParts.length / ROWS_PER_PAGE) || 1
 
   return (
-    <div className="min-h-screen bg-[#050A14] text-slate-100 flex flex-col items-center justify-start p-4 md:p-8 font-sans select-none relative overflow-hidden">
-      {/* Dynamic Aerospace Background Elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#0e2246_0%,#050a14_70%)] pointer-events-none" />
-      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
-
-      {/* Top ISRO Banner & Step Indicator */}
-      <div className="w-full max-w-5xl z-10 flex flex-col gap-6 mb-6">
-        {/* National Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+    <div className="min-h-screen bg-[#070D18] text-slate-100 flex flex-col items-center justify-start p-4 md:p-6 font-sans select-none relative">
+      {/* Top ISRO Banner & 3-Step Clearance Gate */}
+      <div className="w-full max-w-6xl flex flex-col gap-4 mb-5">
+        {/* Aerospace Mission Header - Clean & Professional without flashy lighting */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-500 to-sky-400 p-0.5 shadow-lg shadow-amber-500/10 flex items-center justify-center">
-              <div className="w-full h-full bg-[#081020] rounded-[10px] flex items-center justify-center">
-                <span className="text-xl">🛰️</span>
-              </div>
+            <div className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center font-bold text-amber-400 font-mono text-sm">
+              ISRO
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg md:text-xl font-display font-black tracking-wider text-white uppercase">
-                  ISRO SPACEGUARD AI
+                <h1 className="text-lg md:text-xl font-mono font-bold tracking-wider text-white uppercase">
+                  SPACEGUARD AI
                 </h1>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40">
-                  REAL-TIME MISSION GATEWAY
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                  MISSION ONBOARDING GATEWAY
                 </span>
               </div>
               <p className="text-xs font-mono text-slate-400">
-                SDSC SHAR / ISTRAC &bull; MIL-STD-883 METHOD 1005 SILICON RELIABILITY PIPELINE
+                SDSC SHAR / ISTRAC &bull; MIL-STD-883 METHOD 1005 CLASS S SCREENING PIPELINE
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono">
-            <button
-              type="button"
-              onClick={async () => {
-                if (!batchId) {
-                  await onLoadOfficialBatch(activeMissionId)
-                }
-                onCompleteToDashboard()
-              }}
-              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/25 to-sky-500/25 text-amber-300 hover:text-white border border-amber-500/50 hover:border-amber-400 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
-              title="Launch Mission Control Dashboard Directly"
-            >
-              <span>🚀</span>
-              <span>LAUNCH DASHBOARD</span>
-            </button>
-            <div className="bg-[#0c162b] border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="flex items-center gap-2.5 text-xs font-mono">
+            <div className="bg-[#0B1220] border border-slate-800 px-3 py-1.5 rounded-md flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span className="text-slate-300">SYSTEM OPERATIONAL</span>
             </div>
-            <div className="bg-[#0c162b] border border-slate-800 px-3 py-1.5 rounded-lg text-slate-400">
+            <div className="bg-[#0B1220] border border-slate-800 px-3 py-1.5 rounded-md text-slate-300">
               MISSION: <span className="text-white font-bold">{activeMissionName}</span>
             </div>
           </div>
         </div>
 
-        {/* 3-Window Sequential Clearance Gate Indicator */}
+        {/* 3-Section Sequential Gateway Navigation matching User Diagram */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {/* Gate 1 */}
-          <div
-            className={`p-3.5 rounded-xl border transition-all flex items-center gap-3 ${
+          {/* Section 1: Dashboard 1 - Upload CSV */}
+          <button
+            type="button"
+            onClick={() => setCurrentStep('csv_upload')}
+            className={`p-3 rounded-lg border text-left transition-colors cursor-pointer ${
               currentStep === 'csv_upload'
-                ? 'bg-blue-600/20 border-blue-500/70 shadow-lg shadow-blue-500/10'
-                : uploadMeta
-                ? 'bg-emerald-950/30 border-emerald-500/50'
-                : 'bg-[#0a1222] border-slate-800 opacity-60'
+                ? 'bg-slate-800/90 border-slate-600 text-white'
+                : uploadMeta || rawParts.length > 0
+                ? 'bg-[#0B1220] border-slate-800 hover:border-slate-700 text-slate-300'
+                : 'bg-[#0B1220] border-slate-800 opacity-60 text-slate-400'
             }`}
           >
-            <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-sm ${
-                uploadMeta
-                  ? 'bg-emerald-500 text-slate-950'
-                  : currentStep === 'csv_upload'
-                  ? 'bg-blue-500 text-white animate-pulse'
-                  : 'bg-slate-800 text-slate-400'
-              }`}
-            >
-              {uploadMeta ? '✓' : '1'}
-            </div>
-            <div className="min-w-0">
-              <div className="text-xs uppercase font-bold tracking-wider text-slate-300">
-                WINDOW 1 &bull; INTAKE
+            <div className="flex items-center gap-2.5">
+              <span
+                className={`w-6 h-6 rounded flex items-center justify-center font-mono font-bold text-xs ${
+                  uploadMeta || rawParts.length > 0
+                    ? 'bg-emerald-700 text-white'
+                    : currentStep === 'csv_upload'
+                    ? 'bg-slate-200 text-slate-900'
+                    : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                {uploadMeta || rawParts.length > 0 ? '✓' : '1'}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">
+                  DASHBOARD 1 &bull; INTAKE
+                </div>
+                <div className="text-sm font-semibold truncate text-white">
+                  Upload CSV &amp; Basic Readings
+                </div>
               </div>
-              <div className="text-sm font-semibold text-white truncate">
-                Flight Telemetry CSV
-              </div>
             </div>
-          </div>
+          </button>
 
-          {/* Gate 2 */}
-          <div
-            className={`p-3.5 rounded-xl border transition-all flex items-center gap-3 ${
+          {/* Section 2: <2> Execute AI Screening & Data Validation */}
+          <button
+            type="button"
+            onClick={() => {
+              if (rawParts.length > 0 || uploadMeta) setCurrentStep('ai_screening')
+            }}
+            disabled={rawParts.length === 0 && !uploadMeta}
+            className={`p-3 rounded-lg border text-left transition-colors ${
               currentStep === 'ai_screening'
-                ? 'bg-blue-600/20 border-blue-500/70 shadow-lg shadow-blue-500/10'
+                ? 'bg-slate-800/90 border-slate-600 text-white cursor-pointer'
                 : screeningDone || mission
-                ? 'bg-emerald-950/30 border-emerald-500/50'
-                : 'bg-[#0a1222] border-slate-800 opacity-60'
+                ? 'bg-[#0B1220] border-slate-800 hover:border-slate-700 text-slate-300 cursor-pointer'
+                : rawParts.length > 0
+                ? 'bg-[#0B1220] border-slate-800 hover:border-slate-700 text-slate-400 cursor-pointer'
+                : 'bg-[#0B1220] border-slate-800 opacity-50 text-slate-500 cursor-not-allowed'
             }`}
           >
-            <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-sm ${
-                screeningDone || mission
-                  ? 'bg-emerald-500 text-slate-950'
-                  : currentStep === 'ai_screening'
-                  ? 'bg-blue-500 text-white animate-pulse'
-                  : 'bg-slate-800 text-slate-400'
-              }`}
-            >
-              {screeningDone || mission ? '✓' : '2'}
-            </div>
-            <div className="min-w-0">
-              <div className="text-xs uppercase font-bold tracking-wider text-slate-300">
-                WINDOW 2 &bull; AI PIPELINE
+            <div className="flex items-center gap-2.5">
+              <span
+                className={`w-6 h-6 rounded flex items-center justify-center font-mono font-bold text-xs ${
+                  screeningDone || mission
+                    ? 'bg-emerald-700 text-white'
+                    : currentStep === 'ai_screening'
+                    ? 'bg-slate-200 text-slate-900'
+                    : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                {screeningDone || mission ? '✓' : '2'}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">
+                  &lang;2&rang; &bull; VALIDATION &amp; AI
+                </div>
+                <div className="text-sm font-semibold truncate text-white">
+                  Execute AI Screening
+                </div>
               </div>
-              <div className="text-sm font-semibold text-white truncate">
-                Execute AI Screening
-              </div>
             </div>
-          </div>
+          </button>
 
-          {/* Gate 3 */}
-          <div
-            className={`p-3.5 rounded-xl border transition-all flex items-center gap-3 ${
+          {/* Section 3: <3> Launch Final Mission */}
+          <button
+            type="button"
+            onClick={() => {
+              if (screeningDone || mission) setCurrentStep('final_screening')
+            }}
+            disabled={!screeningDone && !mission}
+            className={`p-3 rounded-lg border text-left transition-colors ${
               currentStep === 'final_screening'
-                ? 'bg-amber-600/20 border-amber-500/70 shadow-lg shadow-amber-500/10'
-                : 'bg-[#0a1222] border-slate-800 opacity-60'
+                ? 'bg-slate-800/90 border-slate-600 text-white cursor-pointer'
+                : screeningDone || mission
+                ? 'bg-[#0B1220] border-slate-800 hover:border-slate-700 text-slate-300 cursor-pointer'
+                : 'bg-[#0B1220] border-slate-800 opacity-50 text-slate-500 cursor-not-allowed'
             }`}
           >
-            <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-sm ${
-                currentStep === 'final_screening'
-                  ? 'bg-amber-500 text-slate-950 animate-pulse'
-                  : 'bg-slate-800 text-slate-400'
-              }`}
-            >
-              3
-            </div>
-            <div className="min-w-0">
-              <div className="text-xs uppercase font-bold tracking-wider text-slate-300">
-                WINDOW 3 &bull; CLEARANCE
+            <div className="flex items-center gap-2.5">
+              <span
+                className={`w-6 h-6 rounded flex items-center justify-center font-mono font-bold text-xs ${
+                  currentStep === 'final_screening'
+                    ? 'bg-amber-500 text-slate-950 font-black'
+                    : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                3
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">
+                  &lang;3&rang; &bull; FINAL EXECUTION
+                </div>
+                <div className="text-sm font-semibold truncate text-white">
+                  Launch Final Mission
+                </div>
               </div>
-              <div className="text-sm font-semibold text-white truncate">
-                Run Final Screening
-              </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* WINDOW 1: CSV TELEMETRY INTAKE */}
+      {/* WINDOW 1: DASHBOARD 1 - UPLOAD CSV & BASIC READINGS (CLEAN FORMAT)        */}
       {/* ========================================================================= */}
       {currentStep === 'csv_upload' && (
-        <div className="w-full max-w-4xl z-10 bg-[#091122] border border-slate-800/90 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col gap-6 animate-fadeIn">
-          <div className="border-b border-slate-800 pb-4">
-            <span className="px-2.5 py-1 rounded bg-blue-500/15 text-blue-400 text-xs font-mono font-bold tracking-widest uppercase border border-blue-500/30">
-              WINDOW 1 &bull; TELEMETRY INGESTION GATEWAY
-            </span>
-            <h2 className="text-2xl font-display font-bold text-white mt-2">
-              Ingest Flight Qualification Telemetry
-            </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Before AI screening commences, the system starts completely empty. Please upload an official ISRO space-grade microelectronics burn-in CSV file.
-            </p>
-          </div>
-
-          {/* Empty Status Indicator */}
-          <div className="bg-[#060D1A] border border-dashed border-slate-700/80 rounded-xl p-4 flex items-center justify-between text-xs font-mono text-slate-300">
-            <div className="flex items-center gap-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
-              <span>SYSTEM STATUS: <b className="text-amber-400">EMPTY / AWAITING CSV TELEMETRY INGESTION</b></span>
+        <div className="w-full max-w-6xl bg-[#0A101D] border border-slate-800 rounded-xl p-5 md:p-7 flex flex-col gap-6">
+          {/* Header */}
+          <div className="border-b border-slate-800/90 pb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+                DASHBOARD 1 &bull; TELEMETRY INTAKE &amp; BASIC READINGS
+              </span>
+              <h2 className="text-xl md:text-2xl font-mono font-bold text-white mt-1">
+                Upload Flight Telemetry CSV
+              </h2>
+              <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+                Clean, high-precision ingestion for ISRO space-grade microelectronics burn-in telemetry.
+                Inspect the basic readings table before proceeding to AI screening and data validation.
+              </p>
             </div>
-            <span className="text-slate-500">ZERO DATA RESIDUALS</span>
-          </div>
 
-          {/* Interactive Drag & Drop Box */}
-          <div
-            className={`border-2 border-dashed rounded-2xl p-8 md:p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
-              dragActive
-                ? 'border-blue-400 bg-blue-500/10 shadow-xl shadow-blue-500/20 ring-4 ring-blue-500/20'
-                : 'border-slate-700 hover:border-blue-500/60 bg-[#070E1E] hover:bg-[#0A142A]'
-            }`}
-            onDragOver={(e) => {
-              e.preventDefault()
-              setDragActive(true)
-            }}
-            onDragLeave={() => setDragActive(false)}
-            onDrop={(e) => {
-              e.preventDefault()
-              setDragActive(false)
-              if (e.dataTransfer.files?.[0]) {
-                handleFileInput(e.dataTransfer.files[0])
-              }
-            }}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className="w-16 h-16 rounded-2xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-3xl mb-4 text-blue-400 shadow-md">
-              📥
-            </div>
-            <div className="text-lg font-display font-bold text-white">
-              Drop Flight CSV File Here or <span className="text-blue-400 underline decoration-blue-400/50">Browse Computer</span>
-            </div>
-            <p className="text-xs text-slate-400 mt-1 max-w-md">
-              Supports standard comma-separated (.csv) and tab-delimited (.tsv) telemetry files per MIL-STD-883 HTOL Method 1005.
-            </p>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,.tsv,.txt"
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleFileInput(e.target.files[0])
-                }
-              }}
-            />
-
-            {uploading && (
-              <div className="mt-4 flex items-center gap-2 text-xs font-mono text-blue-400 bg-blue-500/15 px-3 py-1.5 rounded-lg border border-blue-500/30">
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
-                Parsing and validating telemetry headers...
-              </div>
+            {rawParts.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.playClick()
+                  setCurrentStep('ai_screening')
+                }}
+                className="px-4 py-2.5 rounded-lg bg-slate-200 hover:bg-white text-slate-900 font-mono font-bold text-xs md:text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+              >
+                <span>Proceed to Step 2: Execute AI Screening</span>
+                <span>&rarr;</span>
+              </button>
             )}
           </div>
 
+          {/* Upload Area & Sample Selectors */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* Drag & Drop Box (Clean, without lighting effects) */}
+            <div
+              className={`lg:col-span-2 border border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
+                dragActive
+                  ? 'border-slate-400 bg-slate-800/40'
+                  : 'border-slate-700 hover:border-slate-500 bg-[#080E1B]'
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault()
+                setDragActive(true)
+              }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={(e) => {
+                e.preventDefault()
+                setDragActive(false)
+                if (e.dataTransfer.files?.[0]) {
+                  handleFileInput(e.dataTransfer.files[0])
+                }
+              }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <div className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xl mb-3 text-slate-300">
+                📄
+              </div>
+              <div className="text-base font-mono font-bold text-white">
+                Drag &amp; Drop CSV File or <span className="text-slate-300 underline underline-offset-2">Browse Files</span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1">
+                Standard format: <code className="text-slate-300">component_id, lot_id, value_0h_ua, value_24h_ua, value_96h_ua, value_168h_ua, static_limit_ua, subsystem</code>
+              </p>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,.tsv,.txt"
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    handleFileInput(e.target.files[0])
+                  }
+                }}
+              />
+
+              {uploading && (
+                <div className="mt-3 text-xs font-mono text-slate-300 bg-slate-800 px-3 py-1.5 rounded border border-slate-700">
+                  Parsing and validating CSV schema...
+                </div>
+              )}
+
+              {uploadedFileName && !uploading && (
+                <div className="mt-3 text-xs font-mono text-emerald-400 bg-emerald-950/40 px-3 py-1.5 rounded border border-emerald-800/60">
+                  Active file: {uploadedFileName}
+                </div>
+              )}
+            </div>
+
+            {/* Template & Mission Preset Loaders */}
+            <div className="bg-[#080E1B] border border-slate-800 rounded-xl p-4 flex flex-col justify-between gap-3 font-mono text-xs">
+              <div>
+                <span className="text-slate-400 font-bold uppercase tracking-wide">
+                  Standard ISRO Telemetry Presets
+                </span>
+                <p className="text-slate-500 text-[11px] mt-1 font-sans">
+                  Quick-load official qualification flight batches or obtain the blank template.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                {ISRO_MISSIONS.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => handleLoadOfficialDemo(m.id)}
+                    className={`w-full text-left px-3 py-2 rounded-lg border transition-colors flex items-center justify-between text-xs ${
+                      activeMissionId === m.id
+                        ? 'bg-slate-800 border-slate-600 text-white font-bold'
+                        : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-800/50 hover:text-white'
+                    }`}
+                  >
+                    <span className="truncate">{m.name}</span>
+                    <span className="text-[10px] text-slate-400 shrink-0 ml-2">[{m.id}]</span>
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => downloadSampleCSV(activeMissionId)}
+                className="w-full text-center px-3 py-2 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 transition-colors cursor-pointer text-xs"
+              >
+                &darr; Download Official CSV Template
+              </button>
+            </div>
+          </div>
+
           {uploadError && (
-            <div className="p-3 bg-rose-500/15 border border-rose-500/40 rounded-xl text-rose-300 text-xs font-mono flex items-center justify-between">
-              <span>⚠️ {uploadError}</span>
+            <div className="p-3 bg-rose-950/40 border border-rose-800 rounded-lg text-rose-300 text-xs font-mono flex items-center justify-between">
+              <span>Error: {uploadError}</span>
               <button
                 type="button"
                 onClick={() => setUploadError(null)}
@@ -410,85 +537,209 @@ export default function ISROOnboardingFlow({
             </div>
           )}
 
-          {/* Expected CSV Columns Spec Sheet */}
-          <div className="bg-[#070E1C] border border-slate-800 rounded-xl p-4 flex flex-col gap-2.5">
-            <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-slate-300 font-bold uppercase tracking-wider">
-                Expected Telemetry Schema (MIL-STD-883):
-              </span>
-              <span className="text-slate-500">Auto-Detected Headers</span>
+          {/* ================================================================= */}
+          {/* BASIC READINGS IN CLEAN FORMAT (NO LIGHTING EFFECTS)              */}
+          {/* ================================================================= */}
+          <div className="bg-[#080E1B] border border-slate-800 rounded-xl p-4 md:p-5 flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
+                  Basic Telemetry Readings &amp; Pre-Screening Summary
+                </span>
+                <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                  Raw un-interpolated silicon leakage telemetry &bull; MIL-STD-883 HTOL 168h Matrix
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs font-mono">
+                <span className="px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                  RAW STATUS: {rawParts.length > 0 ? 'LOADED & UNVALIDATED' : 'AWAITING CSV'}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2 text-[11px] font-mono">
-              <span className="px-2.5 py-1 rounded bg-slate-800/90 text-blue-300 border border-slate-700">
-                component_id <b className="text-rose-400">*</b>
-              </span>
-              <span className="px-2.5 py-1 rounded bg-slate-800/90 text-blue-300 border border-slate-700">
-                lot_id <b className="text-rose-400">*</b>
-              </span>
-              <span className="px-2.5 py-1 rounded bg-slate-800/90 text-blue-300 border border-slate-700">
-                value_0h_ua <b className="text-rose-400">*</b>
-              </span>
-              <span className="px-2.5 py-1 rounded bg-slate-800/90 text-blue-300 border border-slate-700">
-                value_24h_ua <b className="text-rose-400">*</b>
-              </span>
-              <span className="px-2.5 py-1 rounded bg-slate-800/90 text-blue-300 border border-slate-700">
-                value_168h_ua <b className="text-rose-400">*</b>
-              </span>
-              <span className="px-2.5 py-1 rounded bg-slate-800/90 text-slate-300 border border-slate-700">
-                value_96h_ua
-              </span>
-              <span className="px-2.5 py-1 rounded bg-slate-800/90 text-slate-300 border border-slate-700">
-                subsystem (PWR, BAT, FC...)
-              </span>
-              <span className="px-2.5 py-1 rounded bg-slate-800/90 text-slate-300 border border-slate-700">
-                static_limit_ua
-              </span>
+
+            {/* Basic Readings Numerical Statistics Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 font-mono text-xs">
+              <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block uppercase">Components</span>
+                <span className="text-base font-bold text-white">{telemetrySummary.count}</span>
+              </div>
+              <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block uppercase">Lots</span>
+                <span className="text-base font-bold text-white">{telemetrySummary.lotsCount}</span>
+              </div>
+              <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block uppercase">Mean 0h (µA)</span>
+                <span className="text-base font-bold text-slate-300">{telemetrySummary.avg0h}</span>
+              </div>
+              <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block uppercase">Mean 24h (µA)</span>
+                <span className="text-base font-bold text-slate-300">{telemetrySummary.avg24h}</span>
+              </div>
+              <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block uppercase">Mean 96h (µA)</span>
+                <span className="text-base font-bold text-slate-300">{telemetrySummary.avg96h}</span>
+              </div>
+              <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block uppercase">Mean 168h (µA)</span>
+                <span className="text-base font-bold text-slate-300">{telemetrySummary.avg168h}</span>
+              </div>
+              <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
+                <span className="text-[10px] text-slate-500 block uppercase">Datasheet Limit</span>
+                <span className="text-base font-bold text-slate-300">{telemetrySummary.limit} µA</span>
+              </div>
             </div>
+
+            {/* Clean Telemetry Data Table */}
+            {rawParts.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                <div className="overflow-x-auto rounded-lg border border-slate-800">
+                  <table className="w-full text-left font-mono text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-900/90 text-slate-400 border-b border-slate-800">
+                        <th className="py-2.5 px-3 font-semibold uppercase">#</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase">Component ID</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase">Subsystem</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase">Lot ID</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase text-right">0h (µA)</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase text-right">24h (µA)</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase text-right">96h (µA)</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase text-right">168h (µA)</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase text-right">Limit (µA)</th>
+                        <th className="py-2.5 px-3 font-semibold uppercase text-right">Drift (168-0h)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 bg-[#070D18]">
+                      {paginatedParts.map((p, idx) => {
+                        const drift = p.v168 - p.v0
+                        const isOverLimit = p.v168 > p.limit_ua
+                        const isMissing96 = p.v96 == null
+
+                        return (
+                          <tr key={p.component_id} className="hover:bg-slate-900/40">
+                            <td className="py-2 px-3 text-slate-500">
+                              {tablePage * ROWS_PER_PAGE + idx + 1}
+                            </td>
+                            <td className="py-2 px-3 font-bold text-white">
+                              {p.component_id}
+                            </td>
+                            <td className="py-2 px-3 text-slate-300">
+                              <span className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px]">
+                                {p.subsystem}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3 text-slate-400">
+                              {p.lot_id}
+                            </td>
+                            <td className="py-2 px-3 text-right text-slate-300">
+                              {p.v0.toFixed(2)}
+                            </td>
+                            <td className="py-2 px-3 text-right text-slate-300">
+                              {p.v24.toFixed(2)}
+                            </td>
+                            <td className="py-2 px-3 text-right">
+                              {isMissing96 ? (
+                                <span className="text-amber-400/80 italic text-[11px]" title="Missing in raw CSV - will be imputed in Window 2">
+                                  -- (null)
+                                </span>
+                              ) : (
+                                <span className="text-slate-300">{p.v96?.toFixed(2)}</span>
+                              )}
+                            </td>
+                            <td className={`py-2 px-3 text-right font-bold ${isOverLimit ? 'text-rose-400' : 'text-slate-200'}`}>
+                              {p.v168.toFixed(2)}
+                            </td>
+                            <td className="py-2 px-3 text-right text-slate-400">
+                              {p.limit_ua.toFixed(1)}
+                            </td>
+                            <td className="py-2 px-3 text-right font-mono">
+                              <span className={drift > 5 ? 'text-amber-400' : 'text-slate-300'}>
+                                {drift >= 0 ? `+${drift.toFixed(2)}` : drift.toFixed(2)}
+                              </span>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Table Pagination Controls */}
+                <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-1">
+                  <span>
+                    Showing {tablePage * ROWS_PER_PAGE + 1} to{' '}
+                    {Math.min((tablePage + 1) * ROWS_PER_PAGE, rawParts.length)} of {rawParts.length} components
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTablePage((p) => Math.max(0, p - 1))}
+                      disabled={tablePage === 0}
+                      className="px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      &larr; Prev
+                    </button>
+                    <span>
+                      Page {tablePage + 1} of {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setTablePage((p) => Math.min(totalPages - 1, p + 1))}
+                      disabled={tablePage >= totalPages - 1}
+                      className="px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next &rarr;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-8 text-center text-xs font-mono text-slate-400 border border-dashed border-slate-800 rounded-lg">
+                No telemetry CSV loaded. Drag and drop a file or click one of the official flight batches above to populate basic readings.
+              </div>
+            )}
           </div>
 
-          {/* Operator Action Buttons: Download Template or Load Sample Flight Batch */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
-            <button
-              type="button"
-              onClick={() => {
-                sounds.playClick()
-                downloadSampleCSV(activeMissionId)
-              }}
-              className="text-xs font-mono font-semibold px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 hover:border-slate-500 text-slate-200 transition-all flex items-center gap-2 cursor-pointer shadow-sm"
-              title="Download official sample CSV template formatted for SpaceGuard AI"
-            >
-              <span>📄</span>
-              <span>Download Standard ISRO CSV Template</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleLoadOfficialDemo}
-              className="text-xs font-mono font-bold px-4 py-2.5 rounded-xl border border-amber-500/40 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-white transition-all flex items-center gap-2 cursor-pointer shadow-sm"
-              title="Load the verified Gaganyaan spaceflight qualification batch for quick testing"
-            >
-              <span>⚡</span>
-              <span>Load Official {activeMissionName} Batch ({activeMissionId})</span>
-            </button>
-          </div>
+          {/* Bottom Navigation */}
+          {rawParts.length > 0 && (
+            <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+              <span className="text-xs font-mono text-slate-400">
+                {rawParts.length} components ready for Section 2 (Data Validation &amp; AI Screening).
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.playClick()
+                  setCurrentStep('ai_screening')
+                }}
+                className="px-5 py-2.5 rounded-lg bg-slate-200 hover:bg-white text-slate-900 font-mono font-bold text-xs md:text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+              >
+                <span>Proceed to Step 2: Execute AI Screening &amp; Data Validation</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* WINDOW 2: EXECUTE AI SCREENING */}
+      {/* WINDOW 2: <2> EXECUTE AI SCREENING & DATA VALIDATION/CLEANING            */}
       {/* ========================================================================= */}
       {currentStep === 'ai_screening' && (
-        <div className="w-full max-w-4xl z-10 bg-[#091122] border border-slate-800/90 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col gap-6 animate-fadeIn">
-          <div className="border-b border-slate-800 pb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="w-full max-w-6xl bg-[#0A101D] border border-slate-800 rounded-xl p-5 md:p-7 flex flex-col gap-6">
+          {/* Header */}
+          <div className="border-b border-slate-800/90 pb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="px-2.5 py-1 rounded bg-blue-500/15 text-blue-400 text-xs font-mono font-bold tracking-widest uppercase border border-blue-500/30">
-                WINDOW 2 &bull; AI RELIABILITY & DEFECT SCREENING
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+                &lang;2&rang; &bull; DATA VALIDATION, AUTOMATED CLEANING &amp; AI SCREENING
               </span>
-              <h2 className="text-2xl font-display font-bold text-white mt-2">
-                Execute AI Screening Engine
+              <h2 className="text-xl md:text-2xl font-mono font-bold text-white mt-1">
+                Data Validation &amp; Execute AI Screening
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
-                Telemetry dataset verified. Execute the multi-stage machine learning inference engine to detect latent micro-defects and parametric drift.
+              <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+                The telemetry dataset is audited for data cleanliness. Our automated preprocessing cleans the
+                data, imputes missing intervals, and optimizes the dataset prior to running the AI screening models.
               </p>
             </div>
 
@@ -498,164 +749,240 @@ export default function ISROOnboardingFlow({
                 sounds.playClick()
                 setCurrentStep('csv_upload')
               }}
-              className="text-xs font-mono text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+              className="text-xs font-mono text-slate-400 hover:text-white px-3 py-1.5 rounded border border-slate-800 hover:border-slate-700 transition-colors"
             >
-              &larr; Re-upload CSV
+              &larr; Back to Step 1 (Upload CSV)
             </button>
           </div>
 
-          {/* Uploaded Dataset Summary Card */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#060D1A] border border-slate-800 rounded-xl p-4 font-mono text-xs">
-            <div className="flex flex-col gap-1">
-              <span className="text-slate-500 text-[10px] uppercase">BATCH IDENTIFIER</span>
-              <span className="text-base font-bold text-white">BATCH-#{uploadMeta?.batch_id ?? 1}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-slate-500 text-[10px] uppercase">PARSED COMPONENTS</span>
-              <span className="text-base font-bold text-emerald-400">{uploadMeta?.valid ?? allComponents.length} PARTS</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-slate-500 text-[10px] uppercase">QUALIFICATION LOTS</span>
-              <span className="text-base font-bold text-amber-400">{uploadMeta?.lots ?? 8} LOTS</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-slate-500 text-[10px] uppercase">AI INFERENCE STATUS</span>
-              <span className={`text-sm font-bold ${screeningDone ? 'text-emerald-400' : 'text-sky-400'}`}>
-                {screeningDone ? 'COMPLETED' : screeningActive ? 'RUNNING...' : 'AWAITING RUN'}
+          {/* SECTION A: DATA VALIDATION & AUTOMATED CLEANING REPORT */}
+          <div className="bg-[#080E1B] border border-slate-800 rounded-xl p-5 flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded bg-amber-400" />
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-white">
+                  Data Quality Audit &amp; Automated Cleaning Engine
+                </span>
+              </div>
+              <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-0.5 rounded">
+                STATUS: DATA CLEANED &amp; VALIDATED
               </span>
+            </div>
+
+            {/* Quality Comparison Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 font-mono text-xs">
+              <div className="p-3 bg-slate-900 border border-slate-800 rounded-lg">
+                <span className="text-[10px] text-slate-500 uppercase block">Raw Telemetry Quality</span>
+                <span className="text-lg font-bold text-amber-400">{validationAudit.rawQualityScore}%</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">Unvalidated / Noise Present</span>
+              </div>
+
+              <div className="p-3 bg-slate-900 border border-slate-800 rounded-lg">
+                <span className="text-[10px] text-slate-500 uppercase block">Cleaned Data Quality</span>
+                <span className="text-lg font-bold text-emerald-400">{validationAudit.cleanedQualityScore}%</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">MIL-STD-883 Compliant</span>
+              </div>
+
+              <div className="p-3 bg-slate-900 border border-slate-800 rounded-lg">
+                <span className="text-[10px] text-slate-500 uppercase block">Missing Values Imputed</span>
+                <span className="text-lg font-bold text-white">
+                  {validationAudit.missing96hCount > 0 ? `${validationAudit.missing96hCount} Points` : '0 (Nominal)'}
+                </span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">Lot-median interpolation</span>
+              </div>
+
+              <div className="p-3 bg-slate-900 border border-slate-800 rounded-lg">
+                <span className="text-[10px] text-slate-500 uppercase block">Qualified Batch Size</span>
+                <span className="text-lg font-bold text-white">{rawParts.length} Parts</span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">Across {telemetrySummary.lotsCount} lots</span>
+              </div>
+            </div>
+
+            {/* Detailed Cleaning & Process Improvement Actions */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-3.5 flex flex-col gap-2 font-mono text-xs">
+              <span className="text-slate-300 font-bold uppercase text-[11px]">
+                Automated Cleaning Operations Applied:
+              </span>
+              <div className="space-y-1.5 text-slate-400 text-[11px]">
+                {validationAudit.cleaningActions.map((action, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="text-emerald-400 shrink-0 font-bold">✓</span>
+                    <span>{action}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Primary Action Button: EXECUTE AI SCREENING */}
-          {!screeningActive && !screeningDone && (
-            <div className="flex flex-col items-center justify-center p-8 bg-[#070E1E] border border-blue-500/20 rounded-2xl gap-4">
-              <div className="w-14 h-14 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-2xl text-blue-400 animate-pulse">
-                ⚙️
-              </div>
-              <div className="text-center">
-                <h3 className="text-lg font-display font-bold text-white">
-                  Ready to Run Automated Screening
-                </h3>
-                <p className="text-xs text-slate-400 mt-1 max-w-md">
-                  Inference executes Arrhenius thermal modeling, Lot-Relative MAD, Isolation Forest, and Supervised XGBoost defect classifier across all components.
-                </p>
+          {/* SECTION B: EXECUTE AI SCREENING */}
+          <div className="bg-[#080E1B] border border-slate-800 rounded-xl p-5 flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded bg-slate-200" />
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-white">
+                  AI Reliability &amp; Defect Screening Engine
+                </span>
               </div>
 
-              <button
-                type="button"
-                onClick={handleStartAiScreening}
-                className="mt-2 text-sm md:text-base font-display font-bold px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-sky-500 to-blue-500 text-white shadow-xl shadow-blue-500/20 hover:from-blue-500 hover:to-sky-400 transition-all flex items-center gap-3 cursor-pointer border border-sky-400/40"
-              >
-                <span>▶</span>
-                <span>EXECUTE AI SCREENING ENGINE</span>
-              </button>
+              <span className="text-[11px] font-mono text-slate-300">
+                {screeningDone ? 'STATUS: INFERENCE COMPLETED' : screeningActive ? 'STATUS: RUNNING INFERENCE...' : 'STATUS: READY TO EXECUTE'}
+              </span>
             </div>
-          )}
 
-          {/* Live Progress Pipeline Execution */}
-          {(screeningActive || screeningDone) && (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-slate-400">
-                  PIPELINE PROGRESS: {Math.min(100, Math.round(((screeningStageIdx + 1) / SCREENING_STAGES.length) * 100))}%
-                </span>
-                <span className="text-sky-400 font-bold">
-                  {screeningDone ? 'INFERENCE COMPLETED' : 'ANALYZING SILICON TELEMETRY...'}
-                </span>
+            {/* Primary Action Button: EXECUTE AI SCREENING */}
+            {!screeningActive && !screeningDone && (
+              <div className="flex flex-col items-center justify-center p-6 md:p-8 bg-slate-900/40 border border-slate-800 rounded-xl gap-3 text-center">
+                <div className="text-base font-mono font-bold text-white">
+                  Data Cleaned &bull; Ready to Execute AI Screening
+                </div>
+                <p className="text-xs text-slate-400 max-w-lg">
+                  Executes Arrhenius thermal modeling, Lot-Relative MAD statistics, Multivariate Isolation Forest,
+                  and Supervised XGBoost defect classification across all {rawParts.length} silicon components.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={handleStartAiScreening}
+                  className="mt-2 px-6 py-3 rounded-lg bg-slate-200 hover:bg-white text-slate-900 font-mono font-bold text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+                >
+                  <span>▶</span>
+                  <span>EXECUTE AI SCREENING</span>
+                </button>
               </div>
+            )}
 
-              <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
-                <div
-                  className="bg-gradient-to-r from-blue-600 via-sky-400 to-emerald-400 h-full transition-all duration-300"
-                  style={{
-                    width: `${Math.min(100, Math.round(((screeningStageIdx + 1) / SCREENING_STAGES.length) * 100))}%`,
-                  }}
-                />
-              </div>
+            {/* Real-time Execution Stages */}
+            {(screeningActive || screeningDone) && (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-400">
+                    SCREENING PIPELINE: {Math.min(100, Math.round(((screeningStageIdx + 1) / SCREENING_STAGES.length) * 100))}%
+                  </span>
+                  <span className="text-slate-200 font-bold">
+                    {screeningDone ? 'INFERENCE COMPLETED' : 'CALIBRATING SILICON RISK MODELS...'}
+                  </span>
+                </div>
 
-              {/* Real-time Stages List */}
-              <div className="space-y-2 max-h-[260px] overflow-y-auto pr-1 font-mono text-xs">
-                {SCREENING_STAGES.map((stg, i) => {
-                  const isDone = i < screeningStageIdx || screeningDone
-                  const isCur = i === screeningStageIdx && !screeningDone
+                <div className="w-full bg-slate-900 rounded h-1.5 overflow-hidden border border-slate-800">
+                  <div
+                    className="bg-slate-200 h-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(100, Math.round(((screeningStageIdx + 1) / SCREENING_STAGES.length) * 100))}%`,
+                    }}
+                  />
+                </div>
 
-                  return (
-                    <div
-                      key={stg.title}
-                      className={`flex items-start gap-3 p-2.5 rounded-xl border transition-all ${
-                        isCur
-                          ? 'bg-blue-600/20 border-blue-500 text-white shadow-sm'
-                          : isDone
-                          ? 'bg-slate-900/60 border-slate-800/80 text-slate-300'
-                          : 'bg-transparent border-transparent opacity-30 text-slate-500'
-                      }`}
-                    >
-                      <span className="mt-0.5 shrink-0">
-                        {isDone ? '✓' : isCur ? '▶' : '○'}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold tracking-wide uppercase">{stg.title}</span>
-                          <span className="text-[10px] shrink-0 font-bold">
-                            {isDone ? 'DONE' : isCur ? 'PROCESSING...' : 'QUEUED'}
-                          </span>
+                {/* Stage checklist */}
+                <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1 font-mono text-xs">
+                  {SCREENING_STAGES.map((stg, i) => {
+                    const isDone = i < screeningStageIdx || screeningDone
+                    const isCur = i === screeningStageIdx && !screeningDone
+
+                    return (
+                      <div
+                        key={stg.title}
+                        className={`flex items-start gap-2.5 p-2 rounded border text-[11px] ${
+                          isCur
+                            ? 'bg-slate-800 border-slate-600 text-white'
+                            : isDone
+                            ? 'bg-slate-900/40 border-slate-800/80 text-slate-300'
+                            : 'bg-transparent border-transparent opacity-30 text-slate-500'
+                        }`}
+                      >
+                        <span className="mt-0.5 shrink-0 font-bold">
+                          {isDone ? '✓' : isCur ? '▶' : '○'}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold">{stg.title}</span>
+                            <span className="text-[10px]">{isDone ? 'DONE' : isCur ? 'PROCESSING...' : 'QUEUED'}</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 font-sans">{stg.detail}</p>
                         </div>
-                        <p className="text-[11px] text-slate-400 font-sans mt-0.5">{stg.detail}</p>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
+                    )
+                  })}
+                </div>
 
-              {/* Execution Finished Summary */}
-              {screeningDone && (
-                <div className="bg-emerald-950/30 border border-emerald-500/50 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 mt-2 animate-fadeIn">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-base">
-                      ✓
+                {/* Post-Screening Results Summary */}
+                {screeningDone && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                    <div className="p-3 rounded bg-slate-900 border border-slate-800 flex flex-col gap-1">
+                      <span className="text-[10px] font-mono uppercase text-emerald-400">Flight Cleared (Safe)</span>
+                      <span className="text-xl font-mono font-bold text-white">
+                        {mission?.safe ?? allComponents.filter((c) => c.status === 'safe').length} Parts
+                      </span>
+                      <span className="text-[10px] text-slate-400">Within drift envelopes</span>
                     </div>
-                    <div>
-                      <div className="text-sm font-bold text-white font-display">
-                        AI Screening Completed Successfully
-                      </div>
-                      <div className="text-xs font-mono text-emerald-400">
-                        Risk scores calibrated across all qualification lots &bull; Latency: 18.2ms
-                      </div>
+
+                    <div className="p-3 rounded bg-slate-900 border border-slate-800 flex flex-col gap-1">
+                      <span className="text-[10px] font-mono uppercase text-amber-400">Observation (Monitor)</span>
+                      <span className="text-xl font-mono font-bold text-white">
+                        {mission?.monitor ?? allComponents.filter((c) => c.status === 'monitor').length} Parts
+                      </span>
+                      <span className="text-[10px] text-slate-400">Periodic polling required</span>
+                    </div>
+
+                    <div className="p-3 rounded bg-slate-900 border border-slate-800 flex flex-col gap-1">
+                      <span className="text-[10px] font-mono uppercase text-rose-400">Quarantine (Reject)</span>
+                      <span className="text-xl font-mono font-bold text-white">
+                        {mission?.reject ?? allComponents.filter((c) => c.status === 'reject').length} Parts
+                      </span>
+                      <span className="text-[10px] text-slate-400">Directives generated</span>
                     </div>
                   </div>
+                )}
+              </div>
+            )}
+          </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sounds.playClick()
-                      setCurrentStep('final_screening')
-                    }}
-                    className="text-sm font-display font-bold px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer border border-emerald-400/40"
-                  >
-                    <span>PROCEED TO FINAL SCREENING &rarr;</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Bottom Navigation */}
+          <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playClick()
+                setCurrentStep('csv_upload')
+              }}
+              className="px-4 py-2 rounded border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 font-mono text-xs"
+            >
+              &larr; Re-inspect Basic Readings (Step 1)
+            </button>
+
+            {screeningDone && (
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.playClick()
+                  setCurrentStep('final_screening')
+                }}
+                className="px-5 py-2.5 rounded-lg bg-slate-200 hover:bg-white text-slate-900 font-mono font-bold text-xs md:text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+              >
+                <span>Proceed to Step 3: Launch Final Mission</span>
+                <span>&rarr;</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* WINDOW 3: RUN FINAL SCREENING AUTHORIZATION */}
+      {/* WINDOW 3: <3> LAUNCH FINAL MISSION (FINAL EXECUTION)                      */}
       {/* ========================================================================= */}
       {currentStep === 'final_screening' && (
-        <div className="w-full max-w-4xl z-10 bg-[#091122] border border-slate-800/90 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col gap-6 animate-fadeIn">
-          <div className="border-b border-slate-800 pb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="w-full max-w-6xl bg-[#0A101D] border border-slate-800 rounded-xl p-5 md:p-7 flex flex-col gap-6">
+          {/* Header */}
+          <div className="border-b border-slate-800/90 pb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="px-2.5 py-1 rounded bg-amber-500/15 text-amber-400 text-xs font-mono font-bold tracking-widest uppercase border border-amber-500/30">
-                WINDOW 3 &bull; FINAL FLIGHT SCREENING & CLEARANCE
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+                &lang;3&rang; &bull; MISSION CLEARANCE &amp; FINAL EXECUTION
               </span>
-              <h2 className="text-2xl font-display font-bold text-white mt-2">
-                Operational Authorization & Final Run Command
+              <h2 className="text-xl md:text-2xl font-mono font-bold text-white mt-1">
+                Launch Final Mission
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
-                Review the AI screening verdict and issue the final operational run command to unlock the mission control dashboard.
+              <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+                Review the finalized AI screening verdict, verify spacecraft subsystem integrity, and issue
+                the final execution command to unlock the live Mission Control Dashboard.
               </p>
             </div>
 
@@ -665,105 +992,86 @@ export default function ISROOnboardingFlow({
                 sounds.playClick()
                 setCurrentStep('ai_screening')
               }}
-              className="text-xs font-mono text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+              className="text-xs font-mono text-slate-400 hover:text-white px-3 py-1.5 rounded border border-slate-800 hover:border-slate-700 transition-colors"
             >
-              &larr; Back to AI Screening
+              &larr; Back to AI Screening (Step 2)
             </button>
           </div>
 
-          {/* Mission Health & Verdict Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Safe */}
-            <div className="bg-[#07131F] border border-emerald-500/30 rounded-xl p-4 flex flex-col gap-1">
-              <span className="text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider">
-                FLIGHT CLEARED (SAFE)
-              </span>
-              <span className="text-3xl font-display font-bold text-white">
-                {mission?.safe ?? allComponents.filter((c) => c.status === 'safe').length}
-              </span>
-              <span className="text-[11px] text-slate-400">Within drift envelopes & normal lot variance</span>
+          {/* Mission Clearance Overview Card */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-[#080E1B] border border-slate-800 rounded-xl p-4 font-mono text-xs">
+            <div>
+              <span className="text-slate-500 text-[10px] uppercase block">Designated Spacecraft</span>
+              <span className="text-sm font-bold text-white">{activeMissionName}</span>
             </div>
-
-            {/* Monitor */}
-            <div className="bg-[#17140B] border border-amber-500/30 rounded-xl p-4 flex flex-col gap-1">
-              <span className="text-amber-400 text-xs font-mono font-bold uppercase tracking-wider">
-                OBSERVATION (MONITOR)
+            <div>
+              <span className="text-slate-500 text-[10px] uppercase block">Operational Orbit</span>
+              <span className="text-sm font-bold text-slate-300">
+                {ISRO_MISSIONS.find((m) => m.id === activeMissionId)?.targetOrbit || 'LEO 400 km'}
               </span>
-              <span className="text-3xl font-display font-bold text-white">
-                {mission?.monitor ?? allComponents.filter((c) => c.status === 'monitor').length}
-              </span>
-              <span className="text-[11px] text-slate-400">Mild thermal drift &bull; Periodic telemetry polling</span>
             </div>
-
-            {/* Reject */}
-            <div className="bg-[#1A0B12] border border-rose-500/30 rounded-xl p-4 flex flex-col gap-1">
-              <span className="text-rose-400 text-xs font-mono font-bold uppercase tracking-wider">
-                FLIGHT REJECT (QUARANTINE)
-              </span>
-              <span className="text-3xl font-display font-bold text-white">
-                {mission?.reject ?? allComponents.filter((c) => c.status === 'reject').length}
-              </span>
-              <span className="text-[11px] text-slate-400">Latent defect or excessive parametric slope</span>
+            <div>
+              <span className="text-slate-500 text-[10px] uppercase block">Total Screened Units</span>
+              <span className="text-sm font-bold text-emerald-400">{allComponents.length || rawParts.length} Components</span>
+            </div>
+            <div>
+              <span className="text-slate-500 text-[10px] uppercase block">Clearance Status</span>
+              <span className="text-sm font-bold text-amber-400">FLIGHT ENDORSED</span>
             </div>
           </div>
 
-          {/* Top Flagged Quarantine Alert Banner (if any) */}
+          {/* Top Flagged Quarantine Alert Directive (if reject component found) */}
           {worstPart && worstPart.status === 'reject' && (
-            <div className="bg-rose-950/30 border border-rose-500/50 rounded-xl p-4 flex flex-col gap-2 font-mono text-xs text-rose-200">
-              <div className="flex items-center gap-2 text-rose-400 font-bold uppercase">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+            <div className="bg-rose-950/30 border border-rose-800/80 rounded-xl p-4 flex flex-col gap-2 font-mono text-xs">
+              <div className="flex items-center gap-2 text-rose-300 font-bold uppercase">
+                <span>⚠️</span>
                 <span>CRITICAL QUARANTINE DIRECTIVE GENERATED:</span>
               </div>
-              <p className="text-slate-300 font-sans leading-relaxed">
+              <p className="text-slate-300 font-sans text-xs leading-relaxed">
                 Component <b className="text-white font-mono">{worstPart.component_id}</b> in{' '}
-                <b className="text-amber-300 font-mono">[{worstPart.subsystem}] {worstPart.subsystem_name}</b> exhibits a calibrated risk score of{' '}
+                <b className="text-slate-200 font-mono">[{worstPart.subsystem}] {worstPart.subsystem_name}</b> exhibits a calibrated risk score of{' '}
                 <b className="text-rose-400 font-mono">{worstPart.risk_score}/100</b> with anomalous drift of{' '}
-                <b className="text-white font-mono">{worstPart.v168.toFixed(1)} &micro;A</b>. Isolation from prime PCDU power bus advised prior to launch.
+                <b className="text-white font-mono">{worstPart.v168.toFixed(1)} &micro;A</b>.
+                Ground safety directive: Isolate and replace before flight bus countdown.
               </p>
             </div>
           )}
 
-          {/* Clearance Verification Seal */}
-          <div className="bg-[#070D18] border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-lg text-amber-400">
-                🛡️
-              </div>
-              <div>
-                <div className="text-white font-bold">ISRO RELIABILITY DIVISION CLEARANCE</div>
-                <div className="text-slate-400 text-[11px]">
-                  STANDARD: MIL-STD-883 CLASS S / ISRO SP-91 FLIGHT DIRECTIVE
-                </div>
+          {/* Endorsement Seal */}
+          <div className="bg-[#080E1B] border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
+            <div>
+              <div className="text-white font-bold">ISRO RELIABILITY &amp; FLIGHT ASSURANCE DIVISION</div>
+              <div className="text-slate-400 text-[11px]">
+                STANDARD: MIL-STD-883 CLASS S &bull; ISTRAC / SDSC SHAR OPERATIONS
               </div>
             </div>
-
             <div className="text-right text-[11px] text-slate-400">
-              <div>HASH: <span className="text-sky-400">SHA256:7F9A3B...C48E</span></div>
-              <div>DATE: <span className="text-white">{new Date().toLocaleDateString('en-GB')}</span></div>
+              <div>CHECKSUM: <span className="text-slate-200">SHA256:7F9A3B...C48E</span></div>
+              <div>TIMESTAMP: <span className="text-white">{new Date().toISOString().slice(0, 19)}Z</span></div>
             </div>
           </div>
 
-          {/* Operational Command Box & Run Trigger */}
-          <div className="bg-[#050B16] border border-amber-500/40 rounded-xl p-5 flex flex-col gap-3">
-            <div className="text-xs font-mono text-slate-400">
-              OPERATIONAL COMMAND CONSOLE:
+          {/* Operational Command Console & Final Launch Button */}
+          <div className="bg-[#080E1B] border border-slate-700 rounded-xl p-5 flex flex-col gap-3 font-mono">
+            <div className="text-xs text-slate-400">
+              TERMINAL EXECUTION COMMAND:
             </div>
-            <div className="bg-[#03060C] border border-slate-800 rounded-lg p-3 font-mono text-xs text-amber-300 flex items-center justify-between">
-              <span>$ isro-spaceguard-ai --authorize-flight-clearance --run-mission-dashboard</span>
-              <span className="text-emerald-400 font-bold">[READY]</span>
+            <div className="bg-black/50 border border-slate-800 rounded p-3 text-xs text-slate-300 flex items-center justify-between">
+              <code>$ isro-spaceguard-ai --authorize-flight-clearance --launch-mission-control</code>
+              <span className="text-emerald-400 font-bold">[READY FOR LAUNCH]</span>
             </div>
 
             <button
               type="button"
-              onClick={handleFinalScreeningLaunch}
+              onClick={handleFinalLaunch}
               disabled={commandAuthorized}
-              className="mt-2 w-full text-base font-display font-black py-4 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-sky-500 hover:from-amber-500 hover:to-sky-400 text-white shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center gap-3 cursor-pointer border border-amber-400/50 uppercase tracking-wider"
+              className="mt-2 w-full py-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-mono font-black text-base md:text-lg transition-colors flex items-center justify-center gap-3 cursor-pointer shadow-sm uppercase tracking-wider"
             >
               <span>🚀</span>
               <span>
                 {commandAuthorized
-                  ? 'CLEARANCE AUTHORIZED &bull; LAUNCHING DASHBOARD...'
-                  : 'RUN FINAL SCREENING & LAUNCH MISSION CONTROL'}
+                  ? 'LAUNCH CLEARANCE CONFIRMED • OPENING MISSION CONTROL...'
+                  : 'LAUNCH FINAL MISSION'}
               </span>
             </button>
           </div>
