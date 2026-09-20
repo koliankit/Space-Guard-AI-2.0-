@@ -284,15 +284,15 @@ export default function SidebarNav({
         </div>
 
         {/* Scrollable Navigation Hierarchy */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-3.5 select-none scrollbar-thin scrollbar-thumb-[#26384D] scrollbar-track-transparent">
+        <nav className="flex-1 overflow-y-auto px-2.5 py-2 space-y-2.5 select-none scrollbar-thin scrollbar-thumb-[#26384D] scrollbar-track-transparent">
           {navSections.map((section) => (
-            <div key={section.title} className="space-y-1">
+            <div key={section.title} className="space-y-0.5">
               {/* Section Header with Accent Line */}
               <div className="flex items-center justify-between px-2 py-0.5">
-                <span className="text-[10px] font-mono font-bold tracking-widest text-[#5A6E85] uppercase">
+                <span className="text-[9.5px] font-mono font-bold tracking-widest text-[#5A6E85] uppercase">
                   {section.title}
                 </span>
-                <span className="w-12 h-px bg-[#26384D]" />
+                <span className="w-10 h-px bg-[#26384D]" />
               </div>
 
               {/* Navigation Items */}
@@ -304,19 +304,19 @@ export default function SidebarNav({
                       key={`${section.title}-${item.id}-${idx}`}
                       type="button"
                       onClick={() => handleSelect(item.id)}
-                      className={`w-full group text-left px-2.5 py-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer border ${
+                      className={`w-full group text-left px-2 py-1.5 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer border ${
                         active
                           ? 'bg-[#16253A] border-[#C99A2E]/70 text-[#E8EDF2] shadow-sm font-semibold ring-1 ring-[#C99A2E]/30'
                           : 'bg-transparent border-transparent text-[#91A0B2] hover:text-[#E8EDF2] hover:bg-[#111E30] hover:border-[#26384D]'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <span className="text-sm opacity-90 flex-shrink-0">{item.icon}</span>
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="text-xs opacity-90 flex-shrink-0">{item.icon}</span>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             {item.tag && (
                               <span
-                                className={`text-[9.5px] font-mono px-1 rounded ${
+                                className={`text-[9px] font-mono px-1 rounded ${
                                   active
                                     ? 'bg-[#C99A2E]/25 text-[#C99A2E] font-bold'
                                     : 'bg-[#070D18] text-[#5A6E85]'
@@ -326,7 +326,7 @@ export default function SidebarNav({
                               </span>
                             )}
                             <div
-                              className={`text-xs font-mono tracking-wide truncate ${
+                              className={`text-[11.5px] font-mono tracking-wide truncate ${
                                 active ? 'text-[#E8EDF2] font-bold' : 'group-hover:text-[#E8EDF2]'
                               }`}
                             >
@@ -334,7 +334,7 @@ export default function SidebarNav({
                             </div>
                           </div>
                           {item.description && (
-                            <div className="text-[10px] text-[#5A6E85] truncate font-sans mt-0.5">
+                            <div className="text-[9.5px] text-[#5A6E85] truncate font-sans">
                               {item.description}
                             </div>
                           )}
@@ -344,7 +344,7 @@ export default function SidebarNav({
                       {/* Optional Badge */}
                       {item.badge && (
                         <span
-                          className={`ml-2 px-1.5 py-0.5 rounded text-[9.5px] font-mono font-bold border flex-shrink-0 ${
+                          className={`ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold border flex-shrink-0 ${
                             item.badgeColor || 'bg-[#111E30] text-[#91A0B2] border-[#26384D]'
                           }`}
                         >
@@ -354,7 +354,7 @@ export default function SidebarNav({
 
                       {/* Active Indicator Bar */}
                       {active && (
-                        <span className="w-1.5 h-4 rounded-full bg-[#C99A2E] ml-2 flex-shrink-0" />
+                        <span className="w-1 h-3.5 rounded-full bg-[#C99A2E] ml-1.5 flex-shrink-0" />
                       )}
                     </button>
                   )
@@ -362,6 +362,59 @@ export default function SidebarNav({
               </div>
             </div>
           ))}
+
+          {/* Active Flight Telemetry HUD Widget - Uses the empty space intelligently */}
+          <div className="mt-3 p-3 rounded-xl bg-[#0D1726] border border-[#26384D] space-y-2 text-xs font-mono">
+            <div className="flex items-center justify-between border-b border-[#26384D] pb-1 text-[10px] text-[#5A6E85] uppercase tracking-wider font-bold">
+              <span>ACTIVE TELEMETRY HUD</span>
+              <span className="text-[#3FA66B] font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
+                LIVE
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+              <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D]">
+                <div className="text-[9px] text-[#91A0B2]">BATCH SIZE</div>
+                <div className="font-bold text-[#E8EDF2] mt-0.5">{totalComponents > 0 ? `${totalComponents} Parts` : '0 Parts'}</div>
+              </div>
+              <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D]">
+                <div className="text-[9px] text-[#91A0B2]">GATE STATUS</div>
+                <div className={`font-bold mt-0.5 ${rejectCount > 0 ? 'text-[#D94B5B]' : 'text-[#3FA66B]'}`}>
+                  {rejectCount > 0 ? `${rejectCount} REJECT` : 'FLIGHT OK'}
+                </div>
+              </div>
+            </div>
+
+            {/* Subsystem Quick Health Mini-Matrix */}
+            <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D] space-y-1">
+              <div className="flex items-center justify-between text-[9px] text-[#91A0B2]">
+                <span>SUBSYSTEM HEALTH</span>
+                <span className="text-[#3FA66B]">NOMINAL</span>
+              </div>
+              <div className="grid grid-cols-4 gap-1 text-[9px] text-center font-bold">
+                <span className="bg-[#111E30] text-[#3FA66B] py-0.5 rounded border border-[#3FA66B]/30">PWR 98%</span>
+                <span className="bg-[#111E30] text-[#D94B5B] py-0.5 rounded border border-[#D94B5B]/40">FC 84%</span>
+                <span className="bg-[#111E30] text-[#3FA66B] py-0.5 rounded border border-[#3FA66B]/30">COM 96%</span>
+                <span className="bg-[#111E30] text-[#3FA66B] py-0.5 rounded border border-[#3FA66B]/30">SEN 95%</span>
+              </div>
+            </div>
+
+            <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D] flex items-center justify-between text-[10px]">
+              <span className="text-[#91A0B2]">ENCLAVE CRYPTO:</span>
+              <span className="text-[#3B82B6] font-bold">HMAC-SHA256</span>
+            </div>
+
+            <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D] flex items-center justify-between text-[10px]">
+              <span className="text-[#91A0B2]">DSN LINK:</span>
+              <span className="text-[#3FA66B] font-bold">BYL-32 (LOCK)</span>
+            </div>
+
+            <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D] flex items-center justify-between text-[10px]">
+              <span className="text-[#91A0B2]">BUS TELEMETRY:</span>
+              <span className="text-[#C99A2E] font-bold">28.12V &bull; 23.4&deg;C</span>
+            </div>
+          </div>
         </nav>
 
         {/* Bottom Operational Footer */}

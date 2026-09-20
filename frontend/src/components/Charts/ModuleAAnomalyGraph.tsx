@@ -17,6 +17,7 @@ interface ModuleAAnomalyGraphProps {
 const STAGES = [0, 24, 96, 168]
 
 export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAAnomalyGraphProps) {
+  const [zoomMode, setZoomMode] = useState<'focus' | 'full'>('focus')
   const [stageH, setStageH] = useState<number>(168)
   const [animProgress, setAnimProgress] = useState<number>(1)
   const [isSimulating, setIsSimulating] = useState<boolean>(false)
@@ -25,7 +26,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   const [manualInspectHour, setManualInspectHour] = useState<number | null>(null)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 350 })
+  const [chartDims, setChartDims] = useState<{ width: number; height: number }>({ width: 880, height: 270 })
 
   const pathRef = useRef<SVGPathElement>(null)
   const [pathLength, setPathLength] = useState<number>(800)
@@ -44,7 +45,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       if (w > 0 && h > 0) {
         setChartDims({
           width: Math.round(w),
-          height: Math.round(Math.max(340, h)),
+          height: Math.round(Math.max(240, h)),
         })
       }
     }
@@ -59,7 +60,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
         if (w > 0 && h > 0) {
           setChartDims({
             width: Math.round(w),
-            height: Math.round(Math.max(340, h)),
+            height: Math.round(Math.max(240, h)),
           })
         }
       }
@@ -74,7 +75,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   }, [])
 
   const W = Math.max(500, chartDims.width)
-  const H = Math.max(340, chartDims.height)
+  const H = Math.max(240, chartDims.height)
   const padL = 50
   const padR = 24
   const padT = 24
@@ -94,8 +95,17 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   const v168 = component?.v168 ?? 11.4
 
   const allVals = [v0, v24, v96, v168, limitVal, bandLow, bandHigh]
-  const minY = Math.max(0, Math.min(...allVals) * 0.8)
-  const maxY = Math.max(...allVals) * 1.15
+  const fullMinY = Math.max(0, Math.min(...allVals) * 0.8)
+  const fullMaxY = Math.max(...allVals) * 1.15
+
+  const dataMin = Math.min(v0, v24, v96, v168, bandLow)
+  const dataMax = Math.max(v0, v24, v96, v168, bandHigh)
+  const margin = Math.max(0.6, (dataMax - dataMin) * 0.28)
+  const focusMinY = Math.max(0, Math.floor((dataMin - margin) * 10) / 10)
+  const focusMaxY = Math.ceil((dataMax + margin) * 10) / 10
+
+  const minY = zoomMode === 'focus' ? focusMinY : fullMinY
+  const maxY = zoomMode === 'focus' ? focusMaxY : fullMaxY
 
   const xFor = useCallback((h: number) => padL + (h / 168) * (W - padL - padR), [padL, padR, W])
   const yFor = useCallback((v: number) => H - padB - ((v - minY) / (maxY - minY || 1)) * (H - padT - padB), [H, padB, minY, maxY, padT])
@@ -350,24 +360,38 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   }
 
   return (
-    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
+    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none flex-1 h-full w-full min-h-[300px]">
       {/* Top Header & Stage Scrubbing Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-800/80 pb-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-800/80 pb-2">
         <div className="flex items-center gap-2">
           <span
             className="w-2.5 h-2.5 rounded-full led"
             style={{ backgroundColor: curveColor }}
           />
           <span className="font-display font-bold text-xs md:text-sm text-white tracking-wider uppercase">
-            GRAPH A &bull; HTOL 168H PARAMETRIC ANOMALY OSCILLOSCOPE
+            GRAPH A &bull; HTOL 168H OSCILLOSCOPE
           </span>
           <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-200 font-bold">
             {component.component_id}
           </span>
         </div>
 
-        {/* Action controls, Speed selector & Stage Filter Buttons */}
+        {/* Action controls, Zoom Toggle, Speed selector & Stage Filter Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Zoom Toggle: Focus Dynamic Scale vs Full Spec Scale */}
+          <button
+            type="button"
+            onClick={() => setZoomMode((z) => (z === 'focus' ? 'full' : 'focus'))}
+            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all border cursor-pointer ${
+              zoomMode === 'focus'
+                ? 'bg-[#C99A2E]/25 text-[#C99A2E] border-[#C99A2E]/60 shadow-sm'
+                : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+            }`}
+            title={zoomMode === 'focus' ? 'Switch to Full Spec Scale (0-50µA)' : 'Focus Zoom on Telemetry Data Curve'}
+          >
+            {zoomMode === 'focus' ? '🔍 FOCUS: TELEMETRY' : '📐 FULL SPEC (50µA)'}
+          </button>
+
           {/* Playback Controls & Speed Toggle */}
           <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
             {isSimulating ? (
@@ -425,7 +449,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
                 key={h}
                 type="button"
                 onClick={() => setStageH(h)}
-                className={`px-3 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
                   stageH === h
                     ? 'bg-amber-500/30 text-amber-300 border border-amber-500/60 font-bold shadow-isro'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -441,7 +465,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       {/* Main SVG Chart Canvas with Interactive Manual Line Section & Cursor */}
       <div
         ref={containerRef}
-        className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812] w-full flex-1 transition-all duration-300 min-h-[340px] md:min-h-[360px] h-[350px] md:h-[370px]"
+        className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812] w-full flex-1 transition-all duration-300 min-h-[230px] md:min-h-[250px] h-[250px] md:h-[270px]"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
@@ -546,24 +570,60 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
             />
           )}
 
-          {/* Static Datasheet Limit Line (Red line at limit_ua) */}
-          <line
-            x1={padL}
-            x2={W - padR}
-            y1={yFor(limitVal)}
-            y2={yFor(limitVal)}
-            stroke="#EF4444"
-            strokeWidth={1.5}
-            strokeDasharray="4 3"
-          />
-          <text
-            x={W - padR}
-            y={yFor(limitVal) - 4}
-            textAnchor="end"
-            className="fill-rose-400 text-[8px] font-mono font-bold"
-          >
-            SPEC LIMIT ({limitVal}&mu;A)
-          </text>
+          {/* Datasheet Limit Line or Out-of-Frame Indicator */}
+          {limitVal <= maxY ? (
+            <>
+              <line
+                x1={padL}
+                x2={W - padR}
+                y1={yFor(limitVal)}
+                y2={yFor(limitVal)}
+                stroke="#EF4444"
+                strokeWidth={1.5}
+                strokeDasharray="4 3"
+              />
+              <text
+                x={W - padR}
+                y={yFor(limitVal) - 4}
+                textAnchor="end"
+                className="fill-rose-400 text-[8px] font-mono font-bold"
+              >
+                SPEC LIMIT ({limitVal}&mu;A)
+              </text>
+            </>
+          ) : (
+            <g transform={`translate(${W - padR - 195}, ${padT + 4})`}>
+              <rect x="0" y="0" width="190" height="18" rx="4" fill="#111E30" stroke="#EF4444" strokeWidth="0.8" opacity="0.92" />
+              <text x="8" y="12.5" fill="#F87171" fontSize="8" fontFamily="monospace" fontWeight="bold">
+                ▲ SPEC LIMIT {limitVal.toFixed(1)}&mu;A (+{(limitVal - v168).toFixed(1)}&mu;A Margin)
+              </text>
+            </g>
+          )}
+
+          {/* Lot Peer Gaussian Distribution Meter in Top Canvas Space */}
+          {zoomMode === 'focus' && (
+            <g transform={`translate(${W - padR - 225}, ${padT + 26})`} opacity={0.92}>
+              <rect x="0" y="0" width="220" height="42" rx="5" fill="#070D18" stroke="#26384D" strokeWidth="0.8" />
+              <text x="8" y="12" fill="#91A0B2" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
+                LOT STATISTICAL SPREAD (N={component.lot_id || 'LOT'})
+              </text>
+              <text x="8" y="24" fill="#C99A2E" fontSize="8" fontFamily="monospace">
+                &mu;={lotMean.toFixed(1)}&mu;A &bull; &sigma;=&plusmn;{lotStd.toFixed(2)} &bull; z={finalZ != null ? `${finalZ > 0 ? '+' : ''}${finalZ.toFixed(2)}&sigma;` : '--'}
+              </text>
+              {/* Visual sigma meter */}
+              <rect x="8" y="30" width="204" height="6" rx="3" fill="#111E30" />
+              <rect x="42" y="30" width="136" height="6" rx="2" fill="#3FA66B" opacity={0.35} />
+              <line x1="110" x2="110" y1="28" y2="38" stroke="#FFFFFF" strokeWidth="1.5" />
+              <circle
+                cx={Math.min(206, Math.max(12, 110 + (finalZ || 0) * 32))}
+                cy="33"
+                r="3.5"
+                fill={curveColor}
+                stroke="#FFFFFF"
+                strokeWidth="1"
+              />
+            </g>
+          )}
 
           {/* Lot Norm Baseline Trace (Crisp White dashed line) */}
           {baselineCurve && (

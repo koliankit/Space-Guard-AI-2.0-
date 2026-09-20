@@ -391,10 +391,10 @@ export default function MultiScreenWall({
       </div>
 
       {/* Main Command Wall Content Area: Divided into Sector A and Sector B */}
-      <div className="p-4 flex-1 flex flex-col gap-4">
+      <div className="p-3 flex-1 flex flex-col gap-3">
         {/* ================= PRIMARY LAYOUT: TWO SECTORS (MODULE A & MODULE B WITH GRAPHS BELOW) ================= */}
         {consoleLayout === 'dual' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch flex-1 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-stretch flex-1 w-full">
             {/* ================= SECTOR 1: MODULE A ================= */}
             <div className="flex flex-col h-full flex-1 min-w-0">
               <ModuleAAnomalyPanel

@@ -86,30 +86,30 @@ export default function ModuleBFutureDriftPanel({
       </div>
 
       {/* Main Content Area */}
-      <div className="p-3.5 flex-1 flex flex-col gap-3.5">
+      <div className="p-2.5 flex-1 flex flex-col gap-2.5">
         {selected ? (
-          <div className={`p-3 rounded-lg border flex flex-col gap-2.5 transition-colors ${
+          <div className={`p-2.5 rounded-lg border flex flex-col gap-2 transition-colors ${
             willBreach ? 'bg-[#28131D] border-[#D94B5B]/50' : 'bg-[#16253A] border-[#26384D]'
           }`}>
             {/* Top Identity & Drift Classification Row */}
-            <div className="flex flex-wrap items-center justify-between gap-2.5 font-mono">
-              <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex flex-wrap items-center justify-between gap-2 font-mono">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-base md:text-lg font-bold text-[#E8EDF2] tracking-wide">{selected.component_id}</span>
-                <span className="text-[#5A6E85] text-sm">&bull;</span>
-                <span className="text-[#C99A2E] text-xs md:text-sm font-semibold">Target Subsystem:</span>
+                <span className="text-[#5A6E85] text-xs">&bull;</span>
+                <span className="text-[#C99A2E] text-xs font-semibold">Target Subsystem:</span>
                 <button
                   type="button"
                   onClick={() => onSelectSubsystem && onSelectSubsystem(selected.subsystem)}
-                  className="px-2 py-1 rounded-md bg-[#111E30] border border-[#26384D] text-[#3B82B6] text-xs font-bold hover:border-[#3B82B6] transition-colors"
+                  className="px-2 py-0.5 rounded bg-[#111E30] border border-[#26384D] text-[#3B82B6] text-xs font-bold hover:border-[#3B82B6] transition-colors"
                 >
                   [{selected.subsystem}] {loc?.name || selected.subsystem}
                 </button>
               </div>
 
               {/* Drift Trend Badge */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <span
-                  className={`px-3 py-1 rounded-md text-xs font-bold border transition-colors ${
+                  className={`px-2.5 py-0.5 rounded text-xs font-bold border transition-colors ${
                     willBreach
                       ? 'bg-[#D94B5B]/20 text-[#D94B5B] border-[#D94B5B]/50'
                       : isAccelerating
@@ -118,7 +118,7 @@ export default function ModuleBFutureDriftPanel({
                   }`}
                 >
                   {isSim ? (
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] led" />
                       {willBreach
                         ? 'CRITICAL LIMIT EXCEEDANCE'
@@ -131,7 +131,7 @@ export default function ModuleBFutureDriftPanel({
                   )}
                 </span>
                 {willBreach && (
-                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#D94B5B] text-[#E8EDF2] animate-alert-once">
+                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#D94B5B] text-[#E8EDF2] animate-alert-once">
                     CRITICAL BREACH
                   </span>
                 )}
@@ -139,34 +139,34 @@ export default function ModuleBFutureDriftPanel({
             </div>
 
             {/* In-Flight Reliability Forecast Metrics Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-              <div className="p-2.5 rounded-lg bg-[#070D18] border border-[#26384D] flex flex-col">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-mono">
+              <div className="p-1.5 rounded bg-[#070D18] border border-[#26384D] flex flex-col">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#91A0B2] uppercase font-semibold">Drift Velocity</span>
+                  <span className="text-[10px] text-[#91A0B2] uppercase font-semibold">Drift Velocity</span>
                   {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] led" />}
                 </div>
-                <span className={`text-base font-bold mt-1 tabular-nums ${liveVel > 50 ? 'text-[#D94B5B]' : 'text-[#C99A2E]'}`}>
-                  {liveVel.toFixed(2)} <span className="text-xs font-normal text-[#91A0B2]">nA/hr</span>
+                <span className={`text-sm font-bold mt-0.5 tabular-nums ${liveVel > 50 ? 'text-[#D94B5B]' : 'text-[#C99A2E]'}`}>
+                  {liveVel.toFixed(2)} <span className="text-[10px] font-normal text-[#91A0B2]">nA/hr</span>
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#070D18] border border-[#26384D] flex flex-col">
+              <div className="p-1.5 rounded bg-[#070D18] border border-[#26384D] flex flex-col">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#91A0B2] uppercase font-semibold">264h Extrapolated</span>
+                  <span className="text-[10px] text-[#91A0B2] uppercase font-semibold">264h Extrapolated</span>
                   {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] led" />}
                 </div>
-                <span className={`text-base font-bold mt-1 tabular-nums ${willBreach ? 'text-[#D94B5B]' : 'text-[#E8EDF2]'}`}>
-                  {liveProj.toFixed(1)} <span className="text-xs font-normal text-[#91A0B2]">&mu;A</span>
+                <span className={`text-sm font-bold mt-0.5 tabular-nums ${willBreach ? 'text-[#D94B5B]' : 'text-[#E8EDF2]'}`}>
+                  {liveProj.toFixed(1)} <span className="text-[10px] font-normal text-[#91A0B2]">&mu;A</span>
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#070D18] border border-[#26384D] flex flex-col">
+              <div className="p-1.5 rounded bg-[#070D18] border border-[#26384D] flex flex-col">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#91A0B2] uppercase font-semibold">Future Safety Margin</span>
+                  <span className="text-[10px] text-[#91A0B2] uppercase font-semibold">Future Margin</span>
                   {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] led" />}
                 </div>
                 <span
-                  className={`text-base font-bold mt-1 tabular-nums ${
+                  className={`text-sm font-bold mt-0.5 tabular-nums ${
                     liveMarg < 5
                       ? 'text-[#D94B5B]'
                       : liveMarg < 15
@@ -174,13 +174,13 @@ export default function ModuleBFutureDriftPanel({
                       : 'text-[#3FA66B]'
                   }`}
                 >
-                  {liveMarg.toFixed(1)} <span className="text-xs font-normal text-[#91A0B2]">&mu;A</span>
+                  {liveMarg.toFixed(1)} <span className="text-[10px] font-normal text-[#91A0B2]">&mu;A</span>
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#070D18] border border-[#26384D] flex flex-col">
-                <span className="text-xs text-[#91A0B2] uppercase font-semibold">Time to Limit Breach</span>
-                <span className={`text-base font-bold mt-1 tabular-nums ${breachHour && breachHour <= 300 ? 'text-[#D94B5B]' : 'text-[#3FA66B]'}`}>
+              <div className="p-1.5 rounded bg-[#070D18] border border-[#26384D] flex flex-col">
+                <span className="text-[10px] text-[#91A0B2] uppercase font-semibold">Breach Horizon</span>
+                <span className={`text-sm font-bold mt-0.5 tabular-nums ${breachHour && breachHour <= 300 ? 'text-[#D94B5B]' : 'text-[#3FA66B]'}`}>
                   {breachHour && breachHour > 0 && breachHour < 1000
                     ? `T+${Math.round(breachHour)}h`
                     : 'NO BREACH (>1000h)'}
@@ -189,13 +189,13 @@ export default function ModuleBFutureDriftPanel({
             </div>
           </div>
         ) : (
-          <div className="p-6 text-center text-xs text-[#91A0B2] bg-[#16253A] rounded-lg border border-[#26384D]">
-            No component selected. Ingest data or pick a component to run Module B Future Drift Forecast.
+          <div className="p-4 text-center text-xs text-[#91A0B2] bg-[#16253A] rounded-lg border border-[#26384D]">
+            No component selected. Pick a component to run Module B Future Drift Forecast.
           </div>
         )}
 
         {/* Module B Dedicated Graph: Predictive Extrapolation Canvas */}
-        <div className="mt-1 flex flex-col h-[350px] md:h-[370px] min-h-[340px] md:min-h-[360px] w-full">
+        <div className="mt-0.5 flex flex-col h-[260px] md:h-[280px] min-h-[240px] w-full">
           <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>
