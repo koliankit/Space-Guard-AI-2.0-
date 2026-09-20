@@ -137,6 +137,44 @@ export interface AnalyzeResult {
   lot_summaries?: Record<string, any>
   evaluation_metrics?: EvaluationMetrics
   top_flagged: ComponentOut | null
+  tee_security?: TeeSecurityStatus
+}
+
+export interface TeeAttestationReport {
+  execution_id: string
+  enclave_id: string
+  enclave_version: string
+  timestamp: string
+  input_hash: string
+  output_hash: string
+  mode: 'simulation' | 'production'
+  hardware_backed: boolean
+  component_count: number
+  elapsed_ms: number
+  signature: string
+  status: string
+  verification: string
+  protected_operations: string[]
+}
+
+export interface TeeSecurityStatus {
+  enabled: boolean
+  status: 'ENABLED' | 'SIMULATION' | 'DISABLED' | 'UNAVAILABLE'
+  mode: 'simulation' | 'production'
+  mode_display: string
+  secure_execution: boolean
+  hardware_backed: boolean
+  enclave_id?: string | null
+  require_hardware: boolean
+  fallback_allowed: boolean
+  protected_operations: string[]
+  total_executions: number
+  successful_executions: number
+  fallback_executions: number
+  last_execution_timestamp?: string | null
+  attestation_available: boolean
+  latest_attestation?: TeeAttestationReport | null
+  disclaimer: string
 }
 
 export interface SubsystemStatus {

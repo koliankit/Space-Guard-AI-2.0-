@@ -12,7 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_db, SessionLocal
-from routes import upload, analysis, components, mission, report, demo, auth
+from routes import upload, analysis, components, mission, report, demo, auth, security
 from services.auth import init_default_users
 
 app = FastAPI(
@@ -37,6 +37,7 @@ app.include_router(mission.router)
 app.include_router(report.router)
 app.include_router(demo.router)
 app.include_router(auth.router)
+app.include_router(security.router)
 
 
 @app.on_event("startup")
@@ -48,10 +49,12 @@ def on_startup():
 
 @app.get("/api/health")
 def health():
+    from security.tee_service import tee_service
     return {
         "status": "ok",
         "system": "ASTRA VIGIL",
         "engine": "ASTRA VIGIL AI Reliability Screening Engine",
         "version": "2.5.0",
-        "domain": "ISRO Aerospace / Space Electronics Screening"
+        "domain": "ISRO Aerospace / Space Electronics Screening",
+        "tee_security": tee_service.get_status()
     }

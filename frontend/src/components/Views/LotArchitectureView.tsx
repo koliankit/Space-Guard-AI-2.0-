@@ -734,7 +734,7 @@ export default function LotArchitectureView({
                             : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                         }`}
                       >
-                        {inspectedComponent.status.toUpperCase()} &bull; RISK {inspectedComponent.risk_score ?? '--'}/100
+                        {(inspectedComponent.status || 'safe').toUpperCase()} &bull; RISK {inspectedComponent.risk_score ?? '--'}/100
                       </span>
                       <button
                         type="button"

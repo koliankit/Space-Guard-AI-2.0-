@@ -4,10 +4,10 @@ import * as THREE from 'three'
 import type { ComponentOut, SubsystemStatus } from '../../types'
 
 const STATUS_COLOR: Record<string, string> = {
-  safe: '#10B981',
-  monitor: '#F59E0B',
-  reject: '#EF4444',
-  idle: '#FFFFFF',
+  safe: '#3FA66B',     // Engineering Green
+  monitor: '#D6A33A',  // Amber
+  reject: '#D94B5B',   // Alert Red
+  idle: '#91A0B2',     // Cool Gray
 }
 
 interface EquipmentModuleProps {
@@ -33,10 +33,27 @@ export default function SatelliteEquipment({
 }: EquipmentModuleProps) {
   const groupRef = useRef<THREE.Group>(null)
   const pulseRef = useRef<THREE.Mesh>(null)
+  const locatorRingRef = useRef<THREE.Mesh>(null)
   const bracketRef = useRef<THREE.Group>(null)
   const basePos = subsystem.position as [number, number, number]
 
   const isTargetComponent = Boolean(selectedComponent && subsystem.key === selectedComponent.subsystem)
+
+  // User specification:
+  // normal → blue highlight (#3B82B6)
+  // monitor → amber highlight (#D6A33A)
+  // reject → red highlight (#D94B5B)
+  const componentHighlightColor = useMemo(() => {
+    if (!selectedComponent) return '#3B82B6'
+    if (selectedComponent.status === 'reject' || selectedComponent.behavioral_health === 'CRITICAL') {
+      return '#D94B5B' // red highlight
+    }
+    if (selectedComponent.status === 'monitor' || selectedComponent.behavioral_health === 'DEGRADING') {
+      return '#D6A33A' // amber highlight
+    }
+    return '#3B82B6'   // normal blue highlight
+  }, [selectedComponent])
+
   const effectiveStatus = isTargetComponent && selectedComponent
     ? (selectedComponent.status === 'reject' || selectedComponent.behavioral_health === 'CRITICAL'
         ? 'reject'
@@ -45,25 +62,29 @@ export default function SatelliteEquipment({
         : 'safe')
     : subsystem.status
 
-  const color = STATUS_COLOR[effectiveStatus] ?? STATUS_COLOR.idle
+  const color = isTargetComponent ? componentHighlightColor : (STATUS_COLOR[effectiveStatus] ?? STATUS_COLOR.idle)
   const isReject = effectiveStatus === 'reject'
 
-  // Animate pulse on selection or warning status
+  // Animate gentle pulse on selection or warning status (no fast frantic flashing)
   useFrame(({ clock }) => {
     if (pulseRef.current) {
       if (isReject) {
-        const t = clock.elapsedTime * 4.5
-        const s = 1.0 + 0.4 * Math.sin(t)
+        // Gentle single-pulse rate (2.5s cycle)
+        const s = 1.0 + 0.18 * Math.sin(clock.elapsedTime * 2.5)
         pulseRef.current.scale.set(s, s, s)
       } else if (isSelected || isHovered) {
-        const s = 1.0 + 0.22 * Math.sin(clock.elapsedTime * 4)
+        const s = 1.0 + 0.12 * Math.sin(clock.elapsedTime * 2.5)
         pulseRef.current.scale.set(s, s, s)
       } else {
         pulseRef.current.scale.set(1, 1, 1)
       }
     }
+    if (locatorRingRef.current && isTargetComponent) {
+      const s = 1.0 + 0.14 * Math.sin(clock.elapsedTime * 2.5)
+      locatorRingRef.current.scale.set(s, s, s)
+    }
     if (bracketRef.current && (isSelected || isHovered)) {
-      bracketRef.current.rotation.y = clock.elapsedTime * 0.5
+      bracketRef.current.rotation.y = clock.elapsedTime * 0.3
     }
   })
 
@@ -492,6 +513,19 @@ export default function SatelliteEquipment({
         <mesh ref={pulseRef} position={[0, 0.18, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[0.14, 0.014, 10, 28]} />
           <meshBasicMaterial color={color} transparent opacity={isReject ? 0.95 : 0.75} />
+        </mesh>
+      )}
+
+      {/* Small Pulsing Locator Ring for Selected Component */}
+      {isTargetComponent && (
+        <mesh ref={locatorRingRef} position={[0, 0.20, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.07, 0.088, 36]} />
+          <meshBasicMaterial
+            color={componentHighlightColor}
+            transparent
+            opacity={0.9}
+            side={THREE.DoubleSide}
+          />
         </mesh>
       )}
 

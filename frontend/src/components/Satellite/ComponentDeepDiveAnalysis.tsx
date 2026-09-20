@@ -181,7 +181,7 @@ export default function ComponentDeepDiveAnalysis({
                 : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
             }`}
           >
-            {component.status.toUpperCase()}
+            {(component.status || 'safe').toUpperCase()}
           </span>
         </div>
       </div>

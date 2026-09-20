@@ -99,6 +99,9 @@ def _build_analysis_response(batch: Batch, result_df: pd.DataFrame, ml_meta: dic
             "ground_truth": (None if pd.isna(top.get("ground_truth")) else int(top["ground_truth"])),
         }
 
+    from security.tee_service import tee_service
+    tee_sec = tee_service.get_status()
+
     return {
         "batch_id": batch.id,
         "safe": safe,
@@ -110,6 +113,7 @@ def _build_analysis_response(batch: Batch, result_df: pd.DataFrame, ml_meta: dic
         "lot_summaries": lot_summaries if lot_summaries is not None else batch.lot_summary or [],
         "evaluation_metrics": eval_metrics,
         "top_flagged": top_flagged,
+        "tee_security": tee_sec,
     }
 
 

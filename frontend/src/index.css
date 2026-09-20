@@ -44,8 +44,8 @@ html, body, #root {
 }
 
 body {
-  background: #070B14;
-  color: #E2E8F0;
+  background: #070D18;
+  color: #E8EDF2;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
   font-variation-settings: 'opsz' 14, 'wght' 600;
@@ -57,62 +57,127 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Calm, Aerospace-Grade Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E2D4A;
+  background: #26384D;
   border-radius: 3px;
-  border: 1px solid #283C62;
+  border: 1px solid #16253A;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #F59E0B;
+  background: #C99A2E;
 }
 ::-webkit-scrollbar-track {
-  background: #070B14;
+  background: #070D18;
 }
 
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
-@keyframes pulsedot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(1.1); } }
-@keyframes modalin { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* ==============================================================================
+   Calm Aerospace Motion & Telemetry Animations (No Rapid Flashing)
+   ============================================================================== */
 
-.led { animation: blink 2s infinite; }
-.dot-pulse { animation: pulsedot 1.2s infinite; }
-.modal-anim { animation: modalin .18s cubic-bezier(0.16, 1, 0.3, 1); }
+/* 1. Very slow ambient grid movement: 18-second subtle loop */
+@keyframes grid-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 32px 32px; }
+}
 
-/* ISRO Spacecraft Flight Telemetry Grid (Subtle, Clean & Non-distracting) */
 .grid-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: .4;
+  opacity: 0.28;
   background-image:
-    linear-gradient(rgba(148, 163, 184, .03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, .03) 1px, transparent 1px);
+    linear-gradient(rgba(38, 56, 77, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(38, 56, 77, 0.35) 1px, transparent 1px);
   background-size: 32px 32px;
+  animation: grid-drift 18s linear infinite;
 }
 
-/* Aerospace Precision Console Glass */
+/* 2. Gentle Telemetry Pulse (2.5s calm breathing, replaces jarring fast blink) */
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.03); }
+}
+
+.led {
+  animation: gentle-pulse 2.5s ease-in-out infinite;
+}
+
+.dot-pulse {
+  animation: gentle-pulse 2.5s ease-in-out infinite;
+}
+
+/* 3. Single-shot Alert Pulse: Pulses once on appearance, then remains static */
+@keyframes alert-once {
+  0% { opacity: 0.4; transform: scale(0.99); }
+  45% { opacity: 1; transform: scale(1.01); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-alert-once {
+  animation: alert-once 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Subtle Telemetry Line Signal Flow */
+@keyframes signal-flow {
+  0% { stroke-dashoffset: 48; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.telemetry-flow {
+  stroke-dasharray: 6 6;
+  animation: signal-flow 2.8s linear infinite;
+}
+
+/* 5. TEE Subtle Boundary Signal (Calm perimeter signal, NO cyber glow) */
+@keyframes tee-subtle-signal {
+  0%, 100% {
+    border-color: #26384D;
+  }
+  50% {
+    border-color: #3B82B6;
+  }
+}
+
+.tee-boundary-signal {
+  animation: tee-subtle-signal 3.5s ease-in-out infinite;
+}
+
+/* 6. Modal Ingress Animation */
+@keyframes modalin {
+  from { transform: scale(0.97); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-anim {
+  animation: modalin 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==============================================================================
+   Aerospace Panel Glass & Reticle Styling
+   ============================================================================== */
+
 .hud-glass {
-  background: rgba(14, 23, 41, 0.9);
+  background: rgba(17, 30, 48, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  border: 1px solid #26384D;
 }
 
 .hud-glass-interactive {
-  background: rgba(14, 23, 41, 0.85);
+  background: rgba(17, 30, 48, 0.85);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(51, 65, 85, 0.6);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #26384D;
+  transition: all 0.2s ease;
 }
 
 .hud-glass-interactive:hover {
-  background: rgba(20, 32, 57, 0.95);
-  border-color: rgba(245, 158, 11, 0.5);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  background: rgba(22, 37, 58, 0.95);
+  border-color: #3B82B6;
 }
 
 .hud-tag {
@@ -132,55 +197,55 @@ body {
   position: absolute;
   top: -1px; left: -1px;
   width: 6px; height: 6px;
-  border-top: 1.5px solid #F59E0B;
-  border-left: 1.5px solid #F59E0B;
+  border-top: 1.5px solid #C99A2E;
+  border-left: 1.5px solid #C99A2E;
 }
 .reticle-corner::after {
   content: '';
   position: absolute;
   bottom: -1px; right: -1px;
   width: 6px; height: 6px;
-  border-bottom: 1.5px solid #F59E0B;
-  border-right: 1.5px solid #F59E0B;
+  border-bottom: 1.5px solid #C99A2E;
+  border-right: 1.5px solid #C99A2E;
 }
 
 /* Reticle Corners - Green (Safe) */
 .reticle-corner-green::before {
-  border-top: 1.5px solid #10B981;
-  border-left: 1.5px solid #10B981;
+  border-top: 1.5px solid #3FA66B;
+  border-left: 1.5px solid #3FA66B;
 }
 .reticle-corner-green::after {
-  border-bottom: 1.5px solid #10B981;
-  border-right: 1.5px solid #10B981;
+  border-bottom: 1.5px solid #3FA66B;
+  border-right: 1.5px solid #3FA66B;
 }
 
 /* Reticle Corners - Red (Reject / Alert) */
 .reticle-corner-red::before {
-  border-top: 1.5px solid #EF4444;
-  border-left: 1.5px solid #EF4444;
+  border-top: 1.5px solid #D94B5B;
+  border-left: 1.5px solid #D94B5B;
 }
 .reticle-corner-red::after {
-  border-bottom: 1.5px solid #EF4444;
-  border-right: 1.5px solid #EF4444;
+  border-bottom: 1.5px solid #D94B5B;
+  border-right: 1.5px solid #D94B5B;
 }
 
+/* Subtle Radar Sweep */
 @keyframes radar-sweep {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
 .radar-spinner {
-  animation: radar-sweep 5s linear infinite;
+  animation: radar-sweep 8s linear infinite;
 }
 
 /* Card & Console Shadows */
 .shadow-isro {
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.15);
+  box-shadow: 0 2px 10px rgba(201, 154, 46, 0.15);
 }
 .shadow-telemetry {
-  box-shadow: 0 2px 10px rgba(56, 163, 255, 0.15);
+  box-shadow: 0 2px 10px rgba(59, 130, 182, 0.15);
 }
 .shadow-alert {
-  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 2px 10px rgba(217, 75, 91, 0.2);
 }
-

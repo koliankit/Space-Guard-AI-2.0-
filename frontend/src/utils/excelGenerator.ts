@@ -348,7 +348,7 @@ export function generateExcelReport(
                 <td style="text-align: right;">+${part.slope.toFixed(4)}</td>
                 <td style="text-align: center; font-weight: bold;">${Math.round(part.risk_score)}/100</td>
                 <td class="${isRej ? 'badge-reject' : isMon ? 'badge-monitor' : 'badge-safe'}">
-                  ${part.status.toUpperCase()}
+                  ${(part.status || 'safe').toUpperCase()}
                 </td>
               </tr>
             `

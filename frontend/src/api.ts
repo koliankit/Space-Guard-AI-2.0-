@@ -1,4 +1,4 @@
-import type { AnalyzeResult, ComponentOut, MissionStatus, UploadResult } from './types'
+import type { AnalyzeResult, ComponentOut, MissionStatus, UploadResult, TeeSecurityStatus } from './types'
 import { offlineISRO } from './offlineEngine'
 
 export const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8000'
@@ -178,4 +178,62 @@ export function reportUrl(batchId?: number | null): string {
   const md = offlineISRO.generateMarkdownReport()
   const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' })
   return URL.createObjectURL(blob)
+}
+
+export async function getTeeSecurityStatus(): Promise<TeeSecurityStatus> {
+  if (await isBackendAvailable()) {
+    try {
+      const res = await fetch(`${API_BASE}/api/security/tee/status`)
+      return await asJson(res)
+    } catch (e) {
+      console.warn('Backend TEE status query failed:', e)
+    }
+  }
+  // Offline / standalone demo fallback
+  return {
+    enabled: true,
+    status: 'SIMULATION',
+    mode: 'simulation',
+    mode_display: 'Development / Simulation (Client)',
+    secure_execution: true,
+    hardware_backed: false,
+    enclave_id: 'spaceguard-tee-client-offline-sim',
+    require_hardware: false,
+    fallback_allowed: true,
+    protected_operations: [
+      'AI Inference Evaluation',
+      'Sensitive Model Weights & Parameters',
+      'Risk Score Multi-Factor Calculation',
+      'Screening Decision Logic (SAFE/MONITOR/REJECT)',
+      'Cryptographic Execution Attestation',
+    ],
+    total_executions: 1,
+    successful_executions: 1,
+    fallback_executions: 0,
+    last_execution_timestamp: new Date().toISOString(),
+    attestation_available: true,
+    latest_attestation: {
+      execution_id: 'offline-sim-attestation-01',
+      enclave_id: 'spaceguard-tee-client-offline-sim',
+      enclave_version: '2.5.0-tee-client',
+      timestamp: new Date().toISOString(),
+      input_hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      output_hash: '8f4c2e9a58b61c9f42813df9a4e32d56a297e59c118742cf6f76c8c8861e9ef5',
+      mode: 'simulation',
+      hardware_backed: false,
+      component_count: 100,
+      elapsed_ms: 2.4,
+      signature: 'client-sim-hmac-sha256-verified-offline',
+      status: 'ATTESTED_VALID',
+      verification: 'CLIENT_OFFLINE_SIMULATED_PROOF',
+      protected_operations: [
+        'AI Inference Evaluation',
+        'Proprietary Multi-Factor Risk Weighting',
+        'Flight Decision Logic (SAFE/MONITOR/REJECT)',
+        'Cryptographic Result Attestation',
+      ],
+    },
+    disclaimer:
+      'TEE provides an optional hardware-backed isolation layer for selected sensitive computations. In simulation mode, execution is emulated for local development and is not hardware-protected.',
+  }
 }

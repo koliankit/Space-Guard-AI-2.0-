@@ -528,7 +528,7 @@ export default function SatelliteScene({
           minDistance={1.8}
           maxDistance={14}
           autoRotate={isAutoRotate}
-          autoRotateSpeed={0.8}
+          autoRotateSpeed={0.22}
           onStart={() => {
             // User manually started dragging: pause auto-rotate and cancel any active transition
             setIsAutoRotate(false)

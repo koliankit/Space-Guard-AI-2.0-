@@ -44,12 +44,14 @@ def run_pipeline(df: pd.DataFrame):
     df = anomaly_detector.run_isolation_forest(df)
     # 4. XGBoost: Supervised classification when ground-truth labels exist
     df, ml_meta = anomaly_detector.run_supervised_if_labeled(df)
-    # 5. Risk Engine: Composite risk score, risk level, and contextual explainability
-    df = risk_engine.score_and_decide(df, has_ml=ml_meta is not None)
+    # 5. TEE Security Layer / Risk Engine: Composite risk score, risk level, and contextual explainability
+    from security.tee_service import tee_service
+    df, tee_meta = tee_service.execute_protected_risk_computation(df, has_ml=ml_meta is not None)
     # 6. Localization: Map to physical spacecraft subsystems
     df = satellite_mapper.add_subsystem(df)
     # 7. Model Evaluation Metrics
     eval_metrics = anomaly_detector.compute_evaluation_metrics(df)
+    eval_metrics["tee_security"] = tee_meta
     # 8. Lot Cohort Summaries
     lot_summaries = lot_analysis.generate_lot_summaries(df)
 

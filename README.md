@@ -185,3 +185,42 @@ frontend origin, and swap SQLite for Postgres if you expect concurrent users.
   an explicit "no held-out test set" caveat rather than presented as validated.
 - **No ads, no telemetry, no external calls beyond your own backend** — the frontend only ever talks to the
   `VITE_API_BASE_URL` you configure.
+
+---
+
+## TEE Security Layer
+
+### What is TEE?
+A **Trusted Execution Environment (TEE)** is a hardware-enforced, isolated execution boundary provided by modern CPUs (such as Intel SGX, AMD SEV, AWS Nitro Enclaves, or GCP Confidential Computing VMs). It protects sensitive application code and memory contents from unauthorized access or alteration, even from privileged host operating systems, hypervisors, and unauthorized administrators.
+
+### Why SpaceGuard AI Uses TEE
+Spaceflight component qualification involves high-stakes decision-making for multi-million-dollar space assets. In distributed, multi-tenant cloud environments or edge testing facilities, mission engineers must be confident that:
+1. Proprietary anomaly scoring coefficients and multi-factor weighting schemes remain confidential.
+2. Screening thresholds and flight qualification verdicts (`SAFE`, `MONITOR`, `REJECT`) cannot be maliciously tampered with during execution.
+3. Every qualification clearance verdict includes a tamper-evident cryptographic attestation proof linking the input burn-in measurements to the final decision.
+
+### What Computations Are Protected
+The TEE boundary encapsulates selected sensitive operations:
+- **Proprietary Risk Weightings**: The composite risk weighting terms combining lot-relative deviations, drift acceleration, boundary proximity, and temperature stress.
+- **Flight Qualification Decision Logic**: The threshold evaluations determining `SAFE`, `MONITOR`, and `REJECT` quarantine verdicts.
+- **Inference Verification**: Integrity validation of upstream AI models (Isolation Forest and XGBoost predictions).
+- **Cryptographic Attestation**: Generation of HMAC-SHA256 digests and signed execution proofs.
+
+### Why TEE is Strictly an Optional Layer
+TEE is a **defense-in-depth security and deployment layer**, **NOT** an AI algorithm or statistical replacement:
+- If `TEE_ENABLED=false`: The SpaceGuard AI pipeline (Module A lot-relative normalization, Module B temporal drift prediction, risk engine, and 3D satellite localization) operates normally without degradation.
+- If `TEE_ENABLED=true`: The sensitive computation is routed through the TEE boundary.
+- If TEE is unavailable: A configurable fallback policy (`TEE_FALLBACK_ALLOWED=true`) ensures continuous operation without crashing, while explicitly logging that fallback mode was used and never falsely claiming hardware protection.
+
+### Simulation / Development Mode vs. Production Deployment
+- **Local Development / Simulation Mode (`TEE_MODE=simulation`)**:
+  Simulates the enclave perimeter in software so engineers can test and verify TEE integrations on standard developer laptops without specialized confidential computing hardware.
+  *Important Note*: The system and UI clearly label this as `● TEE SIMULATION` (`hardware_backed: false`) and never claim hardware security when running in software emulation.
+- **Production Hardware Enclave (`TEE_MODE=production`)**:
+  Deploys the protected service inside a hardware-isolated confidential computing environment (e.g. AMD SEV-SNP or AWS Nitro Enclave), validating cryptographic attestation measurements before authorizing screening operations.
+
+### Engineering Limitations & Realistic Scope
+- **No Absolute Guarantee**: TEE memory isolation does not make an application immune to all security risks. It does not prevent algorithmic flaws in model training, side-channel attacks, or malicious physical tampering with hardware.
+- **Data Quality Independence**: TEE protects computation confidentiality and execution integrity; it does not replace empirical burn-in data verification or MIL-STD-883 screening standards.
+- **Attestation Scope**: Attestation proves code integrity within the enclave boundary at execution time, but does not guarantee the trustworthiness of external network inputs prior to ingestion.
+

@@ -74,7 +74,7 @@ export default function ComparePanel({ component }: { component: ComponentOut | 
               </span>
             </div>
             <div className={`text-sm font-bold mb-1 ${aiColor}`}>
-              {component ? `${component.status.toUpperCase()} (${component.risk_score}/100)` : 'PREDICTIVE VERDICT'}
+              {component ? `${(component.status || 'safe').toUpperCase()} (${component.risk_score}/100)` : 'PREDICTIVE VERDICT'}
             </div>
             <div className="text-[11px] text-slate-300 leading-relaxed italic mb-2">
               "Is it behaving normally, and where is its behavior heading?"

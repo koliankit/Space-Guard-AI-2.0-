@@ -267,13 +267,22 @@ export default function ISROOnboardingFlow({
           </div>
 
           <div className="flex items-center gap-2.5 text-xs font-mono">
-            <div className="bg-[#0B1220] border border-slate-800 px-3 py-1.5 rounded-md flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-slate-300">SYSTEM OPERATIONAL</span>
+            <div className="bg-[#111E30] border border-[#26384D] px-3 py-1.5 rounded-md flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
+              <span className="text-[#91A0B2]">SYSTEM OPERATIONAL</span>
             </div>
-            <div className="bg-[#0B1220] border border-slate-800 px-3 py-1.5 rounded-md text-slate-300">
-              MISSION: <span className="text-white font-bold">{activeMissionName}</span>
+            <div className="bg-[#111E30] border border-[#26384D] px-3 py-1.5 rounded-md text-[#91A0B2]">
+              MISSION: <span className="text-[#E8EDF2] font-bold">{activeMissionName}</span>
             </div>
+            <button
+              type="button"
+              onClick={onCompleteToDashboard}
+              className="bg-[#16253A] hover:bg-[#C99A2E] text-[#E8EDF2] hover:text-[#070D18] border border-[#26384D] hover:border-[#C99A2E] px-3.5 py-1.5 rounded-md font-mono font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm ml-2"
+              title="Enter Mission Control Dashboard directly"
+            >
+              <span>ENTER DASHBOARD</span>
+              <span>&rarr;</span>
+            </button>
           </div>
         </div>
 

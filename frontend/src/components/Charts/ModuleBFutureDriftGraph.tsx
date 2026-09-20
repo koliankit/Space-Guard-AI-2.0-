@@ -380,15 +380,15 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   // If no component is selected, render empty state (all hooks have been unconditionally called above)
   if (!component) {
     return (
-      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2 flex-1 h-full min-h-[400px]">
+      <div className="bg-[#111E30] border border-[#26384D] rounded-xl p-3.5 flex flex-col gap-2 flex-1 h-full min-h-[400px]">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-mono font-bold text-amber-400 flex items-center gap-1.5 text-[11px] uppercase">
-            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
+          <span className="font-mono font-bold text-[#C99A2E] flex items-center gap-1.5 text-[11px] uppercase">
+            <span className="w-2 h-2 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
             Module B &bull; Future Drift Forecaster (+96h Projection)
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">MODEL: POLYNOMIAL EXTENSION</span>
+          <span className="text-[10px] text-[#91A0B2] font-mono">MODEL: POLYNOMIAL EXTENSION</span>
         </div>
-        <div className="flex-1 min-h-[360px] md:min-h-[440px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
+        <div className="flex-1 min-h-[360px] md:min-h-[440px] flex items-center justify-center rounded-lg border border-[#26384D] bg-[#070D18] text-[#91A0B2] text-xs font-mono">
           [ AWAITING COMPONENT SELECTION TO DISPLAY DRIFT PROJECTION ]
         </div>
       </div>
@@ -396,19 +396,19 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
   }
 
   return (
-    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 relative shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
+    <div className="bg-[#111E30] border border-[#26384D] rounded-xl p-3 flex flex-col gap-2 relative shadow-lg select-none flex-1 h-full w-full min-h-[400px]">
       {/* Top Header & Extrapolation Horizon Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs md:text-sm border-b border-slate-800/80 pb-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs md:text-sm border-b border-[#26384D] pb-2.5">
         <div className="flex items-center gap-2">
-          <span className="font-display font-bold text-amber-400 flex items-center gap-1.5 text-xs md:text-sm uppercase tracking-wider">
-            <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
+          <span className="font-display font-bold text-[#C99A2E] flex items-center gap-1.5 text-xs md:text-sm uppercase tracking-wider">
+            <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-[#D94B5B] animate-alert-once' : 'bg-[#C99A2E] animate-gentle-pulse'}`} />
             MODULE B &bull; IN-FLIGHT DRIFT FORECASTING
           </span>
           <span
             className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold border ${
               willBreach
-                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                ? 'bg-[#28131D] text-[#D94B5B] border-[#D94B5B]/50'
+                : 'bg-[#3FA66B]/15 text-[#3FA66B] border-[#3FA66B]/40'
             }`}
           >
             {willBreach ? 'BREACH PREDICTED' : 'NOMINAL DRIFT'}
@@ -418,12 +418,12 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         {/* Live Simulation status, Speed Selector & Horizon Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Playback Controls & Speed Toggle */}
-          <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
+          <div className="flex items-center gap-1.5 bg-[#070D18] p-1 rounded-lg border border-[#26384D]">
             {isSimulating ? (
               <button
                 type="button"
                 onClick={togglePause}
-                className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#C99A2E]/20 text-[#C99A2E] border border-[#C99A2E]/40 text-[10px] font-mono font-bold hover:bg-[#C99A2E]/30 transition-all cursor-pointer"
                 title={isPaused ? 'Resume Simulation' : 'Pause Simulation'}
               >
                 <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
@@ -432,7 +432,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               <button
                 type="button"
                 onClick={() => startSimulation(true)}
-                className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#16253A] hover:bg-[#26384D] text-[#C99A2E] hover:text-[#E8EDF2] border border-[#26384D] text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
                 title="Replay in-flight drift simulation"
               >
                 <span>↺</span> REPLAY
@@ -440,16 +440,16 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             )}
 
             {/* Speed Selector */}
-            <div className="flex items-center gap-0.5 pl-1 border-l border-slate-700 text-[9.5px] font-mono">
+            <div className="flex items-center gap-0.5 pl-1 border-l border-[#26384D] text-[9.5px] font-mono">
               {([0.5, 1, 2] as const).map((spd) => (
                 <button
                   key={spd}
                   type="button"
                   onClick={() => setSimSpeed(spd)}
-                  className={`px-1.5 py-0.5 rounded ${
+                  className={`px-1.5 py-0.5 rounded transition-colors ${
                     simSpeed === spd
-                      ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-[#C99A2E]/30 text-[#C99A2E] font-bold border border-[#C99A2E]/50'
+                      : 'text-[#91A0B2] hover:text-[#E8EDF2]'
                   }`}
                   title={spd === 0.5 ? 'Ultra Slow (17s)' : spd === 1 ? 'Slow Observation (8.5s)' : 'Fast (4s)'}
                 >
@@ -460,7 +460,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
 
             {/* Live Phase Pill */}
             {isSimulating && (
-              <span className="text-[9.5px] font-mono font-bold text-amber-400 px-1 animate-pulse">
+              <span className="text-[9.5px] font-mono font-bold text-[#C99A2E] px-1 animate-gentle-pulse">
                 {isPaused
                   ? 'PAUSED'
                   : p2 > 0
@@ -470,8 +470,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             )}
           </div>
 
-          <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-xs">
-            <span className="text-slate-400 px-1 uppercase text-xs font-bold">HORIZON:</span>
+          <div className="flex items-center gap-1 bg-[#070D18] p-1 rounded-lg border border-[#26384D] font-mono text-xs">
+            <span className="text-[#91A0B2] px-1 uppercase text-xs font-bold">HORIZON:</span>
             {([216, 264, 336] as const).map((h) => (
               <button
                 key={h}
@@ -479,8 +479,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 onClick={() => setActiveHorizon(h)}
                 className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
                   activeHorizon === h
-                    ? 'bg-amber-500/30 text-amber-300 border border-amber-500/60 font-bold shadow-isro'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-[#C99A2E]/25 text-[#C99A2E] border border-[#C99A2E]/60 font-bold'
+                    : 'text-[#91A0B2] hover:text-[#E8EDF2] hover:bg-[#16253A]'
                 }`}
               >
                 +{h - 168}h ({h}h)
@@ -490,7 +490,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
 
           {/* Manual Inspection Active Badge */}
           {isInspecting && (
-            <span className="text-[10px] font-mono font-bold text-sky-300 bg-sky-950/80 px-2 py-1 rounded border border-sky-500/40">
+            <span className="text-[10px] font-mono font-bold text-[#3B82B6] bg-[#070D18] px-2 py-1 rounded border border-[#3B82B6]/40">
               PROBE: T+{Math.round(inspectH)}h &bull; {inspectVal.toFixed(2)} &mu;A
             </span>
           )}
@@ -500,7 +500,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
       {/* SVG Canvas Area with Manual Inspection Crosshair */}
       <div
         ref={containerRef}
-        className="relative rounded-lg border border-slate-800/80 bg-[#040812] overflow-hidden w-full flex-1 transition-all duration-300 min-h-[340px] md:min-h-[360px] h-[350px] md:h-[370px]"
+        className="relative rounded-lg border border-[#26384D] bg-[#070D18] overflow-hidden w-full flex-1 transition-all duration-300 min-h-[340px] md:min-h-[360px] h-[350px] md:h-[370px]"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
@@ -512,15 +512,15 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         >
           <defs>
             <linearGradient id="coneGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.05" />
-              <stop offset="100%" stopColor={willBreach ? '#ef4444' : '#f59e0b'} stopOpacity="0.25" />
+              <stop offset="0%" stopColor="#C99A2E" stopOpacity="0.06" />
+              <stop offset="100%" stopColor={willBreach ? '#D94B5B' : '#C99A2E'} stopOpacity="0.22" />
             </linearGradient>
             <linearGradient id="flightZoneGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.03" />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.07" />
+              <stop offset="0%" stopColor="#3B82B6" stopOpacity="0.02" />
+              <stop offset="100%" stopColor="#3B82B6" stopOpacity="0.06" />
             </linearGradient>
             <pattern id="gridPatternB" width="30" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 30 0 L 0 0 0 20" fill="none" stroke="#162238" strokeWidth="0.5" strokeOpacity="0.7" />
+              <path d="M 30 0 L 0 0 0 20" fill="none" stroke="#26384D" strokeWidth="0.5" strokeOpacity="0.6" />
             </pattern>
           </defs>
 
@@ -538,12 +538,12 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
           <text
             x={toX(168) + 8}
             y={padT + 14}
-            fill="#ffffff"
+            fill="#E8EDF2"
             fontSize="8"
             fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
             fontWeight="bold"
             letterSpacing="0.08em"
-            opacity={0.8}
+            opacity={0.7}
           >
             IN-FLIGHT PROJECTION ZONE (+{activeHorizon - 168}H)
           </text>
@@ -558,16 +558,16 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   y1={yPos}
                   x2={W - padR}
                   y2={yPos}
-                  stroke={yVal === limitVal ? '#ef4444' : '#162238'}
+                  stroke={yVal === limitVal ? '#D94B5B' : '#26384D'}
                   strokeDasharray={yVal === limitVal ? '4 3' : undefined}
                   strokeWidth={yVal === limitVal ? 1.2 : 0.6}
-                  strokeOpacity={yVal === limitVal ? 0.9 : 0.8}
+                  strokeOpacity={yVal === limitVal ? 0.9 : 0.6}
                 />
                 <text
                   x={padL - 6}
                   y={yPos + 3}
                   textAnchor="end"
-                  fill={yVal === limitVal ? '#ef4444' : '#64748b'}
+                  fill={yVal === limitVal ? '#D94B5B' : '#91A0B2'}
                   fontSize="9"
                   fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight={yVal === limitVal ? 'bold' : 'normal'}
@@ -588,16 +588,16 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   y1={padT}
                   x2={xPos}
                   y2={H - padB}
-                  stroke={h === 168 ? '#ffffff' : h === activeHorizon ? '#f59e0b' : '#162238'}
+                  stroke={h === 168 ? '#E8EDF2' : h === activeHorizon ? '#C99A2E' : '#26384D'}
                   strokeDasharray={h >= 168 ? '3 3' : undefined}
                   strokeWidth={h >= 168 ? 1 : 0.5}
-                  strokeOpacity={h >= 168 ? 0.7 : 0.5}
+                  strokeOpacity={h >= 168 ? 0.7 : 0.4}
                 />
                 <text
                   x={xPos}
                   y={H - padB + 14}
                   textAnchor="middle"
-                  fill={h === 168 ? '#ffffff' : h === activeHorizon ? '#f59e0b' : '#64748b'}
+                  fill={h === 168 ? '#E8EDF2' : h === activeHorizon ? '#C99A2E' : '#91A0B2'}
                   fontSize="9"
                   fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight={h >= 168 ? 'bold' : 'normal'}
@@ -613,7 +613,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             x={toX(168)}
             y={H - padB + 26}
             textAnchor="middle"
-            fill="#ffffff"
+            fill="#91A0B2"
             fontSize="7.5"
             fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
           >
@@ -622,8 +622,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
 
           {/* Datasheet Limit Badge */}
           <g transform={`translate(${W - padR - 105}, ${toY(limitVal) - 9})`}>
-            <rect width="102" height="15" rx="3" fill="#881337" opacity="0.8" />
-            <text x="51" y="10.5" textAnchor="middle" fill="#fda4af" fontSize="8" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
+            <rect width="102" height="15" rx="3" fill="#28131D" stroke="#D94B5B" strokeWidth="0.8" opacity="0.9" />
+            <text x="51" y="10.5" textAnchor="middle" fill="#D94B5B" fontSize="8" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
               SPEC LIMIT {limitVal.toFixed(1)} &mu;A
             </text>
           </g>
@@ -636,19 +636,19 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             <path
               d={earlyPredPathD}
               fill="none"
-              stroke="#94a3b8"
+              stroke="#91A0B2"
               strokeWidth="1"
               strokeDasharray="2 3"
-              opacity={Math.min(0.6, (p1 - 0.14) * 2)}
+              opacity={Math.min(0.5, (p1 - 0.14) * 2)}
             />
           )}
 
-          {/* Measured Past Telemetry Line (0h -> 168h, drawn live via strokeDashoffset) */}
+          {/* Measured Past Telemetry Line (0h -> 168h, Technical Blue) */}
           <path
             ref={measuredPathRef}
             d={measuredPathD}
             fill="none"
-            stroke="#ffffff"
+            stroke="#3B82B6"
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -656,19 +656,19 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             strokeDashoffset={isSimulating && p1 < 1 ? measuredLen * (1 - p1) : undefined}
           />
 
-          {/* Future Extrapolation Line (168h -> Horizon, drawn dynamically in Phase 2) */}
+          {/* Future Extrapolation Line (168h -> Horizon, Muted Gold or Alert Red) */}
           {extrapPathD && (
             <path
               d={extrapPathD}
               fill="none"
-              stroke={willBreach ? '#ef4444' : '#f59e0b'}
+              stroke={willBreach ? '#D94B5B' : '#C99A2E'}
               strokeWidth="2.2"
               strokeDasharray="4 3"
               strokeLinecap="round"
             />
           )}
 
-          {/* Nodes for Measured Points (Sequentially appearing as reached) */}
+          {/* Nodes for Measured Points */}
           {measuredPoints.map((p) => {
             const isReached = p1 >= p.h / 168 || animProgress >= 1
             if (!isReached) return null
@@ -682,8 +682,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 onMouseEnter={() => setHoveredPoint({ hour: p.h, val: p.v, label: p.label })}
                 onMouseLeave={() => setHoveredPoint(null)}
               >
-                <circle cx={cx} cy={cy} r="4" fill="#0f172a" stroke="#ffffff" strokeWidth="1.5" />
-                <circle cx={cx} cy={cy} r="1.5" fill="#ffffff" />
+                <circle cx={cx} cy={cy} r="4" fill="#070D18" stroke="#3B82B6" strokeWidth="1.5" />
+                <circle cx={cx} cy={cy} r="1.5" fill="#E8EDF2" />
               </g>
             )
           })}
@@ -695,8 +695,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 cx={toX(168)}
                 cy={toY(early168)}
                 r="3.5"
-                fill="#0f172a"
-                stroke="#94a3b8"
+                fill="#070D18"
+                stroke="#91A0B2"
                 strokeWidth="1.2"
                 strokeDasharray="2 2"
               />
@@ -705,14 +705,14 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 y1={toY(v168)}
                 x2={toX(168)}
                 y2={toY(early168)}
-                stroke="#f59e0b"
+                stroke="#C99A2E"
                 strokeWidth="1.2"
                 strokeDasharray="2 2"
               />
             </g>
           )}
 
-          {/* Future Projection Node at Horizon (activates in Phase 2 or when static) */}
+          {/* Future Projection Node at Horizon */}
           {(p2 > 0 || !isSimulating) && (
             <g
               className="cursor-pointer"
@@ -729,23 +729,23 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 <circle
                   cx={toX(activeHorizon)}
                   cy={toY(projectedAtHorizon)}
-                  r={10}
+                  r={8}
                   fill="none"
-                  stroke={willBreach ? '#ef4444' : '#f59e0b'}
-                  strokeWidth="1.5"
-                  className="animate-ping"
-                  opacity={0.6}
+                  stroke={willBreach ? '#D94B5B' : '#C99A2E'}
+                  strokeWidth="1.2"
+                  className="animate-gentle-pulse"
+                  opacity={0.5}
                 />
               )}
               <circle
                 cx={toX(targetExtrapH)}
                 cy={toY(targetExtrapVal)}
                 r={5}
-                fill={willBreach ? '#be123c' : '#d97706'}
-                stroke={willBreach ? '#fda4af' : '#fde68a'}
+                fill={willBreach ? '#28131D' : '#111E30'}
+                stroke={willBreach ? '#D94B5B' : '#C99A2E'}
                 strokeWidth="2"
               />
-              <circle cx={toX(targetExtrapH)} cy={toY(targetExtrapVal)} r="2" fill="#ffffff" />
+              <circle cx={toX(targetExtrapH)} cy={toY(targetExtrapVal)} r="2" fill={willBreach ? '#D94B5B' : '#C99A2E'} />
             </g>
           )}
 
@@ -756,19 +756,19 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               <circle
                 cx={probeTip.x}
                 cy={probeTip.y}
-                r={9}
-                fill={probeTip.isExtrap ? '#f59e0b' : '#ffffff'}
-                opacity={0.35}
+                r={8}
+                fill={probeTip.isExtrap ? '#C99A2E' : '#3B82B6'}
+                opacity={0.25}
               />
               <circle
                 cx={probeTip.x}
                 cy={probeTip.y}
-                r={4.5}
-                fill={probeTip.isExtrap ? '#f59e0b' : '#38bdf8'}
-                stroke="#ffffff"
+                r={4}
+                fill={probeTip.isExtrap ? '#C99A2E' : '#3B82B6'}
+                stroke="#E8EDF2"
                 strokeWidth={1.5}
               />
-              <circle cx={probeTip.x} cy={probeTip.y} r={1.5} fill="#ffffff" />
+              <circle cx={probeTip.x} cy={probeTip.y} r={1.5} fill="#E8EDF2" />
 
               {/* Floating HUD Telemetry Badge */}
               <g
@@ -783,8 +783,8 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   width="100"
                   height="20"
                   rx="4"
-                  fill="#0B1528"
-                  stroke={probeTip.isExtrap ? '#f59e0b' : '#38bdf8'}
+                  fill="#111E30"
+                  stroke={probeTip.isExtrap ? '#C99A2E' : '#3B82B6'}
                   strokeWidth="1.2"
                   filter="drop-shadow(0 2px 5px rgba(0,0,0,0.6))"
                 />
@@ -792,7 +792,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   x="0"
                   y="2"
                   textAnchor="middle"
-                  fill="#ffffff"
+                  fill="#E8EDF2"
                   fontSize="8.5"
                   fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight="bold"
@@ -803,14 +803,14 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             </g>
           )}
 
-          {/* Breach Crosshair & Annotation if within visible range and reached by sweep */}
+          {/* Breach Crosshair & Annotation - Calm highlight with alert-once */}
           {breachHour && breachHour <= maxX && (p2 === 1 || currentExtrapH >= breachHour) && (
-            <g transform={`translate(${toX(breachHour)}, ${toY(limitVal)})`}>
-              <circle r="7" fill="none" stroke="#ef4444" strokeWidth="1.5" className="animate-ping" opacity="0.75" />
-              <circle r="5" fill="#ef4444" fillOpacity="0.3" stroke="#ef4444" strokeWidth="1.8" />
-              <line x1="-8" y1="0" x2="8" y2="0" stroke="#ef4444" strokeWidth="1.5" />
-              <line x1="0" y1="-8" x2="0" y2="8" stroke="#ef4444" strokeWidth="1.5" />
-              <text x="0" y="-11" textAnchor="middle" fill="#ef4444" fontSize="7.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
+            <g transform={`translate(${toX(breachHour)}, ${toY(limitVal)})`} className="animate-alert-once">
+              <circle r="7" fill="none" stroke="#D94B5B" strokeWidth="1.2" opacity="0.8" />
+              <circle r="4.5" fill="#28131D" stroke="#D94B5B" strokeWidth="1.8" />
+              <line x1="-8" y1="0" x2="8" y2="0" stroke="#D94B5B" strokeWidth="1.5" />
+              <line x1="0" y1="-8" x2="0" y2="8" stroke="#D94B5B" strokeWidth="1.5" />
+              <text x="0" y="-11" textAnchor="middle" fill="#D94B5B" fontSize="7.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
                 BREACH T+{Math.round(breachHour)}H
               </text>
             </g>
@@ -825,7 +825,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 x2={toX(inspectH)}
                 y1={padT}
                 y2={H - padB}
-                stroke={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
+                stroke={isInspectExtrap ? '#C99A2E' : '#3B82B6'}
                 strokeWidth={1.5}
                 strokeDasharray="3 2"
                 opacity={0.9}
@@ -836,7 +836,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 x2={toX(inspectH)}
                 y1={toY(inspectVal)}
                 y2={toY(inspectVal)}
-                stroke={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
+                stroke={isInspectExtrap ? '#C99A2E' : '#3B82B6'}
                 strokeWidth={0.8}
                 strokeDasharray="2 2"
                 opacity={0.5}
@@ -845,16 +845,16 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
               <circle
                 cx={toX(inspectH)}
                 cy={toY(inspectVal)}
-                r={7}
-                fill={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
-                opacity={0.3}
+                r={6}
+                fill={isInspectExtrap ? '#C99A2E' : '#3B82B6'}
+                opacity={0.25}
               />
               <circle
                 cx={toX(inspectH)}
                 cy={toY(inspectVal)}
-                r={4}
-                fill={isInspectExtrap ? '#d97706' : '#0284c7'}
-                stroke="#ffffff"
+                r={3.5}
+                fill={isInspectExtrap ? '#C99A2E' : '#3B82B6'}
+                stroke="#E8EDF2"
                 strokeWidth={1.5}
               />
 
@@ -871,16 +871,16 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   width="128"
                   height="24"
                   rx="4"
-                  fill="#030712"
-                  stroke={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
-                  strokeWidth="1.4"
+                  fill="#111E30"
+                  stroke={isInspectExtrap ? '#C99A2E' : '#3B82B6'}
+                  strokeWidth="1.2"
                   filter="drop-shadow(0 3px 6px rgba(0,0,0,0.8))"
                 />
                 <text
                   x="0"
                   y="-1"
                   textAnchor="middle"
-                  fill="#94a3b8"
+                  fill="#91A0B2"
                   fontSize="8"
                   fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                 >
@@ -890,7 +890,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                   x="0"
                   y="8"
                   textAnchor="middle"
-                  fill={isInspectExtrap ? '#f59e0b' : '#38bdf8'}
+                  fill={isInspectExtrap ? '#C99A2E' : '#3B82B6'}
                   fontSize="9.5"
                   fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight="bold"
@@ -910,15 +910,15 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
                 width="84"
                 height="22"
                 rx="4"
-                fill="#0f172a"
-                stroke="#f59e0b"
+                fill="#111E30"
+                stroke="#C99A2E"
                 strokeWidth="1"
                 filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"
               />
-              <text x="0" y="-2" textAnchor="middle" fill="#94a3b8" fontSize="7.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif">
+              <text x="0" y="-2" textAnchor="middle" fill="#91A0B2" fontSize="7.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif">
                 {hoveredPoint.label}
               </text>
-              <text x="0" y="6" textAnchor="middle" fill="#f59e0b" fontSize="8.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
+              <text x="0" y="6" textAnchor="middle" fill="#C99A2E" fontSize="8.5" fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif" fontWeight="bold">
                 {hoveredPoint.val.toFixed(2)} &mu;A
               </text>
             </g>
@@ -929,7 +929,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             x={padL - 6}
             y={padT - 6}
             textAnchor="end"
-            fill="#64748b"
+            fill="#91A0B2"
             fontSize="8"
             fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
           >
@@ -940,69 +940,69 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
 
       {/* Metric Callouts & Flight Advisory Bottom Row (Live Count-Up Synchronized with Sweep or Manual Inspection) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+        <div className="p-2.5 rounded-lg bg-[#16253A] border border-[#26384D] flex flex-col">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
+            <span className="text-xs text-[#91A0B2] uppercase font-semibold">Drift Velocity</span>
             {isSimulating && (
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
             )}
           </div>
-          <span className={`text-base font-bold mt-0.5 tabular-nums ${displayedDriftVelocity > 50 ? 'text-rose-400' : 'text-amber-400'}`}>
-            {displayedDriftVelocity.toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
+          <span className={`text-base font-bold mt-0.5 tabular-nums ${displayedDriftVelocity > 50 ? 'text-[#D94B5B]' : 'text-[#C99A2E]'}`}>
+            {displayedDriftVelocity.toFixed(2)} <span className="text-xs font-normal text-[#91A0B2]">nA/hr</span>
           </span>
         </div>
 
-        <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+        <div className="p-2.5 rounded-lg bg-[#16253A] border border-[#26384D] flex flex-col">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">Early Pred Error</span>
+            <span className="text-xs text-[#91A0B2] uppercase font-semibold">Early Pred Error</span>
             {isSimulating && (
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
             )}
           </div>
-          <span className="text-base font-bold text-amber-300 mt-0.5 tabular-nums">
-            &plusmn;{displayedPredError.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+          <span className="text-base font-bold text-[#E8EDF2] mt-0.5 tabular-nums">
+            &plusmn;{displayedPredError.toFixed(2)} <span className="text-xs font-normal text-[#91A0B2]">&mu;A</span>
           </span>
         </div>
 
-        <div className={`p-2.5 rounded-lg bg-[#050B16] border flex flex-col transition-colors ${
-          isInspecting ? 'border-sky-500/50 bg-sky-950/20' : 'border-slate-800'
+        <div className={`p-2.5 rounded-lg bg-[#16253A] border flex flex-col transition-colors ${
+          isInspecting ? 'border-[#3B82B6] bg-[#16253A]' : 'border-[#26384D]'
         }`}>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">
+            <span className="text-xs text-[#91A0B2] uppercase font-semibold">
               {isInspecting ? `Probe @ T+${Math.round(inspectH)}h` : `+${activeHorizon - 168}h Projection`}
             </span>
             {isSimulating && !isInspecting && (
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
             )}
             {isInspecting && (
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3B82B6] animate-gentle-pulse" />
             )}
           </div>
           <span className={`text-base font-bold mt-0.5 tabular-nums ${
-            isInspecting ? 'text-sky-300 font-bold' : willBreach ? 'text-rose-400 font-bold' : 'text-slate-100'
+            isInspecting ? 'text-[#3B82B6] font-bold' : willBreach ? 'text-[#D94B5B] font-bold' : 'text-[#E8EDF2]'
           }`}>
-            {displayedProjection.toFixed(2)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+            {displayedProjection.toFixed(2)} <span className="text-xs font-normal text-[#91A0B2]">&mu;A</span>
           </span>
         </div>
 
-        <div className={`p-2.5 rounded-lg bg-[#050B16] border flex flex-col transition-colors ${
-          isInspecting ? 'border-sky-500/50 bg-sky-950/20' : 'border-slate-800'
+        <div className={`p-2.5 rounded-lg bg-[#16253A] border flex flex-col transition-colors ${
+          isInspecting ? 'border-[#3B82B6] bg-[#16253A]' : 'border-[#26384D]'
         }`}>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 uppercase font-semibold">
+            <span className="text-xs text-[#91A0B2] uppercase font-semibold">
               {isInspecting ? 'Probe Safety Margin' : 'Future Margin'}
             </span>
             {isSimulating && !isInspecting && (
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
             )}
             {isInspecting && (
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3B82B6] animate-gentle-pulse" />
             )}
           </div>
           <span className={`text-base font-bold mt-0.5 tabular-nums ${
-            displayedMargin < 5 ? 'text-rose-400' : displayedMargin < 15 ? 'text-amber-400' : 'text-emerald-400'
+            displayedMargin < 5 ? 'text-[#D94B5B]' : displayedMargin < 15 ? 'text-[#D6A33A]' : 'text-[#3FA66B]'
           }`}>
-            {displayedMargin.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+            {displayedMargin.toFixed(1)} <span className="text-xs font-normal text-[#91A0B2]">&mu;A</span>
           </span>
         </div>
       </div>

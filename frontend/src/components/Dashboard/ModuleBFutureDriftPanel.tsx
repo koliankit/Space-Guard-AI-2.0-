@@ -44,20 +44,22 @@ export default function ModuleBFutureDriftPanel({
   const isAccelerating = selected?.drift_trend === 'ACCELERATING POSITIVE DRIFT'
 
   return (
-    <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden h-full">
+    <div className={`flex flex-col rounded-xl bg-[#111E30] border shadow-xl overflow-hidden h-full transition-colors ${
+      willBreach ? 'border-[#D94B5B]/60' : 'border-[#26384D]'
+    }`}>
       {/* Module B Top Bezel Bar */}
-      <div className="bg-[#0D162A] border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+      <div className="bg-[#0D1726] border-b border-[#26384D] px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-3">
-          <span className="px-3 py-1 rounded-md bg-amber-500/25 text-amber-300 text-sm sm:text-base font-mono font-black border border-amber-500/70 shadow-isro tracking-wider uppercase whitespace-nowrap">
+          <span className="px-3 py-1 rounded-md bg-[#C99A2E]/20 text-[#C99A2E] text-sm sm:text-base font-mono font-black border border-[#C99A2E]/60 shadow-isro tracking-wider uppercase whitespace-nowrap">
             MODULE B
           </span>
-          <span className="text-xs sm:text-sm font-display font-bold text-white tracking-wider uppercase">
+          <span className="text-xs sm:text-sm font-display font-bold text-[#E8EDF2] tracking-wider uppercase">
             Future Drift &amp; In-Flight Reliability Forecasting
           </span>
         </div>
         <div className="flex items-center gap-2 text-xs font-mono">
-          <span className={`w-2.5 h-2.5 rounded-full ${willBreach ? 'bg-rose-500 led' : 'bg-amber-400 led'}`} />
-          <span className="text-slate-400 text-[11px]">
+          <span className={`w-2 h-2 rounded-full ${willBreach ? 'bg-[#D94B5B] led' : 'bg-[#C99A2E] led'}`} />
+          <span className="text-[#91A0B2] text-[11px]">
             {isSim
               ? simData?.p2 && simData.p2 > 0
                 ? `IN-FLIGHT EXTRAPOLATING: +${Math.round((simData?.currentH ?? 168) - 168)}H`
@@ -68,16 +70,16 @@ export default function ModuleBFutureDriftPanel({
       </div>
 
       {/* Module B Predictive Engine & Horizon Sub-bar */}
-      <div className="p-3 bg-[#070D1A] border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+      <div className="p-3 bg-[#0D1726] border-b border-[#26384D] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
         <div className="flex items-center gap-2">
-          <span className="text-slate-400 font-mono text-[11px]">PREDICTION ENGINE:</span>
-          <span className="text-amber-300 font-bold bg-amber-500/15 px-2 py-0.5 rounded border border-amber-500/30 text-[11px]">
+          <span className="text-[#91A0B2] font-mono text-[11px]">PREDICTION ENGINE:</span>
+          <span className="text-[#C99A2E] font-bold bg-[#C99A2E]/15 px-2 py-0.5 rounded border border-[#C99A2E]/30 text-[11px]">
             EMPIRICAL ARRHENIUS DEGRADATION
           </span>
         </div>
         <div className="flex items-center gap-2 text-[11px]">
-          <span className="text-slate-400">HORIZON:</span>
-          <span className="text-emerald-400 font-bold bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+          <span className="text-[#91A0B2]">HORIZON:</span>
+          <span className="text-[#3FA66B] font-bold bg-[#3FA66B]/15 px-2 py-0.5 rounded border border-[#3FA66B]/30">
             264H IN-FLIGHT (+96H EXTENSION)
           </span>
         </div>
@@ -86,17 +88,19 @@ export default function ModuleBFutureDriftPanel({
       {/* Main Content Area */}
       <div className="p-3.5 flex-1 flex flex-col gap-3.5">
         {selected ? (
-          <div className="p-3 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col gap-2.5">
+          <div className={`p-3 rounded-lg border flex flex-col gap-2.5 transition-colors ${
+            willBreach ? 'bg-[#28131D] border-[#D94B5B]/50' : 'bg-[#16253A] border-[#26384D]'
+          }`}>
             {/* Top Identity & Drift Classification Row */}
             <div className="flex flex-wrap items-center justify-between gap-2.5 font-mono">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="text-base md:text-lg font-bold text-white tracking-wide">{selected.component_id}</span>
-                <span className="text-slate-400 text-sm">&bull;</span>
-                <span className="text-amber-300 text-xs md:text-sm font-semibold">Target Subsystem:</span>
+                <span className="text-base md:text-lg font-bold text-[#E8EDF2] tracking-wide">{selected.component_id}</span>
+                <span className="text-[#5A6E85] text-sm">&bull;</span>
+                <span className="text-[#C99A2E] text-xs md:text-sm font-semibold">Target Subsystem:</span>
                 <button
                   type="button"
                   onClick={() => onSelectSubsystem && onSelectSubsystem(selected.subsystem)}
-                  className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-amber-300 text-xs font-bold hover:bg-slate-700 transition-colors"
+                  className="px-2 py-1 rounded-md bg-[#111E30] border border-[#26384D] text-[#3B82B6] text-xs font-bold hover:border-[#3B82B6] transition-colors"
                 >
                   [{selected.subsystem}] {loc?.name || selected.subsystem}
                 </button>
@@ -105,17 +109,17 @@ export default function ModuleBFutureDriftPanel({
               {/* Drift Trend Badge */}
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-3 py-1 rounded-md text-xs font-bold border transition-all ${
+                  className={`px-3 py-1 rounded-md text-xs font-bold border transition-colors ${
                     willBreach
-                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                      ? 'bg-[#D94B5B]/20 text-[#D94B5B] border-[#D94B5B]/50'
                       : isAccelerating
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                      : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                      ? 'bg-[#D6A33A]/20 text-[#D6A33A] border-[#D6A33A]/50'
+                      : 'bg-[#3FA66B]/20 text-[#3FA66B] border-[#3FA66B]/50'
                   }`}
                 >
                   {isSim ? (
                     <span className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] led" />
                       {willBreach
                         ? 'CRITICAL LIMIT EXCEEDANCE'
                         : simData?.p2 && simData.p2 > 0
@@ -127,129 +131,82 @@ export default function ModuleBFutureDriftPanel({
                   )}
                 </span>
                 {willBreach && (
-                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-rose-600 text-white animate-pulse">
+                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#D94B5B] text-[#E8EDF2] animate-alert-once">
                     CRITICAL BREACH
                   </span>
                 )}
               </div>
             </div>
 
-            {/* In-Flight Reliability Forecast Metrics Grid (Live count-up synchronized with sweep) */}
+            {/* In-Flight Reliability Forecast Metrics Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+              <div className="p-2.5 rounded-lg bg-[#070D18] border border-[#26384D] flex flex-col">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400 uppercase font-semibold">Drift Velocity</span>
-                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />}
+                  <span className="text-xs text-[#91A0B2] uppercase font-semibold">Drift Velocity</span>
+                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] led" />}
                 </div>
-                <span className={`text-base font-bold mt-1 tabular-nums ${liveVel > 50 ? 'text-rose-400' : 'text-amber-400'}`}>
-                  {liveVel.toFixed(2)} <span className="text-xs font-normal text-slate-400">nA/hr</span>
+                <span className={`text-base font-bold mt-1 tabular-nums ${liveVel > 50 ? 'text-[#D94B5B]' : 'text-[#C99A2E]'}`}>
+                  {liveVel.toFixed(2)} <span className="text-xs font-normal text-[#91A0B2]">nA/hr</span>
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+              <div className="p-2.5 rounded-lg bg-[#070D18] border border-[#26384D] flex flex-col">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400 uppercase font-semibold">264h Extrapolated</span>
-                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />}
+                  <span className="text-xs text-[#91A0B2] uppercase font-semibold">264h Extrapolated</span>
+                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] led" />}
                 </div>
-                <span className={`text-base font-bold mt-1 tabular-nums ${willBreach ? 'text-rose-400' : 'text-slate-100'}`}>
-                  {liveProj.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+                <span className={`text-base font-bold mt-1 tabular-nums ${willBreach ? 'text-[#D94B5B]' : 'text-[#E8EDF2]'}`}>
+                  {liveProj.toFixed(1)} <span className="text-xs font-normal text-[#91A0B2]">&mu;A</span>
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
+              <div className="p-2.5 rounded-lg bg-[#070D18] border border-[#26384D] flex flex-col">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400 uppercase font-semibold">Future Safety Margin</span>
-                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />}
+                  <span className="text-xs text-[#91A0B2] uppercase font-semibold">Future Safety Margin</span>
+                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] led" />}
                 </div>
                 <span
                   className={`text-base font-bold mt-1 tabular-nums ${
                     liveMarg < 5
-                      ? 'text-rose-400'
+                      ? 'text-[#D94B5B]'
                       : liveMarg < 15
-                      ? 'text-amber-400'
-                      : 'text-emerald-400'
+                      ? 'text-[#D6A33A]'
+                      : 'text-[#3FA66B]'
                   }`}
                 >
-                  {liveMarg.toFixed(1)} <span className="text-xs font-normal text-slate-400">&mu;A</span>
+                  {liveMarg.toFixed(1)} <span className="text-xs font-normal text-[#91A0B2]">&mu;A</span>
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#050B16] border border-slate-800 flex flex-col">
-                <span className="text-xs text-slate-400 uppercase font-semibold">Time to Limit Breach</span>
-                <span className={`text-base font-bold mt-1 tabular-nums ${breachHour && breachHour <= 300 ? 'text-rose-400' : 'text-emerald-400'}`}>
+              <div className="p-2.5 rounded-lg bg-[#070D18] border border-[#26384D] flex flex-col">
+                <span className="text-xs text-[#91A0B2] uppercase font-semibold">Time to Limit Breach</span>
+                <span className={`text-base font-bold mt-1 tabular-nums ${breachHour && breachHour <= 300 ? 'text-[#D94B5B]' : 'text-[#3FA66B]'}`}>
                   {breachHour && breachHour > 0 && breachHour < 1000
-                    ? `T+${Math.round(breachHour)} hrs`
-                    : '> 10,000 hrs (SAFE)'}
+                    ? `T+${Math.round(breachHour)}h`
+                    : 'NO BREACH (>1000h)'}
                 </span>
               </div>
-            </div>
-
-            {/* Early Drift Extrapolation & Safety Slope Validation */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs md:text-sm font-mono text-slate-200 pt-1.5 border-t border-slate-800/80">
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col items-start">
-                <span className="text-slate-400">Early 0-24h Model:</span>
-                <span className="text-slate-100 font-bold tabular-nums">
-                  {selected.predicted168_from_early.toFixed(1)} &mu;A
-                </span>
-              </div>
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col items-start">
-                <span className="text-slate-400">Pred. Drift Rate:</span>
-                <span className="text-amber-300 font-bold tabular-nums">
-                  {(selected.predicted_drift_rate ?? ((selected.predicted168_from_early - selected.v0) / 168)).toFixed(4)} &mu;A/hr
-                </span>
-              </div>
-              <div className="flex justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg flex-col items-start">
-                <span className="text-slate-400">Safety Slope Limit:</span>
-                <span className="text-slate-100 font-bold tabular-nums">
-                  {(selected.safety_slope ?? 0.040).toFixed(4)} &mu;A/hr
-                </span>
-              </div>
-              <div className={`flex justify-between px-3 py-1.5 rounded-lg flex-col items-start ${selected.safety_slope_exceeded ? 'bg-rose-500/20' : 'bg-emerald-500/20'}`}>
-                <span className={`${selected.safety_slope_exceeded ? 'text-rose-300' : 'text-emerald-300'}`}>Safety Check:</span>
-                <span className={`font-bold tabular-nums ${selected.safety_slope_exceeded ? 'text-rose-400' : 'text-emerald-400'}`}>
-                  {selected.safety_slope_exceeded ? 'FAIL (REJECT)' : 'PASS'}
-                </span>
-              </div>
-            </div>
-
-            {/* Flight Operations Advisory / Mitigation Actions */}
-            <div
-              className={`p-3 rounded-lg text-xs md:text-sm flex items-start gap-2.5 border ${
-                willBreach
-                  ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
-                  : 'bg-amber-500/10 border-amber-500/40 text-amber-200'
-              }`}
-            >
-              <span className="font-bold font-mono text-xs md:text-sm uppercase whitespace-nowrap">
-                {willBreach ? '⚠️ Mitigation Advisory:' : 'ℹ️ Flight Recommendation:'}
-              </span>
-              <span className="text-xs md:text-[13.5px] font-sans leading-relaxed">
-                {willBreach
-                  ? `Component exhibits runaway leakage drift exceeding ${limitVal} µA threshold in mission orbit. Recommend automated telemetry trip, power bus decoupling, and switching to redundant Cold-Standby channel in ${loc?.bay || 'Equipment Bay'}.`
-                  : `Component exhibits stable drift velocity (${(slope * 1000).toFixed(1)} nA/hr). Maintain regular 24h orbital polling cycle. Bus supply remains nominal.`}
-              </span>
             </div>
           </div>
         ) : (
-          <div className="p-6 text-center text-xs text-slate-400 bg-[#070D1A] rounded-lg border border-slate-800">
-            No component selected. Pick a component from Module A to evaluate Module B Future Drift Projections.
+          <div className="p-6 text-center text-xs text-[#91A0B2] bg-[#16253A] rounded-lg border border-[#26384D]">
+            No component selected. Ingest data or pick a component to run Module B Future Drift Forecast.
           </div>
         )}
 
-        {/* Module B Dedicated Graph: Future Drift Forecaster */}
+        {/* Module B Dedicated Graph: Predictive Extrapolation Canvas */}
         <div className="mt-1 flex flex-col h-[350px] md:h-[370px] min-h-[340px] md:min-h-[360px] w-full">
           <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>
 
       {/* Module B Bezel Bottom Bar */}
-      <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-2 text-xs text-slate-400 flex justify-between font-mono">
-        <span>Extrapolation Algorithm: Empirical Arrhenius Degradation Model</span>
-        <span className={willBreach ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
-          {willBreach ? 'ACTION REQUIRED: ISOLATE COMPONENT' : 'SYSTEM RELIABILITY: NOMINAL'}
+      <div className="bg-[#0D1726] border-t border-[#26384D] px-4 py-2 text-xs text-[#91A0B2] flex justify-between font-mono">
+        <span>Extrapolation: Linear Arrhenius + Dynamic Confidence Cone</span>
+        <span className="text-[#E8EDF2]">
+          Datasheet Bound: {limitVal.toFixed(1)} &mu;A
         </span>
       </div>
     </div>
   )
 }
-

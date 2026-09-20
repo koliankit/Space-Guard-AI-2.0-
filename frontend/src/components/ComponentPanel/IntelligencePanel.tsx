@@ -56,7 +56,7 @@ export function ComponentOverviewCard({ component }: { component: ComponentOut |
                   : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
               }`}
             >
-              {component.status.toUpperCase()}
+              {(component.status || 'safe').toUpperCase()}
             </span>
           </div>
         </div>
@@ -88,7 +88,7 @@ export function ComponentOverviewCard({ component }: { component: ComponentOut |
           <div className="flex justify-between items-center">
             <span className="text-slate-400 font-medium">AI Lot-Relative Verdict:</span>
             <b className={`px-2.5 py-1 rounded font-mono text-xs ${isReject ? 'text-rose-300 bg-rose-500/20' : isMonitor ? 'text-amber-300 bg-amber-500/20' : 'text-emerald-300 bg-emerald-500/20'}`}>
-              {component.status.toUpperCase()} &bull; Risk {component.risk_score}/100
+              {(component.status || 'safe').toUpperCase()} &bull; Risk {component.risk_score}/100
             </b>
           </div>
           {isAbnormalInSpec ? (
@@ -280,7 +280,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
           <span className={`font-mono text-base font-bold ${
             isReject ? 'text-rose-400' : isMonitor ? 'text-amber-400' : 'text-emerald-400'
           }`}>
-            {component.risk_score} / 100 [{component.status.toUpperCase()}]
+            {component.risk_score} / 100 [{(component.status || 'safe').toUpperCase()}]
           </span>
           <span className="text-[10px] text-slate-400 truncate">
             {component.risk_score >= 75 ? 'QUARANTINE THRESHOLD' : component.risk_score >= 40 ? 'MONITORING ACTIVE' : 'FLIGHT READY'}

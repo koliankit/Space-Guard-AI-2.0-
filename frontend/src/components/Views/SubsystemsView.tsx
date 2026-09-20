@@ -243,7 +243,7 @@ export default function SubsystemsView({
                           : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                       }`}
                     >
-                      {lot.status.toUpperCase()}
+                      {(lot.status || 'safe').toUpperCase()}
                     </span>
                   </div>
 
@@ -398,7 +398,7 @@ export default function SubsystemsView({
                           : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                       }`}
                     >
-                      {sub.status.toUpperCase()}
+                      {(sub.status || 'safe').toUpperCase()}
                     </span>
                   </div>
 

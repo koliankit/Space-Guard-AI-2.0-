@@ -277,7 +277,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
 
   const isRej = component?.status === 'reject'
   const isMon = component?.status === 'monitor'
-  const curveColor = isRej ? '#EF4444' : isMon ? '#F59E0B' : '#10B981'
+  const curveColor = isRej ? '#D94B5B' : isMon ? '#D6A33A' : '#3FA66B'
 
   // Live interpolated readouts in sync with sweep (matching Module A & B)
   const finalDelta = (component?.v168 ?? 0) - (component?.v0 ?? 0)
@@ -301,27 +301,27 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     }).join(' ')
 
     return (
-      <div className="bg-[#0B1120] p-4 md:p-5 rounded-xl border border-slate-800 relative overflow-hidden font-sans w-full flex flex-col gap-3">
+      <div className="bg-[#111E30] p-4 md:p-5 rounded-xl border border-[#26384D] relative overflow-hidden font-sans w-full flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h3 className="m-0 text-sm md:text-base font-bold font-display tracking-wider uppercase text-amber-400 flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 led" />
+          <h3 className="m-0 text-sm md:text-base font-bold font-display tracking-wider uppercase text-[#C99A2E] flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
             Burn-In Waveform Telemetry Oscilloscope (Full Spectrum)
           </h3>
-          <span className="font-mono text-xs text-slate-300 tracking-wider">
-            CHANNEL: <span className="text-emerald-400 font-bold">OSC-CH1 / CH2 / CH3</span>
+          <span className="font-mono text-xs text-[#91A0B2] tracking-wider">
+            CHANNEL: <span className="text-[#3FA66B] font-bold">OSC-CH1 / CH2 / CH3</span>
           </span>
         </div>
         <div ref={containerRef} className="w-full flex-1 min-h-[440px]">
-          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="w-full h-full block bg-[#060B16] rounded-xl border border-slate-800 select-none">
+          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="w-full h-full block bg-[#070D18] rounded-xl border border-[#26384D] select-none">
             {/* Reticle Grid */}
             {[0.2, 0.4, 0.6, 0.8].map((pct, i) => (
-              <line key={`h-${i}`} x1={padL} y1={padT + pct * (H - padT - padB)} x2={W - padR} y2={padT + pct * (H - padT - padB)} stroke="#94A3B8" strokeOpacity="0.12" strokeDasharray="4 4" />
+              <line key={`h-${i}`} x1={padL} y1={padT + pct * (H - padT - padB)} x2={W - padR} y2={padT + pct * (H - padT - padB)} stroke="#26384D" strokeOpacity="0.5" strokeDasharray="4 4" />
             ))}
             {/* Channel 1 */}
-            <polyline points={busPts1} fill="none" stroke="#10B981" strokeWidth="2.5" style={{ filter: 'drop-shadow(0 0 8px rgba(16,185,129,0.6))' }} />
+            <polyline points={busPts1} fill="none" stroke="#3FA66B" strokeWidth="2.2" />
             {/* Channel 2 */}
-            <polyline points={busPts2} fill="none" stroke="#FFFFFF" strokeWidth="2" strokeDasharray="4 3" style={{ filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.6))' }} />
-            <text x={W / 2} y={H / 2} textAnchor="middle" className="fill-amber-300 text-xs font-mono font-bold tracking-wider">
+            <polyline points={busPts2} fill="none" stroke="#3B82B6" strokeWidth="1.8" strokeDasharray="4 3" />
+            <text x={W / 2} y={H / 2} textAnchor="middle" className="fill-[#C99A2E] text-xs font-mono font-bold tracking-wider">
               [ LIVE SPACECRAFT BUS STREAM &bull; SELECT COMPONENT TO INSPECT WAVEFORM ]
             </text>
           </svg>
@@ -331,31 +331,31 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
   }
 
   return (
-    <div className="bg-[#0B1120] p-4 md:p-5 rounded-xl border border-slate-800 relative overflow-hidden font-sans w-full flex flex-col gap-3 shadow-panel-subtle select-none">
+    <div className="bg-[#111E30] p-4 md:p-5 rounded-xl border border-[#26384D] relative overflow-hidden font-sans w-full flex flex-col gap-3 select-none">
       {/* Top Header & Live Sweep Controls Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[#26384D]">
         <div className="flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 rounded-full led" style={{ backgroundColor: curveColor }} />
-          <h3 className="m-0 text-sm md:text-base font-bold font-display tracking-wider uppercase text-amber-400 flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full animate-gentle-pulse" style={{ backgroundColor: curveColor }} />
+          <h3 className="m-0 text-sm md:text-base font-bold font-display tracking-wider uppercase text-[#C99A2E] flex items-center gap-2">
             Burn-In Waveform Telemetry Oscilloscope
           </h3>
-          <span className="text-xs font-mono px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-100 font-bold">
+          <span className="text-xs font-mono px-2.5 py-0.5 rounded bg-[#16253A] border border-[#26384D] text-[#E8EDF2] font-bold">
             {component.component_id}
           </span>
-          <span className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-[#070D1A] border border-slate-800 text-slate-400">
-            {component.subsystem_name || component.subsystem.toUpperCase()} &bull; LOT: {component.lot_id}
+          <span className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-[#0D1726] border border-[#26384D] text-[#91A0B2]">
+            {component.subsystem_name || (component.subsystem ? component.subsystem.toUpperCase() : 'SUBSYSTEM')} &bull; LOT: {component.lot_id}
           </span>
         </div>
 
         {/* Live Sweep Playback & Horizon Filter Controls */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Playback Controls & Speed Toggle */}
-          <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
+          <div className="flex items-center gap-1.5 bg-[#070D18] p-1 rounded-lg border border-[#26384D]">
             {isSimulating ? (
               <button
                 type="button"
                 onClick={togglePause}
-                className="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-mono font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
+                className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#C99A2E]/20 text-[#C99A2E] border border-[#C99A2E]/40 text-[11px] font-mono font-bold hover:bg-[#C99A2E]/30 transition-all cursor-pointer"
                 title={isPaused ? 'Resume Sweep' : 'Pause Sweep'}
               >
                 <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
@@ -364,7 +364,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
               <button
                 type="button"
                 onClick={() => startSweepAnimation(true)}
-                className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[11px] font-mono font-bold transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#16253A] hover:bg-[#26384D] text-[#C99A2E] hover:text-[#E8EDF2] border border-[#26384D] text-[11px] font-mono font-bold transition-all cursor-pointer shadow-sm"
                 title="Replay oscilloscope telemetry sweep"
               >
                 <span>↺</span> REPLAY
@@ -372,16 +372,16 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             )}
 
             {/* Speed Selector */}
-            <div className="flex items-center gap-0.5 pl-1.5 border-l border-slate-700 text-[10px] font-mono">
+            <div className="flex items-center gap-0.5 pl-1.5 border-l border-[#26384D] text-[10px] font-mono">
               {([0.5, 1, 2] as const).map((spd) => (
                 <button
                   key={spd}
                   type="button"
                   onClick={() => setSimSpeed(spd)}
-                  className={`px-1.5 py-0.5 rounded ${
+                  className={`px-1.5 py-0.5 rounded transition-colors ${
                     simSpeed === spd
-                      ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-[#C99A2E]/30 text-[#C99A2E] font-bold border border-[#C99A2E]/50'
+                      : 'text-[#91A0B2] hover:text-[#E8EDF2]'
                   }`}
                   title={spd === 0.5 ? '0.5x Slow' : spd === 1 ? '1x Normal' : '2x Fast'}
                 >
@@ -392,15 +392,15 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
 
             {/* Live Timestamp Indicator */}
             {isSimulating && (
-              <span className="text-[10px] font-mono font-bold text-emerald-400 px-1.5 animate-pulse">
+              <span className="text-[10px] font-mono font-bold text-[#3FA66B] px-1.5 animate-gentle-pulse">
                 {isPaused ? '[PAUSED]' : `[T+${Math.round(simHour)}h]`}
               </span>
             )}
           </div>
 
           {/* Stage Scrubbing Selectors */}
-          <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800">
-            <span className="text-xs font-mono text-slate-400 px-1.5 uppercase font-bold">Horizon:</span>
+          <div className="flex items-center gap-1 bg-[#070D18] p-1 rounded-lg border border-[#26384D]">
+            <span className="text-xs font-mono text-[#91A0B2] px-1.5 uppercase font-bold">Horizon:</span>
             {STAGES.map((h) => (
               <button
                 key={h}
@@ -408,8 +408,8 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                 onClick={() => setStageH(h)}
                 className={`px-2.5 py-1 text-center font-mono text-xs rounded border transition-all cursor-pointer ${
                   stageH === h
-                    ? 'border-amber-500 bg-amber-500/25 text-amber-300 font-bold shadow-sm'
-                    : 'border-slate-800 bg-[#070D1A] text-slate-300 hover:border-amber-500/50 hover:text-white'
+                    ? 'border-[#C99A2E]/70 bg-[#C99A2E]/25 text-[#C99A2E] font-bold shadow-sm'
+                    : 'border-[#26384D] bg-[#16253A] text-[#91A0B2] hover:border-[#C99A2E]/50 hover:text-[#E8EDF2]'
                 }`}
               >
                 {h === 216 ? '216h (EOT)' : `${h}h`}
@@ -479,12 +479,13 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             const val = minY + (maxY - minY) * f
             return (
               <g key={f}>
-                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#162238" strokeWidth={0.8} />
+                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#26384D" strokeWidth={0.8} />
                 <text
                   x={padL - 8}
                   y={y + 3.5}
                   textAnchor="end"
-                  className="fill-slate-400 text-[9px] md:text-[10px] font-mono tabular-nums"
+                  fill="#91A0B2"
+                  className="text-[9px] md:text-[10px] font-mono tabular-nums"
                 >
                   {val.toFixed(1)} µA
                 </text>
@@ -502,7 +503,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                   x2={x}
                   y1={padT}
                   y2={H - padB}
-                  stroke="#152033"
+                  stroke="#26384D"
                   strokeDasharray="2 2"
                   strokeWidth={0.8}
                 />
@@ -510,7 +511,8 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                   x={x}
                   y={H - padB + 16}
                   textAnchor="middle"
-                  className="fill-slate-400 text-[10px] font-mono font-semibold"
+                  fill="#91A0B2"
+                  className="text-[10px] font-mono font-semibold"
                 >
                   {h === 216 ? '216h (EOT)' : `T+${h}h`}
                 </text>
@@ -526,42 +528,41 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
               width={xFor(stageH) - xFor(0)}
               height={Math.max(0, yFor(bandLow) - yFor(bandHigh))}
               fill="url(#lotBandGrad)"
-              stroke="#FFFFFF"
+              stroke="#3B82B6"
               strokeOpacity="0.25"
               strokeDasharray="3 3"
             />
           )}
 
-          {/* Static Datasheet Limit Line (Red dashed line at limit_ua) */}
+          {/* Static Datasheet Limit Line (Alert Red dashed line at limit_ua) */}
           <line
             x1={padL}
             x2={W - padR}
             y1={yFor(limitVal)}
             y2={yFor(limitVal)}
-            stroke="#EF4444"
-            strokeWidth={1.8}
+            stroke="#D94B5B"
+            strokeWidth={1.6}
             strokeDasharray="6 4"
-            style={{ filter: 'drop-shadow(0 0 5px rgba(239,68,68,0.7))' }}
           />
           <text
             x={W - padR}
             y={yFor(limitVal) - 6}
             textAnchor="end"
-            className="fill-rose-400 text-[9px] md:text-[10px] font-mono font-bold"
+            fill="#D94B5B"
+            className="text-[9px] md:text-[10px] font-mono font-bold"
           >
             SPEC LIMIT ({limitVal.toFixed(0)} µA)
           </text>
 
-          {/* Secondary Channel: Lot Norm Baseline Trace (White dashed spline) */}
+          {/* Secondary Channel: Lot Norm Baseline Trace (Technical Blue dashed spline) */}
           {baselineCurve && (
             <path
               d={baselineCurve}
               fill="none"
-              stroke="#FFFFFF"
-              strokeWidth={2.0}
-              filter="url(#steelGlow)"
+              stroke="#3B82B6"
+              strokeWidth={1.8}
               strokeDasharray="4 3"
-              opacity={0.85}
+              opacity={0.8}
             />
           )}
 
@@ -574,7 +575,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             />
           )}
 
-          {/* Primary Measured Component Current Waveform Spline (Hidden SVG path for coordinate extraction) */}
+          {/* Primary Measured Component Current Waveform Spline */}
           {smoothCurve && (
             <path
               ref={pathRef}
@@ -591,8 +592,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
               d={smoothCurve}
               fill="none"
               stroke={curveColor}
-              strokeWidth={3}
-              filter="url(#telemetryGlow)"
+              strokeWidth={2.4}
               clipPath="url(#sweepClipTelemetry)"
             />
           )}
@@ -607,23 +607,22 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                 <circle
                   cx={xFor(h)}
                   cy={yFor(v)}
-                  r={5.5}
-                  fill="#060B16"
-                  stroke={isFuture ? '#F59E0B' : curveColor}
-                  strokeWidth={2.2}
-                  filter="url(#telemetryGlow)"
+                  r={5}
+                  fill="#070D18"
+                  stroke={isFuture ? '#C99A2E' : curveColor}
+                  strokeWidth={2}
                 />
                 <circle
                   cx={xFor(h)}
                   cy={yFor(v)}
-                  r={2.5}
-                  fill={isFuture ? '#F59E0B' : curveColor}
+                  r={2}
+                  fill={isFuture ? '#C99A2E' : curveColor}
                 />
                 <text
                   x={xFor(h)}
                   y={yFor(v) - 10}
                   textAnchor="middle"
-                  fill={isFuture ? '#F59E0B' : curveColor}
+                  fill={isFuture ? '#C99A2E' : curveColor}
                   className="text-[10px] font-mono font-bold"
                 >
                   {v.toFixed(2)} µA
@@ -640,18 +639,17 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                 y1={yFor(v168)}
                 x2={xFor(216)}
                 y2={yFor(predFuture)}
-                stroke="#F59E0B"
-                strokeWidth={2.2}
+                stroke="#C99A2E"
+                strokeWidth={2}
                 strokeDasharray="5 3"
                 clipPath="url(#sweepClipTelemetry)"
-                style={{ filter: 'drop-shadow(0 0 4px rgba(245,158,11,0.6))' }}
               />
               {animProgress >= 0.95 && (
                 <text
                   x={xFor(216)}
                   y={yFor(predFuture) - 10}
                   textAnchor="end"
-                  fill="#F59E0B"
+                  fill="#C99A2E"
                   className="text-[10px] font-mono font-bold"
                 >
                   +96h Projected: {predFuture.toFixed(2)} µA
@@ -670,35 +668,35 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                 y1={padT}
                 y2={H - padB}
                 stroke={curveColor}
-                strokeWidth={1.2}
+                strokeWidth={1}
                 strokeDasharray="3 2"
-                opacity={0.7}
+                opacity={0.6}
               />
 
-              {/* Pulsing Radar Rings */}
+              {/* Calm Radar Indicator */}
               <circle
                 cx={tipPoint.x}
                 cy={tipPoint.y}
-                r={10}
+                r={8}
                 fill="none"
                 stroke={curveColor}
                 strokeWidth={1}
-                opacity={0.5}
-                className="animate-ping"
+                opacity={0.4}
+                className="animate-gentle-pulse"
               />
               <circle
                 cx={tipPoint.x}
                 cy={tipPoint.y}
-                r={5}
+                r={4.5}
                 fill={curveColor}
-                stroke="#FFFFFF"
+                stroke="#E8EDF2"
                 strokeWidth={1.5}
               />
               <circle
                 cx={tipPoint.x}
                 cy={tipPoint.y}
                 r={1.8}
-                fill="#FFFFFF"
+                fill="#E8EDF2"
               />
 
               {/* Floating Live Telemetry Chip above the probe */}
@@ -714,16 +712,16 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                   width="124"
                   height="22"
                   rx="5"
-                  fill="#0B1528"
+                  fill="#111E30"
                   stroke={curveColor}
-                  strokeWidth="1.4"
-                  filter="drop-shadow(0 3px 6px rgba(0,0,0,0.7))"
+                  strokeWidth="1.2"
+                  filter="drop-shadow(0 2px 5px rgba(0,0,0,0.6))"
                 />
                 <text
                   x="0"
                   y="2.5"
                   textAnchor="middle"
-                  fill="#FFFFFF"
+                  fill="#E8EDF2"
                   fontSize="9.5"
                   fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
                   fontWeight="bold"
@@ -747,8 +745,8 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
                   y={22 - bh}
                   width={bw}
                   height={bh}
-                  fill={isSimulating ? '#10B981' : '#F59E0B'}
-                  opacity={0.35 + (bh / 24) * 0.45}
+                  fill={isSimulating ? '#3FA66B' : '#C99A2E'}
+                  opacity={0.3 + (bh / 24) * 0.4}
                   rx={1}
                 />
               )
@@ -757,79 +755,79 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
         </svg>
       </div>
 
-      {/* Live Reading Telemetry HUD Cards (Showing Real-Time Dynamic Readings as per Module A & B) */}
+      {/* Live Reading Telemetry HUD Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
         {/* Card 1: Live Measured Current */}
-        <div className="p-2.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[10.5px] uppercase font-semibold">Live Reading</span>
-          <span className={`font-mono text-base font-bold tabular-nums ${isSimulating ? 'text-amber-300' : 'text-emerald-400'}`}>
+        <div className="p-2.5 rounded-xl bg-[#16253A] border border-[#26384D] flex flex-col justify-between gap-1">
+          <span className="text-[#91A0B2] text-[10.5px] uppercase font-semibold">Live Reading</span>
+          <span className={`font-mono text-base font-bold tabular-nums ${isSimulating ? 'text-[#C99A2E]' : 'text-[#3FA66B]'}`}>
             {simVal.toFixed(2)} µA
           </span>
-          <span className="text-[9.5px] text-slate-400">
+          <span className="text-[9.5px] text-[#91A0B2]">
             {isSimulating ? `Probe at T+${Math.round(simHour)}h` : '168h end-of-test'}
           </span>
         </div>
 
         {/* Card 2: Delta Drift */}
-        <div className="p-2.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[10.5px] uppercase font-semibold">Delta Drift (vs 0h)</span>
+        <div className="p-2.5 rounded-xl bg-[#16253A] border border-[#26384D] flex flex-col justify-between gap-1">
+          <span className="text-[#91A0B2] text-[10.5px] uppercase font-semibold">Delta Drift (vs 0h)</span>
           <span className={`font-mono text-base font-bold tabular-nums ${
-            displayedDelta > 5 ? 'text-amber-400' : 'text-slate-100'
+            displayedDelta > 5 ? 'text-[#C99A2E]' : 'text-[#E8EDF2]'
           }`}>
             {displayedDelta > 0 ? '+' : ''}{displayedDelta.toFixed(2)} µA
           </span>
-          <span className="text-[9.5px] text-slate-400">
+          <span className="text-[9.5px] text-[#91A0B2]">
             0h baseline: {v0.toFixed(2)} µA
           </span>
         </div>
 
         {/* Card 3: Lot Z-Score */}
-        <div className="p-2.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[10.5px] uppercase font-semibold">Lot Z-Score</span>
+        <div className="p-2.5 rounded-xl bg-[#16253A] border border-[#26384D] flex flex-col justify-between gap-1">
+          <span className="text-[#91A0B2] text-[10.5px] uppercase font-semibold">Lot Z-Score</span>
           <span className={`font-mono text-base font-bold tabular-nums ${
-            Math.abs(displayedZ) >= 3 ? 'text-rose-400' : Math.abs(displayedZ) >= 2 ? 'text-amber-400' : 'text-emerald-400'
+            Math.abs(displayedZ) >= 3 ? 'text-[#D94B5B]' : Math.abs(displayedZ) >= 2 ? 'text-[#D6A33A]' : 'text-[#3FA66B]'
           }`}>
             {displayedZ > 0 ? '+' : ''}{displayedZ.toFixed(2)}σ
           </span>
-          <span className="text-[9.5px] text-slate-400">
+          <span className="text-[9.5px] text-[#91A0B2]">
             Lot mean: {lotMean.toFixed(1)} µA
           </span>
         </div>
 
         {/* Card 4: Spec Margin */}
-        <div className="p-2.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[10.5px] uppercase font-semibold">Spec Margin</span>
+        <div className="p-2.5 rounded-xl bg-[#16253A] border border-[#26384D] flex flex-col justify-between gap-1">
+          <span className="text-[#91A0B2] text-[10.5px] uppercase font-semibold">Spec Margin</span>
           <span className={`font-mono text-base font-bold tabular-nums ${
-            marginToSpec < 0 ? 'text-rose-400' : marginToSpec < 8 ? 'text-amber-400' : 'text-emerald-400'
+            marginToSpec < 0 ? 'text-[#D94B5B]' : marginToSpec < 8 ? 'text-[#D6A33A]' : 'text-[#3FA66B]'
           }`}>
             {marginToSpec > 0 ? '+' : ''}{marginToSpec.toFixed(2)} µA
           </span>
-          <span className="text-[9.5px] text-slate-400">
+          <span className="text-[9.5px] text-[#91A0B2]">
             Limit: {limitVal.toFixed(0)} µA
           </span>
         </div>
 
         {/* Card 5: Drift Slope */}
-        <div className="p-2.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[10.5px] uppercase font-semibold">Burn-In Drift Rate</span>
-          <span className="font-mono text-base font-bold text-amber-300">
+        <div className="p-2.5 rounded-xl bg-[#16253A] border border-[#26384D] flex flex-col justify-between gap-1">
+          <span className="text-[#91A0B2] text-[10.5px] uppercase font-semibold">Burn-In Drift Rate</span>
+          <span className="font-mono text-base font-bold text-[#C99A2E]">
             {component.slope.toFixed(4)} µA/h
           </span>
-          <span className="text-[9.5px] text-slate-400 truncate">
+          <span className="text-[9.5px] text-[#91A0B2] truncate">
             {component.drift_trend || 'NOMINAL'}
           </span>
         </div>
 
         {/* Card 6: +96h Projected Drift */}
-        <div className="p-2.5 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
-          <span className="text-slate-400 text-[10.5px] uppercase font-semibold">Projected 216h</span>
+        <div className="p-2.5 rounded-xl bg-[#16253A] border border-[#26384D] flex flex-col justify-between gap-1">
+          <span className="text-[#91A0B2] text-[10.5px] uppercase font-semibold">Projected 216h</span>
           <span className={`font-mono text-base font-bold tabular-nums ${
-            predFuture > limitVal ? 'text-rose-400' : 'text-slate-100'
+            predFuture > limitVal ? 'text-[#D94B5B]' : 'text-[#E8EDF2]'
           }`}>
             {predFuture.toFixed(2)} µA
           </span>
           <span className={`text-[9.5px] truncate ${
-            predFuture > limitVal ? 'text-rose-400 font-bold' : 'text-slate-400'
+            predFuture > limitVal ? 'text-[#D94B5B] font-bold' : 'text-[#91A0B2]'
           }`}>
             {predFuture > limitVal ? 'EXCEEDS LIMIT' : 'Within tolerance'}
           </span>
@@ -837,32 +835,32 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
       </div>
 
       {/* Multi-Channel Legend */}
-      <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-slate-300 pt-2 border-t border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#91A0B2] pt-2 border-t border-[#26384D]">
         <div className="flex items-center gap-5 flex-wrap">
           <span className="flex items-center gap-2">
             <span className="inline-block w-3.5 h-1.5 rounded-full" style={{ backgroundColor: curveColor }} />
-            <span className="text-white font-bold">CH1: Component Measured Current (µA)</span>
+            <span className="text-[#E8EDF2] font-bold">CH1: Component Measured Current (µA)</span>
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-1 bg-white border-t border-dashed border-white" />
-            <span className="text-slate-200 font-semibold">CH2: Lot Baseline Mean ({lotMean.toFixed(1)} µA)</span>
+            <span className="inline-block w-3 h-1 bg-[#3B82B6] border-t border-dashed border-[#3B82B6]" />
+            <span className="text-[#91A0B2] font-semibold">CH2: Lot Baseline Mean ({lotMean.toFixed(1)} µA)</span>
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-1 bg-rose-500" />
-            <span className="text-rose-400 font-semibold">CH3: Datasheet Spec Limit ({limitVal.toFixed(0)} µA)</span>
+            <span className="inline-block w-3 h-1 bg-[#D94B5B]" />
+            <span className="text-[#D94B5B] font-semibold">CH3: Datasheet Spec Limit ({limitVal.toFixed(0)} µA)</span>
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-1 border-t-2 border-dashed border-amber-400" />
-            <span className="text-amber-300 font-bold">Projected Future Drift Vector</span>
+            <span className="inline-block w-3 h-1 border-t-2 border-dashed border-[#C99A2E]" />
+            <span className="text-[#C99A2E] font-bold">Projected Future Drift Vector</span>
           </span>
         </div>
 
-        <div className="flex items-center gap-3 text-[11px] text-slate-400">
+        <div className="flex items-center gap-3 text-[11px] text-[#91A0B2]">
           <span>ADC: 24-BIT DELTA-SIGMA</span>
           <span>&bull;</span>
           <span>SAMPLE RATE: 10 KS/s</span>
           <span>&bull;</span>
-          <span className="text-emerald-400 font-bold">ONLINE</span>
+          <span className="text-[#3FA66B] font-bold">ONLINE</span>
         </div>
       </div>
     </div>

@@ -21,18 +21,29 @@ import SubsystemsView from './components/Views/SubsystemsView'
 import MissionReportView from './components/Views/MissionReportView'
 import LotArchitectureView from './components/Views/LotArchitectureView'
 import MultiScreenWall from './components/Dashboard/MultiScreenWall'
+import SidebarNav from './components/Dashboard/SidebarNav'
+import CsvIntakeView from './components/Views/CsvIntakeView'
+import ValidationView from './components/Views/ValidationView'
+import ModuleAView from './components/Views/ModuleAView'
+import ModuleBView from './components/Views/ModuleBView'
+import RiskEngineView from './components/Views/RiskEngineView'
+import DiagnosticsView from './components/Views/DiagnosticsView'
+import SatelliteView from './components/Views/SatelliteView'
+import TelemetryView from './components/Views/TelemetryView'
 import ISROPitchModal from './components/Dashboard/ISROPitchModal'
 import ISROOnboardingFlow from './components/Onboarding/ISROOnboardingFlow'
+import TeeSecurityModal from './components/Dashboard/TeeSecurityModal'
 import { ISRO_MISSIONS } from './offlineEngine'
 import { sounds } from './utils/soundEffects'
 import { generateCertificatePdf, generateTechnicalReportPdf } from './utils/pdfGenerator'
 import { generateExcelReport } from './utils/excelGenerator'
 import * as api from './api'
-import type { ComponentOut, MissionStatus, UploadResult } from './types'
+import type { ComponentOut, MissionStatus, UploadResult, TeeSecurityStatus } from './types'
 
 export default function App() {
-  const [operationalPhase, setOperationalPhase] = useState<'onboarding' | 'dashboard'>('onboarding')
-  const [activeTab, setActiveTab] = useState<DashboardTab>('wall')
+  const [operationalPhase, setOperationalPhase] = useState<'onboarding' | 'dashboard'>('dashboard')
+  const [activeTab, setActiveTab] = useState<DashboardTab>('overview')
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
   const [dataMetaText, setDataMetaText] = useState(
@@ -43,6 +54,8 @@ export default function App() {
   const [pitchModalOpen, setPitchModalOpen] = useState(false)
   const [ingestModalOpen, setIngestModalOpen] = useState(false)
   const [lotModalOpen, setLotModalOpen] = useState(false)
+  const [teeModalOpen, setTeeModalOpen] = useState(false)
+  const [teeStatus, setTeeStatus] = useState<TeeSecurityStatus | null>(null)
 
   const activeMission = ISRO_MISSIONS.find((m) => m.id === activeMissionId) || ISRO_MISSIONS[0]
 
@@ -189,9 +202,10 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Initial mount: load flight batch so Mission Control Dashboard is pre-populated
+  // Initial mount: load flight batch so Mission Control Dashboard is pre-populated, and query TEE status
   useEffect(() => {
     handleDemo('GAGANYAAN', false)
+    api.getTeeSecurityStatus().then(setTeeStatus).catch(() => {})
   }, [])
 
   async function runScreening(idOverride?: number) {
@@ -217,6 +231,16 @@ export default function App() {
       setFlaggedList(list.components.filter((c) => c.status !== 'safe').slice(0, 60))
       setAnalysisRun(true)
       log('ISRO Anomaly detection completed across all qualification lots.', 'ok')
+
+      if (result.tee_security) {
+        setTeeStatus(result.tee_security)
+        if (result.tee_security.enabled) {
+          log(
+            `TEE Security Layer active [${(result.tee_security.mode || 'simulated').toUpperCase()}] \u2014 Risk computation executed in protected enclave boundary.`,
+            'ok'
+          )
+        }
+      }
 
       if (result.top_flagged) {
         const worst = result.top_flagged
@@ -309,43 +333,7 @@ export default function App() {
     setActiveTab('telemetry')
   }
 
-  if (operationalPhase === 'onboarding') {
-    return (
-      <>
-        <ISROOnboardingFlow
-          onFileUploaded={handleFile}
-          onLoadOfficialBatch={handleDemo}
-          batchId={batchId}
-          uploadMeta={uploadMeta}
-          mission={mission}
-          allComponents={allComponents}
-          flaggedList={flaggedList}
-          onRunScreening={async () => {
-            await onPipelineDone()
-          }}
-          onCompleteToDashboard={() => {
-            setOperationalPhase('dashboard')
-            log('ISRO Flight Clearance Order Confirmed \u2014 Launching Mission Control Dashboard.', 'ok')
-          }}
-          activeMissionName={activeMission.name}
-          activeMissionId={activeMissionId}
-          onSelectMission={handleSelectMission}
-        />
-        {mappingModal && mappingModal.detected_headers && (
-          <MappingModal
-            headers={mappingModal.detected_headers}
-            autoMapping={mappingModal.auto_mapping ?? {}}
-            missingFields={mappingModal.missing_fields ?? []}
-            onApply={applyMapping}
-            onCancel={() => {
-              setMappingModal(null)
-              setPendingFile(null)
-            }}
-          />
-        )}
-      </>
-    )
-  }
+
 
   return (
     <div className="min-h-screen text-slate-100 flex flex-col bg-bg">
@@ -360,7 +348,10 @@ export default function App() {
         onOpenIngestModal={() => setIngestModalOpen(true)}
         activeMissionName={activeMission.name}
         onResetWorkflow={resetWorkflow}
-        onOpenOnboarding={() => setOperationalPhase('onboarding')}
+        onOpenOnboarding={() => setActiveTab('csv_intake')}
+        teeStatus={teeStatus}
+        onOpenTeeModal={() => setTeeModalOpen(true)}
+        onToggleSidebar={() => setMobileSidebarOpen((v) => !v)}
       />
       <UploadBar
         metaText={dataMetaText}
@@ -393,14 +384,14 @@ export default function App() {
 
       {/* Non-Blocking Critical Anomaly Alert Banner (Appears first before full modal) */}
       {quarantineToast && !alertComponent && (
-        <div className="bg-rose-500/15 border-b border-rose-500/60 px-5 py-2 flex items-center justify-between gap-3 text-xs font-mono text-white animate-modalin shadow-alert-glow z-30">
+        <div className="bg-[#28131D] border-b border-[#D94B5B]/60 px-5 py-2 flex items-center justify-between gap-3 text-xs font-mono text-[#E8EDF2] animate-alert-once z-30">
           <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 led" />
-            <span className="font-bold text-rose-400 uppercase tracking-wider">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#D94B5B] animate-gentle-pulse" />
+            <span className="font-bold text-[#D94B5B] uppercase tracking-wider">
               CRITICAL ANOMALY IDENTIFIED:
             </span>
             <span>
-              Part <b className="text-white font-bold">{quarantineToast.component_id}</b> in <b className="text-amber-400">[{quarantineToast.subsystem}] {quarantineToast.subsystem_name}</b> has Risk Score <b className="text-rose-400">{quarantineToast.risk_score}/100</b> ({quarantineToast.v168.toFixed(1)} &micro;A drift).
+              Part <b className="text-[#E8EDF2] font-bold">{quarantineToast.component_id}</b> in <b className="text-[#D6A33A]">[{quarantineToast.subsystem}] {quarantineToast.subsystem_name}</b> has Risk Score <b className="text-[#D94B5B]">{quarantineToast.risk_score}/100</b> ({quarantineToast.v168.toFixed(1)} &micro;A drift).
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -411,7 +402,7 @@ export default function App() {
                 if (modalTimerId) clearTimeout(modalTimerId)
                 setQuarantineToast(null)
               }}
-              className="px-2 py-1 rounded text-slate-400 hover:text-white text-xs hover:bg-white/10 transition-colors"
+              className="px-2 py-1 rounded text-[#91A0B2] hover:text-[#E8EDF2] text-xs hover:bg-white/10 transition-colors"
               title="Dismiss Banner"
             >
               &#10005;
@@ -423,140 +414,178 @@ export default function App() {
       {/* Global AI Screening Overlay */}
       {running && <PipelineOverlay onDone={onPipelineDone} />}
 
-      {/* Dynamic Workflow Views */}
-      {activeTab === 'wall' && (
-        <MultiScreenWall
-          mission={mission}
-          components={allComponents.length > 0 ? allComponents : flaggedList}
-          selected={selected}
-          onSelectComponent={selectComponent}
-          onSelectSubsystem={selectSubsystem}
-          focusKey={focusKey}
-          running={running}
-          onRunScreening={() => runScreening()}
-          onUploadFile={handleFile}
-          onOpenLotsModal={() => setLotModalOpen(true)}
-          onNavigateToLotsTab={() => setActiveTab('lots')}
+      {/* Main Single Application Frame: LEFT NAVIGATION + RIGHT FULL WORKSPACE */}
+      <div className="flex-1 flex flex-row w-full overflow-hidden relative">
+        {/* Left Navigation Sidebar */}
+        <SidebarNav
+          activeTab={activeTab}
+          onSelectTab={(tab) => {
+            setActiveTab(tab)
+            setMobileSidebarOpen(false)
+          }}
+          totalComponents={allComponents.length > 0 ? allComponents.length : flaggedList.length}
+          rejectCount={mission?.reject ?? 0}
+          monitorCount={mission?.monitor ?? 0}
+          safeCount={mission?.safe ?? 0}
+          activeMissionName={activeMission.name}
+          teeStatus={teeStatus}
+          onOpenTeeModal={() => setTeeModalOpen(true)}
+          onOpenPitchModal={() => setPitchModalOpen(true)}
+          isOpenMobile={mobileSidebarOpen}
+          onCloseMobile={() => setMobileSidebarOpen(false)}
         />
-      )}
 
-      {activeTab === 'lots' && (
-        <LotArchitectureView
-          components={allComponents.length > 0 ? allComponents : flaggedList}
-          subsystems={subsystems}
-          onSelectComponent={selectComponent}
-          onFocusSubsystem={selectSubsystem}
-          onFocusIn3D={focusIn3D}
-          onRunScreening={() => runScreening()}
-          running={running}
-          selectedId={selected?.component_id ?? null}
-        />
-      )}
+        {/* Right Full Dashboard Workspace */}
+        <main className="flex-1 min-w-0 overflow-y-auto bg-[#070D18] flex flex-col">
+          {/* OVERVIEW */}
+          {(activeTab === 'overview' || activeTab === 'wall') && (
+            <MultiScreenWall
+              mission={mission}
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              selected={selected}
+              onSelectComponent={selectComponent}
+              onSelectSubsystem={selectSubsystem}
+              focusKey={focusKey}
+              running={running}
+              onRunScreening={() => runScreening()}
+              onUploadFile={handleFile}
+              onOpenLotsModal={() => setLotModalOpen(true)}
+              onNavigateToLotsTab={() => setActiveTab('locations')}
+            />
+          )}
 
-      {activeTab === 'telemetry' && (
-        <div className="flex flex-col xl:flex-row gap-4 p-4 bg-[#060B16] flex-1 w-full items-start">
-          {/* Sticky Left Sidebar: Component Monitor is pinned so selection is NEVER lost on scroll */}
-          <div className="w-full xl:w-[380px] 2xl:w-[420px] flex-shrink-0 xl:sticky xl:top-2 xl:h-[calc(100vh-80px)] flex flex-col rounded-xl overflow-hidden border border-slate-800 bg-[#0B1120] shadow-md z-10">
-            <ComponentMonitor
+          {/* DATA: CSV Intake */}
+          {activeTab === 'csv_intake' && (
+            <CsvIntakeView
+              onFileUploaded={handleFile}
+              onLoadOfficialBatch={handleDemo}
+              batchId={batchId}
+              uploadMeta={uploadMeta}
+              allComponents={allComponents}
+              activeMissionName={activeMission.name}
+              activeMissionId={activeMissionId}
+              onSelectMission={handleSelectMission}
+              onContinueToValidation={() => setActiveTab('validation')}
+            />
+          )}
+
+          {/* DATA: Validation */}
+          {activeTab === 'validation' && (
+            <ValidationView
+              batchId={batchId}
+              uploadMeta={uploadMeta}
+              allComponents={allComponents}
+              mission={mission}
+              running={running}
+              onRunScreening={() => runScreening()}
+              onSelectStage={setActiveTab}
+              activeMissionName={activeMission.name}
+            />
+          )}
+
+          {/* DATA: Module A */}
+          {activeTab === 'module_a' && (
+            <ModuleAView
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              selected={selected}
+              onSelectComponent={selectComponent}
+              onSelectSubsystem={selectSubsystem}
+              onSelectStage={setActiveTab}
+              mission={mission}
+            />
+          )}
+
+          {/* DATA: Module B */}
+          {activeTab === 'module_b' && (
+            <ModuleBView
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              selected={selected}
+              onSelectComponent={selectComponent}
+              onSelectSubsystem={selectSubsystem}
+              onSelectStage={setActiveTab}
+              mission={mission}
+            />
+          )}
+
+          {/* ANALYSIS: Risk Engine */}
+          {activeTab === 'risk_engine' && (
+            <RiskEngineView
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              selected={selected}
+              onSelectComponent={selectComponent}
+              mission={mission}
+            />
+          )}
+
+          {/* ANALYSIS: Screening Matrix */}
+          {activeTab === 'matrix' && (
+            <ScreeningMatrixView
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              onSelectComponent={selectComponent}
+              onFocusIn3D={focusIn3D}
+              selectedId={selected?.component_id ?? null}
+            />
+          )}
+
+          {/* ANALYSIS: Diagnostics */}
+          {(activeTab === 'diagnostics' || activeTab === 'subsystems') && (
+            <DiagnosticsView
+              subsystems={subsystems}
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              selected={selected}
+              onSelectComponent={selectComponent}
+              onFocusSubsystem={focusSubsystemIn3D}
+            />
+          )}
+
+          {/* SPACECRAFT: 3D Satellite */}
+          {(activeTab === 'satellite' || activeTab === 'orbital') && (
+            <SatelliteView
+              subsystems={subsystems}
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              selected={selected}
+              focusKey={focusKey}
+              onSelectComponent={selectComponent}
+              onSelectSubsystem={selectSubsystem}
+            />
+          )}
+
+          {/* SPACECRAFT: Telemetry */}
+          {activeTab === 'telemetry' && (
+            <TelemetryView
               subsystems={subsystems}
               components={allComponents.length > 0 ? allComponents : flaggedList}
               analysisRun={analysisRun}
-              selectedId={selected?.component_id ?? null}
+              selected={selected}
               onSelectSubsystem={selectSubsystem}
               onSelectComponent={selectComponent}
-              onSearch={(term) => {
-                setSearchTerm(term)
-                refreshFlaggedList(term, filterMode)
-              }}
-              onFilter={(mode) => {
-                setFilterMode(mode)
-                refreshFlaggedList(searchTerm, mode)
-              }}
             />
-          </div>
+          )}
 
-          {/* Main Telemetry & Mission Intelligence Flow - Fills all available space, eliminates empty voids */}
-          <div className="flex-1 min-w-0 flex flex-col gap-4 w-full">
-            {/* Row 1: Two Equal Parts (50/50 Split) - Component Overview (Left) & 3D Interactive Satellite (Right) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch w-full">
-              <div className="flex flex-col h-full">
-                <ComponentOverviewCard component={selected} />
-              </div>
-              <div className="relative min-h-[480px] lg:min-h-[540px] rounded-xl border border-line bg-[radial-gradient(ellipse_at_50%_40%,#0E1A33_0%,#060B16_85%)] overflow-hidden shadow-panel-subtle flex flex-col flex-1 h-full">
-                <SatelliteScene
-                  subsystems={subsystems}
-                  onSelect={selectSubsystem}
-                  focusKey={focusKey}
-                  selectedComponent={selected}
-                />
-              </div>
-            </div>
+          {/* SPACECRAFT: Component Locations */}
+          {(activeTab === 'locations' || activeTab === 'lots') && (
+            <LotArchitectureView
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              subsystems={subsystems}
+              onSelectComponent={selectComponent}
+              onFocusSubsystem={selectSubsystem}
+              onFocusIn3D={focusIn3D}
+              onRunScreening={() => runScreening()}
+              running={running}
+              selectedId={selected?.component_id ?? null}
+            />
+          )}
 
-            {/* Below Row 1: Mathematical Telemetry Metrics Review & XAI Diagnostic Engine */}
-            <div className="w-full">
-              <MathematicalReadingsPanel component={selected} />
-            </div>
-
-            {/* Row 2: Full-Width Parametric Waveform Telemetry Oscilloscope with Live Sweep & Multi-Channel HUD */}
-            <div className="w-full">
-              <TelemetryChart component={selected} />
-            </div>
-
-            {/* AI Prescriptive Actions & Root Cause Analysis (Full Width) */}
-            <div className="w-full">
-              <AIRecommendationSystem
-                component={selected || flaggedList.find((c) => c.status === 'reject') || flaggedList[0] || allComponents[0] || null}
-                onIsolateBus={(id) => {
-                  log(`PCDU Power Bus isolation executed for component ${id}.`, 'flag')
-                }}
-                onFailover={(id) => {
-                  log(`Cold standby failover initiated for component ${id}.`, 'ok')
-                }}
-              />
-            </div>
-
-            {/* Spacecraft Subsystem Hardware & Command Console (Full Width) */}
-            <div className="w-full">
-              <SatelliteEquipmentBoard
-                subsystems={subsystems}
-                components={allComponents.length > 0 ? allComponents : flaggedList}
-                selectedComponent={selected}
-                focusKey={focusKey}
-                onSelectComponent={selectComponent}
-                onSelectSubsystem={selectSubsystem}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'matrix' && (
-        <ScreeningMatrixView
-          components={allComponents.length > 0 ? allComponents : flaggedList}
-          onSelectComponent={selectComponent}
-          onFocusIn3D={focusIn3D}
-          selectedId={selected?.component_id ?? null}
-        />
-      )}
-
-      {activeTab === 'orbital' && <OrbitalTrackingView />}
-
-      {activeTab === 'subsystems' && (
-        <SubsystemsView
-          subsystems={subsystems}
-          components={allComponents.length > 0 ? allComponents : flaggedList}
-          onFocusSubsystem={focusSubsystemIn3D}
-          onSelectComponent={selectComponent}
-        />
-      )}
-
-      {activeTab === 'report' && (
-        <MissionReportView
-          mission={mission}
-          components={allComponents.length > 0 ? allComponents : flaggedList}
-          onDownloadReport={handleReport}
-        />
-      )}
+          {/* OUTPUT: Clearance Report */}
+          {activeTab === 'report' && (
+            <MissionReportView
+              mission={mission}
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              onDownloadReport={handleReport}
+            />
+          )}
+        </main>
+      </div>
 
       <AuditLog entries={audit} />
 
@@ -608,6 +637,12 @@ export default function App() {
           setActiveTab('telemetry')
         }}
         onFocusSubsystem={(key) => setFocusKey(key)}
+      />
+
+      <TeeSecurityModal
+        isOpen={teeModalOpen}
+        onClose={() => setTeeModalOpen(false)}
+        status={teeStatus}
       />
     </div>
   )

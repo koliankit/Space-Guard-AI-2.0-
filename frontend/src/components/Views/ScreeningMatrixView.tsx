@@ -615,7 +615,7 @@ export default function ScreeningMatrixView({
                                         isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
                                       }`}
                                     />
-                                    {c.status.toUpperCase()}
+                                    {(c.status || 'safe').toUpperCase()}
                                   </span>
                                 </td>
                                 <td className="py-1.5 px-3 whitespace-nowrap">
@@ -797,7 +797,7 @@ export default function ScreeningMatrixView({
                                 isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
                               }`}
                             />
-                            {c.status.toUpperCase()}
+                            {(c.status || 'safe').toUpperCase()}
                           </span>
                           {c.behavioral_health && (
                             <span className={`text-[8.5px] font-bold tracking-wider px-1 py-0.5 rounded ${
@@ -820,7 +820,7 @@ export default function ScreeningMatrixView({
                           <span className="inline-flex items-center gap-1 text-[9.5px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/50 font-bold">
                             <span>PASS (Spec)</span>
                             <span>&rarr;</span>
-                            <span className="text-rose-400">{c.status.toUpperCase()} (AI)</span>
+                            <span className="text-rose-400">{(c.status || 'safe').toUpperCase()} (AI)</span>
                           </span>
                         ) : c.traditional_decision === 'FAIL' ? (
                           <span className="text-[9.5px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold">

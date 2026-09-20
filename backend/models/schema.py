@@ -121,6 +121,7 @@ class AnalyzeResponse(BaseModel):
     top_flagged: Optional[ComponentOut] = None
     risk_distribution: Optional[Dict[str, int]] = None
     lot_summaries: Optional[List[LotDetail]] = None
+    tee_security: Optional[Dict[str, Any]] = None
 
 
 class SubsystemStatus(BaseModel):

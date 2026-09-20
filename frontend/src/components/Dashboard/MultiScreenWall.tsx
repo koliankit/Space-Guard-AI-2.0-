@@ -141,43 +141,43 @@ export default function MultiScreenWall({
   const subsystems: SubsystemStatus[] = mission?.subsystems ?? DEFAULT_SUBSYSTEMS
 
   return (
-    <div className="flex flex-col flex-1 bg-[#060B16] text-slate-100 font-sans select-none overflow-x-auto min-h-[calc(100vh-140px)] w-full">
+    <div className="flex flex-col flex-1 bg-[#070D18] text-[#E8EDF2] font-sans select-none overflow-x-auto min-h-[calc(100vh-140px)] w-full">
       {/* Wall Header Banner: ISRO Sriharikota Mission Control Display Wall */}
-      <div className="bg-[#091120] border-b border-slate-800/90 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 w-full">
+      <div className="bg-[#0D1726] border-b border-[#26384D] px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 w-full">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-900 border border-amber-500/50 text-amber-300 text-xs md:text-sm font-display font-bold tracking-wider uppercase shadow-isro">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 led" />
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#16253A] border border-[#C99A2E]/50 text-[#C99A2E] text-xs md:text-sm font-display font-bold tracking-wider uppercase">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
             ISRO SDSC SHAR // Mission Operations Wall
           </div>
-          <span className="text-slate-300 text-xs md:text-sm hidden lg:inline font-sans">
+          <span className="text-[#91A0B2] text-xs md:text-sm hidden lg:inline font-sans">
             Range Operations Directorate &bull; Launch Control Centre (LCC-01)
           </span>
         </div>
 
         {/* Live Synchronized MCC Status Banner & View Switcher */}
         <div className="flex flex-wrap items-center gap-2.5 text-xs md:text-sm">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-slate-400 text-[11px] font-display uppercase font-semibold">Flight Batch:</span>
-            <span className="text-emerald-400 font-bold text-xs md:text-sm font-mono tabular-nums">{components.length} parts</span>
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#111E30] border border-[#26384D] shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
+            <span className="text-[#91A0B2] text-[11px] font-display uppercase font-semibold">Flight Batch:</span>
+            <span className="text-[#3FA66B] font-bold text-xs md:text-sm font-mono tabular-nums">{components.length} parts</span>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-amber-400" />
-            <span className="text-slate-400 text-[11px] font-display uppercase font-semibold">Lots:</span>
-            <span className="text-amber-300 font-bold text-xs md:text-sm font-mono tabular-nums">{lotGroups.length} Qualification Lots</span>
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#111E30] border border-[#26384D] shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
+            <span className="text-[#91A0B2] text-[11px] font-display uppercase font-semibold">Lots:</span>
+            <span className="text-[#C99A2E] font-bold text-xs md:text-sm font-mono tabular-nums">{lotGroups.length} Qualification Lots</span>
           </div>
 
-          {/* Primary View Mode Switcher with enlarged buttons */}
-          <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-xl border border-slate-800 shadow-sm">
-            <span className="text-slate-400 text-[11px] font-display uppercase font-bold px-1.5">View:</span>
+          {/* Primary View Mode Switcher */}
+          <div className="flex items-center gap-1.5 bg-[#070D18] p-1 rounded-xl border border-[#26384D] shadow-sm">
+            <span className="text-[#91A0B2] text-[11px] font-display uppercase font-bold px-1.5">View:</span>
             <button
               type="button"
               onClick={() => setConsoleLayout('dual')}
               className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-display tracking-wide transition-all border cursor-pointer ${
                 consoleLayout === 'dual'
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/70 font-bold shadow-isro'
-                  : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-slate-800/70'
+                  ? 'bg-[#C99A2E]/25 text-[#C99A2E] border-[#C99A2E]/70 font-bold'
+                  : 'bg-transparent text-[#91A0B2] border-transparent hover:text-[#E8EDF2] hover:bg-[#16253A]'
               }`}
               title="Split View: Module A (Anomaly Analysis) on Left + Module B (Future Drift) on Right"
             >
@@ -188,8 +188,8 @@ export default function MultiScreenWall({
               onClick={() => setConsoleLayout('moduleA')}
               className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-display tracking-wide transition-all border cursor-pointer ${
                 consoleLayout === 'moduleA'
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/70 font-bold shadow-isro'
-                  : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-slate-800/70'
+                  ? 'bg-[#C99A2E]/25 text-[#C99A2E] border-[#C99A2E]/70 font-bold'
+                  : 'bg-transparent text-[#91A0B2] border-transparent hover:text-[#E8EDF2] hover:bg-[#16253A]'
               }`}
               title="Focus on Module A: Silicon Anomaly Detection & HTOL Analysis"
             >
@@ -200,8 +200,8 @@ export default function MultiScreenWall({
               onClick={() => setConsoleLayout('moduleB')}
               className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-display tracking-wide transition-all border cursor-pointer ${
                 consoleLayout === 'moduleB'
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/70 font-bold shadow-isro'
-                  : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-slate-800/70'
+                  ? 'bg-[#C99A2E]/25 text-[#C99A2E] border-[#C99A2E]/70 font-bold'
+                  : 'bg-transparent text-[#91A0B2] border-transparent hover:text-[#E8EDF2] hover:bg-[#16253A]'
               }`}
               title="Focus on Module B: Future Drift & In-Flight Reliability Forecasting"
             >
@@ -212,8 +212,8 @@ export default function MultiScreenWall({
               onClick={() => setConsoleLayout('quad')}
               className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-display tracking-wide transition-all border cursor-pointer ${
                 consoleLayout === 'quad'
-                  ? 'bg-amber-500/25 text-amber-300 border-amber-500/70 font-bold shadow-isro'
-                  : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-slate-800/70'
+                  ? 'bg-[#C99A2E]/25 text-[#C99A2E] border-[#C99A2E]/70 font-bold'
+                  : 'bg-transparent text-[#91A0B2] border-transparent hover:text-[#E8EDF2] hover:bg-[#16253A]'
               }`}
               title="Switch to 2x2 Command Wall (3D Digital Twin, Orbit Dynamics, HTOL Oscilloscope, Lot Architecture)"
             >
@@ -223,10 +223,10 @@ export default function MultiScreenWall({
         </div>
       </div>
 
-      {/* Lot Intelligence & Equipment Bay Quick Action Strip with enlarged boxes */}
-      <div className="bg-[#070C18] border-b border-slate-800/90 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm">
+      {/* Lot Intelligence & Equipment Bay Quick Action Strip */}
+      <div className="bg-[#070D18] border-b border-[#26384D] px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm">
         <div className="flex items-center gap-2 overflow-x-auto py-0.5">
-          <span className="text-xs text-slate-300 uppercase font-display font-bold tracking-wider whitespace-nowrap mr-1">
+          <span className="text-xs text-[#91A0B2] uppercase font-display font-bold tracking-wider whitespace-nowrap mr-1">
             FLIGHT LOTS:
           </span>
           {lotGroups.map((lot) => {
@@ -245,25 +245,25 @@ export default function MultiScreenWall({
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-mono whitespace-nowrap transition-all border flex items-center gap-2 cursor-pointer shadow-sm ${
                   isLotSelected
-                    ? 'bg-amber-500/25 border-amber-500/70 text-amber-300 font-bold shadow-isro'
+                    ? 'bg-[#C99A2E]/25 border-[#C99A2E]/70 text-[#C99A2E] font-bold'
                     : lot.rejects > 0
-                    ? 'border-rose-500/50 text-rose-300 bg-rose-950/20 hover:bg-rose-500/20'
-                    : 'border-slate-800 bg-[#070D1A] text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'border-[#D94B5B]/50 text-[#D94B5B] bg-[#28131D] hover:bg-[#28131D]/80'
+                    : 'border-[#26384D] bg-[#111E30] text-[#91A0B2] hover:text-[#E8EDF2] hover:bg-[#16253A]'
                 }`}
               >
                 <span
                   className={`w-2 h-2 rounded-full flex-shrink-0 ${
                     lot.rejects > 0
-                      ? 'bg-rose-500 led'
+                      ? 'bg-[#D94B5B] animate-alert-once'
                       : lot.monitors > 0
-                      ? 'bg-amber-400'
+                      ? 'bg-[#D6A33A]'
                       : isScreened
-                      ? 'bg-emerald-400'
-                      : 'bg-slate-400'
+                      ? 'bg-[#3FA66B]'
+                      : 'bg-[#91A0B2]'
                   }`}
                 />
                 <span className="font-semibold">{lot.lot_id}</span>
-                <span className="text-[11px] px-1.5 py-0.5 rounded bg-black/50 opacity-90 tabular-nums font-bold">
+                <span className="text-[11px] px-1.5 py-0.5 rounded bg-black/40 opacity-90 tabular-nums font-bold">
                   {lot.parts.length}
                 </span>
               </button>
@@ -276,15 +276,15 @@ export default function MultiScreenWall({
             <button
               type="button"
               onClick={onOpenLotsModal}
-              className="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs md:text-sm font-mono font-bold border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+              className="px-3.5 py-1.5 rounded-lg bg-[#16253A] hover:bg-[#26384D] text-[#E8EDF2] text-xs md:text-sm font-mono font-bold border border-[#26384D] flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
               title="Open Lot-Wise Classification Modal"
             >
               <span>📦 Lots Modal</span>
             </button>
           )}
 
-          <div className="text-xs md:text-sm font-mono text-slate-300 bg-[#0A1224] px-3 py-1.5 rounded-lg border border-slate-800">
-            Selected Part: <b className="text-amber-300">{effectiveSelected?.component_id || 'None'}</b>
+          <div className="text-xs md:text-sm font-mono text-[#91A0B2] bg-[#111E30] px-3 py-1.5 rounded-lg border border-[#26384D]">
+            Selected Part: <b className="text-[#C99A2E]">{effectiveSelected?.component_id || 'None'}</b>
           </div>
         </div>
       </div>
@@ -316,7 +316,6 @@ export default function MultiScreenWall({
           </div>
         )}
 
-
         {/* ================= MODE 2: MODULE A ONLY ================= */}
         {consoleLayout === 'moduleA' && (
           <div className="w-full flex-1 flex flex-col">
@@ -345,8 +344,8 @@ export default function MultiScreenWall({
         {consoleLayout === 'quad' && (
           <div className="flex flex-col gap-4 flex-1">
             {/* Sub-bar for Quad mode selection */}
-            <div className="flex items-center justify-between bg-[#0B1120] px-4 py-1.5 rounded-lg border border-slate-800 text-xs">
-              <span className="text-slate-400 font-mono text-[11px] uppercase">
+            <div className="flex items-center justify-between bg-[#111E30] px-4 py-1.5 rounded-lg border border-[#26384D] text-xs">
+              <span className="text-[#91A0B2] font-mono text-[11px] uppercase">
                 Console Viewport Selection:
               </span>
               <div className="flex items-center gap-1">
@@ -357,8 +356,8 @@ export default function MultiScreenWall({
                     onClick={() => setActiveQuadTab(mode)}
                     className={`px-2.5 py-0.5 rounded text-xs font-mono transition-all border ${
                       activeQuadTab === mode
-                        ? 'bg-white text-slate-900 border-white font-bold shadow-sm'
-                        : 'bg-transparent text-slate-400 border-transparent hover:text-white'
+                        ? 'bg-[#16253A] text-[#C99A2E] border-[#C99A2E]/70 font-bold shadow-sm'
+                        : 'bg-transparent text-[#91A0B2] border-transparent hover:text-[#E8EDF2]'
                     }`}
                   >
                     {mode === 'all' ? '2x2 Quad' : `Screen ${mode}`}
@@ -374,112 +373,112 @@ export default function MultiScreenWall({
             >
               {/* SCREEN 01: FLIGHT DYNAMICS & RANGE SAFETY */}
               {(activeQuadTab === 'all' || activeQuadTab === '1') && (
-                <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[460px]">
-                  <div className="bg-[#0F172A] border-b border-slate-800 px-4 py-2.5 flex items-center justify-between">
+                <div className="flex flex-col rounded-xl bg-[#111E30] border border-[#26384D] shadow-xl overflow-hidden min-h-[460px]">
+                  <div className="bg-[#0D1726] border-b border-[#26384D] px-4 py-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-semibold border border-slate-700">
+                      <span className="px-2 py-0.5 rounded bg-[#16253A] text-[#91A0B2] text-[10px] font-semibold border border-[#26384D]">
                         SCREEN 01
                       </span>
-                      <span className="text-xs font-bold text-white tracking-wide">
+                      <span className="text-xs font-bold text-[#E8EDF2] tracking-wide">
                         Range Safety &amp; Orbit Dynamics
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      <span className="text-slate-300 font-medium text-[11px]">RSO Console</span>
+                    <div className="flex items-center gap-1.5 text-xs text-[#91A0B2]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
+                      <span className="text-[#E8EDF2] font-medium text-[11px]">RSO Console</span>
                     </div>
                   </div>
 
                   <div className="p-3.5 flex-1 flex flex-col gap-3">
                     <div className="grid grid-cols-3 gap-2.5 text-center text-xs">
-                      <div className="p-2.5 rounded-lg bg-[#070D1A] border border-slate-800">
-                        <div className="text-[10px] text-slate-400 uppercase font-medium">Altitude</div>
-                        <div className="text-lg font-bold text-white font-mono mt-0.5">
-                          520.4 <span className="text-xs font-normal text-slate-400">KM</span>
+                      <div className="p-2.5 rounded-lg bg-[#16253A] border border-[#26384D]">
+                        <div className="text-[10px] text-[#91A0B2] uppercase font-medium">Altitude</div>
+                        <div className="text-lg font-bold text-[#E8EDF2] font-mono mt-0.5">
+                          520.4 <span className="text-xs font-normal text-[#91A0B2]">KM</span>
                         </div>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-[#070D1A] border border-slate-800">
-                        <div className="text-[10px] text-slate-400 uppercase font-medium">Velocity</div>
-                        <div className="text-lg font-bold text-emerald-400 font-mono mt-0.5">
-                          7.61 <span className="text-xs font-normal text-slate-400">KM/S</span>
+                      <div className="p-2.5 rounded-lg bg-[#16253A] border border-[#26384D]">
+                        <div className="text-[10px] text-[#91A0B2] uppercase font-medium">Velocity</div>
+                        <div className="text-lg font-bold text-[#3FA66B] font-mono mt-0.5">
+                          7.61 <span className="text-xs font-normal text-[#91A0B2]">KM/S</span>
                         </div>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-[#070D1A] border border-slate-800">
-                        <div className="text-[10px] text-slate-400 uppercase font-medium">Inclination</div>
-                        <div className="text-lg font-bold text-slate-200 font-mono mt-0.5">97.42&deg;</div>
+                      <div className="p-2.5 rounded-lg bg-[#16253A] border border-[#26384D]">
+                        <div className="text-[10px] text-[#91A0B2] uppercase font-medium">Inclination</div>
+                        <div className="text-lg font-bold text-[#E8EDF2] font-mono mt-0.5">97.42&deg;</div>
                       </div>
                     </div>
 
-                    <div className="rounded-lg border border-slate-800 overflow-hidden bg-[#070D1A] flex-1 min-h-[220px]">
+                    <div className="rounded-lg border border-[#26384D] overflow-hidden bg-[#070D18] flex-1 min-h-[220px]">
                       <MissionMap critical={rejected.length > 0} />
                     </div>
 
-                    <div className="p-3 rounded-lg bg-[#070D1A] border border-slate-800 text-xs">
-                      <div className="flex justify-between items-center text-slate-300 font-semibold mb-2">
+                    <div className="p-3 rounded-lg bg-[#16253A] border border-[#26384D] text-xs">
+                      <div className="flex justify-between items-center text-[#E8EDF2] font-semibold mb-2">
                         <span>ISTRAC Ground Stations</span>
-                        <span className="text-emerald-400 font-mono text-[11px]">5 of 5 Locked</span>
+                        <span className="text-[#3FA66B] font-mono text-[11px]">5 of 5 Locked</span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
-                        <div className="flex justify-between bg-slate-900/60 p-1.5 rounded border border-slate-800/80">
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-[#91A0B2]">
+                        <div className="flex justify-between bg-[#111E30] p-1.5 rounded border border-[#26384D]">
                           <span>SHAR (Sriharikota):</span>
-                          <span className="text-emerald-400 font-mono font-bold">AZ 142&deg; EL 68&deg;</span>
+                          <span className="text-[#3FA66B] font-mono font-bold">AZ 142&deg; EL 68&deg;</span>
                         </div>
-                        <div className="flex justify-between bg-slate-900/60 p-1.5 rounded border border-slate-800/80">
+                        <div className="flex justify-between bg-[#111E30] p-1.5 rounded border border-[#26384D]">
                           <span>Port Blair:</span>
-                          <span className="text-emerald-400 font-mono font-bold">AZ 210&deg; EL 44&deg;</span>
+                          <span className="text-[#3FA66B] font-mono font-bold">AZ 210&deg; EL 44&deg;</span>
                         </div>
-                        <div className="flex justify-between bg-slate-900/60 p-1.5 rounded border border-slate-800/80">
+                        <div className="flex justify-between bg-[#111E30] p-1.5 rounded border border-[#26384D]">
                           <span>Brunei Station:</span>
-                          <span className="text-emerald-400 font-mono font-bold">AZ 098&deg; EL 52&deg;</span>
+                          <span className="text-[#3FA66B] font-mono font-bold">AZ 098&deg; EL 52&deg;</span>
                         </div>
-                        <div className="flex justify-between bg-slate-900/60 p-1.5 rounded border border-slate-800/80">
+                        <div className="flex justify-between bg-[#111E30] p-1.5 rounded border border-[#26384D]">
                           <span>Biak (Indonesia):</span>
-                          <span className="text-amber-400 font-mono font-bold">AZ 045&deg; EL 31&deg;</span>
+                          <span className="text-[#D6A33A] font-mono font-bold">AZ 045&deg; EL 31&deg;</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-2 text-xs text-slate-400 flex justify-between font-mono">
+                  <div className="bg-[#0D1726] border-t border-[#26384D] px-4 py-2 text-xs text-[#91A0B2] flex justify-between font-mono">
                     <span>Feed: Primary Radar TEL-1</span>
-                    <span className="text-amber-400">Doppler Lock: +14.2 kHz</span>
+                    <span className="text-[#C99A2E]">Doppler Lock: +14.2 kHz</span>
                   </div>
                 </div>
               )}
 
               {/* SCREEN 02: 3D SPACECRAFT DIGITAL TWIN */}
               {(activeQuadTab === 'all' || activeQuadTab === '2') && (
-                <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[460px]">
-                  <div className="bg-[#0F172A] border-b border-slate-800 px-4 py-2.5 flex items-center justify-between">
+                <div className="flex flex-col rounded-xl bg-[#111E30] border border-[#26384D] shadow-xl overflow-hidden min-h-[460px]">
+                  <div className="bg-[#0D1726] border-b border-[#26384D] px-4 py-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-semibold border border-slate-700">
+                      <span className="px-2 py-0.5 rounded bg-[#16253A] text-[#91A0B2] text-[10px] font-semibold border border-[#26384D]">
                         SCREEN 02
                       </span>
-                      <span className="text-xs font-bold text-white tracking-wide font-display">
+                      <span className="text-xs font-bold text-[#E8EDF2] tracking-wide font-display">
                         Spacecraft 3D Digital Twin &amp; AOCS
                       </span>
                       {effectiveSelected && (
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold border ${
                             effectiveSelected.status === 'reject'
-                              ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                              ? 'bg-[#28131D] text-[#D94B5B] border-[#D94B5B]/50'
                               : effectiveSelected.status === 'monitor'
-                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                              ? 'bg-[#D6A33A]/15 text-[#D6A33A] border-[#D6A33A]/40'
+                              : 'bg-[#3FA66B]/15 text-[#3FA66B] border-[#3FA66B]/40'
                           }`}
                         >
                           Target: {effectiveSelected.component_id} [{effectiveSelected.subsystem}]
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      <span className="text-slate-300 font-medium text-[11px]">Vehicle Console</span>
+                    <div className="flex items-center gap-1.5 text-xs text-[#91A0B2]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
+                      <span className="text-[#E8EDF2] font-medium text-[11px]">Vehicle Console</span>
                     </div>
                   </div>
 
                   <div className="p-3.5 flex-1 flex flex-col gap-3">
-                    <div className="relative flex-1 min-h-[290px] rounded-lg border border-slate-800 bg-[radial-gradient(ellipse_at_50%_40%,#111C33_0%,#060B14_85%)] overflow-hidden">
+                    <div className="relative flex-1 min-h-[290px] rounded-lg border border-[#26384D] bg-[#070D18] overflow-hidden">
                       <SatelliteScene
                         subsystems={subsystems}
                         onSelect={onSelectSubsystem}
@@ -496,115 +495,115 @@ export default function MultiScreenWall({
                           onClick={() => onSelectSubsystem(s.key)}
                           className={`p-2 rounded-lg border text-left transition-all ${
                             focusKey === s.key || effectiveSelected?.subsystem === s.key
-                              ? 'bg-amber-500/15 border-amber-500/70 text-white shadow-sm'
+                              ? 'bg-[#C99A2E]/15 border-[#C99A2E]/70 text-[#E8EDF2] shadow-sm'
                               : s.status === 'reject'
-                              ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
-                              : 'bg-[#070D1A] border-slate-800 text-slate-300 hover:border-slate-700'
+                              ? 'bg-[#28131D] border-[#D94B5B]/50 text-[#D94B5B]'
+                              : 'bg-[#16253A] border-[#26384D] text-[#91A0B2] hover:border-[#26384D]'
                           }`}
                         >
                           <div className="font-semibold flex justify-between">
                             <span className="font-mono text-[11px]">[{s.key}]</span>
                             <span
                               className={`font-mono ${
-                                s.status === 'reject' ? 'text-rose-400 font-bold' : 'text-emerald-400'
+                                s.status === 'reject' ? 'text-[#D94B5B] font-bold' : 'text-[#3FA66B]'
                               }`}
                             >
                               {Math.max(0, 100 - Math.round(s.avg_risk))}%
                             </span>
                           </div>
-                          <div className="truncate text-[10px] text-slate-400 mt-0.5">{s.name}</div>
+                          <div className="truncate text-[10px] text-[#91A0B2] mt-0.5">{s.name}</div>
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-1.5 text-[10px] text-slate-400 flex justify-between">
+                  <div className="bg-[#0D1726] border-t border-[#26384D] px-4 py-1.5 text-[10px] text-[#91A0B2] flex justify-between">
                     <span>ATTITUDE: P: +0.02&deg; | R: -0.01&deg; | Y: +0.04&deg;</span>
-                    <span className="text-emerald-400">BUS VOLTAGE: 28.12V NOMINAL</span>
+                    <span className="text-[#3FA66B]">BUS VOLTAGE: 28.12V NOMINAL</span>
                   </div>
                 </div>
               )}
 
               {/* SCREEN 03: HTOL SILICON OSCILLOSCOPE */}
               {(activeQuadTab === 'all' || activeQuadTab === '3') && (
-                <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[460px]">
-                  <div className="bg-[#0D162B] border-b border-slate-800 px-4 py-2 flex items-center justify-between">
+                <div className="flex flex-col rounded-xl bg-[#111E30] border border-[#26384D] shadow-xl overflow-hidden min-h-[460px]">
+                  <div className="bg-[#0D1726] border-b border-[#26384D] px-4 py-2 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-semibold border border-slate-700">
+                      <span className="px-2 py-0.5 rounded bg-[#16253A] text-[#91A0B2] text-[10px] font-semibold border border-[#26384D]">
                         SCREEN 03
                       </span>
-                      <span className="text-xs font-bold text-white tracking-wide font-display">
+                      <span className="text-xs font-bold text-[#E8EDF2] tracking-wide font-display">
                         HTOL 168H Silicon Telemetry &amp; Parametric Drift
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                      <span className="text-slate-300 font-medium text-[11px]">AI Screening</span>
+                    <div className="flex items-center gap-1.5 text-xs text-[#91A0B2]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#D94B5B] animate-alert-once" />
+                      <span className="text-[#E8EDF2] font-medium text-[11px]">AI Screening</span>
                     </div>
                   </div>
 
                   <div className="p-3.5 flex-1 flex flex-col gap-3">
-                    <div className="rounded-lg border border-slate-800 bg-[#070D1A] overflow-hidden flex-1 min-h-[220px]">
+                    <div className="rounded-lg border border-[#26384D] bg-[#070D18] overflow-hidden flex-1 min-h-[220px]">
                       <TelemetryChart component={effectiveSelected} />
                     </div>
 
                     {effectiveSelected ? (
-                      <div className="p-3 rounded-lg bg-[#070D1A] border border-slate-800 text-xs space-y-2">
+                      <div className="p-3 rounded-lg bg-[#16253A] border border-[#26384D] text-xs space-y-2">
                         <div className="flex justify-between items-center font-bold">
-                          <span className="text-white font-mono text-xs">{effectiveSelected.component_id}</span>
+                          <span className="text-[#E8EDF2] font-mono text-xs">{effectiveSelected.component_id}</span>
                           <span
                             className={`px-2.5 py-0.5 rounded text-[10px] font-semibold border ${
                               effectiveSelected.status === 'reject'
-                                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                                ? 'bg-[#28131D] text-[#D94B5B] border-[#D94B5B]/50'
                                 : effectiveSelected.status === 'monitor'
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                ? 'bg-[#D6A33A]/15 text-[#D6A33A] border-[#D6A33A]/40'
+                                : 'bg-[#3FA66B]/15 text-[#3FA66B] border-[#3FA66B]/40'
                             }`}
                           >
-                            {effectiveSelected.status.toUpperCase()} (Risk: {effectiveSelected.risk_score}/100)
+                            {(effectiveSelected.status || 'safe').toUpperCase()} (Risk: {effectiveSelected.risk_score}/100)
                           </span>
                         </div>
-                        <div className="grid grid-cols-4 gap-2 text-xs text-slate-300 bg-slate-900/60 p-2 rounded border border-slate-800/80 font-mono">
-                          <div>0h: <b className="text-slate-100">{effectiveSelected.v0.toFixed(1)}&mu;A</b></div>
-                          <div>24h: <b className="text-slate-100">{effectiveSelected.v24.toFixed(1)}&mu;A</b></div>
-                          <div>96h: <b className="text-slate-100">{effectiveSelected.v96 != null ? effectiveSelected.v96.toFixed(1) : '-'}&mu;A</b></div>
-                          <div>168h: <b className="text-rose-400 font-bold">{effectiveSelected.v168.toFixed(1)}&mu;A</b></div>
+                        <div className="grid grid-cols-4 gap-2 text-xs text-[#91A0B2] bg-[#111E30] p-2 rounded border border-[#26384D] font-mono">
+                          <div>0h: <b className="text-[#E8EDF2]">{effectiveSelected.v0.toFixed(1)}&mu;A</b></div>
+                          <div>24h: <b className="text-[#E8EDF2]">{effectiveSelected.v24.toFixed(1)}&mu;A</b></div>
+                          <div>96h: <b className="text-[#E8EDF2]">{effectiveSelected.v96 != null ? effectiveSelected.v96.toFixed(1) : '-'}&mu;A</b></div>
+                          <div>168h: <b className="text-[#D94B5B] font-bold">{effectiveSelected.v168.toFixed(1)}&mu;A</b></div>
                         </div>
                       </div>
                     ) : (
-                      <div className="p-4 text-center text-xs text-slate-400 bg-[#070D1A] rounded-lg border border-slate-800">
+                      <div className="p-4 text-center text-xs text-[#91A0B2] bg-[#16253A] rounded-lg border border-[#26384D]">
                         Select a component to inspect oscilloscope telemetry.
                       </div>
                     )}
                   </div>
 
-                  <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-2 text-xs text-slate-400 flex justify-between font-mono">
+                  <div className="bg-[#0D1726] border-t border-[#26384D] px-4 py-2 text-xs text-[#91A0B2] flex justify-between font-mono">
                     <span>Sampling: 24-Bit Sigma-Delta ADC</span>
-                    <span className="text-amber-400">Oven Temp: 125.0&deg;C Constant</span>
+                    <span className="text-[#C99A2E]">Oven Temp: 125.0&deg;C Constant</span>
                   </div>
                 </div>
               )}
 
               {/* SCREEN 04: FLIGHT QUALIFICATION LOTS & SATELLITE LOCATION */}
               {(activeQuadTab === 'all' || activeQuadTab === '4') && (
-                <div className="flex flex-col rounded-xl bg-[#090F1E] border border-slate-800 shadow-xl overflow-hidden min-h-[460px]">
-                  <div className="bg-[#0F172A] border-b border-slate-800 px-4 py-2.5 flex items-center justify-between">
+                <div className="flex flex-col rounded-xl bg-[#111E30] border border-[#26384D] shadow-xl overflow-hidden min-h-[460px]">
+                  <div className="bg-[#0D1726] border-b border-[#26384D] px-4 py-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-semibold border border-slate-700">
+                      <span className="px-2 py-0.5 rounded bg-[#16253A] text-[#91A0B2] text-[10px] font-semibold border border-[#26384D]">
                         SCREEN 04
                       </span>
-                      <span className="text-xs font-bold text-white tracking-wide font-display">
+                      <span className="text-xs font-bold text-[#E8EDF2] tracking-wide font-display">
                         {screen4Mode === 'lots' ? 'Flight Qualification Lots & Satellite Locations' : 'Quarantined Anomaly Ledger'}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center bg-[#070D1A] p-0.5 rounded border border-slate-800">
+                      <div className="flex items-center bg-[#070D18] p-0.5 rounded border border-[#26384D]">
                         <button
                           type="button"
                           onClick={() => setScreen4Mode('lots')}
                           className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
-                            screen4Mode === 'lots' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                            screen4Mode === 'lots' ? 'bg-[#C99A2E] text-[#070D18] shadow-sm' : 'text-[#91A0B2] hover:text-[#E8EDF2]'
                           }`}
                         >
                           📦 Lots ({lotGroups.length})
@@ -613,7 +612,7 @@ export default function MultiScreenWall({
                           type="button"
                           onClick={() => setScreen4Mode('quarantine')}
                           className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
-                            screen4Mode === 'quarantine' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                            screen4Mode === 'quarantine' ? 'bg-[#D94B5B] text-white shadow-sm' : 'text-[#91A0B2] hover:text-[#E8EDF2]'
                           }`}
                         >
                           ⚠️ Quarantine ({rejected.length})
@@ -626,12 +625,12 @@ export default function MultiScreenWall({
                     {screen4Mode === 'lots' ? (
                       <div className="flex-1 flex flex-col gap-2.5 overflow-hidden">
                         {activeWallLot && (
-                          <div className="p-2.5 rounded-lg bg-amber-950/20 border border-amber-500/30 flex flex-col gap-2 text-xs">
-                            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-slate-200">
-                              <span className="font-bold text-amber-300">{activeWallLot.lot_id}</span>
-                              <span className="text-emerald-400 font-bold">{activeWallLot.parts.length} components</span>
+                          <div className="p-2.5 rounded-lg bg-[#16253A] border border-[#C99A2E]/30 flex flex-col gap-2 text-xs">
+                            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-[#E8EDF2]">
+                              <span className="font-bold text-[#C99A2E]">{activeWallLot.lot_id}</span>
+                              <span className="text-[#3FA66B] font-bold">{activeWallLot.parts.length} components</span>
                             </div>
-                            <div className="pt-1.5 border-t border-amber-500/20 flex flex-wrap items-center gap-1.5">
+                            <div className="pt-1.5 border-t border-[#26384D] flex flex-wrap items-center gap-1.5">
                               {Object.entries(activeWallLot.subsystemCounts).map(([subKey, count]) => {
                                 const loc = getSubsystemLocation(subKey)
                                 return (
@@ -642,9 +641,9 @@ export default function MultiScreenWall({
                                       setWallSubsystemFilter(wallSubsystemFilter === subKey ? 'ALL' : subKey)
                                       onSelectSubsystem(subKey)
                                     }}
-                                    className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#070D1A] border border-slate-700 text-slate-300 hover:text-white flex items-center gap-1"
+                                    className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#111E30] border border-[#26384D] text-[#91A0B2] hover:text-[#E8EDF2] flex items-center gap-1"
                                   >
-                                    <span className="font-bold text-amber-400">[{subKey}]</span>
+                                    <span className="font-bold text-[#C99A2E]">[{subKey}]</span>
                                     <span>{count} in {loc.name}</span>
                                   </button>
                                 )
@@ -653,9 +652,9 @@ export default function MultiScreenWall({
                           </div>
                         )}
 
-                        <div className="flex-1 overflow-y-auto rounded-lg border border-slate-800 bg-[#070D1A] max-h-[220px]">
+                        <div className="flex-1 overflow-y-auto rounded-lg border border-[#26384D] bg-[#070D18] max-h-[220px]">
                           <table className="w-full text-left text-xs font-sans border-collapse">
-                            <thead className="bg-[#0F172A] text-[10px] uppercase font-semibold text-slate-400 sticky top-0 border-b border-slate-800">
+                            <thead className="bg-[#0D1726] text-[10px] uppercase font-semibold text-[#91A0B2] sticky top-0 border-b border-[#26384D]">
                               <tr>
                                 <th className="py-2 px-2.5">Part ID</th>
                                 <th className="py-2 px-2">Subsystem</th>
@@ -664,7 +663,7 @@ export default function MultiScreenWall({
                                 <th className="py-1.5 px-2">Status</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/60">
+                            <tbody className="divide-y divide-[#26384D]/60">
                               {activeWallLot?.parts
                                 .filter((c) => wallSubsystemFilter === 'ALL' || c.subsystem === wallSubsystemFilter)
                                 .map((c) => {
@@ -678,22 +677,22 @@ export default function MultiScreenWall({
                                         onSelectSubsystem(c.subsystem)
                                       }}
                                       className={`cursor-pointer transition-colors ${
-                                        isSel ? 'bg-amber-500/20 text-white font-bold' : 'hover:bg-slate-800/40 text-slate-300'
+                                        isSel ? 'bg-[#16253A] text-[#E8EDF2] font-bold' : 'hover:bg-[#16253A]/50 text-[#91A0B2]'
                                       }`}
                                     >
-                                      <td className="py-1.5 px-2.5 font-mono font-bold text-white">{c.component_id}</td>
-                                      <td className="py-1.5 px-2 text-amber-400 font-bold font-mono">[{c.subsystem}]</td>
-                                      <td className="py-1.5 px-2 text-slate-300">{loc.bay}</td>
-                                      <td className="py-1.5 px-2 font-mono text-slate-200">{c.v168.toFixed(1)}&mu;A</td>
+                                      <td className="py-1.5 px-2.5 font-mono font-bold text-[#E8EDF2]">{c.component_id}</td>
+                                      <td className="py-1.5 px-2 text-[#C99A2E] font-bold font-mono">[{c.subsystem}]</td>
+                                      <td className="py-1.5 px-2 text-[#91A0B2]">{loc.bay}</td>
+                                      <td className="py-1.5 px-2 font-mono text-[#E8EDF2]">{c.v168.toFixed(1)}&mu;A</td>
                                       <td className="py-1.5 px-2">
                                         <span className={`px-1.5 py-0.5 rounded text-[8.5px] font-bold ${
                                           c.status === 'reject'
-                                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                                            ? 'bg-[#28131D] text-[#D94B5B] border border-[#D94B5B]/50'
                                             : c.status === 'monitor'
-                                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                                            : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                            ? 'bg-[#D6A33A]/15 text-[#D6A33A] border border-[#D6A33A]/40'
+                                            : 'bg-[#3FA66B]/15 text-[#3FA66B] border border-[#3FA66B]/40'
                                         }`}>
-                                          {c.status.toUpperCase()}
+                                          {(c.status || 'safe').toUpperCase()}
                                         </span>
                                       </td>
                                     </tr>
@@ -705,9 +704,9 @@ export default function MultiScreenWall({
                       </div>
                     ) : (
                       /* Quarantine Mode Table */
-                      <div className="flex-1 overflow-y-auto rounded-lg border border-slate-800 bg-[#070D1A] max-h-[220px]">
+                      <div className="flex-1 overflow-y-auto rounded-lg border border-[#26384D] bg-[#070D18] max-h-[220px]">
                         <table className="w-full text-left text-xs font-sans border-collapse">
-                          <thead className="bg-[#0F172A] text-[10px] uppercase font-semibold text-slate-400 sticky top-0 border-b border-slate-800">
+                          <thead className="bg-[#0D1726] text-[10px] uppercase font-semibold text-[#91A0B2] sticky top-0 border-b border-[#26384D]">
                             <tr>
                               <th className="py-2 px-3">Part ID</th>
                               <th className="py-2 px-2">Subsystem &amp; Bay Location</th>
@@ -717,7 +716,7 @@ export default function MultiScreenWall({
                               <th className="py-1.5 px-2">Risk</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-800/60">
+                          <tbody className="divide-y divide-[#26384D]/60">
                             {rejected.map((c) => {
                               const loc = getSubsystemLocation(c.subsystem)
                               const isSel = effectiveSelected?.component_id === c.component_id
@@ -729,19 +728,19 @@ export default function MultiScreenWall({
                                     onSelectSubsystem(c.subsystem)
                                   }}
                                   className={`cursor-pointer transition-colors ${
-                                    isSel ? 'bg-rose-500/20 text-white font-bold' : 'hover:bg-slate-800/40 text-slate-300'
+                                    isSel ? 'bg-[#28131D] text-[#D94B5B] font-bold' : 'hover:bg-[#16253A]/50 text-[#91A0B2]'
                                   }`}
                                 >
-                                  <td className="py-1.5 px-2.5 font-bold font-mono text-white">{c.component_id}</td>
-                                  <td className="py-1.5 px-2 text-amber-400 font-mono font-bold">[{c.subsystem}] {loc.name}</td>
-                                  <td className="py-1.5 px-2 text-rose-400 font-bold font-mono">{c.v168.toFixed(1)}&mu;A</td>
-                                  <td className="py-1.5 px-2 text-rose-400 font-mono">+{c.z168.toFixed(2)}&sigma;</td>
+                                  <td className="py-1.5 px-2.5 font-bold font-mono text-[#E8EDF2]">{c.component_id}</td>
+                                  <td className="py-1.5 px-2 text-[#C99A2E] font-mono font-bold">[{c.subsystem}] {loc.name}</td>
+                                  <td className="py-1.5 px-2 text-[#D94B5B] font-bold font-mono">{c.v168.toFixed(1)}&mu;A</td>
+                                  <td className="py-1.5 px-2 text-[#D94B5B] font-mono">+{c.z168.toFixed(2)}&sigma;</td>
                                   <td className="py-1.5 px-2">
-                                    <span className="px-1.5 py-0.5 rounded text-[8.5px] bg-purple-500/20 text-purple-300 border border-purple-400/40 font-bold">
+                                    <span className="px-1.5 py-0.5 rounded text-[8.5px] bg-[#28131D] text-[#D94B5B] border border-[#D94B5B]/50 font-bold">
                                       PASS Spec &bull; REJECT AI
                                     </span>
                                   </td>
-                                  <td className="py-1.5 px-2 text-rose-400 font-bold font-mono">{c.risk_score}</td>
+                                  <td className="py-1.5 px-2 text-[#D94B5B] font-bold font-mono">{c.risk_score}</td>
                                 </tr>
                               )
                             })}
@@ -751,9 +750,9 @@ export default function MultiScreenWall({
                     )}
                   </div>
 
-                  <div className="bg-[#070D1A] border-t border-slate-800 px-4 py-1.5 text-[10px] text-slate-400 flex justify-between">
+                  <div className="bg-[#0D1726] border-t border-[#26384D] px-4 py-1.5 text-[10px] text-[#91A0B2] flex justify-between">
                     <span>STATUS: {isScreened ? 'AI SCREENING COMPLETED' : 'AWAITING AI SCREENING PIPELINE'}</span>
-                    <span className="text-emerald-400 font-mono">{lotGroups.length} FLIGHT LOTS ACTIVE</span>
+                    <span className="text-[#3FA66B] font-mono">{lotGroups.length} FLIGHT LOTS ACTIVE</span>
                   </div>
                 </div>
               )}
@@ -762,24 +761,24 @@ export default function MultiScreenWall({
         )}
 
         {/* Collapsible Spacecraft Bus & HTOL Circuit Diagram Tray */}
-        <div className="bg-[#0B1120] rounded-xl border border-slate-800 p-4">
+        <div className="bg-[#111E30] rounded-xl border border-[#26384D] p-4">
           <button
             type="button"
             onClick={() => setShowSchematics((v) => !v)}
             className="w-full flex items-center justify-between text-left cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400" />
-              <span className="text-xs font-bold text-slate-200 tracking-wide uppercase font-display">
+              <span className="w-2 h-2 rounded-full bg-[#C99A2E] animate-gentle-pulse" />
+              <span className="text-xs font-bold text-[#E8EDF2] tracking-wide uppercase font-display">
                 ISRO SDSC SHAR Component Architecture &amp; HTOL Telemetry DAQ Schematics
               </span>
             </div>
-            <span className="text-xs text-slate-400 hover:text-white transition-colors font-medium">
+            <span className="text-xs text-[#91A0B2] hover:text-[#E8EDF2] transition-colors font-medium">
               {showSchematics ? '[-] Hide Schematics' : '[+] Expand Test Harness Schematics'}
             </span>
           </button>
           {showSchematics && (
-            <div className="mt-3 pt-3 border-t border-slate-800">
+            <div className="mt-3 pt-3 border-t border-[#26384D]">
               <ComponentDiagram type="all" />
             </div>
           )}
