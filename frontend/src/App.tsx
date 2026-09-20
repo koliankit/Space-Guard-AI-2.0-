@@ -1,6 +1,5 @@
 import { useCallback, useState, useEffect } from 'react'
 import Header, { type DashboardTab } from './components/Dashboard/Header'
-import UploadBar from './components/Dashboard/UploadBar'
 import HealthBar from './components/Dashboard/HealthBar'
 import MappingModal from './components/Dashboard/MappingModal'
 import PipelineOverlay from './components/Dashboard/PipelineOverlay'
@@ -22,6 +21,7 @@ import MissionReportView from './components/Views/MissionReportView'
 import LotArchitectureView from './components/Views/LotArchitectureView'
 import MultiScreenWall from './components/Dashboard/MultiScreenWall'
 import SidebarNav from './components/Dashboard/SidebarNav'
+import SettingsView from './components/Views/SettingsView'
 import CsvIntakeView from './components/Views/CsvIntakeView'
 import ValidationView from './components/Views/ValidationView'
 import ModuleAView from './components/Views/ModuleAView'
@@ -352,24 +352,9 @@ export default function App() {
         teeStatus={teeStatus}
         onOpenTeeModal={() => setTeeModalOpen(true)}
         onToggleSidebar={() => setMobileSidebarOpen((v) => !v)}
-      />
-      <UploadBar
-        metaText={dataMetaText}
-        canRun={batchId !== null}
-        canReport={analysisRun}
+        onRunScreening={() => runScreening()}
         running={running}
-        onFile={handleFile}
-        onDemo={() => handleDemo()}
-        onRun={() => runScreening()}
-        onReport={handleReport}
-        onReportPdf={handleReportPdf}
-        onReportExcel={handleReportExcel}
-        onReportCsv={handleReportCsv}
-        activeMissionId={activeMissionId}
-        onSelectMission={handleSelectMission}
-        onOpenIngestModal={() => setIngestModalOpen(true)}
-        onOpenLotsModal={() => setLotModalOpen(true)}
-        onResetWorkflow={resetWorkflow}
+        isScreened={analysisRun}
       />
 
       {/* Horizontal Health Metrics Bar — only appears after data has been loaded and screened */}
@@ -451,6 +436,7 @@ export default function App() {
               onUploadFile={handleFile}
               onOpenLotsModal={() => setLotModalOpen(true)}
               onNavigateToLotsTab={() => setActiveTab('locations')}
+              onNavigateToTab={(tab) => setActiveTab(tab as DashboardTab)}
             />
           )}
 
@@ -539,7 +525,7 @@ export default function App() {
           )}
 
           {/* SPACECRAFT: 3D Satellite */}
-          {(activeTab === 'satellite' || activeTab === 'orbital') && (
+          {activeTab === 'satellite' && (
             <SatelliteView
               subsystems={subsystems}
               components={allComponents.length > 0 ? allComponents : flaggedList}
@@ -547,6 +533,23 @@ export default function App() {
               focusKey={focusKey}
               onSelectComponent={selectComponent}
               onSelectSubsystem={selectSubsystem}
+            />
+          )}
+
+          {/* OPERATIONS: Orbital DSN Tracking */}
+          {activeTab === 'orbital' && (
+            <OrbitalTrackingView />
+          )}
+
+          {/* SETTINGS: Configuration & Enclave */}
+          {activeTab === 'settings' && (
+            <SettingsView
+              teeStatus={teeStatus}
+              onOpenTeeModal={() => setTeeModalOpen(true)}
+              activeMissionId={activeMissionId}
+              onSelectMission={handleSelectMission}
+              onResetWorkflow={resetWorkflow}
+              totalComponents={allComponents.length}
             />
           )}
 

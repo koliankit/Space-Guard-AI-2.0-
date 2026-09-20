@@ -210,7 +210,7 @@ export default function LotArchitectureView({
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-[#060B16] text-slate-100 font-sans p-4 gap-4 select-none min-h-[calc(100vh-140px)] w-full">
+    <div className="flex flex-col flex-1 bg-[#070D18] text-[#E8EDF2] font-sans p-3 md:p-5 gap-4 select-none min-h-screen w-full overflow-y-auto">
       {/* Top Banner: Header and Key Metrics */}
       <div className="bg-[#0B1120] border border-slate-800 rounded-xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">

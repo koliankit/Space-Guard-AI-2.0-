@@ -29,9 +29,9 @@ export default function SatelliteView({
     null
 
   return (
-    <div className="w-full flex flex-col gap-5 p-4 md:p-6 bg-[#070D18] text-[#E8EDF2] font-sans">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-4 bg-[#0D1726]/60 -mx-4 -mt-4 p-4 md:-mx-6 md:-mt-6 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded bg-[#3B82B6]/20 text-[#3B82B6] border border-[#3B82B6]/40 font-mono font-bold text-xs uppercase tracking-wider">

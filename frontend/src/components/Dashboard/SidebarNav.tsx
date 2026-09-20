@@ -25,6 +25,7 @@ interface NavItem {
   badge?: string | number
   badgeColor?: string
   description?: string
+  tag?: string
 }
 
 interface NavSection {
@@ -37,8 +38,8 @@ export default function SidebarNav({
   onSelectTab,
   totalComponents = 0,
   rejectCount = 0,
-  monitorCount = 0,
-  safeCount = 0,
+  monitorCount: _monitorCount = 0,
+  safeCount: _safeCount = 0,
   activeMissionName = 'Gaganyaan H1',
   teeStatus,
   onOpenTeeModal,
@@ -59,10 +60,34 @@ export default function SidebarNav({
       title: 'OVERVIEW',
       items: [
         {
-          id: 'overview',
-          label: 'Overview',
+          id: 'wall',
+          label: 'Command Wall (Module A & B)',
           icon: '⚡',
-          description: 'Multi-Screen Wall & KPI Command',
+          tag: '00',
+          description: 'Multi-Screen Sector Wall & KPI Hub',
+        },
+        {
+          id: 'locations',
+          label: 'Lot & Locations',
+          icon: '📦',
+          tag: '01',
+          description: 'Qualification Lot Architecture',
+        },
+        {
+          id: 'satellite',
+          label: '3D Satellite',
+          icon: '🛰️',
+          tag: '02',
+          description: 'Interactive Digital Twin Hardware',
+        },
+        {
+          id: 'matrix',
+          label: 'AI Matrix',
+          icon: '▦',
+          tag: '03',
+          badge: totalComponents > 0 ? `${totalComponents} parts` : undefined,
+          badgeColor: 'bg-[#16253A] text-[#E8EDF2] border-[#26384D]',
+          description: 'Comprehensive Screening Matrix',
         },
       ],
     },
@@ -73,27 +98,27 @@ export default function SidebarNav({
           id: 'csv_intake',
           label: 'CSV Intake',
           icon: '📥',
-          badge: totalComponents > 0 ? `${totalComponents} parts` : undefined,
-          badgeColor: 'bg-[#16253A] text-[#E8EDF2] border-[#26384D]',
-          description: 'Ingestion & Raw Preview',
+          badge: totalComponents > 0 ? `${totalComponents} loaded` : undefined,
+          badgeColor: 'bg-[#111E30] text-[#C99A2E] border-[#C99A2E]/40',
+          description: 'Telemetry File Ingestion & Parsing',
         },
         {
           id: 'validation',
           label: 'Validation',
           icon: '🛡️',
-          description: '3-Step Preprocessing Audit',
+          description: '3-Step Preprocessing Audit & Physics',
         },
         {
           id: 'module_a',
           label: 'Module A',
           icon: '🔬',
-          description: 'Lot-Relative Anomaly Detection',
+          description: 'Lot-Relative Dynamic Anomaly Detection',
         },
         {
           id: 'module_b',
           label: 'Module B',
           icon: '📈',
-          description: 'Early Drift & 264h Prediction',
+          description: 'Early Drift & 264h Failure Prediction',
         },
       ],
     },
@@ -104,7 +129,7 @@ export default function SidebarNav({
           id: 'risk_engine',
           label: 'Risk Engine',
           icon: '⚖️',
-          description: 'Bayesian Multi-Factor Scoring',
+          description: 'Bayesian Multi-Factor Scoring Synthesis',
         },
         {
           id: 'matrix',
@@ -112,13 +137,13 @@ export default function SidebarNav({
           icon: '▦',
           badge: rejectCount > 0 ? `${rejectCount} REJECT` : undefined,
           badgeColor: 'bg-[#D94B5B]/20 text-[#D94B5B] border-[#D94B5B]/50',
-          description: 'All-Component Decision Grid',
+          description: 'All-Component Decision Grid & Filters',
         },
         {
           id: 'diagnostics',
           label: 'Diagnostics',
           icon: '🩺',
-          description: 'Physics & Bus Failover Actions',
+          description: 'Physics Root Cause & Bus Failover',
         },
       ],
     },
@@ -129,30 +154,58 @@ export default function SidebarNav({
           id: 'satellite',
           label: '3D Satellite',
           icon: '🛰️',
-          description: 'Interactive Hardware Localization',
+          description: '3D Hardware Localization & Bay Status',
         },
         {
           id: 'telemetry',
           label: 'Telemetry',
           icon: '📡',
-          description: 'Parametric Oscilloscope DAQ',
+          description: 'Parametric Oscilloscope DAQ Sweep',
         },
         {
           id: 'locations',
           label: 'Component Locations',
           icon: '📍',
-          description: 'Subsystems & Lot Architecture',
+          description: 'Subsystems & Lot Placement Map',
         },
       ],
     },
     {
-      title: 'OUTPUT',
+      title: 'OPERATIONS',
       items: [
         {
+          id: 'orbital',
+          label: 'Orbital DSN Tracking',
+          icon: '🌐',
+          tag: 'DSN',
+          description: 'Ground Station Downlink & Orbit Geometry',
+        },
+        {
+          id: 'subsystems',
+          label: 'Subsystem Diagnostics',
+          icon: '🔧',
+          description: '11 Subsystems Health & Isolation Controls',
+        },
+        {
           id: 'report',
-          label: 'Clearance Report',
+          label: 'Clearance Report & PDF',
           icon: '📄',
-          description: 'ISRO Certificate, PDF & Excel',
+          badge: rejectCount > 0 ? `${rejectCount} REJ` : undefined,
+          badgeColor: 'bg-[#D94B5B] text-white border-transparent',
+          description: 'Official ISRO Flight Readiness Certificate',
+        },
+      ],
+    },
+    {
+      title: 'SETTINGS',
+      items: [
+        {
+          id: 'settings',
+          label: 'Settings & Security',
+          icon: '⚙️',
+          badge: teeStatus?.enabled ? 'ENCLAVE' : undefined,
+          badgeColor: 'bg-[#3B82B6]/20 text-[#3B82B6] border-[#3B82B6]/40',
+          description: 'TEE Enclave, Physics Limits & Display',
         },
       ],
     },
@@ -161,10 +214,11 @@ export default function SidebarNav({
   // Map legacy aliases to canonical tab ids for highlight comparison
   const isItemActive = (itemId: DashboardTab) => {
     if (activeTab === itemId) return true
-    if (itemId === 'overview' && activeTab === 'wall') return true
-    if (itemId === 'locations' && activeTab === 'lots') return true
-    if (itemId === 'diagnostics' && activeTab === 'subsystems') return true
-    if (itemId === 'satellite' && activeTab === 'orbital') return true
+    if (itemId === 'wall' && (activeTab === 'overview' || activeTab === 'wall')) return true
+    if (itemId === 'overview' && (activeTab === 'overview' || activeTab === 'wall')) return true
+    if (itemId === 'locations' && (activeTab === 'locations' || activeTab === 'lots')) return true
+    if (itemId === 'diagnostics' && (activeTab === 'diagnostics' || activeTab === 'subsystems')) return true
+    if (itemId === 'subsystems' && (activeTab === 'diagnostics' || activeTab === 'subsystems')) return true
     return false
   }
 
@@ -179,22 +233,22 @@ export default function SidebarNav({
       {/* Mobile Backdrop */}
       {isOpenMobile && (
         <div
-          className="fixed inset-0 bg-black/70 z-40 lg:hidden backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-black/75 z-40 lg:hidden backdrop-blur-sm transition-opacity"
           onClick={onCloseMobile}
         />
       )}
 
-      {/* Main Sidebar Frame */}
+      {/* Main Sidebar Frame: full-height sticky left navigation column */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-64 xl:w-72 bg-[#070D18] border-r border-[#26384D] z-50 flex flex-col justify-between flex-shrink-0 transition-transform duration-200 ease-in-out ${
+        className={`fixed lg:sticky top-0 left-0 h-screen w-72 xl:w-80 bg-[#070D18] border-r border-[#26384D] z-50 flex flex-col justify-between flex-shrink-0 transition-transform duration-200 ease-in-out ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Top Header Identity */}
-        <div className="p-4 border-b border-[#26384D] bg-[#0D1726]/80 flex flex-col gap-2 flex-shrink-0">
+        <div className="p-3.5 border-b border-[#26384D] bg-[#0D1726]/90 flex flex-col gap-2 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#111E30] border border-[#C99A2E]/50 flex items-center justify-center font-bold text-[#C99A2E] font-mono text-xs shadow-isro">
+              <div className="w-8 h-8 rounded-lg bg-[#111E30] border border-[#C99A2E]/60 flex items-center justify-center font-bold text-[#C99A2E] font-mono text-xs shadow-isro">
                 ISRO
               </div>
               <div>
@@ -202,7 +256,7 @@ export default function SidebarNav({
                   SPACEGUARD <span className="text-[#C99A2E]">AI</span>
                 </div>
                 <div className="text-[10px] font-mono text-[#91A0B2] uppercase tracking-wider">
-                  Mission Reliability UI
+                  Mission Control Deck
                 </div>
               </div>
             </div>
@@ -222,49 +276,65 @@ export default function SidebarNav({
 
           {/* Active Mission Pill */}
           <div className="bg-[#111E30] border border-[#26384D] rounded-md px-2.5 py-1 flex items-center justify-between text-[11px] font-mono text-[#91A0B2]">
-            <span className="truncate max-w-[170px]" title={activeMissionName}>
+            <span className="truncate max-w-[200px]" title={activeMissionName}>
               MISSION: <b className="text-[#E8EDF2]">{activeMissionName}</b>
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
           </div>
         </div>
 
-        {/* Scrollable Navigation List */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 select-none scrollbar-thin scrollbar-thumb-[#26384D] scrollbar-track-transparent">
+        {/* Scrollable Navigation Hierarchy */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-3.5 select-none scrollbar-thin scrollbar-thumb-[#26384D] scrollbar-track-transparent">
           {navSections.map((section) => (
             <div key={section.title} className="space-y-1">
-              {/* Section Header */}
-              <div className="px-2.5 py-1 text-[10px] font-mono font-bold tracking-widest text-[#5A6E85] uppercase">
-                {section.title}
+              {/* Section Header with Accent Line */}
+              <div className="flex items-center justify-between px-2 py-0.5">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-[#5A6E85] uppercase">
+                  {section.title}
+                </span>
+                <span className="w-12 h-px bg-[#26384D]" />
               </div>
 
               {/* Navigation Items */}
               <div className="space-y-0.5">
-                {section.items.map((item) => {
+                {section.items.map((item, idx) => {
                   const active = isItemActive(item.id)
                   return (
                     <button
-                      key={item.id}
+                      key={`${section.title}-${item.id}-${idx}`}
                       type="button"
                       onClick={() => handleSelect(item.id)}
-                      className={`w-full group text-left px-3 py-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer border ${
+                      className={`w-full group text-left px-2.5 py-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer border ${
                         active
-                          ? 'bg-[#16253A] border-[#C99A2E]/70 text-[#E8EDF2] shadow-sm font-semibold'
-                          : 'bg-transparent border-transparent text-[#91A0B2] hover:text-[#E8EDF2] hover:bg-[#111E30]/70 hover:border-[#26384D]'
+                          ? 'bg-[#16253A] border-[#C99A2E]/70 text-[#E8EDF2] shadow-sm font-semibold ring-1 ring-[#C99A2E]/30'
+                          : 'bg-transparent border-transparent text-[#91A0B2] hover:text-[#E8EDF2] hover:bg-[#111E30] hover:border-[#26384D]'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         <span className="text-sm opacity-90 flex-shrink-0">{item.icon}</span>
                         <div className="min-w-0 flex-1">
-                          <div
-                            className={`text-xs font-mono tracking-wide truncate ${
-                              active ? 'text-[#E8EDF2] font-bold' : 'group-hover:text-[#E8EDF2]'
-                            }`}
-                          >
-                            {item.label}
+                          <div className="flex items-center gap-1.5">
+                            {item.tag && (
+                              <span
+                                className={`text-[9.5px] font-mono px-1 rounded ${
+                                  active
+                                    ? 'bg-[#C99A2E]/25 text-[#C99A2E] font-bold'
+                                    : 'bg-[#070D18] text-[#5A6E85]'
+                                }`}
+                              >
+                                {item.tag}
+                              </span>
+                            )}
+                            <div
+                              className={`text-xs font-mono tracking-wide truncate ${
+                                active ? 'text-[#E8EDF2] font-bold' : 'group-hover:text-[#E8EDF2]'
+                              }`}
+                            >
+                              {item.label}
+                            </div>
                           </div>
                           {item.description && (
-                            <div className="text-[10px] text-[#5A6E85] truncate font-sans">
+                            <div className="text-[10px] text-[#5A6E85] truncate font-sans mt-0.5">
                               {item.description}
                             </div>
                           )}
@@ -274,7 +344,7 @@ export default function SidebarNav({
                       {/* Optional Badge */}
                       {item.badge && (
                         <span
-                          className={`ml-2 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border flex-shrink-0 ${
+                          className={`ml-2 px-1.5 py-0.5 rounded text-[9.5px] font-mono font-bold border flex-shrink-0 ${
                             item.badgeColor || 'bg-[#111E30] text-[#91A0B2] border-[#26384D]'
                           }`}
                         >
@@ -295,7 +365,7 @@ export default function SidebarNav({
         </nav>
 
         {/* Bottom Operational Footer */}
-        <div className="p-3 border-t border-[#26384D] bg-[#0D1726]/80 flex flex-col gap-2 flex-shrink-0 text-xs font-mono">
+        <div className="p-3 border-t border-[#26384D] bg-[#0D1726]/90 flex flex-col gap-2 flex-shrink-0 text-xs font-mono">
           {/* TEE Security Chip */}
           {teeStatus && onOpenTeeModal && (
             <button
@@ -329,7 +399,7 @@ export default function SidebarNav({
               title="Toggle Audio Feedback"
             >
               <span>{soundOn ? '🔊' : '🔇'}</span>
-              <span>{soundOn ? 'AUDIO ON' : 'MUTED'}</span>
+              <span>{soundOn ? 'AUDIO' : 'MUTED'}</span>
             </button>
 
             {/* Pitch Modal Shortcut */}
@@ -346,6 +416,16 @@ export default function SidebarNav({
                 DECK [P]
               </button>
             )}
+
+            {/* Quick Settings shortcut */}
+            <button
+              type="button"
+              onClick={() => handleSelect('settings')}
+              className="hover:text-[#3B82B6] transition-colors cursor-pointer"
+              title="Open System & Security Settings"
+            >
+              SETTINGS ⚙️
+            </button>
           </div>
         </div>
       </aside>

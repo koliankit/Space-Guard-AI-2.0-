@@ -221,7 +221,7 @@ export default function ScreeningMatrixView({
   }
 
   return (
-    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#060B16] font-mono select-none overflow-hidden text-slate-100 w-full">
+    <div className="flex flex-col flex-1 p-3 md:p-5 bg-[#070D18] font-mono select-none overflow-y-auto text-[#E8EDF2] w-full min-h-screen">
       {/* Top Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-3">
         <div>

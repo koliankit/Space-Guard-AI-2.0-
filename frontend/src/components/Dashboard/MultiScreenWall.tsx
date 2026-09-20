@@ -20,6 +20,7 @@ interface MultiScreenWallProps {
   onUploadFile?: (file: File) => void
   onOpenLotsModal?: () => void
   onNavigateToLotsTab?: () => void
+  onNavigateToTab?: (tab: string) => void
 }
 const DEFAULT_SUBSYSTEMS: SubsystemStatus[] = [
   { key: 'PWR', name: 'Power System', position: [0.55, 0.42, 0.62], count: 48, status: 'safe', avg_risk: 12, top_component: 'PWR-MOSFET-401' },
@@ -47,6 +48,7 @@ export default function MultiScreenWall({
   onUploadFile,
   onOpenLotsModal,
   onNavigateToLotsTab,
+  onNavigateToTab,
 }: MultiScreenWallProps) {
   const rejected = useMemo(() => components.filter((c) => c.status === 'reject'), [components])
   const monitored = useMemo(() => components.filter((c) => c.status === 'monitor'), [components])
@@ -219,6 +221,105 @@ export default function MultiScreenWall({
             >
               2x2 Quad Wall
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 4 Important Overview Elements arranged together in one clean horizontal row */}
+      <div className="bg-[#0D1726]/70 border-b border-[#26384D] px-4 md:px-6 py-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          {/* Overview 1: Command Wall (Module A & B) */}
+          <div
+            onClick={() => setConsoleLayout('dual')}
+            className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-1.5 shadow-sm ${
+              consoleLayout === 'dual'
+                ? 'bg-[#16253A] border-[#C99A2E]/70 ring-1 ring-[#C99A2E]/30'
+                : 'bg-[#111E30] border-[#26384D] hover:border-[#3B82B6]'
+            }`}
+          >
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-[#C99A2E] font-bold flex items-center gap-1.5">
+                <span>⚡</span> [00] COMMAND WALL
+              </span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#070D18] text-[#91A0B2]">DUAL A+B</span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-bold font-mono text-[#E8EDF2]">{components.length}</span>
+              <span className="text-[11px] font-mono text-[#91A0B2]">
+                <span className="text-[#3FA66B] font-bold">{safe.length}S</span> &bull;{' '}
+                <span className="text-[#D6A33A] font-bold">{monitored.length}M</span> &bull;{' '}
+                <span className="text-[#D94B5B] font-bold">{rejected.length}R</span>
+              </span>
+            </div>
+            <div className="text-[10px] text-[#91A0B2] truncate font-sans">
+              Lot-relative anomalies &amp; 264h drift forecasts
+            </div>
+          </div>
+
+          {/* Overview 2: Lot Architecture & Locations */}
+          <div
+            onClick={() => onNavigateToLotsTab ? onNavigateToLotsTab() : onOpenLotsModal?.()}
+            className="p-3 rounded-xl bg-[#111E30] border border-[#26384D] hover:border-[#3B82B6] transition-all cursor-pointer flex flex-col justify-between gap-1.5 shadow-sm group"
+          >
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-[#3B82B6] font-bold flex items-center gap-1.5">
+                <span>📦</span> [01] LOT ARCHITECTURE
+              </span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#070D18] text-[#91A0B2] group-hover:text-[#3B82B6]">OPEN &rarr;</span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-bold font-mono text-[#E8EDF2]">{lotGroups.length} <span className="text-xs text-[#91A0B2] font-normal">Lots</span></span>
+              <span className="text-[11px] font-mono text-[#91A0B2]">
+                {subsystems.length} Subsystems
+              </span>
+            </div>
+            <div className="text-[10px] text-[#91A0B2] truncate font-sans">
+              HTOL lot statistics &amp; placement hierarchy
+            </div>
+          </div>
+
+          {/* Overview 3: 3D Satellite & Telemetry */}
+          <div
+            onClick={() => onNavigateToTab ? onNavigateToTab('satellite') : setConsoleLayout('quad')}
+            className="p-3 rounded-xl bg-[#111E30] border border-[#26384D] hover:border-[#3B82B6] transition-all cursor-pointer flex flex-col justify-between gap-1.5 shadow-sm group"
+          >
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-[#3B82B6] font-bold flex items-center gap-1.5">
+                <span>🛰️</span> [02] 3D SATELLITE
+              </span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#070D18] text-[#91A0B2] group-hover:text-[#3B82B6]">3D &rarr;</span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-bold font-mono text-[#E8EDF2]">{subsystems.length} <span className="text-xs text-[#91A0B2] font-normal">Bays</span></span>
+              <span className="text-[11px] font-mono text-[#3FA66B] font-bold">
+                ● HARDWARE TWIN
+              </span>
+            </div>
+            <div className="text-[10px] text-[#91A0B2] truncate font-sans">
+              Interactive 3D component localization
+            </div>
+          </div>
+
+          {/* Overview 4: AI Screening Matrix */}
+          <div
+            onClick={() => onNavigateToTab ? onNavigateToTab('matrix') : undefined}
+            className="p-3 rounded-xl bg-[#111E30] border border-[#26384D] hover:border-[#C99A2E] transition-all cursor-pointer flex flex-col justify-between gap-1.5 shadow-sm group"
+          >
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-[#C99A2E] font-bold flex items-center gap-1.5">
+                <span>▦</span> [03] AI MATRIX
+              </span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#070D18] text-[#91A0B2] group-hover:text-[#C99A2E]">GRID &rarr;</span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-xl font-bold font-mono text-[#E8EDF2]">{rejected.length} <span className="text-xs text-[#D94B5B] font-bold">Rejections</span></span>
+              <span className="text-[11px] font-mono text-[#91A0B2]">
+                {isScreened ? '100% Evaluated' : 'Awaiting Run'}
+              </span>
+            </div>
+            <div className="text-[10px] text-[#91A0B2] truncate font-sans">
+              Full qualification matrix &amp; Bayesian risk
+            </div>
           </div>
         </div>
       </div>
