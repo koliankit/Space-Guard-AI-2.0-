@@ -103,14 +103,14 @@ export default function TelemetryNetworkBackground({
         vx: (Math.random() - 0.5) * 0.14,
         vy: (Math.random() - 0.5) * 0.14,
         radius: isActiveHub ? 2.4 : 1.2 + Math.random() * 0.7,
-        baseAlpha: isActiveHub ? 0.65 : 0.22 + Math.random() * 0.20,
+        baseAlpha: isActiveHub ? 0.75 : 0.28 + Math.random() * 0.22,
         isActiveHub,
         hubPhase: Math.random() * Math.PI * 2,
         seed: Math.random() * 100,
       })
     }
 
-    // 2. Initialize Space Particles / Stars (3 layers of parallax)
+    // 2. Initialize Space Particles / Stars (3 layers of parallax on dark navy)
     const stars: StarParticle[] = []
     const starCount = 48
     for (let i = 0; i < starCount; i++) {
@@ -122,7 +122,7 @@ export default function TelemetryNetworkBackground({
         vx: -0.06 * speedMultiplier - (Math.random() * 0.04 * speedMultiplier),
         vy: -0.03 * speedMultiplier - (Math.random() * 0.02 * speedMultiplier),
         radius: layer === 0 ? 0.6 + Math.random() * 0.4 : layer === 1 ? 0.9 + Math.random() * 0.5 : 1.3 + Math.random() * 0.4,
-        baseAlpha: layer === 0 ? 0.12 : layer === 1 ? 0.22 : 0.32,
+        baseAlpha: layer === 0 ? 0.25 : layer === 1 ? 0.45 : 0.65,
         twinkleSpeed: 0.3 + Math.random() * 0.5,
         phase: Math.random() * Math.PI * 2,
         layer,
@@ -140,7 +140,7 @@ export default function TelemetryNetworkBackground({
         trail: [],
         beaconTimer: 0,
         beaconRadius: 0,
-        color: 'rgba(14, 165, 233, 0.85)', // Cyan-blue telemetry probe
+        color: 'rgba(56, 189, 248, 0.95)', // Glowing Cyan-blue telemetry probe
       },
       {
         x: (width || window.innerWidth) * 0.85,
@@ -151,7 +151,7 @@ export default function TelemetryNetworkBackground({
         trail: [],
         beaconTimer: 2.0,
         beaconRadius: 0,
-        color: 'rgba(244, 114, 22, 0.85)', // ISRO Deep Mission Telemetry probe
+        color: 'rgba(244, 114, 22, 0.95)', // ISRO Deep Mission Telemetry probe
       },
     ]
 
@@ -184,15 +184,15 @@ export default function TelemetryNetworkBackground({
         ctx.clearRect(0, 0, width, height)
 
         // =========================================================================
-        // SUBSYSTEM 1: Subtle Cosmic Light Current (Continuous Video Atmosphere)
+        // SUBSYSTEM 1: Subtle Cosmic Light Current on Dark Navy Atmosphere
         // =========================================================================
         const atmosphericPhase = globalTime * 0.18 // ~35s cycle
         const atmGlowX = width * (0.35 + 0.12 * Math.sin(atmosphericPhase))
         const atmGlowY = height * (0.42 + 0.10 * Math.cos(atmosphericPhase * 0.8))
 
         const atmGrad = ctx.createRadialGradient(atmGlowX, atmGlowY, 20, atmGlowX, atmGlowY, width * 0.45)
-        atmGrad.addColorStop(0, 'rgba(14, 110, 180, 0.055)')
-        atmGrad.addColorStop(0.55, 'rgba(7, 75, 130, 0.030)')
+        atmGrad.addColorStop(0, 'rgba(14, 136, 211, 0.085)')
+        atmGrad.addColorStop(0.55, 'rgba(7, 91, 140, 0.040)')
         atmGrad.addColorStop(1, 'rgba(0, 0, 0, 0)')
         ctx.fillStyle = atmGrad
         ctx.fillRect(0, 0, width, height)
@@ -204,7 +204,7 @@ export default function TelemetryNetworkBackground({
         const orbitSlowAngle = globalTime * 0.012 // slow continuous drift
 
         // Arc 1: Geostationary Transfer Orbit (GTO Arc)
-        ctx.strokeStyle = 'rgba(11, 75, 125, 0.09)'
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)'
         ctx.lineWidth = 1.0
         ctx.setLineDash([6, 16])
         ctx.beginPath()
@@ -217,7 +217,7 @@ export default function TelemetryNetworkBackground({
         ctx.stroke()
 
         // Arc 2: Low Earth Polar Orbit (LEO Arc)
-        ctx.strokeStyle = 'rgba(14, 125, 195, 0.07)'
+        ctx.strokeStyle = 'rgba(14, 136, 211, 0.10)'
         ctx.setLineDash([4, 14])
         ctx.beginPath()
         const arc2CenterX = width * 0.28
@@ -234,16 +234,16 @@ export default function TelemetryNetworkBackground({
         const s1X = arc1CenterX + arc1RadiusX * Math.cos(sat1Theta) * Math.cos(arc1Rot) - arc1RadiusY * Math.sin(sat1Theta) * Math.sin(arc1Rot)
         const s1Y = arc1CenterY + arc1RadiusX * Math.cos(sat1Theta) * Math.sin(arc1Rot) + arc1RadiusY * Math.sin(sat1Theta) * Math.cos(arc1Rot)
         ctx.beginPath()
-        ctx.arc(s1X, s1Y, 1.8, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(14, 136, 211, 0.45)'
+        ctx.arc(s1X, s1Y, 2.0, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.85)'
         ctx.fill()
 
         const sat2Theta = -globalTime * 0.038
         const s2X = arc2CenterX + arc2RadiusX * Math.cos(sat2Theta) * Math.cos(arc2Rot) - arc2RadiusY * Math.sin(sat2Theta) * Math.sin(arc2Rot)
         const s2Y = arc2CenterY + arc2RadiusX * Math.cos(sat2Theta) * Math.sin(arc2Rot) + arc2RadiusY * Math.sin(sat2Theta) * Math.cos(arc2Rot)
         ctx.beginPath()
-        ctx.arc(s2X, s2Y, 1.6, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(10, 95, 150, 0.40)'
+        ctx.arc(s2X, s2Y, 1.8, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(14, 165, 233, 0.75)'
         ctx.fill()
 
         ctx.restore()
@@ -270,10 +270,12 @@ export default function TelemetryNetworkBackground({
 
           ctx.beginPath()
           ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2)
-          // Muted dark navy & cyan tones for stars
+          // Luminous stars against dark navy background
           ctx.fillStyle = s.layer === 2
-            ? `rgba(14, 120, 185, ${starAlpha})`
-            : `rgba(9, 65, 110, ${starAlpha})`
+            ? `rgba(186, 230, 253, ${starAlpha})`
+            : s.layer === 1
+            ? `rgba(224, 242, 254, ${starAlpha})`
+            : `rgba(255, 255, 255, ${starAlpha})`
           ctx.fill()
         }
 
@@ -319,11 +321,11 @@ export default function TelemetryNetworkBackground({
               for (let t = 0; t < sc.trail.length - 1; t++) {
                 const p1 = sc.trail[t]
                 const p2 = sc.trail[t + 1]
-                const trailAlpha = (1 - t / sc.trail.length) * 0.28
+                const trailAlpha = (1 - t / sc.trail.length) * 0.35
                 ctx.beginPath()
                 ctx.moveTo(p1.x, p1.y)
                 ctx.lineTo(p2.x, p2.y)
-                ctx.strokeStyle = sc.color.replace('0.85', trailAlpha.toFixed(3))
+                ctx.strokeStyle = sc.color.replace('0.95', trailAlpha.toFixed(3))
                 ctx.lineWidth = 1.2 * (1 - t / sc.trail.length)
                 ctx.stroke()
               }
@@ -331,16 +333,16 @@ export default function TelemetryNetworkBackground({
 
             // Draw spacecraft glowing core
             ctx.beginPath()
-            ctx.arc(sc.x, sc.y, 2.0, 0, Math.PI * 2)
+            ctx.arc(sc.x, sc.y, 2.2, 0, Math.PI * 2)
             ctx.fillStyle = sc.color
             ctx.fill()
 
             // Draw expanding beacon radar ring
             if (sc.beaconRadius > 0) {
-              const ringAlpha = (1 - sc.beaconRadius / 26.0) * 0.32
+              const ringAlpha = (1 - sc.beaconRadius / 26.0) * 0.38
               ctx.beginPath()
               ctx.arc(sc.x, sc.y, sc.beaconRadius, 0, Math.PI * 2)
-              ctx.strokeStyle = sc.color.replace('0.85', ringAlpha.toFixed(3))
+              ctx.strokeStyle = sc.color.replace('0.95', ringAlpha.toFixed(3))
               ctx.lineWidth = 0.8
               ctx.stroke()
             }
@@ -378,12 +380,12 @@ export default function TelemetryNetworkBackground({
 
             if (dist < connectionDistance) {
               // Smooth distance-based falloff
-              const alpha = Math.pow(1 - dist / connectionDistance, 1.25) * 0.16
+              const alpha = Math.pow(1 - dist / connectionDistance, 1.25) * 0.22
               ctx.beginPath()
               ctx.moveTo(nodes[i].x, nodes[i].y)
               ctx.lineTo(nodes[j].x, nodes[j].y)
-              // Muted deep-blue line with very low opacity
-              ctx.strokeStyle = `rgba(11, 75, 125, ${Math.max(0.025, alpha)})`
+              // Cyan-blue line with low opacity against dark navy
+              ctx.strokeStyle = `rgba(56, 189, 248, ${Math.max(0.035, alpha)})`
               ctx.lineWidth = 0.8
               ctx.stroke()
 
@@ -407,7 +409,7 @@ export default function TelemetryNetworkBackground({
             toNode,
             progress: 0,
             duration,
-            color: isOrange ? 'rgba(244, 114, 22, 0.85)' : 'rgba(14, 165, 233, 0.85)',
+            color: isOrange ? 'rgba(244, 114, 22, 0.95)' : 'rgba(56, 189, 248, 0.95)',
           })
         }
 
@@ -429,7 +431,7 @@ export default function TelemetryNetworkBackground({
 
             // Pulse glowing core
             ctx.beginPath()
-            ctx.arc(px, py, 2.2, 0, Math.PI * 2)
+            ctx.arc(px, py, 2.4, 0, Math.PI * 2)
             ctx.fillStyle = p.color
             ctx.fill()
 
@@ -440,7 +442,7 @@ export default function TelemetryNetworkBackground({
             ctx.beginPath()
             ctx.moveTo(px, py)
             ctx.lineTo(tx, ty)
-            ctx.strokeStyle = p.color.replace('0.85', '0.25')
+            ctx.strokeStyle = p.color.replace('0.95', '0.30')
             ctx.lineWidth = 1.6
             ctx.stroke()
           }
@@ -460,7 +462,7 @@ export default function TelemetryNetworkBackground({
               hubIndex: hubIdx,
               radius: 4,
               maxRadius: 85,
-              alpha: 0.24,
+              alpha: 0.26,
               speed: 16.0, // expands over ~5s
             })
           }
@@ -469,7 +471,7 @@ export default function TelemetryNetworkBackground({
         for (let i = radarPings.length - 1; i >= 0; i--) {
           const rp = radarPings[i]
           rp.radius += dt * rp.speed
-          rp.alpha = (1 - rp.radius / rp.maxRadius) * 0.24
+          rp.alpha = (1 - rp.radius / rp.maxRadius) * 0.26
 
           if (rp.radius >= rp.maxRadius) {
             radarPings.splice(i, 1)
@@ -480,8 +482,8 @@ export default function TelemetryNetworkBackground({
           if (hub) {
             ctx.beginPath()
             ctx.arc(hub.x, hub.y, rp.radius, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(14, 136, 211, ${rp.alpha})`
-            ctx.lineWidth = 0.7
+            ctx.strokeStyle = `rgba(56, 189, 248, ${rp.alpha})`
+            ctx.lineWidth = 0.8
             ctx.stroke()
           }
         }
@@ -494,23 +496,23 @@ export default function TelemetryNetworkBackground({
           let currentAlpha = n.baseAlpha
           if (n.isActiveHub) {
             // Calm breathing for active hubs (3.5s cycle)
-            currentAlpha = 0.52 + 0.18 * Math.sin(n.hubPhase)
+            currentAlpha = 0.65 + 0.20 * Math.sin(n.hubPhase)
           }
 
           // Node center
           ctx.beginPath()
           ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2)
           ctx.fillStyle = n.isActiveHub
-            ? `rgba(14, 136, 211, ${currentAlpha})`
-            : `rgba(10, 85, 140, ${currentAlpha})`
+            ? `rgba(56, 189, 248, ${currentAlpha})`
+            : `rgba(14, 136, 211, ${currentAlpha})`
           ctx.fill()
 
           // Active telemetry hubs have faint concentric locator ring
           if (n.isActiveHub) {
             ctx.beginPath()
             ctx.arc(n.x, n.y, n.radius * 2.8, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(14, 136, 211, ${currentAlpha * 0.35})`
-            ctx.lineWidth = 0.6
+            ctx.strokeStyle = `rgba(56, 189, 248, ${currentAlpha * 0.40})`
+            ctx.lineWidth = 0.7
             ctx.stroke()
           }
         }
@@ -541,13 +543,13 @@ export default function TelemetryNetworkBackground({
       className={`pointer-events-none absolute inset-0 w-full h-full overflow-hidden select-none ${className}`}
       style={{
         zIndex: 0,
-        backgroundColor: '#C5DBEC',
+        backgroundColor: '#07131F',
         backgroundImage: `
-          linear-gradient(168deg, #ADCBE3 0%, #BCD6E9 28%, #CADFEF 60%, #B8D3E8 100%),
-          radial-gradient(ellipse 70% 50% at 14% 18%, rgba(10, 48, 88, 0.16) 0%, transparent 65%),
-          radial-gradient(ellipse 60% 60% at 86% 28%, rgba(8, 60, 108, 0.12) 0%, transparent 60%),
-          radial-gradient(ellipse 80% 60% at 50% 88%, rgba(12, 45, 82, 0.14) 0%, transparent 70%),
-          radial-gradient(ellipse 40% 40% at 50% 45%, rgba(255, 255, 255, 0.22) 0%, transparent 60%)
+          linear-gradient(168deg, #050E17 0%, #081625 32%, #0B1D2F 65%, #06111C 100%),
+          radial-gradient(ellipse 70% 50% at 14% 18%, rgba(14, 136, 211, 0.14) 0%, transparent 65%),
+          radial-gradient(ellipse 60% 60% at 86% 28%, rgba(7, 91, 140, 0.12) 0%, transparent 60%),
+          radial-gradient(ellipse 80% 60% at 50% 88%, rgba(56, 189, 248, 0.08) 0%, transparent 70%),
+          radial-gradient(ellipse 40% 40% at 50% 45%, rgba(14, 165, 233, 0.06) 0%, transparent 60%)
         `,
       }}
       aria-hidden="true"

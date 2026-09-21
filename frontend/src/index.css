@@ -4,7 +4,7 @@
 
 :root {
   /* FINAL SPACEGUARD AI — LIGHT SPACE TELEMETRY COLOR SYSTEM (SECTION 30) */
-  --bg-main: #C5DBEC;
+  --bg-main: #07131F;
   --bg-secondary: #E6F1F8;
   --bg-panel: #FFFFFF;
   --bg-elevated: #F8FBFD;
@@ -33,7 +33,7 @@
   --card-shadow: 0 4px 18px rgba(14, 50, 80, 0.06);
 
   /* Legacy variable mappings for backward compatibility */
-  --color-bg: #C5DBEC;
+  --color-bg: #07131F;
   --color-bg2: #E6F1F8;
   --color-panel: #FFFFFF;
   --color-panel2: #F8FBFD;
@@ -112,7 +112,7 @@ html, body, #root {
 }
 
 body {
-  background: #C5DBEC;
+  background: #07131F;
   color: #17212B;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
@@ -131,15 +131,15 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #B8CEE0;
+  background: #18304B;
   border-radius: 3px;
-  border: 1px solid #F8FBFD;
+  border: 1px solid #23456B;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #0E88D3;
 }
 ::-webkit-scrollbar-track {
-  background: #C5DBEC;
+  background: #07131F;
 }
 
 /* ==============================================================================
@@ -157,10 +157,10 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.18;
+  opacity: 0.12;
   background-image:
-    linear-gradient(rgba(14, 110, 180, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 110, 180, 0.12) 1px, transparent 1px);
+    linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
   background-size: 32px 32px;
   animation: grid-drift 24s linear infinite;
 }
