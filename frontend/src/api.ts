@@ -36,20 +36,108 @@ async function asJson(res: Response) {
 }
 
 export async function uploadFile(file: File, columnMapping?: Record<string, string>): Promise<UploadResult> {
+  const text = await file.text()
+  // Run offline validator to always have rich, explainable report items ready
+  const offlineResult = offlineISRO.loadCSVText(text, file.name)
+
   if (await isBackendAvailable()) {
     try {
       const form = new FormData()
       form.append('file', file)
       if (columnMapping) form.append('column_mapping', JSON.stringify(columnMapping))
       const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: form })
-      return await asJson(res)
+      const backendResult = await asJson(res)
+
+      // If backend reported validation failure or has validation issues
+      if (
+        backendResult.error === 'validation_failed' ||
+        (backendResult.validation_issues && backendResult.validation_issues.length > 0)
+      ) {
+        const report = offlineResult.validation_report || {
+          fileName: file.name,
+          status: 'BLOCKED' as const,
+          totalRows: backendResult.rows || 0,
+          validRows: 0,
+          invalidRows: backendResult.validation_issues?.length || 1,
+          errorCount: backendResult.validation_issues?.length || 1,
+          criticalCount: backendResult.validation_issues?.length || 1,
+          warningCount: 0,
+          dataQualityScore: 0,
+          errors: (backendResult.validation_issues || []).map((iss: any, idx: number) => ({
+            id: iss.id || `err-be-${idx + 1}`,
+            severity: (iss.severity === 'error' ? 'Critical' : 'Warning') as any,
+            errorType: iss.error_type || iss.errorType || 'INVALID_NUMERIC_VALUE',
+            group: iss.group || 'DATA',
+            stage: iss.stage || 'ROW_LEVEL',
+            row: iss.row ?? null,
+            column: iss.column ?? null,
+            detectedValue: iss.detected_value || iss.detectedValue || '',
+            expectedValue: iss.expected_value || iss.expectedValue || '',
+            message: iss.message || 'Validation error detected.',
+            reason: iss.reason || iss.why || '',
+            what: iss.what || iss.message || '',
+            why: iss.why || iss.reason || '',
+            impact: iss.impact || 'Screening qualification blocked.',
+            howToFix: iss.how_to_fix || iss.howToFix || iss.recommendedFix || 'Correct the error in CSV and re-upload.',
+            recommendedFix: iss.how_to_fix || iss.recommendedFix || 'Correct the error in CSV and re-upload.',
+          })),
+          checks: {
+            formatValid: true,
+            schemaValid: false,
+            requiredColumnsValid: false,
+            rowValidationPassed: false,
+            dataQualityAcceptable: false,
+          },
+        }
+
+        return {
+          ...backendResult,
+          error: 'validation_failed',
+          validation_report: report,
+        }
+      }
+
+      // If backend reports column_mapping_required because of missing mandatory fields, but offline validator identified them as critical schema error
+      if (backendResult.error === 'column_mapping_required') {
+        if (
+          offlineResult.error === 'validation_failed' &&
+          offlineResult.validation_report?.errors.some((e) => e.errorType === 'MISSING_REQUIRED_COLUMN')
+        ) {
+          return offlineResult
+        }
+        return backendResult
+      }
+
+      // If backend succeeded
+      if (!backendResult.error) {
+        backendResult.validation_report = offlineResult.validation_report || {
+          fileName: file.name,
+          status: 'PASSED' as const,
+          totalRows: backendResult.rows || 0,
+          validRows: backendResult.valid || 0,
+          errorCount: 0,
+          criticalCount: 0,
+          warningCount: 0,
+          dataQualityScore: 100,
+          errors: [],
+          checks: {
+            formatValid: true,
+            schemaValid: true,
+            requiredColumnsValid: true,
+            rowValidationPassed: true,
+            dataQualityAcceptable: true,
+          },
+        }
+        return backendResult
+      }
+
+      return backendResult
     } catch (e) {
       console.warn('Backend upload unavailable, using offline engine:', e)
       backendReachable = false
     }
   }
-  const text = await file.text()
-  return offlineISRO.loadCSVText(text, file.name)
+  return offlineResult
 }
 
 export function resetTelemetryState(): void {

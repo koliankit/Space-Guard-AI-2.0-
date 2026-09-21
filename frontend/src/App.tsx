@@ -48,6 +48,8 @@ export default function App() {
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
   const [validationReport, setValidationReport] = useState<ValidationReport | null>(null)
+  const [isValidating, setIsValidating] = useState(false)
+  const [validatingFileName, setValidatingFileName] = useState<string | null>(null)
   const [dataMetaText, setDataMetaText] = useState(
     '<span class="text-[#5B6B7A] font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry to commence qualification clearance.</span>'
   )
@@ -117,14 +119,20 @@ export default function App() {
 
   const handleFile = useCallback(async (file: File) => {
     try {
+      setIsValidating(true)
+      setValidatingFileName(file.name)
+      setActiveTab('validation')
+
       const result = await api.uploadFile(file)
+      setIsValidating(false)
+
       if (result.error === 'column_mapping_required') {
         setPendingFile(file)
         setMappingModal(result)
         return
       }
 
-      if (result.error === 'validation_failed') {
+      if (result.error === 'validation_failed' || result.validation_report?.status === 'BLOCKED') {
         if (modalTimerId) clearTimeout(modalTimerId)
         setValidationReport(result.validation_report || null)
         setUploadMeta(null)
@@ -174,6 +182,7 @@ export default function App() {
 
       setActiveTab('validation')
     } catch (e: any) {
+      setIsValidating(false)
       alert('Upload failed: ' + e.message)
     }
   }, [modalTimerId])
@@ -225,6 +234,8 @@ export default function App() {
     setBatchId(null)
     setUploadMeta(null)
     setValidationReport(null)
+    setIsValidating(false)
+    setValidatingFileName(null)
     setMission(null)
     setFlaggedList([])
     setAllComponents([])
@@ -512,6 +523,8 @@ export default function App() {
               batchId={batchId}
               uploadMeta={uploadMeta}
               validationReport={validationReport}
+              isValidating={isValidating}
+              validatingFileName={validatingFileName}
               onFileUploaded={handleFile}
               allComponents={allComponents}
               mission={mission}

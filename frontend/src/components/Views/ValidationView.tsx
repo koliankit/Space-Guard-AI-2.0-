@@ -10,6 +10,8 @@ interface ValidationViewProps {
   batchId: number | null
   uploadMeta: UploadResult | null
   validationReport?: ValidationReport | null
+  isValidating?: boolean
+  validatingFileName?: string | null
   onFileUploaded?: (file: File) => Promise<void>
   allComponents: ComponentOut[]
   mission: MissionStatus | null
@@ -32,6 +34,8 @@ export default function ValidationView({
   batchId,
   uploadMeta,
   validationReport,
+  isValidating = false,
+  validatingFileName = null,
   onFileUploaded,
   allComponents,
   mission,
@@ -49,13 +53,21 @@ export default function ValidationView({
   const [selectedSeverity, setSelectedSeverity] = useState<'ALL' | 'Critical' | 'Warning'>('ALL')
   const [errorSearch, setErrorSearch] = useState('')
   const [selectedErrorId, setSelectedErrorId] = useState<string | null>(null)
+  const [expandedErrorIds, setExpandedErrorIds] = useState<Set<string>>(new Set())
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const errorLedgerRef = useRef<HTMLDivElement>(null)
+  const errorListRef = useRef<HTMLDivElement>(null)
 
-  // Determine status
-  const isBlocked = validationReport?.status === 'BLOCKED'
-  const isPassed = validationReport?.status === 'PASSED' || (uploadMeta !== null && !isBlocked)
+  // Determine status: A report with BLOCKED status or >0 critical errors is blocked
+  const isBlocked = Boolean(
+    validationReport?.status === 'BLOCKED' ||
+    ((validationReport?.criticalCount ?? 0) > 0)
+  )
+  const isPassed = Boolean(
+    !isBlocked &&
+    (validationReport?.status === 'PASSED' || (uploadMeta !== null && (validationReport?.criticalCount ?? 0) === 0))
+  )
 
   // Parts list
   const rawParts: RawPart[] = useMemo(() => {
@@ -148,12 +160,35 @@ export default function ValidationView({
     return filteredErrors[0] || allErrors[0] || null
   }, [allErrors, filteredErrors, selectedErrorId])
 
-  // Auto-select first error when report changes
+  // Primary error: Most critical error from the report for prominent display
+  const primaryError = useMemo(() => {
+    return allErrors.find((e) => e.severity === 'Critical') || allErrors[0] || null
+  }, [allErrors])
+
+  // Accordion toggle helpers for All Errors list
+  const toggleExpandError = (id: string) => {
+    setExpandedErrorIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const expandAllErrors = () => {
+    setExpandedErrorIds(new Set(allErrors.map((e) => e.id)))
+  }
+
+  const collapseAllErrors = () => {
+    setExpandedErrorIds(new Set())
+  }
+
+  // Auto-expand primary error on mount/report change
   useEffect(() => {
-    if (allErrors.length > 0 && !selectedErrorId) {
-      setSelectedErrorId(allErrors[0].id)
+    if (primaryError) {
+      setExpandedErrorIds(new Set([primaryError.id]))
     }
-  }, [allErrors, selectedErrorId])
+  }, [primaryError])
 
   const hasData = rawParts.length > 0
   const isScreened = mission !== null && (mission.safe > 0 || mission.monitor > 0 || mission.reject > 0)
@@ -248,51 +283,50 @@ export default function ValidationView({
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <button
-            type="button"
-            onClick={async () => {
-              if (isBlocked) {
-                sounds.playAlert()
-                return
-              }
-              sounds.playClick()
-              await onRunScreening()
-            }}
-            disabled={!hasData || running || isBlocked}
-            className={`px-4 py-2.5 rounded-lg font-mono font-bold text-xs md:text-sm transition-all flex items-center gap-2 shadow-sm ${
-              !hasData || running || isBlocked
-                ? 'bg-[#E7EEF5] text-[#718292] cursor-not-allowed border border-[#D5DEE7]'
-                : 'bg-[#0E88D3] hover:bg-[#0c74b4] text-white cursor-pointer'
-            }`}
-            title={
-              isBlocked
-                ? 'AI Screening blocked: Correct critical errors in CSV before proceeding.'
-                : hasData
-                ? 'Execute screening across validated parts'
-                : 'Upload and validate telemetry first'
-            }
-          >
-            <span>{running ? 'Screening in Progress...' : 'Start AI Screening'}</span>
-            <span>⚡</span>
-          </button>
+        {/* Action Buttons: ONLY show Start AI Screening and Proceed to Module A when validation has passed */}
+        {isBlocked ? (
+          <div className="flex items-center gap-2">
+            <span className="px-3.5 py-1.5 rounded-lg bg-[#FEF2F2] border border-[#D9363E]/40 text-[#D9363E] font-mono font-bold text-xs flex items-center gap-2 shadow-sm">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D9363E] animate-pulse" />
+              AI SCREENING: BLOCKED
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              type="button"
+              onClick={async () => {
+                sounds.playClick()
+                await onRunScreening()
+              }}
+              disabled={!hasData || running}
+              className={`px-4 py-2.5 rounded-lg font-mono font-bold text-xs md:text-sm transition-all flex items-center gap-2 shadow-sm ${
+                !hasData || running
+                  ? 'bg-[#E7EEF5] text-[#718292] cursor-not-allowed border border-[#D5DEE7]'
+                  : 'bg-[#0E88D3] hover:bg-[#0c74b4] text-white cursor-pointer'
+              }`}
+              title={hasData ? 'Execute screening across validated parts' : 'Upload and validate telemetry first'}
+            >
+              <span>{running ? 'Screening in Progress...' : 'Start AI Screening'}</span>
+              <span>⚡</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => onSelectStage('module_a')}
-            disabled={!isScreened}
-            className={`px-4 py-2.5 rounded-lg font-mono font-bold text-xs md:text-sm transition-all flex items-center gap-2 ${
-              isScreened
-                ? 'bg-[#F47216] hover:bg-[#e0630e] text-white cursor-pointer shadow-sm'
-                : 'bg-[#E7EEF5] text-[#718292] cursor-not-allowed border border-[#D5DEE7]'
-            }`}
-            title={isScreened ? 'Proceed to Module A' : 'Complete AI Screening first'}
-          >
-            <span>Proceed to Module A</span>
-            <span>&rarr;</span>
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => onSelectStage('module_a')}
+              disabled={!isScreened}
+              className={`px-4 py-2.5 rounded-lg font-mono font-bold text-xs md:text-sm transition-all flex items-center gap-2 ${
+                isScreened
+                  ? 'bg-[#F47216] hover:bg-[#e0630e] text-white cursor-pointer shadow-sm'
+                  : 'bg-[#E7EEF5] text-[#718292] cursor-not-allowed border border-[#D5DEE7]'
+              }`}
+              title={isScreened ? 'Proceed to Module A' : 'Complete AI Screening first'}
+            >
+              <span>Proceed to Module A</span>
+              <span>&rarr;</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Horizontal Analysis Workflow Bar */}
@@ -304,43 +338,47 @@ export default function ValidationView({
       />
 
       {/* ============================================================ */}
-      {/* 1. VALIDATION FAILED / BLOCKED STATE                          */}
+      {/* 1. VALIDATION FAILED / BLOCKED STATE (PART 26 CENTER WORKSPACE) */}
       {/* ============================================================ */}
       {isBlocked && validationReport && (
-        <div className="flex flex-col gap-4 animate-fade-in">
-          {/* Status Banner: DATA VALIDATION FAILED */}
-          <div className="p-4 md:p-5 rounded-xl bg-[#FFFFFF] border-2 border-[#D9363E] shadow-sm flex flex-col gap-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D5DEE7] pb-3.5">
+        <div className="flex flex-col gap-5 animate-fade-in">
+          {/* 1. MAIN ERROR SUMMARY (PART 26 — SECTION 3) */}
+          <div className="p-5 md:p-6 rounded-2xl bg-[#FFFFFF] border-2 border-[#D9363E] shadow-sm flex flex-col gap-4 font-mono">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D5DEE7] pb-4">
               <div className="flex items-center gap-3">
-                <span className="w-4 h-4 rounded-full bg-[#D9363E] animate-pulse flex-shrink-0" />
+                <div className="w-10 h-10 rounded-xl bg-[#D9363E]/15 border border-[#D9363E]/40 flex items-center justify-center text-[#D9363E] font-black text-xl flex-shrink-0">
+                  ✕
+                </div>
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <h2 className="text-lg md:text-xl font-mono font-black text-[#D9363E] tracking-wide uppercase">
-                      ✕ DATA VALIDATION FAILED &bull; AI SCREENING BLOCKED
+                    <h2 className="text-xl md:text-2xl font-mono font-black text-[#D9363E] tracking-wide uppercase">
+                      ✕ DATA VALIDATION FAILED
                     </h2>
-                    <span className="px-2 py-0.5 rounded bg-[#D9363E] text-white font-mono font-bold text-xs">
-                      GATE ENFORCED
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#D9363E] text-white font-mono font-bold text-xs">
+                      BLOCKED
                     </span>
                   </div>
-                  <div className="text-xs text-[#4F6170] font-mono mt-0.5">
-                    File: <b className="text-[#17212B]">{validationReport.fileName || 'uploaded_batch.csv'}</b> &bull; Standard: MIL-STD-883 Method 1005 Class S
+                  <div className="text-xs text-[#4F6170] font-mono mt-1 flex items-center gap-2 flex-wrap">
+                    <span>File: <b className="text-[#17212B]">{validationReport.fileName || 'SpaceGuard_AI_Invalid_CSV_Validation_Test.csv'}</b></span>
+                    <span>&bull;</span>
+                    <span>Standard: MIL-STD-883 Method 1005 Class S</span>
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons (PART 26 — SECTION 7) */}
               <div className="flex items-center gap-2 flex-wrap font-mono text-xs">
                 <button
                   type="button"
-                  onClick={() => errorLedgerRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                  className="px-3.5 py-1.5 rounded-lg border border-[#D5DEE7] bg-[#F8FAFC] hover:bg-[#E7EEF5] text-[#17212B] font-bold cursor-pointer transition-colors"
+                  onClick={() => errorListRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                  className="px-4 py-2 rounded-lg border border-[#D5DEE7] bg-[#F8FAFC] hover:bg-[#E7EEF5] text-[#17212B] font-bold cursor-pointer transition-colors shadow-sm"
                 >
-                  [ VIEW ERRORS ]
+                  [ VIEW ALL ERRORS ]
                 </button>
                 <button
                   type="button"
                   onClick={handleDownloadReportJSON}
-                  className="px-3.5 py-1.5 rounded-lg border border-[#0E88D3] bg-[#0E88D3]/10 hover:bg-[#0E88D3]/20 text-[#0E88D3] font-bold cursor-pointer transition-colors"
+                  className="px-4 py-2 rounded-lg border border-[#0E88D3] bg-[#0E88D3]/10 hover:bg-[#0E88D3]/20 text-[#0E88D3] font-bold cursor-pointer transition-colors"
                   title="Export machine-readable JSON error diagnostic report"
                 >
                   [ DOWNLOAD ERROR REPORT ]
@@ -348,103 +386,208 @@ export default function ValidationView({
                 <button
                   type="button"
                   onClick={handleTriggerUpload}
-                  className="px-3.5 py-1.5 rounded-lg bg-[#0E88D3] hover:bg-[#0c74b4] text-white font-bold cursor-pointer transition-colors shadow-sm"
+                  className="px-4 py-2 rounded-lg bg-[#0E88D3] hover:bg-[#0c74b4] text-white font-bold cursor-pointer transition-colors shadow-sm flex items-center gap-1.5"
                 >
-                  [ UPLOAD CORRECTED CSV ]
+                  <span>📥</span>
+                  <span>[ UPLOAD CORRECTED CSV ]</span>
                 </button>
               </div>
             </div>
 
-            {/* Summary Metrics Grid (7 Required Cards) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 font-mono">
-              <div className="p-3 rounded-lg bg-[#FEF2F2] border border-[#D9363E]/40">
+            {/* Summary Metrics Grid (PART 26 — SECTION 3 COUNTS) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+              <div className="p-3.5 rounded-xl bg-[#FEF2F2] border border-[#D9363E]/40">
+                <div className="text-[10px] text-[#D9363E] uppercase font-bold tracking-wider">Status</div>
+                <div className="text-xl font-black text-[#D9363E] mt-0.5">BLOCKED</div>
+                <div className="text-[10px] text-[#D9363E] font-medium">Gate Enforced</div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#FEF2F2] border border-[#D9363E]/40">
                 <div className="text-[10px] text-[#D9363E] uppercase font-bold tracking-wider">Critical Errors</div>
-                <div className="text-2xl font-bold text-[#D9363E] mt-0.5">{validationReport.criticalCount}</div>
+                <div className="text-2xl font-black text-[#D9363E] mt-0.5">{validationReport.criticalCount}</div>
                 <div className="text-[10px] text-[#D9363E] font-medium">Blocks Pipeline</div>
               </div>
 
-              <div className="p-3 rounded-lg bg-[#FFFBEB] border border-[#C58A00]/40">
+              <div className="p-3.5 rounded-xl bg-[#FFFBEB] border border-[#C58A00]/40">
                 <div className="text-[10px] text-[#C58A00] uppercase font-bold tracking-wider">Warnings</div>
-                <div className="text-2xl font-bold text-[#C58A00] mt-0.5">{validationReport.warningCount}</div>
+                <div className="text-2xl font-black text-[#C58A00] mt-0.5">{validationReport.warningCount}</div>
                 <div className="text-[10px] text-[#C58A00] font-medium">Non-blocking</div>
               </div>
 
-              <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7]">
+              <div className="p-3.5 rounded-xl bg-[#FEF2F2] border border-[#D9363E]/40">
+                <div className="text-[10px] text-[#D9363E] uppercase font-bold tracking-wider">AI Screening</div>
+                <div className="text-xl font-black text-[#D9363E] mt-0.5">BLOCKED</div>
+                <div className="text-[10px] text-[#D9363E] font-medium">Zero Leakage Gate</div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#D5DEE7]">
                 <div className="text-[10px] text-[#4F6170] uppercase font-bold tracking-wider">Rows Checked</div>
                 <div className="text-2xl font-bold text-[#17212B] mt-0.5">{validationReport.totalRows}</div>
-                <div className="text-[10px] text-[#718292]">Total parsed records</div>
+                <div className="text-[10px] text-[#718292]">Total records</div>
               </div>
 
-              <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7]">
-                <div className="text-[10px] text-[#168A5B] uppercase font-bold tracking-wider">Valid Rows</div>
-                <div className="text-2xl font-bold text-[#168A5B] mt-0.5">{validationReport.validRows}</div>
-                <div className="text-[10px] text-[#718292]">Schema compliant</div>
-              </div>
-
-              <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7]">
-                <div className="text-[10px] text-[#D9363E] uppercase font-bold tracking-wider">Invalid Rows</div>
-                <div className="text-2xl font-bold text-[#D9363E] mt-0.5">{validationReport.invalidRows}</div>
-                <div className="text-[10px] text-[#718292]">Contains violations</div>
-              </div>
-
-              <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7]">
-                <div className="text-[10px] text-[#4F6170] uppercase font-bold tracking-wider">Total Columns</div>
-                <div className="text-2xl font-bold text-[#17212B] mt-0.5">{validationReport.totalColumns}</div>
-                <div className="text-[10px] text-[#718292]">Detected headers</div>
-              </div>
-
-              <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7]">
+              <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#D5DEE7]">
                 <div className="text-[10px] text-[#4F6170] uppercase font-bold tracking-wider">Quality Score</div>
                 <div className="text-2xl font-bold text-[#D9363E] mt-0.5">{validationReport.dataQualityScore}%</div>
-                <div className="text-[10px] text-[#D9363E] font-medium">&lt; 60% Qualification Min</div>
-              </div>
-            </div>
-
-            {/* Validation Rule Explainer Alert */}
-            <div className="p-3.5 rounded-lg bg-[#FEF2F2] border border-[#D9363E]/40 text-xs font-mono text-[#D9363E] flex items-start gap-2.5">
-              <span className="text-base leading-none">🛡️</span>
-              <div className="leading-relaxed">
-                <b>VALIDATION GATE ENFORCED:</b> SpaceGuard AI strictly prevents invalid data from entering Module A, Module B, or the Bayesian Risk Engine.
-                No synthetic or unvalidated inputs are passed to downstream AI flight models. Review the explanations below, fix the identified issues in your CSV, and re-upload.
+                <div className="text-[10px] text-[#D9363E] font-medium">&lt; 60% Qual Min</div>
               </div>
             </div>
           </div>
 
-          {/* Interactive Error Guidance Center: 2-Column Ledger & 4-Part Explainer */}
-          <div ref={errorLedgerRef} className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-            {/* Left: Error Ledger Table (7 Cols) */}
-            <div className="lg:col-span-7 flex flex-col bg-[#FFFFFF] border border-[#D5DEE7] rounded-xl shadow-sm overflow-hidden">
-              {/* Filter Tabs & Search Header */}
-              <div className="p-4 border-b border-[#D5DEE7] bg-[#F8FAFC] flex flex-col gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#17212B]">
-                    Validation Error Ledger ({filteredErrors.length})
+          {/* 2. PRIMARY ERROR CARD (PART 26 — SECTION 4) */}
+          {primaryError && (
+            <div className="p-5 md:p-6 rounded-2xl bg-[#FFFFFF] border-2 border-[#D5DEE7] border-l-8 border-l-[#D9363E] shadow-sm flex flex-col gap-4 font-mono">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#D5DEE7] pb-3.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <span className="px-2.5 py-1 rounded-md bg-[#D9363E] text-white text-xs font-bold uppercase tracking-wider">
+                    CRITICAL ERROR
                   </span>
-                  {/* Severity Filter */}
-                  <div className="flex items-center gap-1 font-mono text-[11px]">
-                    {(['ALL', 'Critical', 'Warning'] as const).map((sev) => (
-                      <button
-                        key={sev}
-                        type="button"
-                        onClick={() => setSelectedSeverity(sev)}
-                        className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
-                          selectedSeverity === sev
-                            ? sev === 'Critical'
-                              ? 'bg-[#D9363E] text-white font-bold'
-                              : sev === 'Warning'
-                              ? 'bg-[#C58A00] text-white font-bold'
-                              : 'bg-[#0E88D3] text-white font-bold'
-                            : 'bg-[#FFFFFF] text-[#4F6170] border border-[#D5DEE7] hover:text-[#17212B]'
-                        }`}
-                      >
-                        {sev}
-                      </button>
-                    ))}
-                  </div>
+                  <span className="px-2.5 py-1 rounded-md bg-[#F8FAFC] border border-[#D5DEE7] text-[#17212B] text-xs font-bold">
+                    {primaryError.errorType}
+                  </span>
+                  {primaryError.column && (
+                    <span className="px-2 py-0.5 rounded text-[11px] bg-[#0E88D3]/10 text-[#0E88D3] border border-[#0E88D3]/30">
+                      Column: {primaryError.column}
+                    </span>
+                  )}
+                  {primaryError.row && (
+                    <span className="px-2 py-0.5 rounded text-[11px] bg-[#F8FAFC] text-[#4F6170] border border-[#D5DEE7]">
+                      Row #{primaryError.row}
+                    </span>
+                  )}
                 </div>
 
-                {/* Error Grouping Tabs */}
-                <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[#D5DEE7]/70">
+                <span className="text-xs font-bold text-[#D9363E] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#D9363E] animate-pulse" />
+                  PRIMARY BLOCKING VIOLATION
+                </span>
+              </div>
+
+              {/* ERROR Title */}
+              <div className="flex flex-col gap-1">
+                <span className="text-[11px] text-[#4F6170] uppercase font-bold tracking-wider">
+                  ERROR
+                </span>
+                <h3 className="text-base md:text-lg font-bold text-[#17212B]">
+                  {primaryError.message || primaryError.what}
+                </h3>
+                {(primaryError.detectedValue || primaryError.expectedValue) && (
+                  <div className="flex items-center gap-3 text-xs pt-1 flex-wrap">
+                    {primaryError.detectedValue && (
+                      <span className="text-[#D9363E] bg-[#FEF2F2] px-2 py-0.5 rounded border border-[#D9363E]/30">
+                        Detected: <b>{primaryError.detectedValue}</b>
+                      </span>
+                    )}
+                    {primaryError.expectedValue && (
+                      <span className="text-[#168A5B] bg-[#F0FDF4] px-2 py-0.5 rounded border border-[#168A5B]/30">
+                        Expected: <b>{primaryError.expectedValue}</b>
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 3-Section Explainer: WHY, IMPACT, HOW TO FIX */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                {/* WHY */}
+                <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#D5DEE7] flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#4F6170] uppercase font-bold tracking-wider">
+                    <span>❓</span>
+                    <span>WHY IS THIS ERROR OCCURRING?</span>
+                  </div>
+                  <p className="text-xs text-[#17212B] leading-relaxed font-sans">
+                    {primaryError.why || primaryError.reason || 'The uploaded CSV does not contain the required measurements under MIL-STD-883.'}
+                  </p>
+                </div>
+
+                {/* IMPACT */}
+                <div className="p-4 rounded-xl bg-[#FEF2F2] border border-[#D9363E]/30 flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#D9363E] uppercase font-bold tracking-wider">
+                    <span>⚠️</span>
+                    <span>IMPACT</span>
+                  </div>
+                  <p className="text-xs text-[#17212B] leading-relaxed font-sans">
+                    {primaryError.impact || 'Complete burn-in screening cannot continue. Downstream AI models are blocked.'}
+                  </p>
+                </div>
+
+                {/* HOW TO FIX IT */}
+                <div className="p-4 rounded-xl bg-[#F0FDF4] border border-[#168A5B]/30 flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#168A5B] uppercase font-bold tracking-wider">
+                    <span>🛠️</span>
+                    <span>HOW TO FIX IT</span>
+                  </div>
+                  <p className="text-xs text-[#17212B] leading-relaxed font-sans">
+                    {primaryError.howToFix || primaryError.recommendedFix || 'Add the missing column or value and upload the corrected CSV.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Bar Inside Primary Card */}
+              <div className="pt-2 flex items-center justify-between gap-3 border-t border-[#D5DEE7] flex-wrap">
+                <div className="text-xs text-[#718292]">
+                  AI SCREENING: <b className="text-[#D9363E]">BLOCKED</b> &bull; Gate will clear upon uploading a valid file.
+                </div>
+                <button
+                  type="button"
+                  onClick={handleTriggerUpload}
+                  className="px-4 py-2 rounded-lg bg-[#0E88D3] hover:bg-[#0c74b4] text-white font-bold text-xs cursor-pointer transition-all shadow-sm flex items-center gap-2"
+                >
+                  <span>📥</span>
+                  <span>UPLOAD CORRECTED CSV</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 3. AI SCREENING: BLOCKED CALLOUT BANNER */}
+          <div className="p-4 rounded-xl bg-[#FEF2F2] border border-[#D9363E]/40 text-xs font-mono text-[#D9363E] flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5">
+              <span className="text-lg">🛡️</span>
+              <div className="leading-relaxed">
+                <b>AI SCREENING: BLOCKED</b> &mdash; SpaceGuard AI strictly prevents invalid data from entering Module A (Lot Dispersion), Module B (Burn-In Drift), or the Bayesian Risk Engine.
+              </div>
+            </div>
+            <span className="px-2.5 py-1 rounded bg-[#D9363E] text-white font-bold text-[11px]">
+              CLEARANCE HALTED
+            </span>
+          </div>
+
+          {/* 4. ALL VALIDATION ERRORS (PART 26 — SECTION 5) */}
+          <div ref={errorListRef} className="p-5 md:p-6 rounded-2xl bg-[#FFFFFF] border border-[#D5DEE7] shadow-sm flex flex-col gap-4 font-mono">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D5DEE7] pb-3.5">
+              <div>
+                <h3 className="text-base font-bold text-[#17212B] uppercase tracking-wide">
+                  ALL VALIDATION ERRORS ({allErrors.length})
+                </h3>
+                <p className="text-xs text-[#4F6170] mt-0.5">
+                  Click any error row to expand detailed diagnosis, flight impact, and resolution steps.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={expandAllErrors}
+                  className="px-2.5 py-1 rounded bg-[#F8FAFC] border border-[#D5DEE7] hover:border-[#0E88D3] text-[#17212B] font-semibold cursor-pointer transition-colors"
+                >
+                  Expand All
+                </button>
+                <button
+                  type="button"
+                  onClick={collapseAllErrors}
+                  className="px-2.5 py-1 rounded bg-[#F8FAFC] border border-[#D5DEE7] hover:border-[#0E88D3] text-[#17212B] font-semibold cursor-pointer transition-colors"
+                >
+                  Collapse All
+                </button>
+              </div>
+            </div>
+
+            {/* Filters & Search */}
+            <div className="flex flex-col gap-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                {/* Group Filter Tabs */}
+                <div className="flex flex-wrap items-center gap-1.5">
                   {ERROR_GROUPS.map((grp) => {
                     const count = groupCounts[grp.id] || 0
                     const isActive = selectedGroup === grp.id
@@ -471,202 +614,183 @@ export default function ValidationView({
                   })}
                 </div>
 
-                {/* Search Bar */}
-                <div className="pt-1">
-                  <input
-                    type="text"
-                    placeholder="Search errors by column, row, keyword, or impact..."
-                    value={errorSearch}
-                    onChange={(e) => setErrorSearch(e.target.value)}
-                    className="w-full bg-[#FFFFFF] border border-[#D5DEE7] rounded-lg px-3 py-1.5 text-xs text-[#17212B] font-mono placeholder:text-[#718292] focus:outline-none focus:border-[#0E88D3]"
-                  />
+                {/* Severity Filter */}
+                <div className="flex items-center gap-1 text-xs">
+                  {(['ALL', 'Critical', 'Warning'] as const).map((sev) => (
+                    <button
+                      key={sev}
+                      type="button"
+                      onClick={() => setSelectedSeverity(sev)}
+                      className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                        selectedSeverity === sev
+                          ? sev === 'Critical'
+                            ? 'bg-[#D9363E] text-white font-bold'
+                            : sev === 'Warning'
+                            ? 'bg-[#C58A00] text-white font-bold'
+                            : 'bg-[#0E88D3] text-white font-bold'
+                          : 'bg-[#FFFFFF] text-[#4F6170] border border-[#D5DEE7] hover:text-[#17212B]'
+                      }`}
+                    >
+                      {sev}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Error Table */}
-              <div className="overflow-x-auto flex-1 min-h-[360px] max-h-[580px]">
-                <table className="w-full text-xs font-mono text-left border-collapse">
-                  <thead className="bg-[#F8FAFC] text-[10.5px] text-[#4F6170] uppercase tracking-wider sticky top-0 z-10 border-b border-[#D5DEE7]">
-                    <tr>
-                      <th className="p-2.5 font-semibold">Severity</th>
-                      <th className="p-2.5 font-semibold">Group</th>
-                      <th className="p-2.5 font-semibold">Error Type</th>
-                      <th className="p-2.5 font-semibold">Row</th>
-                      <th className="p-2.5 font-semibold">Column</th>
-                      <th className="p-2.5 font-semibold">Detected</th>
-                      <th className="p-2.5 font-semibold text-right">Inspect</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#D5DEE7]/70 bg-[#FFFFFF]">
-                    {filteredErrors.length > 0 ? (
-                      filteredErrors.map((err) => {
-                        const isSelected = activeError?.id === err.id
-                        return (
-                          <tr
-                            key={err.id}
-                            onClick={() => {
-                              sounds.playClick()
-                              setSelectedErrorId(err.id)
-                            }}
-                            className={`cursor-pointer transition-colors ${
-                              isSelected
-                                ? 'bg-[#0E88D3]/10 ring-1 ring-[#0E88D3] font-semibold'
-                                : 'hover:bg-[#F8FAFC]'
-                            }`}
-                          >
-                            <td className="p-2.5">
-                              <span
-                                className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                  err.severity === 'Critical'
-                                    ? 'bg-[#D9363E]/15 text-[#D9363E] border border-[#D9363E]/40'
-                                    : 'bg-[#C58A00]/15 text-[#C58A00] border border-[#C58A00]/40'
-                                }`}
-                              >
-                                {err.severity}
-                              </span>
-                            </td>
-                            <td className="p-2.5 text-[#4F6170] text-[11px] uppercase">{err.group || 'DATA'}</td>
-                            <td className="p-2.5 font-bold text-[#17212B] whitespace-nowrap">{err.errorType}</td>
-                            <td className="p-2.5 text-[#4F6170]">{err.row ? `#${err.row}` : 'Header'}</td>
-                            <td className="p-2.5 text-[#0E88D3] font-semibold">{err.column || '--'}</td>
-                            <td className="p-2.5 text-[#D9363E] font-medium truncate max-w-[120px]" title={err.detectedValue}>
-                              {err.detectedValue || '--'}
-                            </td>
-                            <td className="p-2.5 text-right">
-                              <button
-                                type="button"
-                                className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                  isSelected
-                                    ? 'bg-[#0E88D3] text-white'
-                                    : 'bg-[#F8FAFC] border border-[#D5DEE7] text-[#4F6170]'
-                                }`}
-                              >
-                                {isSelected ? 'ACTIVE' : 'SELECT'}
-                              </button>
-                            </td>
-                          </tr>
-                        )
-                      })
-                    ) : (
-                      <tr>
-                        <td colSpan={7} className="p-8 text-center text-[#4F6170] italic">
-                          No errors match the selected group/search filters.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              {/* Search Bar */}
+              <input
+                type="text"
+                placeholder="Search errors by column, row, keyword, or impact..."
+                value={errorSearch}
+                onChange={(e) => setErrorSearch(e.target.value)}
+                className="w-full bg-[#FFFFFF] border border-[#D5DEE7] rounded-lg px-3 py-1.5 text-xs text-[#17212B] font-mono placeholder:text-[#718292] focus:outline-none focus:border-[#0E88D3]"
+              />
             </div>
 
-            {/* Right: 4-Part Explanation Side Panel (5 Cols) */}
-            <div className="lg:col-span-5 flex flex-col bg-[#FFFFFF] border border-[#D5DEE7] rounded-xl shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-[#D5DEE7] bg-[#F8FAFC] flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#D9363E]" />
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#17212B]">
-                    Diagnostic &amp; Resolution Guidance
-                  </span>
-                </div>
-                {activeError && (
-                  <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
-                      activeError.severity === 'Critical'
-                        ? 'bg-[#D9363E]/15 text-[#D9363E] border border-[#D9363E]/40'
-                        : 'bg-[#C58A00]/15 text-[#C58A00] border border-[#C58A00]/40'
-                    }`}
-                  >
-                    {activeError.severity.toUpperCase()}
-                  </span>
-                )}
-              </div>
-
-              {activeError ? (
-                <div className="p-4 md:p-5 overflow-y-auto flex-1 flex flex-col gap-4 font-mono text-xs">
-                  {/* Error Header Identification */}
-                  <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#D5DEE7] flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between text-[11px] text-[#4F6170]">
-                      <span>ERROR IDENTIFIER</span>
-                      <span className="text-[#0E88D3] font-bold">GROUP: {activeError.group || 'DATA'}</span>
-                    </div>
-                    <div className="text-base font-bold text-[#17212B]">{activeError.errorType}</div>
-                    <div className="flex items-center gap-3 text-[11px] text-[#4F6170] pt-1 border-t border-[#D5DEE7]">
-                      <span>Row: <b className="text-[#17212B]">{activeError.row ? `#${activeError.row}` : 'Header Row'}</b></span>
-                      <span>&bull;</span>
-                      <span>Target: <b className="text-[#0E88D3]">{activeError.column || 'Global'}</b></span>
-                    </div>
-                  </div>
-
-                  {/* 1. WHAT IS WRONG */}
-                  <div className="p-3.5 rounded-xl bg-[#FEF2F2] border border-[#D9363E]/30 flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-[#D9363E] font-bold text-[11px] uppercase tracking-wider">
-                      <span>1.</span>
-                      <span>What Is Wrong</span>
-                    </div>
-                    <p className="text-xs text-[#17212B] font-sans leading-relaxed mt-0.5">
-                      {activeError.what || activeError.message}
-                    </p>
-                    <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mt-2 pt-2 border-t border-[#D9363E]/20">
-                      <div>
-                        <span className="text-[#4F6170] block">Detected:</span>
-                        <b className="text-[#D9363E] break-all">{activeError.detectedValue || 'Invalid Value'}</b>
-                      </div>
-                      <div>
-                        <span className="text-[#4F6170] block">Expected:</span>
-                        <b className="text-[#168A5B] break-all">{activeError.expectedValue || 'Standard Specification'}</b>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2. WHY THIS IS AN ERROR */}
-                  <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#D5DEE7] flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-[#17212B] font-bold text-[11px] uppercase tracking-wider">
-                      <span>2.</span>
-                      <span>Why This Is An Error</span>
-                    </div>
-                    <p className="text-xs text-[#4F6170] font-sans leading-relaxed mt-0.5">
-                      {activeError.why || 'Violates MIL-STD-883 Method 1005 Class S HTOL screening specification.'}
-                    </p>
-                  </div>
-
-                  {/* 3. IMPACT ON SCREENING PIPELINE */}
-                  <div className="p-3.5 rounded-xl bg-[#FFFBEB] border border-[#C58A00]/40 flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-[#C58A00] font-bold text-[11px] uppercase tracking-wider">
-                      <span>3.</span>
-                      <span>Impact on Screening Pipeline</span>
-                    </div>
-                    <p className="text-xs text-[#17212B] font-sans leading-relaxed mt-0.5">
-                      {activeError.impact || 'Incomplete telemetry prevents calculating Arrhenius drift rate and corrupts Bayesian risk assessment.'}
-                    </p>
-                  </div>
-
-                  {/* 4. HOW TO FIX IT */}
-                  <div className="p-3.5 rounded-xl bg-[#F0FDF4] border border-[#168A5B]/40 flex flex-col gap-1.5">
-                    <div className="flex items-center gap-2 text-[#168A5B] font-bold text-[11px] uppercase tracking-wider">
-                      <span>4.</span>
-                      <span>How To Fix It</span>
-                    </div>
-                    <p className="text-xs text-[#17212B] font-sans font-medium leading-relaxed">
-                      {activeError.howToFix || 'Correct the highlighted cells in the CSV and re-upload the telemetry file.'}
-                    </p>
-                  </div>
-
-                  {/* Quick Action in Panel */}
-                  <div className="pt-2">
-                    <button
-                      type="button"
-                      onClick={handleTriggerUpload}
-                      className="w-full py-2.5 rounded-lg bg-[#0E88D3] hover:bg-[#0c74b4] text-white font-mono font-bold text-xs cursor-pointer transition-colors shadow-sm flex items-center justify-center gap-2"
+            {/* Interactive Error Accordion List (PART 26 — SECTION 5) */}
+            <div className="flex flex-col gap-2 divide-y divide-[#D5DEE7]">
+              {filteredErrors.length > 0 ? (
+                filteredErrors.map((err) => {
+                  const isExpanded = expandedErrorIds.has(err.id)
+                  const isCrit = err.severity === 'Critical'
+                  return (
+                    <div
+                      key={err.id}
+                      className={`pt-2.5 pb-2.5 rounded-xl border transition-all ${
+                        isExpanded
+                          ? isCrit
+                            ? 'bg-[#FEF2F2]/40 border-[#D9363E]/40 p-4'
+                            : 'bg-[#FFFBEB]/40 border-[#C58A00]/40 p-4'
+                          : 'border-transparent hover:bg-[#F8FAFC] px-3'
+                      }`}
                     >
-                      <span>📥 Upload Corrected CSV</span>
-                    </button>
-                  </div>
-                </div>
+                      {/* Summary Row */}
+                      <div
+                        onClick={() => toggleExpandError(err.id)}
+                        className="flex items-center justify-between gap-3 cursor-pointer select-none"
+                      >
+                        <div className="flex items-center gap-2.5 flex-wrap min-w-0">
+                          <span
+                            className={`px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase ${
+                              isCrit
+                                ? 'bg-[#D9363E] text-white'
+                                : 'bg-[#C58A00] text-white'
+                            }`}
+                          >
+                            {err.severity.toUpperCase()}
+                          </span>
+                          <span className="font-bold text-[#17212B] text-xs">
+                            {err.errorType}
+                          </span>
+                          <span className="text-xs text-[#4F6170] truncate max-w-md">
+                            &mdash; {err.message}
+                          </span>
+                          {err.row && (
+                            <span className="text-[11px] text-[#718292] bg-[#F8FAFC] px-1.5 py-0.5 rounded border border-[#D5DEE7]">
+                              Row #{err.row}
+                            </span>
+                          )}
+                          {err.column && (
+                            <span className="text-[11px] text-[#0E88D3] bg-[#0E88D3]/10 px-1.5 py-0.5 rounded border border-[#0E88D3]/30">
+                              {err.column}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs font-bold text-[#0E88D3] flex-shrink-0">
+                          <span>{isExpanded ? 'Hide Details ▲' : 'Inspect ▼'}</span>
+                        </div>
+                      </div>
+
+                      {/* Expanded Details Card */}
+                      {isExpanded && (
+                        <div className="mt-3 pt-3 border-t border-[#D5DEE7] flex flex-col gap-3 text-xs animate-fade-in font-mono">
+                          <div className="p-3 rounded-lg bg-[#FFFFFF] border border-[#D5DEE7]">
+                            <span className="text-[10px] text-[#4F6170] uppercase font-bold tracking-wider">
+                              ERROR
+                            </span>
+                            <div className="text-sm font-bold text-[#17212B] mt-0.5">
+                              {err.message || err.what}
+                            </div>
+                            {(err.detectedValue || err.expectedValue) && (
+                              <div className="flex items-center gap-3 text-[11px] mt-1.5 flex-wrap">
+                                {err.detectedValue && (
+                                  <span className="text-[#D9363E] bg-[#FEF2F2] px-2 py-0.5 rounded border border-[#D9363E]/30">
+                                    Detected: <b>{err.detectedValue}</b>
+                                  </span>
+                                )}
+                                {err.expectedValue && (
+                                  <span className="text-[#168A5B] bg-[#F0FDF4] px-2 py-0.5 rounded border border-[#168A5B]/30">
+                                    Expected: <b>{err.expectedValue}</b>
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div className="p-3 rounded-lg bg-[#FFFFFF] border border-[#D5DEE7]">
+                              <span className="text-[10px] text-[#4F6170] uppercase font-bold tracking-wider">
+                                WHY IS THIS ERROR OCCURRING?
+                              </span>
+                              <p className="text-xs text-[#17212B] font-sans mt-1 leading-relaxed">
+                                {err.why || err.reason || 'Violates MIL-STD-883 flight dataset criteria.'}
+                              </p>
+                            </div>
+
+                            <div className="p-3 rounded-lg bg-[#FFFFFF] border border-[#D9363E]/30">
+                              <span className="text-[10px] text-[#D9363E] uppercase font-bold tracking-wider">
+                                IMPACT
+                              </span>
+                              <p className="text-xs text-[#17212B] font-sans mt-1 leading-relaxed">
+                                {err.impact || 'Screening models cannot verify flight readiness.'}
+                              </p>
+                            </div>
+
+                            <div className="p-3 rounded-lg bg-[#FFFFFF] border border-[#168A5B]/30">
+                              <span className="text-[10px] text-[#168A5B] uppercase font-bold tracking-wider">
+                                HOW TO FIX IT
+                              </span>
+                              <p className="text-xs text-[#17212B] font-sans mt-1 leading-relaxed">
+                                {err.howToFix || err.recommendedFix || 'Correct the indicated value and re-upload the CSV.'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })
               ) : (
                 <div className="p-8 text-center text-[#4F6170] italic">
-                  Select an error from the ledger to inspect its diagnostic breakdown.
+                  No errors match the selected group/search filters.
                 </div>
               )}
+            </div>
+
+            {/* Bottom Action Bar */}
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#D5DEE7] flex-wrap">
+              <div className="text-xs text-[#718292]">
+                Showing {filteredErrors.length} of {allErrors.length} validation issues
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleDownloadReportJSON}
+                  className="px-3.5 py-1.5 rounded-lg border border-[#0E88D3] bg-[#0E88D3]/10 hover:bg-[#0E88D3]/20 text-[#0E88D3] font-bold text-xs cursor-pointer transition-colors"
+                >
+                  [ DOWNLOAD ERROR REPORT ]
+                </button>
+                <button
+                  type="button"
+                  onClick={handleTriggerUpload}
+                  className="px-4 py-2 rounded-lg bg-[#0E88D3] hover:bg-[#0c74b4] text-white font-bold text-xs cursor-pointer transition-colors shadow-sm flex items-center gap-1.5"
+                >
+                  <span>📥</span>
+                  <span>[ UPLOAD CORRECTED CSV ]</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -967,9 +1091,50 @@ export default function ValidationView({
       )}
 
       {/* ============================================================ */}
-      {/* 3. EMPTY STATE (NO DATASET LOADED)                           */}
+      {/* STATE 2: VALIDATING FLIGHT CSV...                            */}
       {/* ============================================================ */}
-      {!isBlocked && !isPassed && (
+      {isValidating && (
+        <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-12 rounded-2xl bg-[#FFFFFF] border-2 border-[#0E88D3] shadow-sm text-center font-mono animate-fade-in">
+          <div className="relative w-20 h-20 mb-5 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border-4 border-[#0E88D3]/20 border-t-[#0E88D3] animate-spin" />
+            <div className="w-12 h-12 rounded-full bg-[#0E88D3]/10 flex items-center justify-center text-2xl">
+              🛰️
+            </div>
+          </div>
+          <h2 className="text-xl md:text-2xl font-black text-[#17212B] uppercase tracking-wide">
+            VALIDATING FLIGHT CSV...
+          </h2>
+          <p className="text-xs text-[#0E88D3] font-bold mt-1.5">
+            {validatingFileName || 'Flight Telemetry CSV'}
+          </p>
+          <p className="text-xs text-[#4F6170] max-w-md mt-2 font-sans">
+            Executing MIL-STD-883 Class S flight telemetry verification: checking format, schema headers, burn-in columns, row numeric validity, and data quality score.
+          </p>
+          <div className="mt-6 flex flex-col gap-2.5 w-full max-w-sm text-left text-xs bg-[#F8FAFC] p-4 rounded-xl border border-[#D5DEE7]">
+            <div className="flex items-center gap-2 text-[#0E88D3] font-semibold">
+              <span className="animate-spin text-xs">⟳</span>
+              <span>1. File Format &amp; Delimiter Check</span>
+            </div>
+            <div className="flex items-center gap-2 text-[#4F6170]">
+              <span className="text-[#0E88D3]">⏳</span>
+              <span>2. MIL-STD-883 Column Schema Validation</span>
+            </div>
+            <div className="flex items-center gap-2 text-[#4F6170]">
+              <span className="text-[#718292]">&bull;</span>
+              <span>3. Row-Level Numeric Range &amp; Unit Verification</span>
+            </div>
+            <div className="flex items-center gap-2 text-[#4F6170]">
+              <span className="text-[#718292]">&bull;</span>
+              <span>4. AI Screening Clearance Gate Check</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* STATE 1: NO DATASET LOADED                                   */}
+      {/* ============================================================ */}
+      {!isValidating && !isBlocked && !isPassed && (
         <div className="flex-1 flex flex-col items-center justify-center p-8 rounded-xl bg-[#FFFFFF] border border-[#D5DEE7] shadow-sm text-center font-mono animate-fade-in">
           <div className="w-16 h-16 rounded-2xl bg-[#0E88D3]/10 border border-[#0E88D3]/30 flex items-center justify-center text-3xl mb-4">
             📡

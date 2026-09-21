@@ -764,9 +764,12 @@ class ClientISROEngine {
         detectedValue: 'NOT DETECTED',
         expectedValue: 'value_168h or value_168h_ua',
         message: 'Missing required column: value_168h',
-        reason: 'The 168-hour burn-in measurement is the primary MIL-STD-883 HTOL flight acceptance milestone.',
-        impact: 'Module A and Module B cannot perform final anomaly scoring or latent defect isolation.',
-        recommendedFix: 'Add the `value_168h` column to the CSV and provide the 168-hour measurement for each component.',
+        reason: 'The uploaded CSV does not contain the required 168-hour burn-in measurement.',
+        what: 'The uploaded CSV does not contain the required 168-hour burn-in measurement.',
+        why: 'The 168-hour burn-in measurement is required by the SpaceGuard screening workflow.',
+        impact: 'Complete burn-in screening cannot continue. Module B cannot perform the required burn-in drift analysis.',
+        howToFix: 'Add the missing value_168h column and upload the corrected CSV.',
+        recommendedFix: 'Add the missing value_168h column and upload the corrected CSV.',
         technicalDetails: 'Final HTOL qualification milestone T=168h missing from dataset headers.',
       })
     }
