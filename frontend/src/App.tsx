@@ -481,7 +481,7 @@ export default function App() {
         />
 
         {/* Right Full Dashboard Workspace with Subtle Telemetry Atmosphere */}
-        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#EEF4F8] flex flex-col relative">
+        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#C5DBEC] flex flex-col relative">
           <TelemetryNetworkBackground />
           <div className="relative z-[1] flex-1 flex flex-col min-h-full">
           {/* OVERVIEW */}

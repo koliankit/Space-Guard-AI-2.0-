@@ -10,7 +10,7 @@ export default function HealthBar({
   reject: number | null
 }) {
   return (
-    <div className="border-b border-[#D5E2EA] bg-[#EEF4F8] px-4 md:px-6 py-3 select-none w-full relative">
+    <div className="border-b border-[#D5E2EA] bg-[#C5DBEC] px-4 md:px-6 py-3 select-none w-full relative">
       <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-3.5">
         {/* Metric 1: Overall Mission Reliability */}
         <div className="relative overflow-hidden flex items-center justify-between p-4 rounded-xl bg-[#FFFFFF] border border-[#D5E2EA] hover:border-[#0E88D3]/50 transition-all shadow-[0_4px_18px_rgba(14,50,80,0.06)]">

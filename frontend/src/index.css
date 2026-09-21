@@ -4,7 +4,7 @@
 
 :root {
   /* FINAL SPACEGUARD AI — LIGHT SPACE TELEMETRY COLOR SYSTEM (SECTION 30) */
-  --bg-main: #EEF4F8;
+  --bg-main: #C5DBEC;
   --bg-secondary: #E6F1F8;
   --bg-panel: #FFFFFF;
   --bg-elevated: #F8FBFD;
@@ -33,7 +33,7 @@
   --card-shadow: 0 4px 18px rgba(14, 50, 80, 0.06);
 
   /* Legacy variable mappings for backward compatibility */
-  --color-bg: #EEF4F8;
+  --color-bg: #C5DBEC;
   --color-bg2: #E6F1F8;
   --color-panel: #FFFFFF;
   --color-panel2: #F8FBFD;
@@ -112,7 +112,7 @@ html, body, #root {
 }
 
 body {
-  background: #EEF4F8;
+  background: #C5DBEC;
   color: #17212B;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
@@ -131,7 +131,7 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D5E2EA;
+  background: #B8CEE0;
   border-radius: 3px;
   border: 1px solid #F8FBFD;
 }
@@ -139,7 +139,7 @@ body {
   background: #0E88D3;
 }
 ::-webkit-scrollbar-track {
-  background: #EEF4F8;
+  background: #C5DBEC;
 }
 
 /* ==============================================================================
@@ -157,12 +157,12 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.35;
+  opacity: 0.18;
   background-image:
-    linear-gradient(rgba(217, 226, 234, 0.5) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(217, 226, 234, 0.5) 1px, transparent 1px);
+    linear-gradient(rgba(14, 110, 180, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 110, 180, 0.12) 1px, transparent 1px);
   background-size: 32px 32px;
-  animation: grid-drift 18s linear infinite;
+  animation: grid-drift 24s linear infinite;
 }
 
 /* 2. Gentle Telemetry Pulse (2.5s calm breathing) */
