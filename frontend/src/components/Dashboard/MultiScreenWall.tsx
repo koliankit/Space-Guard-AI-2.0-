@@ -753,7 +753,7 @@ export default function MultiScreenWall({
                           </div>
                         )}
 
-                        <div className="flex-1 overflow-y-auto rounded-lg border border-[#D9E2EA] bg-[#F4F7FA] max-h-[220px]">
+                        <div className="flex-1 overflow-y-auto rounded-lg border border-[#D5DEE7] bg-[#F4F7FA] min-h-[220px] max-h-[360px]">
                           <table className="w-full text-left text-xs font-sans border-collapse">
                             <thead className="bg-[#FFFFFF] text-[10px] uppercase font-semibold text-[#5B6B7A] sticky top-0 border-b border-[#D9E2EA]">
                               <tr>
@@ -805,7 +805,7 @@ export default function MultiScreenWall({
                       </div>
                     ) : (
                       /* Quarantine Mode Table */
-                      <div className="flex-1 overflow-y-auto rounded-lg border border-[#D9E2EA] bg-[#F4F7FA] max-h-[220px]">
+                      <div className="flex-1 overflow-y-auto rounded-lg border border-[#D5DEE7] bg-[#F4F7FA] min-h-[220px] max-h-[360px]">
                         <table className="w-full text-left text-xs font-sans border-collapse">
                           <thead className="bg-[#FFFFFF] text-[10px] uppercase font-semibold text-[#5B6B7A] sticky top-0 border-b border-[#D9E2EA]">
                             <tr>

@@ -62,7 +62,7 @@ export default function TelemetryView({
       {/* Main Content Layout: Pinned Sidebar Component Monitor + Full Telemetry Chart */}
       <div className="flex flex-col xl:flex-row gap-5 items-stretch flex-1 min-h-0 w-full">
         {/* Component Monitor Selector */}
-        <div className="w-full xl:w-[360px] 2xl:w-[400px] flex-shrink-0 flex flex-col rounded-xl overflow-hidden border border-[#D9E2EA] bg-[#FFFFFF] shadow-md h-full">
+        <div className="w-full xl:w-[420px] 2xl:w-[460px] flex-shrink-0 flex flex-col rounded-xl overflow-hidden border border-[#D5DEE7] bg-[#FFFFFF] shadow-sm min-h-[620px] lg:min-h-[720px]">
           <ComponentMonitor
             subsystems={subsystems}
             components={components}

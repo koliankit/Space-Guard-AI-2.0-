@@ -408,7 +408,7 @@ export default function LotArchitectureView({
             <span className="text-[10.5px] text-[#4F6170] font-mono">Select to inspect</span>
           </div>
 
-          <div className="p-3 overflow-y-auto flex-1 flex flex-col gap-2.5 min-h-[300px] max-h-[calc(100vh-280px)]">
+          <div className="p-3.5 overflow-y-auto flex-1 flex flex-col gap-3 min-h-[460px] max-h-[calc(100vh-200px)]">
             {lotGroups.length === 0 ? (
               <div className="p-8 text-center text-[#718292] text-xs italic font-mono">
                 No qualification lots loaded. Upload a CSV file in CSV Intake.
@@ -548,12 +548,9 @@ export default function LotArchitectureView({
           </div>
         </div>
 
-        {/* ========================================================== */}
-        {/* RIGHT PANE: DEDICATED LOT INSPECTION WORKSPACE (8 Cols)    */}
-        {/* ========================================================== */}
         <div className="lg:col-span-8 flex flex-col bg-[#FFFFFF] border border-[#D5DEE7] rounded-xl shadow-sm overflow-hidden h-full">
           {activeLot ? (
-            <div className="flex flex-col gap-4 p-4 md:p-5 overflow-y-auto max-h-[calc(100vh-220px)]">
+            <div className="flex flex-col gap-4.5 p-4 md:p-6 overflow-y-auto min-h-[520px] max-h-[calc(100vh-180px)]">
               {/* Workspace Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D5DEE7] pb-3.5">
                 <div>

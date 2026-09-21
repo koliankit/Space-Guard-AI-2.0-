@@ -2,10 +2,10 @@ import { useState, useMemo } from 'react'
 import type { ComponentOut, SubsystemStatus } from '../../types'
 
 const DOT_COLOR: Record<string, string> = {
-  safe: 'bg-emerald-400',
-  monitor: 'bg-amber-400',
-  reject: 'bg-rose-500',
-  idle: 'bg-slate-600',
+  safe: 'bg-[#168A5B]',
+  monitor: 'bg-[#C58A00]',
+  reject: 'bg-[#D9363E]',
+  idle: 'bg-[#718292]',
 }
 
 export default function ComponentMonitor({
@@ -85,45 +85,45 @@ export default function ComponentMonitor({
   }, [components, selectedLot, selectedSubKey])
 
   return (
-    <div className="bg-[#FFFFFF] p-4 sm:p-5 border-r border-[#D9E2EA] flex flex-col h-full overflow-hidden font-sans text-xs sm:text-sm">
+    <div className="bg-[#FFFFFF] p-4 sm:p-5 flex flex-col h-full font-sans text-xs sm:text-sm min-h-[620px] select-none">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3.5">
         <h3 className="m-0 text-sm sm:text-base font-bold uppercase tracking-wider text-[#17212B] flex items-center gap-2 font-display">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#0E88D3]" />
           Component Intelligence
         </h3>
-        <span className="text-xs font-mono text-[#5B6B7A] bg-[#F8FAFC] px-2 py-0.5 rounded border border-[#D9E2EA]/60">ISRO-INSTR-01</span>
+        <span className="text-xs font-mono text-[#4F6170] bg-[#F8FAFC] px-2.5 py-1 rounded-md border border-[#D5DEE7] font-semibold">ISRO-INSTR-01</span>
       </div>
 
       {/* Clean Search Input */}
-      <div className="relative mb-3">
-        <span className="absolute left-3 top-2.5 text-[#5B6B7A] text-sm">🔍</span>
+      <div className="relative mb-3.5">
+        <span className="absolute left-3.5 top-3 text-[#718292] text-sm">🔍</span>
         <input
-          className="w-full pl-9 pr-3 py-2 bg-[#FFFFFF] border border-[#D9E2EA] rounded-lg text-[#17212B] font-mono text-xs sm:text-sm focus:border-amber-500 outline-none transition-all placeholder:text-[#81909D]"
-          placeholder="Search Component ID..."
+          className="w-full pl-9 pr-3.5 py-2.5 bg-[#F8FAFC] border border-[#D5DEE7] rounded-xl text-[#17212B] font-mono text-xs sm:text-sm focus:border-[#0E88D3] focus:bg-[#FFFFFF] outline-none transition-all placeholder:text-[#718292]"
+          placeholder="Search Component ID or Lot..."
           onChange={(e) => onSearch(e.target.value)}
         />
       </div>
 
       {/* Filter Mode Selector */}
-      <div className="flex gap-2 mb-3">
+      <div className="flex gap-2 mb-3.5">
         {['ALL', 'SAFE', 'MONITOR', 'REJECT'].map((f) => {
           const isActive = filter === f
           const activeClass =
             f === 'SAFE'
-              ? 'border-emerald-500 bg-emerald-500/25 text-emerald-300 font-bold shadow-sm'
+              ? 'border-[#168A5B] bg-[#168A5B] text-white font-bold shadow-sm'
               : f === 'REJECT'
-              ? 'border-rose-500 bg-rose-500/25 text-rose-300 font-bold shadow-sm'
+              ? 'border-[#D9363E] bg-[#D9363E] text-white font-bold shadow-sm'
               : f === 'MONITOR'
-              ? 'border-amber-500 bg-amber-500/25 text-amber-300 font-bold shadow-sm'
-              : 'border-amber-500 bg-amber-500/25 text-amber-300 font-bold shadow-sm'
+              ? 'border-[#C58A00] bg-[#C58A00] text-white font-bold shadow-sm'
+              : 'border-[#0E88D3] bg-[#0E88D3] text-white font-bold shadow-sm'
 
           return (
             <button
               key={f}
               type="button"
-              className={`flex-1 py-1.5 px-2 text-xs font-bold uppercase rounded-lg border transition-all cursor-pointer ${
-                isActive ? activeClass : 'border-[#D9E2EA] bg-[#FFFFFF] text-[#5B6B7A] hover:text-[#17212B] hover:border-[#D9E2EA]'
+              className={`flex-1 py-2 px-2 text-xs font-bold uppercase rounded-lg border transition-all cursor-pointer ${
+                isActive ? activeClass : 'border-[#D5DEE7] bg-[#F8FAFC] text-[#4F6170] hover:text-[#17212B] hover:border-[#0E88D3]'
               }`}
               onClick={() => {
                 setFilter(f)
@@ -137,17 +137,17 @@ export default function ComponentMonitor({
       </div>
 
       {/* Classification Mode Switcher: LOTS vs SUBSYSTEMS */}
-      <div className="flex items-center justify-between gap-1.5 mb-2.5 p-1 bg-[#FFFFFF] border border-[#D9E2EA] rounded-lg">
+      <div className="flex items-center justify-between gap-2 mb-3 p-1.5 bg-[#F4F7FA] border border-[#D5DEE7] rounded-xl">
         <button
           type="button"
           onClick={() => {
             setClassificationMode('lots')
             setSelectedSubKey(null)
           }}
-          className={`flex-1 py-1.5 px-2.5 rounded-md text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 font-display cursor-pointer ${
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 font-display cursor-pointer ${
             classificationMode === 'lots'
-              ? 'bg-amber-600 text-[#17212B] shadow-sm'
-              : 'text-[#5B6B7A] hover:text-[#17212B]'
+              ? 'bg-[#0E88D3] text-white shadow-sm'
+              : 'text-[#4F6170] hover:text-[#17212B]'
           }`}
         >
           <span>📦</span>
@@ -159,10 +159,10 @@ export default function ComponentMonitor({
             setClassificationMode('subsystems')
             setSelectedLot(null)
           }}
-          className={`flex-1 py-1.5 px-2.5 rounded-md text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 font-display cursor-pointer ${
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 font-display cursor-pointer ${
             classificationMode === 'subsystems'
-              ? 'bg-amber-600 text-[#17212B] shadow-sm'
-              : 'text-[#5B6B7A] hover:text-[#17212B]'
+              ? 'bg-[#0E88D3] text-white shadow-sm'
+              : 'text-[#4F6170] hover:text-[#17212B]'
           }`}
         >
           <span>🛰️</span>
@@ -171,21 +171,21 @@ export default function ComponentMonitor({
       </div>
 
       {/* Classification Header Label */}
-      <div className="text-xs uppercase font-bold text-[#5B6B7A] tracking-wider mb-2 flex justify-between items-center">
+      <div className="text-xs uppercase font-bold text-[#4F6170] tracking-wider mb-2 flex justify-between items-center">
         <span>
           {classificationMode === 'lots' ? 'Select Flight Lot' : 'Subsystems'}
         </span>
-        <span className="text-xs font-mono text-[#5B6B7A]">
+        <span className="text-xs font-mono text-[#718292]">
           {classificationMode === 'lots' ? 'Lot-Wise Split' : 'Count'}
         </span>
       </div>
 
-      {/* Dynamic Classification List: Lots or Subsystems */}
-      <div className="max-h-[220px] overflow-y-auto space-y-1.5 pr-1 mb-3">
+      {/* Dynamic Classification List: Lots or Subsystems (Generous Height Box) */}
+      <div className="max-h-[380px] min-h-[160px] overflow-y-auto space-y-2 pr-1 mb-4">
         {classificationMode === 'lots' && (
           <>
             {lotGroups.length === 0 && (
-              <div className="text-[#81909D] text-xs py-3 text-center bg-[#FFFFFF] rounded-lg border border-[#D9E2EA]">
+              <div className="text-[#718292] text-xs py-4 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
                 No lots registered
               </div>
             )}
@@ -194,10 +194,14 @@ export default function ComponentMonitor({
               return (
                 <div
                   key={lot.lot_id}
-                  className={`flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer text-xs sm:text-sm transition-all border ${
+                  className={`flex items-center justify-between py-3 px-4 rounded-xl cursor-pointer text-xs sm:text-sm transition-all border shadow-sm ${
                     isSelected
-                      ? 'border-amber-500 bg-amber-500/20 text-[#17212B] font-bold shadow-sm'
-                      : 'border-[#D9E2EA]/80 bg-[#FFFFFF] hover:bg-[#F8FAFC]/60 hover:border-[#D9E2EA] text-[#17212B]'
+                      ? 'border-[#0E88D3] bg-[#0E88D3]/10 text-[#17212B] font-bold ring-1 ring-[#0E88D3]'
+                      : lot.rejectCount > 0
+                      ? 'border-[#D9363E]/40 bg-[#FFFFFF] hover:bg-[#FEF2F2]/60 text-[#17212B]'
+                      : lot.monitorCount > 0
+                      ? 'border-[#C58A00]/40 bg-[#FFFFFF] hover:bg-[#FFFBEB]/60 text-[#17212B]'
+                      : 'border-[#D5DEE7] bg-[#FFFFFF] hover:bg-[#F8FAFC] hover:border-[#0E88D3]/50 text-[#17212B]'
                   }`}
                   onClick={() => {
                     if (selectedLot === lot.lot_id) {
@@ -206,21 +210,29 @@ export default function ComponentMonitor({
                       setSelectedLot(lot.lot_id)
                     }
                   }}
-                  title={`Click to view components in ${lot.lot_id}`}
+                  title={`Click to inspect components in ${lot.lot_id}`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${DOT_COLOR[lot.status] ?? DOT_COLOR.idle}`} />
-                    <span className="font-mono text-xs sm:text-sm font-bold text-amber-400 truncate">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className={`w-3 h-3 rounded-full flex-shrink-0 ${DOT_COLOR[lot.status] ?? DOT_COLOR.idle}`} />
+                    <span className="font-mono text-xs sm:text-sm font-bold text-[#17212B] tracking-wide truncate">
                       {lot.lot_id}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {lot.rejectCount > 0 && (
-                      <span className="font-mono text-[10.5px] bg-rose-500/25 text-rose-300 border border-rose-500/40 px-1.5 py-0.5 rounded font-bold">
+                    {lot.rejectCount > 0 ? (
+                      <span className="font-mono text-[11px] bg-[#FEF2F2] text-[#D9363E] border border-[#D9363E]/50 px-2.5 py-1 rounded-md font-bold">
                         {lot.rejectCount} REJ
                       </span>
+                    ) : lot.monitorCount > 0 ? (
+                      <span className="font-mono text-[11px] bg-[#FFFBEB] text-[#C58A00] border border-[#C58A00]/50 px-2.5 py-1 rounded-md font-bold">
+                        {lot.monitorCount} MON
+                      </span>
+                    ) : (
+                      <span className="font-mono text-[11px] bg-[#F0FDF4] text-[#168A5B] border border-[#168A5B]/40 px-2.5 py-1 rounded-md font-bold">
+                        NOM
+                      </span>
                     )}
-                    <span className="font-mono text-[#5B6B7A] text-xs bg-[#F8FAFC] px-2 py-0.5 rounded font-semibold">
+                    <span className="font-mono text-[#4F6170] text-xs bg-[#F8FAFC] border border-[#D5DEE7] px-2.5 py-1 rounded-md font-semibold">
                       {lot.count} pts
                     </span>
                   </div>
@@ -237,10 +249,10 @@ export default function ComponentMonitor({
               return (
                 <div
                   key={s.key}
-                  className={`flex items-center gap-2 py-1.5 px-2 rounded-md cursor-pointer text-xs transition-all border ${
+                  className={`flex items-center gap-2.5 py-2.5 px-3 rounded-xl cursor-pointer text-xs transition-all border ${
                     isSelected
-                      ? 'border-amber-500 bg-amber-500/20 text-[#17212B] font-semibold'
-                      : 'border-transparent hover:bg-[#F8FAFC]/60 hover:border-[#D9E2EA]'
+                      ? 'border-[#0E88D3] bg-[#0E88D3]/10 text-[#17212B] font-semibold ring-1 ring-[#0E88D3]'
+                      : 'border-[#D5DEE7] bg-[#FFFFFF] hover:bg-[#F8FAFC] hover:border-[#0E88D3]/50 text-[#17212B]'
                   }`}
                   onClick={() => {
                     const next = selectedSubKey === s.key ? null : s.key
@@ -248,10 +260,10 @@ export default function ComponentMonitor({
                     onSelectSubsystem(s.key)
                   }}
                 >
-                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${DOT_COLOR[s.status] ?? DOT_COLOR.idle}`} />
-                  <span className="font-mono font-bold text-amber-400 text-[11px] w-9">[{s.key}]</span>
-                  <span className="flex-1 text-[#17212B] truncate text-[11.5px]">{s.name}</span>
-                  <span className="font-mono text-[#5B6B7A] text-[10.5px]">{s.count}</span>
+                  <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${DOT_COLOR[s.status] ?? DOT_COLOR.idle}`} />
+                  <span className="font-mono font-bold text-[#0E88D3] text-xs w-10">[{s.key}]</span>
+                  <span className="flex-1 text-[#17212B] truncate font-medium text-xs">{s.name}</span>
+                  <span className="font-mono text-[#4F6170] text-xs bg-[#F8FAFC] border border-[#D5DEE7] px-2 py-0.5 rounded font-semibold">{s.count}</span>
                 </div>
               )
             })}
@@ -261,15 +273,15 @@ export default function ComponentMonitor({
 
       {/* Active Lot/Subsystem Filter Status Indicator */}
       {(selectedLot || selectedSubKey) && (
-        <div className="mb-2 p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-[10.5px]">
-          <span className="text-amber-300 font-mono truncate">
+        <div className="mb-3 p-2 rounded-xl bg-[#F0F7FD] border border-[#0E88D3]/30 flex items-center justify-between text-xs">
+          <span className="text-[#0E88D3] font-mono truncate">
             {selectedLot ? (
               <>
-                Lot: <b>{selectedLot}</b> ({displayedComponents.length} components)
+                Filtered Lot: <b className="text-[#17212B]">{selectedLot}</b> ({displayedComponents.length} components)
               </>
             ) : (
               <>
-                Subsystem: <b>[{selectedSubKey}]</b> ({displayedComponents.length} components)
+                Subsystem: <b className="text-[#17212B]">[{selectedSubKey}]</b> ({displayedComponents.length} components)
               </>
             )}
           </span>
@@ -279,29 +291,29 @@ export default function ComponentMonitor({
               setSelectedLot(null)
               setSelectedSubKey(null)
             }}
-            className="text-[#5B6B7A] hover:text-[#17212B] px-1.5 py-0.5 rounded text-[10px] bg-[#F8FAFC] hover:bg-[#F8FAFC] transition-colors ml-1 font-bold"
+            className="text-[#4F6170] hover:text-[#17212B] px-2 py-0.5 rounded-md text-xs bg-[#FFFFFF] border border-[#D5DEE7] hover:bg-[#F8FAFC] transition-colors ml-2 font-bold cursor-pointer"
           >
             Clear
           </button>
         </div>
       )}
 
-      {/* Flagged / Lot-Wise Components Feed */}
-      <div className="pt-3 border-t border-[#D9E2EA] flex-1 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between text-xs uppercase font-bold text-[#5B6B7A] tracking-wider mb-2.5">
+      {/* Flagged / Lot-Wise Components Feed (Generously Sized) */}
+      <div className="pt-3.5 border-t border-[#D5DEE7] flex-1 flex flex-col min-h-[280px]">
+        <div className="flex items-center justify-between text-xs uppercase font-bold text-[#4F6170] tracking-wider mb-2.5">
           <span>{selectedLot ? 'Lot Components' : 'Component Feed'}</span>
-          <span className="font-mono text-emerald-400 font-bold text-xs sm:text-sm bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-900/50">
+          <span className="font-mono text-[#168A5B] font-bold text-xs bg-[#F0FDF4] px-2.5 py-1 rounded-md border border-[#168A5B]/30">
             {displayedComponents.length} parts
           </span>
         </div>
-        <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+        <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[220px]">
           {!analysisRun && (
-            <div className="text-[#5B6B7A] text-xs sm:text-sm px-3 py-4 text-center bg-[#FFFFFF] rounded-lg border border-[#D9E2EA]">
+            <div className="text-[#718292] text-xs sm:text-sm px-3 py-6 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
               Awaiting AI Screening execution
             </div>
           )}
           {analysisRun && displayedComponents.length === 0 && (
-            <div className="text-[#5B6B7A] text-xs sm:text-sm px-3 py-4 text-center bg-[#FFFFFF] rounded-lg border border-[#D9E2EA]">
+            <div className="text-[#718292] text-xs sm:text-sm px-3 py-6 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
               No matching components in this selection
             </div>
           )}
@@ -309,41 +321,45 @@ export default function ComponentMonitor({
             displayedComponents.map((c) => (
               <div
                 key={c.component_id}
-                className={`flex justify-between items-center py-2.5 px-3 rounded-lg cursor-pointer text-xs sm:text-sm transition-all border ${
+                className={`flex justify-between items-center py-3 px-3.5 rounded-xl cursor-pointer text-xs sm:text-sm transition-all border shadow-sm ${
                   selectedId === c.component_id
-                    ? 'border-amber-500 bg-amber-500/20 text-[#17212B] font-bold shadow-sm'
-                    : 'border-[#D9E2EA]/80 bg-[#FFFFFF] hover:border-[#D9E2EA] hover:bg-[#F8FAFC]/50'
+                    ? 'border-[#0E88D3] bg-[#0E88D3]/10 text-[#17212B] font-bold ring-1 ring-[#0E88D3]'
+                    : c.status === 'reject'
+                    ? 'border-[#D9363E]/30 bg-[#FFFFFF] hover:border-[#D9363E] hover:bg-[#FEF2F2]/50 text-[#17212B]'
+                    : c.status === 'monitor'
+                    ? 'border-[#C58A00]/30 bg-[#FFFFFF] hover:border-[#C58A00] hover:bg-[#FFFBEB]/50 text-[#17212B]'
+                    : 'border-[#D5DEE7] bg-[#FFFFFF] hover:border-[#0E88D3]/50 hover:bg-[#F8FAFC] text-[#17212B]'
                 }`}
                 onClick={() => onSelectComponent(c.component_id)}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                   <span
                     className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
                       c.status === 'safe'
-                        ? 'bg-emerald-400'
+                        ? 'bg-[#168A5B]'
                         : c.status === 'monitor'
-                        ? 'bg-amber-400'
-                        : 'bg-rose-500'
+                        ? 'bg-[#C58A00]'
+                        : 'bg-[#D9363E]'
                     }`}
                   />
                   <div>
                     <span className="font-mono text-[#17212B] text-xs sm:text-sm font-bold block">{c.component_id}</span>
-                    <span className="text-xs font-mono text-[#5B6B7A] block truncate max-w-[150px]">
+                    <span className="text-xs font-mono text-[#4F6170] block truncate max-w-[170px]">
                       {c.lot_id}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-amber-400 font-mono font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                  <span className="text-xs text-[#0E88D3] font-mono font-bold bg-[#0E88D3]/10 px-2 py-0.5 rounded-md border border-[#0E88D3]/25">
                     [{c.subsystem}]
                   </span>
                   <span
-                    className={`font-mono font-bold px-2 py-0.5 rounded text-xs sm:text-sm ${
+                    className={`font-mono font-bold px-2 py-0.5 rounded-md text-xs sm:text-sm ${
                       c.status === 'safe'
-                        ? 'text-emerald-300 bg-emerald-500/20 border border-emerald-500/30'
+                        ? 'text-[#168A5B] bg-[#F0FDF4] border border-[#168A5B]/30'
                         : c.status === 'monitor'
-                        ? 'text-amber-300 bg-amber-500/20 border border-amber-500/30'
-                        : 'text-rose-300 bg-rose-500/25 border border-rose-500/40'
+                        ? 'text-[#C58A00] bg-[#FFFBEB] border border-[#C58A00]/30'
+                        : 'text-[#D9363E] bg-[#FEF2F2] border border-[#D9363E]/40'
                     }`}
                   >
                     {c.risk_score}
