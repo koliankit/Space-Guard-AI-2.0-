@@ -88,6 +88,7 @@ function SpacecraftModel({
   explodedOffset,
   isXray,
   selectedComponent,
+  isRotating,
   onSelect,
   onHover,
 }: {
@@ -97,10 +98,19 @@ function SpacecraftModel({
   explodedOffset: number
   isXray: boolean
   selectedComponent?: ComponentOut | null
+  isRotating: boolean
   onSelect: (key: string) => void
   onHover: (key: string | null) => void
 }) {
   const groupRef = useRef<THREE.Group>(null)
+
+  // Controlled slow rotation: ~28 seconds per full revolution (2*PI/28 = ~0.22 rad/s)
+  // Pauses when component or subsystem is being inspected
+  useFrame((_, delta) => {
+    if (groupRef.current && isRotating && !selectedKey && !selectedComponent) {
+      groupRef.current.rotation.y += delta * 0.22
+    }
+  })
 
   // Octagonal Chamfered Main Bus Geometry
   const busGeo = useMemo(() => new THREE.CylinderGeometry(0.88, 0.94, 1.28, 8), [])
@@ -440,7 +450,20 @@ export default function SatelliteScene({
   }, [handleResetView])
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div
+      className="relative w-full h-full overflow-hidden select-none"
+      style={{
+        background: 'linear-gradient(180deg, #EAF4FB 0%, #F4F8FB 50%, #DCECF7 100%)',
+      }}
+    >
+      {/* Subtle blue radial space glow behind the satellite */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 opacity-45"
+        style={{
+          background: 'radial-gradient(circle at 50% 45%, rgba(14, 136, 211, 0.22) 0%, transparent 65%)',
+        }}
+      />
+
       {/* Telemetry Mission Control HUD Overlay */}
       <SatelliteHUD
         subsystems={subsystems}
@@ -467,26 +490,27 @@ export default function SatelliteScene({
       <CanvasErrorBoundary>
         <Canvas
           camera={{ position: [0, 1.6, 5.8], fov: 42 }}
+          gl={{ alpha: true, antialias: true }}
           className="cursor-grab active:cursor-grabbing"
           onPointerMissed={() => {
             // Deselect when clicking empty space
             if (focusKey) onSelect('')
           }}
         >
-        {/* Space Environment Lighting */}
-        <ambientLight intensity={0.45} color="#071324" />
+        {/* Light Space Environment Lighting */}
+        <ambientLight intensity={0.65} color="#DCECF7" />
 
-        {/* Primary Sunlight (High contrast, sharp specular) */}
-        <directionalLight position={[6, 8, 4]} intensity={2.8} color="#fffbf0" />
+        {/* Primary Sunlight (Sharp high-altitude solar specular) */}
+        <directionalLight position={[6, 8, 4]} intensity={2.4} color="#ffffff" />
 
-        {/* Earth Albedo Bounce Light (Crisp ambient reflection from below) */}
-        <directionalLight position={[-3, -6, 2]} intensity={0.9} color="#E2E8F0" />
+        {/* Earth Albedo Bounce Light (Crisp reflection from below) */}
+        <directionalLight position={[-3, -6, 2]} intensity={0.8} color="#E2E8F0" />
 
         {/* ISRO Telemetry Blue Solar Specular Light */}
-        <pointLight position={[-5, 2, -4]} intensity={0.8} color="#0E88D3" />
+        <pointLight position={[-5, 2, -4]} intensity={0.6} color="#0E88D3" />
 
-        {/* Deep Space Cosmic Starfield */}
-        <Stars radius={110} depth={50} count={3400} factor={3.8} saturation={0.7} fade speed={0.8} />
+        {/* Soft Celestial Starfield */}
+        <Stars radius={110} depth={50} count={1200} factor={2.2} saturation={0.3} fade speed={0.4} />
 
         {/* Distant Earth Horizon */}
         <EarthBackground />
@@ -494,7 +518,7 @@ export default function SatelliteScene({
         {/* Holographic Concentric Radar Floor */}
         <HologramFloor />
 
-        {/* Detailed Modular Spacecraft */}
+        {/* Detailed Modular Spacecraft with Controlled Slow Rotation */}
         <SpacecraftModel
           subsystems={subsystems}
           selectedKey={effectiveFocusKey}
@@ -502,6 +526,7 @@ export default function SatelliteScene({
           explodedOffset={isExploded ? 1.0 : 0.0}
           isXray={isXray}
           selectedComponent={selectedComponent}
+          isRotating={isAutoRotate}
           onSelect={handleSelectSubsystem}
           onHover={setHoveredKey}
         />
@@ -515,7 +540,7 @@ export default function SatelliteScene({
           onTransitionEnd={() => setIsTransitioning(false)}
         />
 
-        {/* Interactive OrbitControls for 360-degree manual rotation and zoom */}
+        {/* Stable Interactive OrbitControls (camera stays steady while model rotates) */}
         <OrbitControls
           ref={controlsRef}
           enablePan={true}
@@ -527,11 +552,8 @@ export default function SatelliteScene({
           zoomSpeed={1.0}
           minDistance={1.8}
           maxDistance={14}
-          autoRotate={isAutoRotate}
-          autoRotateSpeed={0.22}
+          autoRotate={false}
           onStart={() => {
-            // User manually started dragging: pause auto-rotate and cancel any active transition
-            setIsAutoRotate(false)
             setIsTransitioning(false)
           }}
         />

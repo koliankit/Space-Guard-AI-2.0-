@@ -294,10 +294,10 @@ export default function ISROOnboardingFlow({
             onClick={() => setCurrentStep('csv_upload')}
             className={`p-3 rounded-lg border text-left transition-colors cursor-pointer ${
               currentStep === 'csv_upload'
-                ? 'bg-[#F8FAFC] border-[#D9E2EA] text-white'
+                ? 'bg-[#E8F0F6] border-[#0E88D3] text-[#17212B]'
                 : uploadMeta || rawParts.length > 0
-                ? 'bg-[#FFFFFF] border-[#D9E2EA] hover:border-[#D9E2EA] text-[#5B6B7A]'
-                : 'bg-[#FFFFFF] border-[#D9E2EA] opacity-60 text-[#5B6B7A]'
+                ? 'bg-[#FFFFFF] border-[#D5DEE7] hover:border-[#0E88D3] text-[#4F6170]'
+                : 'bg-[#FFFFFF] border-[#D5DEE7] opacity-60 text-[#718292]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -332,12 +332,12 @@ export default function ISROOnboardingFlow({
             disabled={rawParts.length === 0 && !uploadMeta}
             className={`p-3 rounded-lg border text-left transition-colors ${
               currentStep === 'ai_screening'
-                ? 'bg-[#F8FAFC] border-[#D9E2EA] text-white cursor-pointer'
+                ? 'bg-[#E8F0F6] border-[#0E88D3] text-[#17212B] cursor-pointer'
                 : screeningDone || mission
-                ? 'bg-[#FFFFFF] border-[#D9E2EA] hover:border-[#D9E2EA] text-[#5B6B7A] cursor-pointer'
+                ? 'bg-[#FFFFFF] border-[#D5DEE7] hover:border-[#0E88D3] text-[#4F6170] cursor-pointer'
                 : rawParts.length > 0
-                ? 'bg-[#FFFFFF] border-[#D9E2EA] hover:border-[#D9E2EA] text-[#5B6B7A] cursor-pointer'
-                : 'bg-[#FFFFFF] border-[#D9E2EA] opacity-50 text-[#81909D] cursor-not-allowed'
+                ? 'bg-[#FFFFFF] border-[#D5DEE7] hover:border-[#0E88D3] text-[#4F6170] cursor-pointer'
+                : 'bg-[#FFFFFF] border-[#D5DEE7] opacity-50 text-[#718292] cursor-not-allowed'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -372,10 +372,10 @@ export default function ISROOnboardingFlow({
             disabled={!screeningDone && !mission}
             className={`p-3 rounded-lg border text-left transition-colors ${
               currentStep === 'final_screening'
-                ? 'bg-[#F8FAFC] border-[#D9E2EA] text-white cursor-pointer'
+                ? 'bg-[#E8F0F6] border-[#0E88D3] text-[#17212B] cursor-pointer'
                 : screeningDone || mission
-                ? 'bg-[#FFFFFF] border-[#D9E2EA] hover:border-[#D9E2EA] text-[#5B6B7A] cursor-pointer'
-                : 'bg-[#FFFFFF] border-[#D9E2EA] opacity-50 text-[#81909D] cursor-not-allowed'
+                ? 'bg-[#FFFFFF] border-[#D5DEE7] hover:border-[#0E88D3] text-[#4F6170] cursor-pointer'
+                : 'bg-[#FFFFFF] border-[#D5DEE7] opacity-50 text-[#718292] cursor-not-allowed'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -513,8 +513,8 @@ export default function ISROOnboardingFlow({
                     onClick={() => handleLoadOfficialDemo(m.id)}
                     className={`w-full text-left px-3 py-2 rounded-lg border transition-colors flex items-center justify-between text-xs ${
                       activeMissionId === m.id
-                        ? 'bg-[#F8FAFC] border-[#D9E2EA] text-white font-bold'
-                        : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A] hover:bg-[#F8FAFC] hover:text-[#17212B]'
+                        ? 'bg-[#E8F0F6] border-[#0E88D3] text-[#17212B] font-bold'
+                        : 'bg-[#FFFFFF] border-[#D5DEE7] text-[#4F6170] hover:bg-[#F8FAFC] hover:text-[#17212B]'
                     }`}
                   >
                     <span className="truncate">{m.name}</span>
@@ -892,10 +892,10 @@ export default function ISROOnboardingFlow({
                         key={stg.title}
                         className={`flex items-start gap-2.5 p-2 rounded border text-[11px] ${
                           isCur
-                            ? 'bg-[#F8FAFC] border-[#D9E2EA] text-white'
+                            ? 'bg-[#E8F0F6] border-[#0E88D3] text-[#17212B] font-bold'
                             : isDone
-                            ? 'bg-[#FFFFFF] border-[#D9E2EA]/80 text-[#5B6B7A]'
-                            : 'bg-transparent border-transparent opacity-30 text-[#81909D]'
+                            ? 'bg-[#FFFFFF] border-[#D5DEE7] text-[#168A5B]'
+                            : 'bg-transparent border-transparent opacity-40 text-[#718292]'
                         }`}
                       >
                         <span className="mt-0.5 shrink-0 font-bold">

@@ -516,17 +516,35 @@ export default function SatelliteEquipment({
         </mesh>
       )}
 
-      {/* Small Pulsing Locator Ring for Selected Component */}
+      {/* Engineering Locator Ring & Vertical Guide Beam for Selected Component */}
       {isTargetComponent && (
-        <mesh ref={locatorRingRef} position={[0, 0.20, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.07, 0.088, 36]} />
-          <meshBasicMaterial
-            color={componentHighlightColor}
-            transparent
-            opacity={0.9}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
+        <group position={[0, 0.20, 0]}>
+          <mesh ref={locatorRingRef} rotation={[Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.07, 0.092, 36]} />
+            <meshBasicMaterial
+              color={componentHighlightColor}
+              transparent
+              opacity={0.85}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+          {/* Subtle Vertical Locator Guide Beam */}
+          <line>
+            <bufferGeometry
+              attach="geometry"
+              {...new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, 0.24, 0),
+              ])}
+            />
+            <lineBasicMaterial color={componentHighlightColor} transparent opacity={0.65} />
+          </line>
+          {/* Tip Locator Tick Dot */}
+          <mesh position={[0, 0.24, 0]}>
+            <sphereGeometry args={[0.014, 10, 10]} />
+            <meshBasicMaterial color={componentHighlightColor} />
+          </mesh>
+        </group>
       )}
 
       {/* 3D Holographic Corner Selection Bracket (visible when selected or hovered) */}

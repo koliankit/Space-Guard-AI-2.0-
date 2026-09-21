@@ -90,7 +90,7 @@ export default function Header({
   }
 
   return (
-    <header className="border-b border-[#D9E2EA] bg-[#FFFFFF] sticky top-0 z-40 font-sans select-none flex-shrink-0 shadow-sm">
+    <header className="border-b border-[#D5DEE7] bg-[#FFFFFF] sticky top-0 z-40 font-sans select-none flex-shrink-0 shadow-sm">
       <div className="flex items-center justify-between px-3 md:px-5 py-2 gap-2.5 w-full">
         {/* Left Section: Mobile Menu, ISRO Crest & SpaceGuard AI Brand */}
         <div className="flex items-center gap-3 min-w-0">
@@ -98,7 +98,7 @@ export default function Header({
             <button
               type="button"
               onClick={onToggleSidebar}
-              className="lg:hidden p-1.5 rounded-lg bg-[#F8FAFC] border border-[#D9E2EA] text-[#17212B] hover:text-[#0E88D3] hover:border-[#0E88D3] transition-colors flex-shrink-0 cursor-pointer"
+              className="lg:hidden p-1.5 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7] text-[#17212B] hover:text-[#0E88D3] hover:border-[#0E88D3] transition-colors flex-shrink-0 cursor-pointer"
               title="Toggle Navigation Menu"
             >
               <span className="text-sm">☰</span>
@@ -107,7 +107,7 @@ export default function Header({
 
           <div className="w-8 h-8 rounded-lg border border-[#F47216]/60 bg-gradient-to-br from-[#F47216]/10 to-[#0E88D3]/10 flex flex-col items-center justify-center text-white font-display font-bold text-xs shadow-orange flex-shrink-0">
             <span className="tracking-tight text-[11px] text-[#F47216] font-black leading-none">ISRO</span>
-            <span className="text-[7.5px] text-[#5B6B7A] font-mono tracking-widest leading-none mt-0.5">MOX</span>
+            <span className="text-[7.5px] text-[#4F6170] font-mono tracking-widest leading-none mt-0.5">MOX</span>
           </div>
 
           <div className="min-w-0">
@@ -115,7 +115,7 @@ export default function Header({
               <span className="text-sm md:text-base font-display font-black tracking-wider text-[#17212B] uppercase truncate">
                 SpaceGuard <span className="text-[#F47216]">AI</span>
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-[#F8FAFC] text-[#5B6B7A] border border-[#D9E2EA] font-mono font-medium hidden sm:inline-block">
+              <span className="text-[10px] px-2 py-0.5 rounded bg-[#F8FAFC] text-[#4F6170] border border-[#D5DEE7] font-mono font-medium hidden sm:inline-block">
                 SDSC SHAR // LCC-01
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded bg-[#0E88D3]/10 text-[#0E88D3] border border-[#0E88D3]/30 font-mono font-bold truncate max-w-[160px] md:max-w-xs hidden md:inline-block">
@@ -127,21 +127,27 @@ export default function Header({
 
         {/* Center Section: Telemetry Clocks & Ground Station */}
         <div className="hidden md:flex items-center gap-2 text-xs font-mono flex-shrink-0">
-          <div className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D9E2EA] flex items-center gap-1.5 shadow-sm">
-            <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">IST</span>
+          {/* Subtle LIVE Status Indicator */}
+          <div className="px-2.5 py-1 rounded-lg bg-[#F0FDF4] border border-[#168A5B]/30 flex items-center gap-1.5 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#168A5B] animate-pulse" />
+            <span className="text-[10px] text-[#168A5B] uppercase font-bold tracking-wide">LIVE</span>
+          </div>
+
+          <div className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7] flex items-center gap-1.5 shadow-sm">
+            <span className="text-[10px] text-[#4F6170] uppercase font-semibold">IST</span>
             <span className="font-bold text-[#17212B] tabular-nums text-xs">{istTime || '16:15:00'}</span>
           </div>
 
           <div className="px-2.5 py-1 rounded-lg bg-[#0E88D3]/10 border border-[#0E88D3]/30 flex items-center gap-1.5 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-[#0E88D3] led" />
+            <span className="w-2 h-2 rounded-full bg-[#0E88D3] animate-pulse" />
             <span className="text-[10px] text-[#0E88D3] uppercase font-bold">MET</span>
             <span className="font-bold text-[#0E88D3] tabular-nums text-xs">{formatMet(metSeconds)}</span>
           </div>
 
-          <div className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D9E2EA] items-center gap-1.5 hidden xl:flex shadow-sm">
-            <span className={`w-2 h-2 rounded-full ${streamActive ? 'bg-[#168A5B] led' : 'bg-[#81909D]'}`} />
-            <span className="text-[10px] text-[#5B6B7A] font-semibold">BYL-32 DSN</span>
-            <span className={`text-xs font-bold ${streamActive ? 'text-[#168A5B]' : 'text-[#81909D]'}`}>
+          <div className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7] items-center gap-1.5 hidden xl:flex shadow-sm">
+            <span className={`w-2 h-2 rounded-full ${streamActive ? 'bg-[#168A5B] animate-pulse' : 'bg-[#718292]'}`} />
+            <span className="text-[10px] text-[#4F6170] font-semibold">BYL-32 DSN</span>
+            <span className={`text-xs font-bold ${streamActive ? 'text-[#168A5B]' : 'text-[#718292]'}`}>
               {streamActive ? 'CARRIER LOCK' : 'STANDBY'}
             </span>
           </div>
@@ -151,10 +157,10 @@ export default function Header({
         <div className="flex items-center gap-2 text-xs font-mono flex-shrink-0">
           {/* Active Dataset Status & Run Button */}
           {totalComponents > 0 && (
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D9E2EA]">
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#168A5B]" />
               <span className="text-[#17212B] font-bold">{totalComponents}</span>
-              <span className="text-[#5B6B7A] text-[10.5px]">PARTS</span>
+              <span className="text-[#4F6170] text-[10.5px]">PARTS</span>
               {rejectCount > 0 && (
                 <span className="ml-1 px-1.5 py-0.2 rounded bg-[#D9363E] text-white text-[10px] font-black">
                   {rejectCount} REJ
@@ -189,7 +195,7 @@ export default function Header({
             }}
             className={`px-2.5 py-1 rounded-lg border transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm select-none ${
               !teeStatus?.enabled
-                ? 'border-[#D9E2EA] bg-[#F8FAFC] text-[#5B6B7A] hover:border-[#0E88D3] hover:text-[#17212B]'
+                ? 'border-[#D5DEE7] bg-[#F8FAFC] text-[#4F6170] hover:border-[#0E88D3] hover:text-[#17212B]'
                 : teeStatus.mode === 'simulation'
                 ? 'border-[#0E88D3]/40 bg-[#0E88D3]/10 text-[#0E88D3] hover:bg-[#0E88D3]/15'
                 : 'border-[#0E88D3]/40 bg-[#0E88D3]/15 text-[#0E88D3] hover:bg-[#0E88D3]/20'
@@ -199,8 +205,8 @@ export default function Header({
             <span
               className={`w-2 h-2 rounded-full ${
                 !teeStatus?.enabled
-                  ? 'border border-[#81909D] bg-transparent'
-                  : 'bg-[#0E88D3] led'
+                  ? 'border border-[#718292] bg-transparent'
+                  : 'bg-[#0E88D3] animate-pulse'
               }`}
             />
             <span className="text-[11px] font-mono font-bold tracking-wide">
@@ -216,7 +222,7 @@ export default function Header({
                 sounds.playPing()
                 onOpenPitchModal()
               }}
-              className="text-xs font-sans font-semibold px-2.5 py-1 rounded-lg border border-[#D9E2EA] bg-[#F8FAFC] text-[#17212B] hover:border-[#0E88D3] hover:text-[#0E88D3] transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="text-xs font-sans font-semibold px-2.5 py-1 rounded-lg border border-[#D5DEE7] bg-[#F8FAFC] text-[#17212B] hover:border-[#0E88D3] hover:text-[#0E88D3] transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
               title="View Official ISRO Briefing Deck (Press 'P')"
             >
               <span>📑</span>

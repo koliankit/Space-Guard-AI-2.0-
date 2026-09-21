@@ -564,10 +564,10 @@ export default function SatelliteEquipmentBoard({
                         <button
                           type="button"
                           onClick={() => handleToggleIsolate(item.component_id)}
-                          className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border ${
+                          className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border cursor-pointer ${
                             isIsolated
-                              ? 'bg-rose-500 text-white border-rose-600 font-bold'
-                              : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500 hover:text-[#17212B]'
+                              ? 'bg-[#D9363E] text-white border-[#D9363E] font-bold shadow-sm'
+                              : 'bg-[#FEF2F2] text-[#D9363E] border-[#D9363E]/40 hover:bg-[#D9363E] hover:text-white'
                           }`}
                         >
                           {isIsolated ? '✓ Bus Isolated' : 'Isolate Bus'}
@@ -576,10 +576,10 @@ export default function SatelliteEquipmentBoard({
                         <button
                           type="button"
                           onClick={() => handleToggleFailover(item.component_id)}
-                          className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border ${
+                          className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border cursor-pointer ${
                             isFailover
-                              ? 'bg-slate-700 text-white border-white/40 font-bold'
-                              : 'bg-white/10 text-white border-white/20 hover:bg-[#F8FAFC] hover:text-[#17212B]'
+                              ? 'bg-[#0E88D3] text-white border-[#0E88D3] font-bold shadow-sm'
+                              : 'bg-[#F8FAFC] text-[#17212B] border-[#D5DEE7] hover:bg-[#E8F0F6]'
                           }`}
                         >
                           {isFailover ? '✓ Spare B Active' : 'Failover Spare'}

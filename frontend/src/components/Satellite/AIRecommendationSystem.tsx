@@ -497,10 +497,10 @@ export default function AIRecommendationSystem({
                   <span
                     className={`text-xs font-bold px-2.5 py-0.5 rounded font-mono uppercase whitespace-nowrap flex-shrink-0 ${
                       act.urgency === 'IMMEDIATE'
-                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                        ? 'bg-[#FEF2F2] text-[#D9363E] border border-[#D9363E]/40'
                         : act.urgency === 'PREVENTATIVE'
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                        : 'bg-white/15 text-white border border-white/30'
+                        ? 'bg-[#FFFBEB] text-[#C58A00] border border-[#C58A00]/40'
+                        : 'bg-[#F8FAFC] text-[#4F6170] border border-[#D5DEE7]'
                     }`}
                   >
                     {act.urgency}

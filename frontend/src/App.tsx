@@ -4,6 +4,7 @@ import HealthBar from './components/Dashboard/HealthBar'
 import MappingModal from './components/Dashboard/MappingModal'
 import PipelineOverlay from './components/Dashboard/PipelineOverlay'
 import AuditLog, { type AuditEntry } from './components/Dashboard/AuditLog'
+import TelemetryNetworkBackground from './components/Dashboard/TelemetryNetworkBackground'
 import DataIngestModal from './components/Dashboard/DataIngestModal'
 import LotClassificationModal from './components/Dashboard/LotClassificationModal'
 import ComponentMonitor from './components/ComponentPanel/ComponentMonitor'
@@ -468,8 +469,10 @@ export default function App() {
           onCloseMobile={() => setMobileSidebarOpen(false)}
         />
 
-        {/* Right Full Dashboard Workspace */}
-        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#EEF3F7] flex flex-col">
+        {/* Right Full Dashboard Workspace with Subtle Telemetry Atmosphere */}
+        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#EEF3F7] flex flex-col relative">
+          <TelemetryNetworkBackground />
+          <div className="relative z-[1] flex-1 flex flex-col min-h-full">
           {/* OVERVIEW */}
           {(activeTab === 'overview' || activeTab === 'wall') && (
             <MultiScreenWall
@@ -638,6 +641,7 @@ export default function App() {
               onDownloadReport={handleReport}
             />
           )}
+          </div>
         </main>
       </div>
 

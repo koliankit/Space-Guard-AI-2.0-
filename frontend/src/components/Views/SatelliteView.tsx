@@ -75,7 +75,7 @@ export default function SatelliteView({
         </div>
 
         {/* Right: 3D Interactive Satellite Viewport */}
-        <div className="relative min-h-[500px] lg:min-h-[560px] rounded-xl border border-[#D9E2EA] bg-[radial-gradient(ellipse_at_50%_40%,#FFFFFF_0%,#F4F7FA_85%)] overflow-hidden shadow-xl flex flex-col flex-1 h-full">
+        <div className="relative min-h-[500px] lg:min-h-[560px] rounded-xl border border-[#BFD8E8] bg-[linear-gradient(180deg,#EAF4FB_0%,#F4F8FB_50%,#DCECF7_100%)] overflow-hidden shadow-md flex flex-col flex-1 h-full ring-1 ring-[#0E88D3]/10">
           <SatelliteScene
             subsystems={subsystems}
             onSelect={onSelectSubsystem}

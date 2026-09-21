@@ -358,10 +358,10 @@ export default function ComponentDeepDiveAnalysis({
                   sounds.playPing()
                   onIsolateBus(component.component_id)
                 }}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all border flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all border flex items-center justify-center gap-2 cursor-pointer ${
                   isIsolated
-                    ? 'bg-rose-500 text-white border-rose-600 font-bold'
-                    : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500 hover:text-[#17212B]'
+                    ? 'bg-[#D9363E] text-white border-[#D9363E] font-bold shadow-sm'
+                    : 'bg-[#FEF2F2] text-[#D9363E] border-[#D9363E]/40 hover:bg-[#D9363E] hover:text-white'
                 }`}
               >
                 <span>⚡</span> {isIsolated ? '✓ Power Bus Isolated' : 'Isolate Power Bus'}
@@ -375,10 +375,10 @@ export default function ComponentDeepDiveAnalysis({
                   sounds.playSuccess()
                   onFailover(component.component_id)
                 }}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all border flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all border flex items-center justify-center gap-2 cursor-pointer ${
                   isFailover
-                    ? 'bg-slate-700 text-white border-white/40 font-bold'
-                    : 'bg-white/10 text-white border-white/20 hover:bg-[#F8FAFC] hover:text-[#17212B]'
+                    ? 'bg-[#0E88D3] text-white border-[#0E88D3] font-bold shadow-sm'
+                    : 'bg-[#F8FAFC] text-[#17212B] border-[#D5DEE7] hover:bg-[#E8F0F6]'
                 }`}
               >
                 <span>🔄</span> {isFailover ? '✓ Cold Spare B Active' : 'Engage Cold Spare B'}
