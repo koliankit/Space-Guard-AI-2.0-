@@ -238,11 +238,12 @@ export default function ModuleAAnomalyPanel({
               </div>
             </div>
 
-            {/* HTOL Telemetry Reading Grid (Row 1) */}
-            <div className="grid grid-cols-5 gap-1.5 text-xs font-mono">
+            {/* HTOL Telemetry Reading Grid (4-box harmonized with Module B) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-mono">
               <div className="p-1.5 rounded bg-[#07111C] border border-[#22A06B]/30 flex flex-col">
                 <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">0h Initial</span>
                 <span className="text-sm font-bold text-[#F1F5F9] mt-0.5 tabular-nums">{selected.v0.toFixed(1)} &mu;A</span>
+                <span className="text-[9px] text-[#6F8495] font-mono mt-0.5">T=0 Baseline</span>
               </div>
 
               <div className={`p-1.5 rounded bg-[#07111C] border flex flex-col transition-colors ${
@@ -254,6 +255,9 @@ export default function ModuleAAnomalyPanel({
                 <span className="text-sm font-bold text-[#F1F5F9] mt-0.5 tabular-nums">
                   {isSim && simH < 24 ? '--' : `${selected.v24.toFixed(1)} \u00B5A`}
                 </span>
+                <span className="text-[9px] text-[#0E88D3] font-mono mt-0.5">
+                  &Delta; +{(selected.v24 - selected.v0).toFixed(2)} &mu;A
+                </span>
               </div>
 
               <div className={`p-1.5 rounded bg-[#07111C] border flex flex-col transition-colors ${
@@ -261,10 +265,11 @@ export default function ModuleAAnomalyPanel({
                   ? 'border-[#1D3A52] opacity-60'
                   : 'border-[#22A06B]/40'
               }`}>
-                <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">96h Mid</span>
+                <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">96h Mid-HTOL</span>
                 <span className="text-sm font-bold text-[#F1F5F9] mt-0.5 tabular-nums">
                   {isSim && simH < 96 ? '--' : selected.v96 != null ? `${selected.v96.toFixed(1)} \u00B5A` : '--'}
                 </span>
+                <span className="text-[9px] text-[#6F8495] font-mono mt-0.5">Midpoint Check</span>
               </div>
 
               <div className={`p-1.5 rounded bg-[#07111C] border flex flex-col transition-colors ${
@@ -289,55 +294,30 @@ export default function ModuleAAnomalyPanel({
                 }`}>
                   {isSim && simH < 168 ? `${simVal.toFixed(1)} \u00B5A` : `${selected.v168.toFixed(1)} \u00B5A`}
                 </span>
-              </div>
-
-              <div className="p-1.5 rounded bg-[#07111C] border border-[#1D3A52] flex flex-col">
-                <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">Spec Limit</span>
-                <span className="text-sm font-bold text-[#E5484D] mt-0.5 tabular-nums">{(selected.limit_ua || 50).toFixed(1)} &mu;A</span>
-              </div>
-            </div>
-
-            {/* Outlier & Statistical Analysis Row (Row 2) */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 text-xs font-mono text-[#F1F5F9]">
-              <div className="flex justify-between bg-[#102337] px-2.5 py-1 rounded flex-col sm:flex-row items-center sm:items-start text-center sm:text-left border border-[#1D3A52]/60">
-                <span className="text-[10px] text-[#9AAFC0]">Median / MAD:</span>
-                <span className="text-xs text-[#F1F5F9] font-bold tabular-nums">
-                  {selected.lot_median?.toFixed(1) ?? selected.lot_mean?.toFixed(1) ?? '--'} &mu;A &bull; {selected.lot_mad?.toFixed(2) ?? selected.lot_std?.toFixed(2) ?? '--'}
-                </span>
-              </div>
-              <div className="flex justify-between bg-[#102337] px-2.5 py-1 rounded flex-col sm:flex-row items-center sm:items-start text-center sm:text-left border border-[#1D3A52]/60">
-                <span className="text-[10px] text-[#9AAFC0]">Lot z-Score:</span>
-                <span className={`text-xs font-bold tabular-nums ${
+                <span className={`text-[9px] font-mono mt-0.5 ${
                   liveZ != null && Math.abs(liveZ) > 2 ? 'text-[#E5484D]' : 'text-[#0E88D3]'
                 }`}>
-                  {liveZ != null ? `${liveZ > 0 ? '+' : ''}${liveZ.toFixed(2)}σ` : '--'}
-                </span>
-              </div>
-              <div className="flex justify-between bg-[#102337] px-2.5 py-1 rounded flex-col sm:flex-row items-center sm:items-start text-center sm:text-left border border-[#1D3A52]/60">
-                <span className="text-[10px] text-[#9AAFC0]">Rank %ile:</span>
-                <span className="text-xs text-[#0E88D3] font-bold tabular-nums">
-                  {selected.lot_rank_percentile != null ? `${selected.lot_rank_percentile.toFixed(1)}%` : '--'}
-                </span>
-              </div>
-              <div className="flex justify-between bg-[#102337] px-2.5 py-1 rounded flex-col sm:flex-row items-center sm:items-start text-center sm:text-left border border-[#1D3A52]/60">
-                <span className="text-[10px] text-[#9AAFC0]">Anomaly Score:</span>
-                <span className="text-xs text-[#0E88D3] font-bold tabular-nums">
-                  {displayedScore.toFixed(1)}/100
+                  z: {liveZ != null ? `${liveZ > 0 ? '+' : ''}${liveZ.toFixed(2)}σ` : '--'}
                 </span>
               </div>
             </div>
 
-            {/* AI Diagnostics & Failure Physics */}
-            {selected.reason && (
-              <div className="p-2 rounded bg-[#102337] border border-[#1D3A52] text-xs text-[#F1F5F9] flex items-start gap-2">
-                <span className="text-[#0E88D3] font-bold font-mono text-[11px] uppercase whitespace-nowrap">
-                  Diagnosis:
+            {/* AI Diagnostics & Statistical Analysis Strip */}
+            <div className="p-2 rounded bg-[#102337] border border-[#1D3A52] text-xs text-[#F1F5F9] flex flex-wrap items-center justify-between gap-2 font-mono">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <span className="text-[#0E88D3] font-bold text-[10px] uppercase whitespace-nowrap">
+                  DIAGNOSIS:
                 </span>
-                <span className="text-xs text-[#F1F5F9] font-sans leading-relaxed truncate" title={selected.reason}>
-                  {selected.reason}
+                <span className="text-xs text-[#F1F5F9] truncate font-sans" title={selected.reason || 'Nominal component telemetry'}>
+                  {selected.reason || 'Nominal HTOL burn-in curve within statistical bounds.'}
                 </span>
               </div>
-            )}
+              <div className="flex items-center gap-3 text-[10px] text-[#9AAFC0] whitespace-nowrap">
+                <span>&mu;: <b className="text-[#F1F5F9]">{selected.lot_mean?.toFixed(1) ?? '--'}&mu;A</b></span>
+                <span>Limit: <b className="text-[#E5484D]">{(selected.limit_ua || 50).toFixed(1)}&mu;A</b></span>
+                <span>AI Score: <b className="text-[#0E88D3]">{displayedScore.toFixed(1)}/100</b></span>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="p-4 text-center text-xs text-[#9AAFC0] bg-[#142B40] rounded-lg border border-[#1D3A52]">

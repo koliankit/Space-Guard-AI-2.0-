@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { ComponentOut } from '../../types'
 import { sounds } from '../../utils/soundEffects'
+import { createMonotoneCubicPath } from '../../utils/spline'
 
 const STAGES = [0, 24, 96, 168, 216]
 
@@ -60,7 +61,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     }
   }, [])
 
-  const W = Math.max(500, chartDims.width)
+  const W = Math.max(280, chartDims.width)
   const H = Math.max(340, chartDims.height)
   const padL = 60
   const padR = 36
@@ -103,25 +104,11 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
 
   const shown = useMemo(() => stages.filter(([h]) => h <= stageH), [stages, stageH])
 
-  // Smooth Catmull-Rom spline curve for component
+  // Smooth Fritsch-Carlson monotone cubic spline curve for component
   const smoothCurve = useMemo(() => {
     if (shown.length < 2) return ''
     const mapped = shown.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
-    let d = `M ${mapped[0].x} ${mapped[0].y}`
-    for (let i = 0; i < mapped.length - 1; i++) {
-      const p0 = i > 0 ? mapped[i - 1] : mapped[i]
-      const p1 = mapped[i]
-      const p2 = mapped[i + 1]
-      const p3 = i !== mapped.length - 2 ? mapped[i + 2] : p2
-
-      const cp1x = p1.x + (p2.x - p0.x) / 6
-      const cp1y = p1.y + (p2.y - p0.y) / 6
-      const cp2x = p2.x - (p3.x - p1.x) / 6
-      const cp2y = p2.y - (p3.y - p1.y) / 6
-
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
-    }
-    return d
+    return createMonotoneCubicPath(mapped)
   }, [shown, minY, maxY, W, H])
 
   const lastPoint = shown[shown.length - 1]
@@ -131,7 +118,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
     return `${smoothCurve} L ${xFor(lastPoint[0])} ${H - padB} L ${xFor(shown[0][0])} ${H - padB} Z`
   }, [smoothCurve, shown, lastPoint, H, padB])
 
-  // Lot peer baseline curve (represents nominal cohort behavior, strictly non-inverting)
+  // Lot peer baseline curve (represents nominal cohort behavior, strictly monotonic)
   const baselineCurve = useMemo(() => {
     const lotBase0 = Math.min(lotMean * 0.75, v0 < lotMean ? v0 * 0.96 : lotMean * 0.75)
     const lotDelta = Math.max(0.1, lotMean - lotBase0)
@@ -145,21 +132,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
 
     if (baselinePts.length < 2) return ''
     const mapped = baselinePts.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
-    let d = `M ${mapped[0].x} ${mapped[0].y}`
-    for (let i = 0; i < mapped.length - 1; i++) {
-      const p0 = i > 0 ? mapped[i - 1] : mapped[i]
-      const p1 = mapped[i]
-      const p2 = mapped[i + 1]
-      const p3 = i !== mapped.length - 2 ? mapped[i + 2] : p2
-
-      const cp1x = p1.x + (p2.x - p0.x) / 6
-      const cp1y = p1.y + (p2.y - p0.y) / 6
-      const cp2x = p2.x - (p3.x - p1.x) / 6
-      const cp2y = p2.y - (p3.y - p1.y) / 6
-
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
-    }
-    return d
+    return createMonotoneCubicPath(mapped)
   }, [v0, lotMean, stageH, minY, maxY, W, H])
 
   // Probe tip coordinates along the path
@@ -422,7 +395,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
       {/* Main Full-Width SVG Oscilloscope Canvas */}
       <div
         ref={containerRef}
-        className="relative rounded-xl overflow-hidden border border-slate-800 bg-[#07111C] w-full transition-all duration-300 min-h-[340px] md:min-h-[360px] h-[350px] md:h-[370px]"
+        className="relative rounded-xl overflow-hidden border border-[#1D3A52] bg-[#07111C] w-full flex-1 transition-all duration-300 min-h-[340px] h-full"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
@@ -479,7 +452,7 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             const val = minY + (maxY - minY) * f
             return (
               <g key={f}>
-                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#1D3A52" strokeWidth={0.8} />
+                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#1D3A52" strokeWidth={0.8} strokeOpacity={0.6} />
                 <text
                   x={padL - 8}
                   y={y + 3.5}
@@ -493,29 +466,33 @@ export default function TelemetryChart({ component }: { component: ComponentOut 
             )
           })}
 
-          {/* Stage X-axis Vertical Gridlines & Time Markers */}
-          {STAGES.map((h) => {
+          {/* Uniform 24-Hour Engineering Reticle Gridlines across 0-216h */}
+          {[0, 24, 48, 72, 96, 120, 144, 168, 192, 216].map((h) => {
             const x = xFor(h)
+            const isMilestone = h === 0 || h === 24 || h === 96 || h === 168 || h === 216
             return (
-              <g key={h}>
+              <g key={`grid-v-tel-${h}`}>
                 <line
                   x1={x}
                   x2={x}
                   y1={padT}
                   y2={H - padB}
                   stroke="#1D3A52"
-                  strokeDasharray="2 2"
-                  strokeWidth={0.8}
+                  strokeDasharray={isMilestone ? '3 2' : '1 3'}
+                  strokeWidth={isMilestone ? 1 : 0.6}
+                  strokeOpacity={isMilestone ? 0.85 : 0.35}
                 />
-                <text
-                  x={x}
-                  y={H - padB + 16}
-                  textAnchor="middle"
-                  fill="#9AAFC0"
-                  className="text-[10px] font-mono font-semibold"
-                >
-                  {h === 216 ? '216h (EOT)' : `T+${h}h`}
-                </text>
+                {isMilestone && (
+                  <text
+                    x={x}
+                    y={H - padB + 16}
+                    textAnchor="middle"
+                    fill="#9AAFC0"
+                    className="text-[10px] font-mono font-semibold"
+                  >
+                    {h === 216 ? '216h (EOT)' : `T+${h}h`}
+                  </text>
+                )}
               </g>
             )
           })}

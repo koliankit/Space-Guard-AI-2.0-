@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { ComponentOut } from '../../types'
 import { sounds } from '../../utils/soundEffects'
+import { createMonotoneCubicPath } from '../../utils/spline'
 
 export interface ModuleBSimData {
   progress: number
@@ -79,7 +80,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     }
   }, [])
 
-  const W = Math.max(500, chartDims.width)
+  const W = Math.max(280, chartDims.width)
   const H = Math.max(240, chartDims.height)
   const padL = 50
   const padR = 24
@@ -236,13 +237,10 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     [v0, v24, v96, v168]
   )
 
-  const measuredPathD = useMemo(
-    () =>
-      measuredPoints
-        .map((p, i) => `${i === 0 ? 'M' : 'L'} ${toX(p.h).toFixed(1)} ${toY(p.v).toFixed(1)}`)
-        .join(' '),
-    [measuredPoints, toX, toY]
-  )
+  const measuredPathD = useMemo(() => {
+    const pts = measuredPoints.map((p) => ({ x: toX(p.h), y: toY(p.v) }))
+    return createMonotoneCubicPath(pts)
+  }, [measuredPoints, toX, toY])
 
   // Measure ground measured path length whenever path geometry updates
   useEffect(() => {
@@ -528,7 +526,7 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
       {/* SVG Canvas Area with Manual Inspection Crosshair */}
       <div
         ref={containerRef}
-        className="relative rounded-lg border border-[#1D3A52] bg-[#07111C] overflow-hidden w-full flex-1 transition-all duration-300 min-h-[230px] md:min-h-[250px] h-[250px] md:h-[270px]"
+        className="relative rounded-lg border border-[#1D3A52] bg-[#07111C] overflow-hidden w-full flex-1 transition-all duration-300 min-h-[260px] h-full"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
@@ -606,32 +604,35 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
             )
           })}
 
-          {/* X Axis Time Marks (0, 24, 96, 168, horizon) */}
-          {[0, 24, 96, 168, activeHorizon].map((h) => {
+          {/* Uniform 24-Hour Engineering Reticle Gridlines across Ground & In-Flight Horiz */}
+          {Array.from({ length: Math.floor(activeHorizon / 24) + 1 }, (_, i) => i * 24).map((h) => {
             const xPos = toX(h)
+            const isMilestone = h === 0 || h === 24 || h === 96 || h === 168 || h === activeHorizon
             return (
-              <g key={h}>
+              <g key={`grid-v-b-${h}`}>
                 <line
                   x1={xPos}
                   y1={padT}
                   x2={xPos}
                   y2={H - padB}
                   stroke={h === 168 ? '#F1F5F9' : h === activeHorizon ? '#F47216' : '#1D3A52'}
-                  strokeDasharray={h >= 168 ? '3 3' : undefined}
-                  strokeWidth={h >= 168 ? 1 : 0.5}
-                  strokeOpacity={h >= 168 ? 0.7 : 0.4}
+                  strokeDasharray={h === 168 ? '3 3' : isMilestone ? '3 2' : '1 3'}
+                  strokeWidth={h === 168 || h === activeHorizon ? 1.2 : isMilestone ? 0.9 : 0.5}
+                  strokeOpacity={h === 168 || h === activeHorizon ? 0.85 : isMilestone ? 0.7 : 0.3}
                 />
-                <text
-                  x={xPos}
-                  y={H - padB + 14}
-                  textAnchor="middle"
-                  fill={h === 168 ? '#F1F5F9' : h === activeHorizon ? '#F47216' : '#9AAFC0'}
-                  fontSize="9"
-                  fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
-                  fontWeight={h >= 168 ? 'bold' : 'normal'}
-                >
-                  {h}h
-                </text>
+                {isMilestone && (
+                  <text
+                    x={xPos}
+                    y={H - padB + 14}
+                    textAnchor="middle"
+                    fill={h === 168 ? '#F1F5F9' : h === activeHorizon ? '#F47216' : '#9AAFC0'}
+                    fontSize="9"
+                    fontFamily="'Sitka Small Semibold', 'Sitka Small', Georgia, serif"
+                    fontWeight={h >= 168 ? 'bold' : 'normal'}
+                  >
+                    {h}h
+                  </text>
+                )}
               </g>
             )
           })}
@@ -991,71 +992,39 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
         </svg>
       </div>
 
-      {/* Metric Callouts & Flight Advisory Bottom Row (Live Count-Up Synchronized with Sweep or Manual Inspection) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-mono">
-        <div className="p-1.5 rounded-lg bg-[#142B40] border border-[#1D3A52] flex flex-col">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">Drift Velocity</span>
-            {isSimulating && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] animate-gentle-pulse" />
-            )}
-          </div>
-          <span className={`text-sm font-bold mt-0.5 tabular-nums ${displayedDriftVelocity > 50 ? 'text-[#E5484D]' : 'text-[#F47216]'}`}>
-            {displayedDriftVelocity.toFixed(2)} <span className="text-[10px] font-normal text-[#9AAFC0]">nA/hr</span>
+      {/* Legend & Telemetry Readouts (Harmonized with Module A) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm font-mono text-[#F1F5F9] pt-2 border-t border-[#1D3A52]">
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3.5 h-1.5 rounded-full bg-[#0E88D3]" />
+            <span className="font-bold text-[#F1F5F9]">HTOL Measured</span>
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-1 bg-[#F47216] border-t border-dashed border-[#F47216]" />
+            <span className="text-[#F47216] font-semibold">Arrhenius Extrapolation</span>
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-1 bg-[#E5484D]" />
+            <span className="text-[#E5484D] font-semibold">Spec Limit ({limitVal.toFixed(1)}&mu;A)</span>
           </span>
         </div>
 
-        <div className="p-1.5 rounded-lg bg-[#142B40] border border-[#1D3A52] flex flex-col">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">Early Pred Error</span>
-            {isSimulating && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] animate-gentle-pulse" />
-            )}
-          </div>
-          <span className="text-sm font-bold text-[#F1F5F9] mt-0.5 tabular-nums">
-            &plusmn;{displayedPredError.toFixed(2)} <span className="text-[10px] font-normal text-[#9AAFC0]">&mu;A</span>
-          </span>
-        </div>
-
-        <div className={`p-1.5 rounded-lg bg-[#142B40] border flex flex-col transition-colors ${
-          isInspecting ? 'border-[#0E88D3] bg-[#142B40]' : 'border-[#1D3A52]'
-        }`}>
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">
-              {isInspecting ? `Probe @ T+${Math.round(inspectH)}h` : `+${activeHorizon - 168}h Projection`}
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <span className="text-[#9AAFC0]">
+              {isInspecting ? `Probe @ T+${Math.round(inspectH)}h:` : 'Drift Velocity:'}
             </span>
-            {isSimulating && !isInspecting && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] animate-gentle-pulse" />
-            )}
-            {isInspecting && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] animate-gentle-pulse" />
-            )}
-          </div>
-          <span className={`text-sm font-bold mt-0.5 tabular-nums ${
-            isInspecting ? 'text-[#0E88D3] font-bold' : willBreach ? 'text-[#E5484D] font-bold' : 'text-[#F1F5F9]'
-          }`}>
-            {displayedProjection.toFixed(2)} <span className="text-[10px] font-normal text-[#9AAFC0]">&mu;A</span>
+            <b className={`font-bold tabular-nums ${isInspecting ? 'text-[#0E88D3]' : displayedDriftVelocity > 50 ? 'text-[#E5484D]' : 'text-[#F47216]'}`}>
+              {isInspecting ? `${inspectVal.toFixed(2)} µA` : `${displayedDriftVelocity.toFixed(2)} nA/h`}
+            </b>
           </span>
-        </div>
-
-        <div className={`p-1.5 rounded-lg bg-[#142B40] border flex flex-col transition-colors ${
-          isInspecting ? 'border-[#0E88D3] bg-[#142B40]' : 'border-[#1D3A52]'
-        }`}>
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">
-              {isInspecting ? 'Probe Margin' : 'Future Margin'}
+          <span className="flex items-center gap-1.5">
+            <span className="text-[#9AAFC0]">
+              {isInspecting ? 'Probe Margin:' : `+${activeHorizon - 168}h Margin:`}
             </span>
-            {isSimulating && !isInspecting && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] animate-gentle-pulse" />
-            )}
-            {isInspecting && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] animate-gentle-pulse" />
-            )}
-          </div>
-          <span className={`text-sm font-bold mt-0.5 tabular-nums ${
-            displayedMargin < 5 ? 'text-[#E5484D]' : displayedMargin < 15 ? 'text-[#F2B84B]' : 'text-[#22A06B]'
-          }`}>
-            {displayedMargin.toFixed(1)} <span className="text-[10px] font-normal text-[#9AAFC0]">&mu;A</span>
+            <b className={`font-bold tabular-nums ${displayedMargin < 5 ? 'text-[#E5484D]' : displayedMargin < 15 ? 'text-[#F2B84B]' : 'text-[#22A06B]'}`}>
+              {displayedMargin.toFixed(1)} µA
+            </b>
           </span>
         </div>
       </div>

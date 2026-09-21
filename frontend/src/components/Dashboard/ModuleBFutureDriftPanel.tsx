@@ -138,7 +138,7 @@ export default function ModuleBFutureDriftPanel({
               </div>
             </div>
 
-            {/* In-Flight Reliability Forecast Metrics Grid */}
+            {/* In-Flight Reliability Forecast Metrics Grid (4-box harmonized with Module A) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-mono">
               <div className="p-1.5 rounded bg-[#07111C] border border-[#1D3A52] flex flex-col">
                 <div className="flex items-center justify-between">
@@ -148,6 +148,7 @@ export default function ModuleBFutureDriftPanel({
                 <span className={`text-sm font-bold mt-0.5 tabular-nums ${liveVel > 50 ? 'text-[#E5484D]' : 'text-[#F47216]'}`}>
                   {liveVel.toFixed(2)} <span className="text-[10px] font-normal text-[#9AAFC0]">nA/hr</span>
                 </span>
+                <span className="text-[9px] text-[#6F8495] font-mono mt-0.5">Arrhenius Slope</span>
               </div>
 
               <div className="p-1.5 rounded bg-[#07111C] border border-[#1D3A52] flex flex-col">
@@ -158,6 +159,7 @@ export default function ModuleBFutureDriftPanel({
                 <span className={`text-sm font-bold mt-0.5 tabular-nums ${willBreach ? 'text-[#E5484D]' : 'text-[#F1F5F9]'}`}>
                   {liveProj.toFixed(1)} <span className="text-[10px] font-normal text-[#9AAFC0]">&mu;A</span>
                 </span>
+                <span className="text-[9px] text-[#0E88D3] font-mono mt-0.5">In-Flight Target</span>
               </div>
 
               <div className="p-1.5 rounded bg-[#07111C] border border-[#1D3A52] flex flex-col">
@@ -176,6 +178,7 @@ export default function ModuleBFutureDriftPanel({
                 >
                   {liveMarg.toFixed(1)} <span className="text-[10px] font-normal text-[#9AAFC0]">&mu;A</span>
                 </span>
+                <span className="text-[9px] text-[#6F8495] font-mono mt-0.5">Datasheet Headroom</span>
               </div>
 
               <div className="p-1.5 rounded bg-[#07111C] border border-[#1D3A52] flex flex-col">
@@ -185,6 +188,24 @@ export default function ModuleBFutureDriftPanel({
                     ? `T+${Math.round(breachHour)}h`
                     : 'NO BREACH (>1000h)'}
                 </span>
+                <span className="text-[9px] text-[#6F8495] font-mono mt-0.5">Safety Boundary</span>
+              </div>
+            </div>
+
+            {/* In-Flight Physics & Reliability Horizon Strip (Matching Module A exactly) */}
+            <div className="p-2 rounded bg-[#102337] border border-[#1D3A52] text-xs text-[#F1F5F9] flex flex-wrap items-center justify-between gap-2 font-mono">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <span className="text-[#F47216] font-bold text-[10px] uppercase whitespace-nowrap">
+                  MODEL:
+                </span>
+                <span className="text-xs text-[#F1F5F9] truncate font-sans" title="Empirical Arrhenius Thermal Activation Model (Ea=0.7eV)">
+                  Arrhenius Thermal Degradation &bull; Dynamic Confidence Cone
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-[10px] text-[#9AAFC0] whitespace-nowrap">
+                <span>Pred Error: <b className="text-[#F1F5F9]">&plusmn;{(selected?.prediction_error_168 ?? 0.42).toFixed(2)}&mu;A</b></span>
+                <span>Spec Limit: <b className="text-[#E5484D]">{limitVal.toFixed(1)}&mu;A</b></span>
+                <span>Horizon: <b className="text-[#0E88D3]">264H (+96H)</b></span>
               </div>
             </div>
           </div>

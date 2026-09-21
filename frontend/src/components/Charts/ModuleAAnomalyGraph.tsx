@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { ComponentOut } from '../../types'
 import { sounds } from '../../utils/soundEffects'
+import { createMonotoneCubicPath } from '../../utils/spline'
 
 export interface ModuleASimData {
   progress: number
@@ -74,7 +75,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
     }
   }, [])
 
-  const W = Math.max(500, chartDims.width)
+  const W = Math.max(280, chartDims.width)
   const H = Math.max(240, chartDims.height)
   const padL = 50
   const padR = 24
@@ -126,25 +127,11 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
   const shown = useMemo(() => stages.filter(([h]) => h <= stageH), [stages, stageH])
 
-  // Smooth Catmull-Rom curve (with full dependencies so coordinates are never stale)
+  // Smooth Fritsch-Carlson monotone cubic spline curve (strictly monotonic, zero overshoot)
   const smoothCurve = useMemo(() => {
     if (shown.length < 2) return ''
     const mapped = shown.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
-    let d = `M ${mapped[0].x.toFixed(1)} ${mapped[0].y.toFixed(1)}`
-    for (let i = 0; i < mapped.length - 1; i++) {
-      const p0 = i > 0 ? mapped[i - 1] : mapped[i]
-      const p1 = mapped[i]
-      const p2 = mapped[i + 1]
-      const p3 = i !== mapped.length - 2 ? mapped[i + 2] : p2
-
-      const cp1x = p1.x + (p2.x - p0.x) / 6
-      const cp1y = p1.y + (p2.y - p0.y) / 6
-      const cp2x = p2.x - (p3.x - p1.x) / 6
-      const cp2y = p2.y - (p3.y - p1.y) / 6
-
-      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`
-    }
-    return d
+    return createMonotoneCubicPath(mapped)
   }, [shown, xFor, yFor])
 
   const lastPoint = shown[shown.length - 1]
@@ -166,22 +153,8 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
     if (baselinePts.length < 2) return ''
     const mapped = baselinePts.map(([h, v]) => ({ x: xFor(h), y: yFor(v) }))
-    let d = `M ${mapped[0].x} ${mapped[0].y}`
-    for (let i = 0; i < mapped.length - 1; i++) {
-      const p0 = i > 0 ? mapped[i - 1] : mapped[i]
-      const p1 = mapped[i]
-      const p2 = mapped[i + 1]
-      const p3 = i !== mapped.length - 2 ? mapped[i + 2] : p2
-
-      const cp1x = p1.x + (p2.x - p0.x) / 6
-      const cp1y = p1.y + (p2.y - p0.y) / 6
-      const cp2x = p2.x - (p3.x - p1.x) / 6
-      const cp2y = p2.y - (p3.y - p1.y) / 6
-
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
-    }
-    return d
-  }, [v0, lotMean, stageH, minY, maxY])
+    return createMonotoneCubicPath(mapped)
+  }, [v0, lotMean, stageH, xFor, yFor])
 
   // Probe tip coordinates along the path
   const tipPoint = useMemo(() => {
@@ -465,7 +438,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       {/* Main SVG Chart Canvas with Interactive Manual Line Section & Cursor */}
       <div
         ref={containerRef}
-        className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#07111C] w-full flex-1 transition-all duration-300 min-h-[230px] md:min-h-[250px] h-[250px] md:h-[270px]"
+        className="relative rounded-lg overflow-hidden border border-[#1D3A52] bg-[#07111C] w-full flex-1 transition-all duration-300 min-h-[260px] h-full"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
@@ -511,18 +484,19 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
             </clipPath>
           </defs>
 
-          {/* Gridlines */}
+          {/* Horizontal Reticle Gridlines & Y-Axis Scale Values */}
           {[0, 0.25, 0.5, 0.75, 1].map((f) => {
             const y = padT + (H - padT - padB) * (1 - f)
             const val = minY + (maxY - minY) * f
             return (
               <g key={f}>
-                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#142B40" strokeWidth={0.8} />
+                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#1D3A52" strokeWidth={0.8} strokeOpacity={0.6} />
                 <text
                   x={padL - 6}
                   y={y + 3.5}
                   textAnchor="end"
-                  className="fill-slate-400 text-[8.5px] font-mono tabular-nums"
+                  fill="#9AAFC0"
+                  className="text-[8.5px] font-mono tabular-nums"
                 >
                   {val.toFixed(1)}
                 </text>
@@ -530,28 +504,33 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
             )
           })}
 
-          {/* Stage X-axis vertical gridlines */}
-          {STAGES.map((h) => {
+          {/* Uniform 24-Hour Engineering Reticle Gridlines across 0-168h */}
+          {[0, 24, 48, 72, 96, 120, 144, 168].map((h) => {
             const x = xFor(h)
+            const isMilestone = h === 0 || h === 24 || h === 96 || h === 168
             return (
-              <g key={h}>
+              <g key={`grid-v-${h}`}>
                 <line
                   x1={x}
                   x2={x}
                   y1={padT}
                   y2={H - padB}
-                  stroke="#142B40"
-                  strokeDasharray="2 2"
-                  strokeWidth={0.8}
+                  stroke="#1D3A52"
+                  strokeDasharray={isMilestone ? '3 2' : '1 3'}
+                  strokeWidth={isMilestone ? 1 : 0.6}
+                  strokeOpacity={isMilestone ? 0.85 : 0.35}
                 />
-                <text
-                  x={x}
-                  y={H - padB + 14}
-                  textAnchor="middle"
-                  className="fill-slate-400 text-[9px] font-mono font-semibold"
-                >
-                  T+{h}h
-                </text>
+                {isMilestone && (
+                  <text
+                    x={x}
+                    y={H - padB + 14}
+                    textAnchor="middle"
+                    fill="#9AAFC0"
+                    className="text-[9px] font-mono font-semibold"
+                  >
+                    T+{h}h
+                  </text>
+                )}
               </g>
             )
           })}
@@ -877,45 +856,45 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       </div>
 
       {/* Legend & Telemetry Readouts (Updating live in sync with sweep or manual inspection) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm font-mono text-slate-200 pt-2 border-t border-slate-800/80">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm font-mono text-[#F1F5F9] pt-2 border-t border-[#1D3A52]">
         <div className="flex items-center gap-4 flex-wrap">
           <span className="flex items-center gap-2">
             <span
               className="inline-block w-3.5 h-1.5 rounded-full"
               style={{ backgroundColor: curveColor }}
             />
-            <span className="font-bold text-white">Component Measured</span>
+            <span className="font-bold text-[#F1F5F9]">Component Measured</span>
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-1 bg-white border-t border-dashed border-white" />
-            <span className="text-slate-100 font-semibold">Lot Norm Mean ({lotMean.toFixed(1)}&mu;A)</span>
+            <span className="inline-block w-3 h-1 bg-[#F1F5F9] border-t border-dashed border-[#F1F5F9]" />
+            <span className="text-[#9AAFC0] font-semibold">Lot Norm Mean ({lotMean.toFixed(1)}&mu;A)</span>
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-1 bg-rose-500" />
-            <span className="text-rose-400 font-semibold">Limit Threshold</span>
+            <span className="inline-block w-3 h-1 bg-[#E5484D]" />
+            <span className="text-[#E5484D] font-semibold">Limit Threshold</span>
           </span>
         </div>
 
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5">
-            <span className="text-slate-400">
+            <span className="text-[#9AAFC0]">
               {isInspecting ? `Inspecting T+${Math.round(activeInspectHour)}h:` : 'Delta Drift:'}
             </span>
-            <b className={`font-bold tabular-nums ${isInspecting ? 'text-sky-300' : isSimulating ? 'text-amber-300' : 'text-white'}`}>
+            <b className={`font-bold tabular-nums ${isInspecting ? 'text-[#0E88D3]' : isSimulating ? 'text-[#F47216]' : 'text-[#F1F5F9]'}`}>
               {displayedDelta.toFixed(2)} &micro;A
             </b>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="text-slate-400">
+            <span className="text-[#9AAFC0]">
               {isInspecting ? 'Z-Score @ Probe:' : 'Lot Z-Score:'}
             </span>
             <b
               className={`tabular-nums ${
                 displayedZ != null && Math.abs(displayedZ) >= 3
-                  ? 'text-rose-400 font-bold'
+                  ? 'text-[#E5484D] font-bold'
                   : displayedZ != null && Math.abs(displayedZ) >= 2
-                  ? 'text-amber-400 font-bold'
-                  : 'text-emerald-400 font-bold'
+                  ? 'text-[#F2B84B] font-bold'
+                  : 'text-[#22A06B] font-bold'
               }`}
             >
               {displayedZ != null ? `${displayedZ > 0 ? '+' : ''}${displayedZ.toFixed(2)}σ` : '--'}
