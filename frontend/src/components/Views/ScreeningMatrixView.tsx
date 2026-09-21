@@ -21,6 +21,7 @@ export default function ScreeningMatrixView({
   const [selectedLotFilter, setSelectedLotFilter] = useState<string>('ALL')
   const [viewGrouping, setViewGrouping] = useState<'flat' | 'lot_grouped'>('flat')
   const [collapsedLots, setCollapsedLots] = useState<Record<string, boolean>>({})
+  const [showParadigmComparison, setShowParadigmComparison] = useState(false)
 
   // Unique available qualification lots with counts
   const availableLots = useMemo(() => {
@@ -221,20 +222,20 @@ export default function ScreeningMatrixView({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-full p-3 md:p-5 bg-[#07111C] font-mono select-none text-[#F1F5F9] w-full">
+    <div className="flex flex-col flex-1 min-h-0 p-2.5 md:p-4 bg-[#07111C] font-mono select-none text-[#F1F5F9] w-full">
       {/* Top Header & Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-[#1D3A52] mb-2">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400" />
-            <h2 className="m-0 text-sm font-display font-black tracking-widest text-white uppercase">
+            <span className="w-2 h-2 rounded-full bg-[#0E88D3]" />
+            <h2 className="m-0 text-sm font-display font-black tracking-widest text-[#F1F5F9] uppercase">
               ISRO COMPONENT SCREENING MATRIX &amp; ANOMALY LEDGER
             </h2>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/40 font-bold">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-[#0E88D3]/15 text-[#0E88D3] border border-[#0E88D3]/40 font-bold">
               MIL-STD-883 METHOD 1005 HTOL
             </span>
           </div>
-          <div className="text-[10px] text-slate-400 tracking-wider mt-0.5">
+          <div className="text-[10px] text-[#9AAFC0] tracking-wider mt-0.5">
             Dynamic Lot-Relative Anomaly Detection &bull; 0h+24h &rarr; 168h Drift Extrapolation &bull; Latent Silicon Breakdown Prevention
           </div>
         </div>
@@ -245,83 +246,92 @@ export default function ScreeningMatrixView({
             type="button"
             onClick={handleExportCSV}
             disabled={components.length === 0}
-            className="hud-glass px-3 py-1.5 rounded border border-slate-700 text-amber-300 hover:border-amber-400 text-xs flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 rounded border border-[#1D3A52] bg-[#102337] text-[#0E88D3] hover:border-[#0E88D3] hover:bg-[#142B40] hover:text-[#F1F5F9] text-xs flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed font-medium"
           >
             <span>&#8681;</span> EXPORT CSV LEDGER
           </button>
         </div>
       </div>
 
-      {/* SIH26170 Requirement 11: Traditional vs AI Screening Paradigm Comparison Banner */}
-      <div className="mb-3 p-3 rounded-xl bg-[#0B1528] border border-amber-500/30 text-xs shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-800">
+      {/* SIH26170 Requirement 11: Traditional vs AI Screening Paradigm Architecture */}
+      <div className="mb-2 px-3 py-1.5 rounded-lg bg-[#102337] border border-[#1D3A52] text-xs transition-all">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase font-display font-black px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            <span className="text-[9px] uppercase font-display font-black px-1.5 py-0.5 rounded bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/40">
               ISRO ARCHITECTURE
             </span>
-            <span className="font-bold text-white text-xs">
-              AI detects abnormal component behavior, predicts future degradation, explains the risk, and localizes the exact component on the spacecraft.
+            <span className="text-[#F1F5F9] text-[11px] font-medium">
+              AI detects abnormal drift, predicts 168h degradation, and localizes latent escapes under MIL-STD-883.
+            </span>
+            <span className="hidden xl:inline text-[10px] text-[#F47216] font-semibold">
+              &bull; WITHIN LIMIT &ne; ALWAYS HEALTHY
             </span>
           </div>
-          <span className="text-[10px] text-amber-400 font-semibold">
-            &bull; Augments established aerospace screening &bull; WITHIN LIMIT &ne; ALWAYS HEALTHY
-          </span>
+          <button
+            type="button"
+            onClick={() => setShowParadigmComparison((prev) => !prev)}
+            className="text-[10.5px] text-[#0E88D3] hover:text-[#F1F5F9] px-2 py-0.5 rounded bg-[#142B40] border border-[#1D3A52] transition-colors flex items-center gap-1 font-semibold cursor-pointer"
+          >
+            <span>{showParadigmComparison ? '▲ Hide Paradigm Comparison' : '▼ Compare Traditional vs AI'}</span>
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
-          <div className="p-2.5 rounded-lg bg-[#060D1A] border border-slate-800">
-            <div className="text-[10px] font-bold text-slate-400 uppercase mb-1 flex items-center gap-1">
-              <span className="text-rose-400">&#10006;</span> TRADITIONAL AEROSPACE SCREENING:
+        {showParadigmComparison && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-[11px] mt-2 pt-2 border-t border-[#1D3A52]">
+            <div className="p-2.5 rounded-lg bg-[#07111C] border border-[#1D3A52]">
+              <div className="text-[10px] font-bold text-[#9AAFC0] uppercase mb-1 flex items-center gap-1">
+                <span className="text-[#E5484D]">&#10006;</span> TRADITIONAL AEROSPACE SCREENING:
+              </div>
+              <div className="font-mono text-[#F1F5F9]">
+                Measurement &rarr; <span className="text-white font-bold">Fixed Datasheet Limit (50 &micro;A)</span> &rarr; PASS/FAIL
+              </div>
+              <div className="text-[10px] text-[#6F8495] mt-1 italic">
+                Critical Gap: A component with severe latent drift (e.g. 38.9 &micro;A vs 10 &micro;A lot baseline) PASSES if static limit is 50 &micro;A.
+              </div>
             </div>
-            <div className="font-mono text-slate-300">
-              Measurement &rarr; <span className="text-white font-bold">Fixed Datasheet Limit</span> &rarr; PASS/FAIL
-            </div>
-            <div className="text-[10px] text-slate-500 mt-1 italic">
-              Critical Gap: A component with severe latent drift (e.g. 38.9 µA vs 10 µA lot baseline) PASSES if static limit is 50 µA.
-            </div>
-          </div>
 
-          <div className="p-2.5 rounded-lg bg-[#131C2E] border border-amber-500/40">
-            <div className="text-[10px] font-bold text-amber-400 uppercase mb-1 flex items-center gap-1">
-              <span className="text-emerald-400">&#10003;</span> SPACEGUARD AI DECISION-SUPPORT LAYER:
-            </div>
-            <div className="font-mono text-amber-300">
-              Detect &rarr; <b className="text-white">Understand</b> &rarr; <b className="text-white">Predict (168h)</b> &rarr; <b className="text-white">Localize (3D)</b> &rarr; <b className="text-rose-300">Decide</b>
-            </div>
-            <div className="text-[10px] text-slate-300 mt-1">
-              Domain-specific integration of Z-score, Isolation Forest, and regression into an aerospace predictive screening pipeline to catch latent escapes.
+            <div className="p-2.5 rounded-lg bg-[#142B40] border border-[#0E88D3]/40">
+              <div className="text-[10px] font-bold text-[#0E88D3] uppercase mb-1 flex items-center gap-1">
+                <span className="text-[#22A06B]">&#10003;</span> SPACEGUARD AI DECISION-SUPPORT LAYER:
+              </div>
+              <div className="font-mono text-[#0E88D3]">
+                Detect &rarr; <b className="text-[#F1F5F9]">Understand</b> &rarr; <b className="text-[#F1F5F9]">Predict (168h)</b> &rarr; <b className="text-[#F1F5F9]">Localize (3D)</b> &rarr; <b className="text-[#E5484D]">Decide</b>
+              </div>
+              <div className="text-[10px] text-[#9AAFC0] mt-1">
+                Domain-specific integration of Z-score, Isolation Forest, and regression into an aerospace predictive screening pipeline to catch latent escapes.
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* SIH26170 Requirement 10: Real Evaluation Metrics Strip */}
       {metrics && (
-        <div className="mb-3 px-3 py-2 rounded-lg bg-[#091122] border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-[11px]">
+        <div className="mb-2 px-3 py-1.5 rounded-lg bg-[#102337] border border-[#1D3A52] flex flex-wrap items-center justify-between gap-2.5 text-[11px]">
           <div className="flex items-center gap-2">
-            <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded bg-[#22A06B]/20 text-[#22A06B] border border-[#22A06B]/40">
               AI ENGINE METRICS
             </span>
             <span className="text-slate-400 text-xs">
               0h+24h &rarr; 168h Extrapolation:
             </span>
             <span className="text-white font-bold">
-              MAE: <span className="text-amber-300 font-mono">{metrics.mae.toFixed(3)} µA</span> &bull; RMSE: <span className="text-amber-300 font-mono">{metrics.rmse.toFixed(3)} µA</span>
+              MAE: <span className="text-[#0E88D3] font-mono">{metrics.mae.toFixed(3)} µA</span> &bull; RMSE: <span className="text-[#0E88D3] font-mono">{metrics.rmse.toFixed(3)} µA</span>
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             {metrics.hasGt ? (
               <div className="flex items-center gap-2 font-mono text-[10.5px]">
-                <span className="text-slate-400">Precision: <b className="text-emerald-400">{(metrics.precision! * 100).toFixed(1)}%</b></span>
+                <span className="text-slate-400">Precision: <b className="text-[#22A06B]">{(metrics.precision! * 100).toFixed(1)}%</b></span>
                 <span className="text-slate-600">|</span>
-                <span className="text-slate-400">Recall: <b className="text-emerald-400">{(metrics.recall! * 100).toFixed(1)}%</b></span>
+                <span className="text-slate-400">Recall: <b className="text-[#22A06B]">{(metrics.recall! * 100).toFixed(1)}%</b></span>
                 <span className="text-slate-600">|</span>
                 <span className="text-slate-400" title="False Negative Rate - Critical metric for zero-defect space screening">
-                  FNR (Escapes): <b className={((1 - (metrics.recall ?? 1)) * 100) > 0 ? 'text-rose-400' : 'text-emerald-400'}>{((1 - (metrics.recall ?? 1)) * 100).toFixed(1)}%</b>
+                  FNR (Escapes): <b className={((1 - (metrics.recall ?? 1)) * 100) > 0 ? 'text-[#E5484D]' : 'text-[#22A06B]'}>{((1 - (metrics.recall ?? 1)) * 100).toFixed(1)}%</b>
                 </span>
                 <span className="text-slate-600">|</span>
-                <span className="text-slate-400">F1: <b className="text-amber-300">{(metrics.f1! * 100).toFixed(1)}%</b></span>
+                <span className="text-slate-400">F1: <b className="text-[#0E88D3]">{(metrics.f1! * 100).toFixed(1)}%</b></span>
               </div>
             ) : (
               <span className="text-[10px] text-slate-400 italic">
@@ -333,15 +343,16 @@ export default function ScreeningMatrixView({
       )}
 
       {/* Filter Tabs & Search Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+      <div className="flex flex-col gap-2 mb-2.5">
+        {/* Row 1: Verdict Filter Tabs */}
         <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
             onClick={() => setFilterMode('ALL')}
             className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'ALL'
-                ? 'bg-amber-500/20 border-amber-500 text-amber-300 font-bold shadow-sm'
-                : 'hud-glass border-slate-800 text-slate-400 hover:text-white'
+                ? 'bg-[#0E88D3]/20 border-[#0E88D3] text-[#0E88D3] font-bold shadow-sm'
+                : 'bg-[#102337] border-[#1D3A52] text-[#9AAFC0] hover:text-white hover:bg-[#142B40]'
             }`}
           >
             ALL [{counts.all}]
@@ -351,8 +362,8 @@ export default function ScreeningMatrixView({
             onClick={() => setFilterMode('reject')}
             className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'reject'
-                ? 'bg-rose-500/25 border-rose-500 text-rose-400 font-bold shadow-alert-glow'
-                : 'hud-glass border-slate-800 text-rose-400/80 hover:text-rose-400'
+                ? 'bg-[#E5484D]/25 border-[#E5484D] text-[#E5484D] font-bold shadow-alert-glow'
+                : 'bg-[#102337] border-[#1D3A52] text-[#E5484D]/80 hover:text-[#E5484D] hover:bg-[#142B40]'
             }`}
           >
             &#9888; REJECT [{counts.reject}]
@@ -362,8 +373,8 @@ export default function ScreeningMatrixView({
             onClick={() => setFilterMode('degrading')}
             className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'degrading'
-                ? 'bg-orange-500/25 border-orange-500 text-orange-400 font-bold'
-                : 'hud-glass border-slate-800 text-orange-400/80 hover:text-orange-400'
+                ? 'bg-[#F47216]/25 border-[#F47216] text-[#F47216] font-bold'
+                : 'bg-[#102337] border-[#1D3A52] text-[#F47216]/80 hover:text-[#F47216] hover:bg-[#142B40]'
             }`}
           >
             &#9650; DEGRADING [{counts.degrading}]
@@ -373,8 +384,8 @@ export default function ScreeningMatrixView({
             onClick={() => setFilterMode('monitor')}
             className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'monitor'
-                ? 'bg-amber-500/25 border-amber-500 text-amber-400 font-bold'
-                : 'hud-glass border-slate-800 text-amber-400/80 hover:text-amber-400'
+                ? 'bg-[#F2B84B]/25 border-[#F2B84B] text-[#F2B84B] font-bold'
+                : 'bg-[#102337] border-[#1D3A52] text-[#F2B84B]/80 hover:text-[#F2B84B] hover:bg-[#142B40]'
             }`}
           >
             &#9670; MONITOR [{counts.monitor}]
@@ -384,8 +395,8 @@ export default function ScreeningMatrixView({
             onClick={() => setFilterMode('safe')}
             className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'safe'
-                ? 'bg-emerald-500/25 border-emerald-500 text-emerald-400 font-bold'
-                : 'hud-glass border-slate-800 text-emerald-400/80 hover:text-emerald-400'
+                ? 'bg-[#22A06B]/25 border-[#22A06B] text-[#22A06B] font-bold'
+                : 'bg-[#102337] border-[#1D3A52] text-[#22A06B]/80 hover:text-[#22A06B] hover:bg-[#142B40]'
             }`}
           >
             &#10003; SAFE [{counts.safe}]
@@ -395,8 +406,8 @@ export default function ScreeningMatrixView({
             onClick={() => setFilterMode('abnormal_within_spec')}
             className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'abnormal_within_spec'
-                ? 'bg-purple-500/25 border-purple-400 text-purple-300 font-bold shadow-sm'
-                : 'hud-glass border-slate-800 text-purple-400/80 hover:text-purple-300'
+                ? 'bg-[#0E88D3]/25 border-[#0E88D3] text-[#F1F5F9] font-bold shadow-sm'
+                : 'bg-[#102337] border-[#1D3A52] text-[#9AAFC0] hover:text-[#F1F5F9] hover:bg-[#142B40]'
             }`}
             title="Components that PASS fixed datasheet limit but are ABNORMAL relative to lot peers (Latent Defects)"
           >
@@ -404,70 +415,72 @@ export default function ScreeningMatrixView({
           </button>
         </div>
 
-        {/* Lot Filter Dropdown and Grouping Switcher */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Lot Selector */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-slate-400 uppercase font-bold">Lot:</span>
-            <select
-              value={selectedLotFilter}
-              onChange={(e) => setSelectedLotFilter(e.target.value)}
-              className="bg-[#0A1020] border border-slate-700 text-slate-200 text-xs px-2.5 py-1.5 rounded focus:border-amber-500 outline-none font-mono cursor-pointer"
-            >
-              <option value="ALL">📦 All Lots ({availableLots.length})</option>
-              {availableLots.map((l) => (
-                <option key={l.lot_id} value={l.lot_id}>
-                  {l.lot_id} ({l.count} parts) {l.status === 'reject' ? '⚠️ REJECT' : ''}
-                </option>
-              ))}
-            </select>
+        {/* Row 2: Lot Selector, Grouping Toggle, and Search Input */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Lot Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-[#9AAFC0] uppercase font-bold">Lot:</span>
+              <select
+                value={selectedLotFilter}
+                onChange={(e) => setSelectedLotFilter(e.target.value)}
+                className="bg-[#102337] border border-[#1D3A52] text-[#F1F5F9] text-xs px-2.5 py-1.5 rounded focus:border-[#0E88D3] outline-none font-mono cursor-pointer"
+              >
+                <option value="ALL">📦 All Lots ({availableLots.length})</option>
+                {availableLots.map((l) => (
+                  <option key={l.lot_id} value={l.lot_id}>
+                    {l.lot_id} ({l.count} parts) {l.status === 'reject' ? '⚠️ REJECT' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* View Grouping Toggle */}
+            <div className="flex items-center bg-[#0B1928] border border-[#1D3A52] rounded-md p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewGrouping('flat')}
+                className={`px-2.5 py-1 rounded text-[10.5px] uppercase font-bold transition-all ${
+                  viewGrouping === 'flat'
+                    ? 'bg-[#0E88D3]/20 border border-[#0E88D3]/40 text-[#0E88D3] shadow-sm'
+                    : 'text-[#9AAFC0] hover:text-white'
+                }`}
+              >
+                📋 Flat View
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewGrouping('lot_grouped')}
+                className={`px-2.5 py-1 rounded text-[10.5px] uppercase font-bold transition-all ${
+                  viewGrouping === 'lot_grouped'
+                    ? 'bg-[#0E88D3]/20 border border-[#0E88D3]/40 text-[#0E88D3] shadow-sm'
+                    : 'text-[#9AAFC0] hover:text-white'
+                }`}
+              >
+                📦 Group by Lot ({lotGroupsForDisplay.length})
+              </button>
+            </div>
           </div>
 
-          {/* View Grouping Toggle */}
-          <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded-md p-0.5">
-            <button
-              type="button"
-              onClick={() => setViewGrouping('flat')}
-              className={`px-2.5 py-1 rounded text-[10.5px] uppercase font-bold transition-all ${
-                viewGrouping === 'flat'
-                  ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              📋 Flat View
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewGrouping('lot_grouped')}
-              className={`px-2.5 py-1 rounded text-[10.5px] uppercase font-bold transition-all ${
-                viewGrouping === 'lot_grouped'
-                  ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              📦 Group by Lot ({lotGroupsForDisplay.length})
-            </button>
+          {/* Search Input */}
+          <div className="relative min-w-[260px] flex-1 max-w-md">
+            <input
+              type="text"
+              placeholder="Search Part ID, Subsystem, Lot..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-[#102337] border border-[#1D3A52] text-[#F1F5F9] text-xs px-3 py-1.5 rounded focus:border-[#0E88D3] focus:outline-none placeholder-[#6F8495]"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9AAFC0] hover:text-white text-xs"
+              >
+                &times;
+              </button>
+            )}
           </div>
-        </div>
-
-        {/* Search Input */}
-        <div className="relative min-w-[260px]">
-          <input
-            type="text"
-            placeholder="Search Part ID, Subsystem, Lot..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#0A1020] border border-slate-700 text-slate-100 text-xs px-3 py-1.5 rounded focus:border-amber-500 focus:outline-none placeholder-slate-500"
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={() => setSearchTerm('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
-            >
-              &times;
-            </button>
-          )}
         </div>
       </div>
 
@@ -489,7 +502,7 @@ export default function ScreeningMatrixView({
 
       {/* High-Density Data Display: Either Lot-Grouped Accordions or Flat Table */}
       {viewGrouping === 'lot_grouped' ? (
-        <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1">
+        <div className="flex-1 min-h-[520px] md:min-h-[620px] overflow-y-auto space-y-2.5 pr-1">
           {lotGroupsForDisplay.length === 0 ? (
             <div className="py-12 text-center text-slate-500 bg-[#0B1928] rounded-xl border border-slate-800">
               No qualification lots found matching current criteria.
@@ -503,12 +516,12 @@ export default function ScreeningMatrixView({
               return (
                 <div
                   key={lot.lot_id}
-                  className={`rounded-xl border transition-all overflow-hidden bg-[#0B1928] ${
+                  className={`rounded-xl border transition-all overflow-hidden bg-[#102337] ${
                     isRej
                       ? 'border-rose-500/40 shadow-alert-glow'
                       : isMon
-                      ? 'border-amber-500/40'
-                      : 'border-slate-800 hover:border-slate-700'
+                      ? 'border-[#F2B84B]/40'
+                      : 'border-[#1D3A52] hover:border-[#0E88D3]/40'
                   }`}
                 >
                   {/* Lot Card Header Bar */}
@@ -516,7 +529,7 @@ export default function ScreeningMatrixView({
                     onClick={() =>
                       setCollapsedLots((prev) => ({ ...prev, [lot.lot_id]: !prev[lot.lot_id] }))
                     }
-                    className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-[#0B1528] cursor-pointer select-none border-b border-slate-800/80 hover:bg-[#0E1A32] transition-colors"
+                    className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-[#142B40] cursor-pointer select-none border-b border-[#1D3A52] hover:bg-[#102337] transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-slate-400 font-mono text-xs">
@@ -531,7 +544,7 @@ export default function ScreeningMatrixView({
                         <span className="font-mono font-bold text-white text-xs">
                           {lot.lot_id}
                         </span>
-                        <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono border border-slate-700">
+                        <span className="text-[10px] bg-[#07111C] text-[#9AAFC0] px-2 py-0.5 rounded font-mono border border-[#1D3A52]">
                           {lot.parts.length} components in this lot
                         </span>
                       </div>
@@ -539,7 +552,7 @@ export default function ScreeningMatrixView({
 
                     <div className="flex items-center gap-3 font-mono text-xs">
                       <span className="text-slate-400 text-[11px]">
-                        Lot Baseline &mu;: <b className="text-amber-300">{lot.mean.toFixed(2)} &micro;A</b>
+                        Lot Baseline &mu;: <b className="text-[#0E88D3]">{lot.mean.toFixed(2)} &micro;A</b>
                       </span>
                       {lot.rejects > 0 && (
                         <span className="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold">
@@ -551,7 +564,7 @@ export default function ScreeningMatrixView({
                           {lot.monitors} MONITOR
                         </span>
                       )}
-                      <span className="text-emerald-400 text-[10.5px]">
+                      <span className="text-[#22A06B] text-[10.5px]">
                         {lot.safe} Safe
                       </span>
                     </div>
@@ -559,9 +572,9 @@ export default function ScreeningMatrixView({
 
                   {/* Lot Components Table */}
                   {!isCollapsed && (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto max-h-[480px] overflow-y-auto border-t border-[#1D3A52]">
                       <table className="w-full text-left text-[11px] font-mono border-collapse">
-                        <thead className="bg-[#091122] border-b border-slate-800 text-[10px] uppercase text-slate-400 tracking-wider">
+                        <thead className="sticky top-0 bg-[#102337] border-b border-[#1D3A52] z-10 text-[10px] uppercase text-[#9AAFC0] tracking-wider">
                           <tr>
                             <th className="py-2 px-3">Verdict</th>
                             <th className="py-2 px-3">Traditional vs AI</th>
@@ -579,7 +592,7 @@ export default function ScreeningMatrixView({
                             <th className="py-2 px-3 text-right">3D Actions</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800/60">
+                        <tbody className="divide-y divide-[#1D3A52]/60">
                           {lot.parts.map((c) => {
                             const isSelected = c.component_id === selectedId
                             const isReject = c.status === 'reject'
@@ -592,22 +605,22 @@ export default function ScreeningMatrixView({
                                 onClick={() => onSelectComponent(c.component_id)}
                                 className={`cursor-pointer transition-colors ${
                                   isSelected
-                                    ? 'bg-amber-500/15 text-white font-semibold'
+                                    ? 'bg-[#0E88D3]/20 text-white font-semibold border-l-2 border-[#0E88D3]'
                                     : isReject
-                                    ? 'hover:bg-rose-500/10'
+                                    ? 'hover:bg-[#E5484D]/10'
                                     : isMonitor
-                                    ? 'hover:bg-amber-500/10'
-                                    : 'hover:bg-slate-800/40'
+                                    ? 'hover:bg-[#F2B84B]/10'
+                                    : 'hover:bg-[#142B40]/50'
                                 }`}
                               >
                                 <td className="py-1.5 px-3 whitespace-nowrap">
                                   <span
                                     className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold ${
                                       isReject
-                                        ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                                        ? 'bg-rose-500/20 text-[#E5484D] border border-rose-500/40'
                                         : isMonitor
-                                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                                        : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                        ? 'bg-amber-500/20 text-[#F2B84B] border border-amber-500/40'
+                                        : 'bg-emerald-500/20 text-[#22A06B] border border-emerald-500/40'
                                     }`}
                                   >
                                     <span
@@ -621,7 +634,7 @@ export default function ScreeningMatrixView({
                                 <td className="py-1.5 px-3 whitespace-nowrap">
                                   {isAbnormalInSpec ? (
                                     <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/50 font-bold">
-                                      <span>PASS</span> &rarr; <span className="text-rose-400">REJECT AI</span>
+                                      <span>PASS</span> &rarr; <span className="text-[#E5484D]">REJECT AI</span>
                                     </span>
                                   ) : (
                                     <span className="text-[9.5px] text-slate-400 font-mono">
@@ -632,22 +645,22 @@ export default function ScreeningMatrixView({
                                 <td className="py-1.5 px-3 font-bold text-white whitespace-nowrap">
                                   {c.component_id}
                                 </td>
-                                <td className="py-1.5 px-3 text-amber-400 whitespace-nowrap font-bold">
+                                <td className="py-1.5 px-3 text-[#0E88D3] whitespace-nowrap font-bold">
                                   [{c.subsystem}]
                                 </td>
                                 <td className="py-1.5 px-3 text-slate-400">{c.v0.toFixed(2)}</td>
                                 <td className="py-1.5 px-3 text-slate-400">{c.v24.toFixed(2)}</td>
                                 <td className="py-1.5 px-3 text-slate-400">{c.v96 != null ? c.v96.toFixed(2) : '--'}</td>
-                                <td className={`py-1.5 px-3 font-bold ${isReject ? 'text-rose-400' : isMonitor ? 'text-amber-400' : 'text-slate-100'}`}>
+                                <td className={`py-1.5 px-3 font-bold ${isReject ? 'text-[#E5484D]' : isMonitor ? 'text-[#F2B84B]' : 'text-slate-100'}`}>
                                   {c.v168.toFixed(2)}
                                 </td>
                                 <td className="py-1.5 px-3 text-slate-400">{c.limit_ua.toFixed(0)}</td>
-                                <td className={`py-1.5 px-3 font-bold ${Math.abs(c.z168) >= 3.0 ? 'text-rose-400' : Math.abs(c.z168) >= 2.0 ? 'text-amber-400' : 'text-slate-300'}`}>
+                                <td className={`py-1.5 px-3 font-bold ${Math.abs(c.z168) >= 3.0 ? 'text-[#E5484D]' : Math.abs(c.z168) >= 2.0 ? 'text-[#F2B84B]' : 'text-slate-300'}`}>
                                   {c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;
                                 </td>
-                                <td className="py-1.5 px-3 text-amber-300 font-bold">{c.predicted168_from_early.toFixed(2)}</td>
+                                <td className="py-1.5 px-3 text-[#0E88D3] font-bold">{c.predicted168_from_early.toFixed(2)}</td>
                                 <td className="py-1.5 px-3 text-slate-300">{c.predicted_future.toFixed(2)}</td>
-                                <td className="py-1.5 px-3 font-bold text-rose-400">{c.risk_score}</td>
+                                <td className="py-1.5 px-3 font-bold text-[#E5484D]">{c.risk_score}</td>
                                 <td className="py-1.5 px-3 text-right">
                                   <button
                                     type="button"
@@ -655,7 +668,7 @@ export default function ScreeningMatrixView({
                                       e.stopPropagation()
                                       onFocusIn3D(c)
                                     }}
-                                    className="hud-glass px-2 py-0.5 rounded border border-slate-700 text-amber-300 hover:border-amber-400 text-[10px]"
+                                    className="px-2 py-0.5 rounded border border-[#1D3A52] bg-[#142B40] text-[#0E88D3] hover:border-[#0E88D3] hover:text-white text-[10px] transition-all"
                                   >
                                     3D &rarr;
                                   </button>
@@ -674,14 +687,14 @@ export default function ScreeningMatrixView({
         </div>
       ) : (
         /* High-Density Flat Data Table */
-        <div className="flex-1 min-h-0 overflow-auto rounded-xl border border-slate-800 bg-[#0B1928] shadow-lg">
+        <div className="flex-1 min-h-[520px] md:min-h-[620px] overflow-auto rounded-xl border border-[#1D3A52] bg-[#102337] shadow-lg">
           <table className="w-full text-left text-[11px] font-mono border-collapse">
-            <thead className="sticky top-0 bg-[#0B1528] border-b border-slate-800 z-10 text-[10px] uppercase text-slate-400 tracking-wider">
+            <thead className="sticky top-0 bg-[#142B40] border-b border-[#1D3A52] z-10 text-[10px] uppercase text-[#9AAFC0] tracking-wider">
               <tr>
                 <th className="py-2.5 px-3">AI Verdict &amp; Health</th>
                 <th className="py-2.5 px-3">Traditional vs AI</th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
                   onClick={() => {
                     if (sortBy === 'id') setSortAsc(!sortAsc)
                     else {
@@ -698,7 +711,7 @@ export default function ScreeningMatrixView({
                 <th className="py-2.5 px-3">24h (&micro;A)</th>
                 <th className="py-2.5 px-3">96h (&micro;A)</th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
                   onClick={() => {
                     if (sortBy === 'v168') setSortAsc(!sortAsc)
                     else {
@@ -712,7 +725,7 @@ export default function ScreeningMatrixView({
                 <th className="py-2.5 px-3">Spec Limit</th>
                 <th className="py-2.5 px-3">Lot Mean (&mu;)</th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
                   onClick={() => {
                     if (sortBy === 'z168') setSortAsc(!sortAsc)
                     else {
@@ -724,7 +737,7 @@ export default function ScreeningMatrixView({
                   Lot z-Score {sortBy === 'z168' ? (sortAsc ? '\u25b2' : '\u25bc') : ''}
                 </th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
                   onClick={() => {
                     if (sortBy === 'pred168') setSortAsc(!sortAsc)
                     else {
@@ -738,7 +751,7 @@ export default function ScreeningMatrixView({
                 </th>
                 <th className="py-2.5 px-3">Projected (264h)</th>
                 <th
-                  className="py-2.5 px-3 cursor-pointer hover:text-amber-400"
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
                   onClick={() => {
                     if (sortBy === 'risk') setSortAsc(!sortAsc)
                     else {
@@ -772,12 +785,12 @@ export default function ScreeningMatrixView({
                       onClick={() => onSelectComponent(c.component_id)}
                       className={`cursor-pointer transition-colors ${
                         isSelected
-                          ? 'bg-amber-500/15 text-white font-semibold'
+                          ? 'bg-[#0E88D3]/20 text-white font-semibold border-l-2 border-[#0E88D3]'
                           : isReject
-                          ? 'hover:bg-rose-500/10'
+                          ? 'hover:bg-[#E5484D]/10'
                           : isMonitor
-                          ? 'hover:bg-amber-500/10'
-                          : 'hover:bg-slate-800/40'
+                          ? 'hover:bg-[#F2B84B]/10'
+                          : 'hover:bg-[#142B40]/50'
                       }`}
                     >
                       {/* Status badge & Behavioral Health */}
@@ -786,10 +799,10 @@ export default function ScreeningMatrixView({
                           <span
                             className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold ${
                               isReject
-                                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                                ? 'bg-rose-500/20 text-[#E5484D] border border-rose-500/40'
                                 : isMonitor
-                                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                                : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                ? 'bg-amber-500/20 text-[#F2B84B] border border-amber-500/40'
+                                : 'bg-emerald-500/20 text-[#22A06B] border border-emerald-500/40'
                             }`}
                           >
                             <span
@@ -820,10 +833,10 @@ export default function ScreeningMatrixView({
                           <span className="inline-flex items-center gap-1 text-[9.5px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/50 font-bold">
                             <span>PASS (Spec)</span>
                             <span>&rarr;</span>
-                            <span className="text-rose-400">{(c.status || 'safe').toUpperCase()} (AI)</span>
+                            <span className="text-[#E5484D]">{(c.status || 'safe').toUpperCase()} (AI)</span>
                           </span>
                         ) : c.traditional_decision === 'FAIL' ? (
-                          <span className="text-[9.5px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold">
+                          <span className="text-[9.5px] px-1.5 py-0.5 rounded bg-rose-500/20 text-[#E5484D] border border-rose-500/40 font-bold">
                             FAIL (SPEC LIMIT)
                           </span>
                         ) : (
@@ -839,7 +852,7 @@ export default function ScreeningMatrixView({
                       </td>
 
                       {/* Subsystem */}
-                      <td className="py-2 px-3 text-amber-400 whitespace-nowrap font-bold">
+                      <td className="py-2 px-3 text-[#0E88D3] whitespace-nowrap font-bold">
                         [{c.subsystem}]
                       </td>
 
@@ -852,7 +865,7 @@ export default function ScreeningMatrixView({
                       <td className="py-2 px-3 text-slate-400">{c.v0.toFixed(2)}</td>
                       <td className="py-2 px-3 text-slate-400">{c.v24.toFixed(2)}</td>
                       <td className="py-2 px-3 text-slate-400">{c.v96 != null ? c.v96.toFixed(2) : '--'}</td>
-                      <td className={`py-2 px-3 font-bold ${isReject ? 'text-rose-400' : isMonitor ? 'text-amber-400' : 'text-slate-100'}`}>
+                      <td className={`py-2 px-3 font-bold ${isReject ? 'text-[#E5484D]' : isMonitor ? 'text-[#F2B84B]' : 'text-slate-100'}`}>
                         {c.v168.toFixed(2)}
                       </td>
 
@@ -865,23 +878,23 @@ export default function ScreeningMatrixView({
                       </td>
 
                       {/* Lot z-Score */}
-                      <td className={`py-2 px-3 font-bold ${Math.abs(c.z168) >= 3.0 ? 'text-rose-400' : Math.abs(c.z168) >= 2.0 ? 'text-amber-400' : 'text-slate-300'}`}>
+                      <td className={`py-2 px-3 font-bold ${Math.abs(c.z168) >= 3.0 ? 'text-[#E5484D]' : Math.abs(c.z168) >= 2.0 ? 'text-[#F2B84B]' : 'text-slate-300'}`}>
                         {c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;
                       </td>
 
                       {/* Early Pred 168h from 0h+24h */}
-                      <td className="py-2 px-3 text-amber-300 font-bold" title={`Predicted from 0h+24h: ${c.predicted168_from_early.toFixed(2)} µA`}>
+                      <td className="py-2 px-3 text-[#0E88D3] font-bold" title={`Predicted from 0h+24h: ${c.predicted168_from_early.toFixed(2)} µA`}>
                         {c.predicted168_from_early.toFixed(2)}
                       </td>
 
                       {/* Projected future */}
                       <td className="py-2 px-3">
                         <div className="flex flex-col">
-                          <span className={`font-mono ${c.future_limit_breach || c.predicted_future > c.limit_ua ? 'text-rose-400 font-bold' : 'text-slate-300'}`}>
+                          <span className={`font-mono ${c.future_limit_breach || c.predicted_future > c.limit_ua ? 'text-[#E5484D] font-bold' : 'text-slate-300'}`}>
                             {c.predicted_future.toFixed(2)}
                           </span>
                           {(c.future_limit_breach || c.predicted_future > c.limit_ua) && (
-                            <span className="text-[8px] text-rose-400 font-bold tracking-tight">
+                            <span className="text-[8px] text-[#E5484D] font-bold tracking-tight">
                               &gt; LIMIT BREACH
                             </span>
                           )}
@@ -901,7 +914,7 @@ export default function ScreeningMatrixView({
                           </div>
                           <span
                             className={`font-bold ${
-                              isReject ? 'text-rose-400' : isMonitor ? 'text-amber-400' : 'text-emerald-400'
+                              isReject ? 'text-[#E5484D]' : isMonitor ? 'text-[#F2B84B]' : 'text-[#22A06B]'
                             }`}
                           >
                             {c.risk_score}
@@ -917,7 +930,7 @@ export default function ScreeningMatrixView({
                             e.stopPropagation()
                             onFocusIn3D(c)
                           }}
-                          className="hud-glass px-2 py-0.5 rounded border border-slate-700 text-amber-300 hover:border-amber-400 text-[10px] transition-all"
+                          className="px-2 py-0.5 rounded border border-[#1D3A52] bg-[#142B40] text-[#0E88D3] hover:border-[#0E88D3] hover:text-white text-[10px] transition-all"
                           title="Focus and highlight this component on the 3D Satellite Digital Twin"
                         >
                           3D SENSOR &rarr;
@@ -933,7 +946,7 @@ export default function ScreeningMatrixView({
       )}
 
       {/* Footer Info */}
-      <div className="flex items-center justify-between text-[10px] text-slate-400 pt-3 border-t border-slate-800 mt-3">
+      <div className="flex items-center justify-between text-[10px] text-[#9AAFC0] pt-2 border-t border-[#1D3A52] mt-2">
         <div>
           Showing <span className="text-white font-bold">{sorted.length}</span> of{' '}
           <span className="text-white font-bold">{components.length}</span> screened components &bull; Traditional Spec Limit: 50 &micro;A
