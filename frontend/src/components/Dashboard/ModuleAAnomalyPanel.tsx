@@ -95,38 +95,38 @@ export default function ModuleAAnomalyPanel({
   const isReject = selected?.status === 'reject' || selected?.behavioral_health === 'CRITICAL'
 
   return (
-    <div className={`flex flex-col rounded-xl bg-[#102337] border shadow-xl overflow-hidden h-full transition-colors ${
-      isReject ? 'border-[#E5484D]/60' : 'border-[#1D3A52]'
+    <div className={`flex flex-col rounded-xl bg-[#FFFFFF] border shadow-xl overflow-hidden h-full transition-colors ${
+      isReject ? 'border-[#D9363E]/60' : 'border-[#D9E2EA]'
     }`}>
       {/* Module A Top Bezel Bar */}
-      <div className="bg-[#0B1928] border-b border-[#1D3A52] px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+      <div className="bg-[#FFFFFF] border-b border-[#D9E2EA] px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-3">
           <span className="px-3 py-1 rounded-md bg-[#0E88D3]/15 text-[#0E88D3] text-sm sm:text-base font-mono font-black border border-[#0E88D3]/60 shadow-isro tracking-wider uppercase whitespace-nowrap">
             MODULE A
           </span>
-          <span className="text-xs sm:text-sm font-display font-bold text-[#F1F5F9] tracking-wider uppercase">
+          <span className="text-xs sm:text-sm font-display font-bold text-[#17212B] tracking-wider uppercase">
             Anomaly Detection &amp; Silicon Data Analysis
           </span>
         </div>
         <div className="flex items-center gap-2 text-xs font-mono">
-          <span className={`w-2 h-2 rounded-full ${isReject ? 'bg-[#E5484D] led' : 'bg-[#0E88D3] led'}`} />
-          <span className="text-[#9AAFC0] text-[11px]">
+          <span className={`w-2 h-2 rounded-full ${isReject ? 'bg-[#D9363E] led' : 'bg-[#0E88D3] led'}`} />
+          <span className="text-[#5B6B7A] text-[11px]">
             {isSim ? `LIVE SWEEP ACTIVE: T+${Math.round(simH)}H` : 'HTOL TELEMETRY DAQ'}
           </span>
         </div>
       </div>
 
       {/* Component Quick Selector & Search Bar */}
-      <div className="p-3 bg-[#0B1928] border-b border-[#1D3A52] flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div className="p-3 bg-[#FFFFFF] border-b border-[#D9E2EA] flex flex-wrap items-center justify-between gap-2 text-xs">
         {/* Search Input */}
         <div className="flex items-center gap-2 flex-1 min-w-[180px] max-w-[280px]">
-          <span className="text-[#9AAFC0] font-mono text-[11px]">PART:</span>
+          <span className="text-[#5B6B7A] font-mono text-[11px]">PART:</span>
           <input
             type="text"
             placeholder="Search Part / Lot..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#07111C] border border-[#1D3A52] rounded px-2.5 py-1 text-xs text-[#F1F5F9] font-mono placeholder:text-[#6F8495] focus:outline-none focus:border-[#0E88D3]"
+            className="w-full bg-[#F4F7FA] border border-[#D9E2EA] rounded px-2.5 py-1 text-xs text-[#17212B] font-mono placeholder:text-[#81909D] focus:outline-none focus:border-[#0E88D3]"
           />
         </div>
 
@@ -140,13 +140,13 @@ export default function ModuleAAnomalyPanel({
               className={`px-2 py-0.5 rounded transition-colors uppercase ${
                 statusFilter === filter
                   ? filter === 'reject'
-                    ? 'bg-[#E5484D] text-[#F1F5F9] font-bold'
+                    ? 'bg-[#D9363E] text-[#17212B] font-bold'
                     : filter === 'monitor'
-                    ? 'bg-[#F2B84B] text-[#F1F5F9] font-bold'
+                    ? 'bg-[#C58A00] text-[#17212B] font-bold'
                     : filter === 'safe'
-                    ? 'bg-[#22A06B] text-[#F1F5F9] font-bold'
+                    ? 'bg-[#168A5B] text-[#17212B] font-bold'
                     : 'bg-[#0E88D3]/30 text-[#0E88D3] border border-[#0E88D3]/50 font-bold'
-                  : 'text-[#9AAFC0] hover:text-[#F1F5F9] bg-[#07111C] border border-[#1D3A52]'
+                  : 'text-[#5B6B7A] hover:text-[#17212B] bg-[#F4F7FA] border border-[#D9E2EA]'
               }`}
             >
               {filter}
@@ -160,7 +160,7 @@ export default function ModuleAAnomalyPanel({
           onChange={(e) => {
             if (e.target.value) onSelectComponent(e.target.value)
           }}
-          className="bg-[#07111C] border border-[#1D3A52] text-[#F1F5F9] text-xs font-mono rounded px-2 py-1 max-w-[200px] focus:outline-none focus:border-[#0E88D3]"
+          className="bg-[#F4F7FA] border border-[#D9E2EA] text-[#17212B] text-xs font-mono rounded px-2 py-1 max-w-[200px] focus:outline-none focus:border-[#0E88D3]"
         >
           <option value="" disabled>Select Component ({filteredComponents.length})</option>
           {filteredComponents.slice(0, 100).map((c, idx) => (
@@ -177,25 +177,25 @@ export default function ModuleAAnomalyPanel({
         {/* Selected Component Header Profile */}
         {selected ? (
           <div className={`p-2.5 rounded-lg border flex flex-col gap-2 transition-colors ${
-            isReject ? 'bg-[#24141E] border-[#E5484D]/50' : 'bg-[#142B40] border-[#1D3A52]'
+            isReject ? 'bg-[#FEF2F2] border-[#D9363E]/50' : 'bg-[#F8FAFC] border-[#D9E2EA]'
           }`}>
             {/* Top Identity & Location Row */}
             <div className="flex flex-wrap items-center justify-between gap-2 font-mono">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-base md:text-lg font-bold text-[#F1F5F9] tracking-wide">{selected.component_id}</span>
-                <span className="text-[#6F8495] text-xs">&bull;</span>
+                <span className="text-base md:text-lg font-bold text-[#17212B] tracking-wide">{selected.component_id}</span>
+                <span className="text-[#81909D] text-xs">&bull;</span>
                 <span className="text-[#0E88D3] text-xs font-semibold">Lot: {selected.lot_id}</span>
-                <span className="text-[#6F8495] text-xs">&bull;</span>
+                <span className="text-[#81909D] text-xs">&bull;</span>
                 <button
                   type="button"
                   onClick={() => onSelectSubsystem && onSelectSubsystem(selected.subsystem)}
-                  className="px-2 py-0.5 rounded bg-[#102337] border border-[#1D3A52] text-[#0E88D3] text-xs font-bold hover:border-[#0E88D3] transition-colors"
+                  className="px-2 py-0.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] text-[#0E88D3] text-xs font-bold hover:border-[#0E88D3] transition-colors"
                   title="Filter and highlight subsystem in 3D"
                 >
                   [{selected.subsystem}] {loc?.name || selected.subsystem}
                 </button>
                 {loc && (
-                  <span className="text-[11px] text-[#9AAFC0] bg-[#102337] px-2 py-0.5 rounded border border-[#1D3A52]">
+                  <span className="text-[11px] text-[#5B6B7A] bg-[#FFFFFF] px-2 py-0.5 rounded border border-[#D9E2EA]">
                     {loc.bay} &bull; <span className="text-[#0E88D3]">{formatCoordinates(loc.pos)}</span>
                   </span>
                 )}
@@ -206,15 +206,15 @@ export default function ModuleAAnomalyPanel({
                 <span
                   className={`px-2.5 py-0.5 rounded text-xs font-bold border transition-colors ${
                     liveStatus === 'reject'
-                      ? 'bg-[#E5484D]/20 text-[#E5484D] border-[#E5484D]/50'
+                      ? 'bg-[#D9363E]/20 text-[#D9363E] border-[#D9363E]/50'
                       : liveStatus === 'monitor'
-                      ? 'bg-[#F2B84B]/20 text-[#F2B84B] border-[#F2B84B]/50'
-                      : 'bg-[#22A06B]/20 text-[#22A06B] border-[#22A06B]/50'
+                      ? 'bg-[#C58A00]/20 text-[#C58A00] border-[#C58A00]/50'
+                      : 'bg-[#168A5B]/20 text-[#168A5B] border-[#168A5B]/50'
                   }`}
                 >
                   {isSim ? (
                     <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#22A06B] led" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#168A5B] led" />
                       LIVE DAQ &bull; RISK {liveRiskScore}/100
                     </span>
                   ) : (
@@ -223,15 +223,15 @@ export default function ModuleAAnomalyPanel({
                 </span>
 
                 {selected.traditional_decision === 'PASS' && liveStatus === 'reject' ? (
-                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#E5484D]/20 text-[#E5484D] border border-[#E5484D]/40">
+                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#D9363E]/20 text-[#D9363E] border border-[#D9363E]/40">
                     PASS Spec &bull; REJECT AI
                   </span>
                 ) : selected.traditional_decision === 'FAIL' ? (
-                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#E5484D]/25 text-[#E5484D] border border-[#E5484D]/60">
+                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#D9363E]/25 text-[#D9363E] border border-[#D9363E]/60">
                     FAIL SPEC
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#22A06B]/15 text-[#22A06B] border border-[#22A06B]/40">
+                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#168A5B]/15 text-[#168A5B] border border-[#168A5B]/40">
                     PASS SPEC &amp; AI
                   </span>
                 )}
@@ -240,19 +240,19 @@ export default function ModuleAAnomalyPanel({
 
             {/* HTOL Telemetry Reading Grid (4-box harmonized with Module B) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-mono">
-              <div className="p-1.5 rounded bg-[#07111C] border border-[#22A06B]/30 flex flex-col">
-                <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">0h Initial</span>
-                <span className="text-sm font-bold text-[#F1F5F9] mt-0.5 tabular-nums">{selected.v0.toFixed(1)} &mu;A</span>
-                <span className="text-[9px] text-[#6F8495] font-mono mt-0.5">T=0 Baseline</span>
+              <div className="p-1.5 rounded bg-[#F4F7FA] border border-[#168A5B]/30 flex flex-col">
+                <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">0h Initial</span>
+                <span className="text-sm font-bold text-[#17212B] mt-0.5 tabular-nums">{selected.v0.toFixed(1)} &mu;A</span>
+                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">T=0 Baseline</span>
               </div>
 
-              <div className={`p-1.5 rounded bg-[#07111C] border flex flex-col transition-colors ${
+              <div className={`p-1.5 rounded bg-[#F4F7FA] border flex flex-col transition-colors ${
                 isSim && simH < 24
-                  ? 'border-[#1D3A52] opacity-60'
-                  : 'border-[#22A06B]/40'
+                  ? 'border-[#D9E2EA] opacity-60'
+                  : 'border-[#168A5B]/40'
               }`}>
-                <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">24h Early</span>
-                <span className="text-sm font-bold text-[#F1F5F9] mt-0.5 tabular-nums">
+                <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">24h Early</span>
+                <span className="text-sm font-bold text-[#17212B] mt-0.5 tabular-nums">
                   {isSim && simH < 24 ? '--' : `${selected.v24.toFixed(1)} \u00B5A`}
                 </span>
                 <span className="text-[9px] text-[#0E88D3] font-mono mt-0.5">
@@ -260,42 +260,42 @@ export default function ModuleAAnomalyPanel({
                 </span>
               </div>
 
-              <div className={`p-1.5 rounded bg-[#07111C] border flex flex-col transition-colors ${
+              <div className={`p-1.5 rounded bg-[#F4F7FA] border flex flex-col transition-colors ${
                 isSim && simH < 96
-                  ? 'border-[#1D3A52] opacity-60'
-                  : 'border-[#22A06B]/40'
+                  ? 'border-[#D9E2EA] opacity-60'
+                  : 'border-[#168A5B]/40'
               }`}>
-                <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">96h Mid-HTOL</span>
-                <span className="text-sm font-bold text-[#F1F5F9] mt-0.5 tabular-nums">
+                <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">96h Mid-HTOL</span>
+                <span className="text-sm font-bold text-[#17212B] mt-0.5 tabular-nums">
                   {isSim && simH < 96 ? '--' : selected.v96 != null ? `${selected.v96.toFixed(1)} \u00B5A` : '--'}
                 </span>
-                <span className="text-[9px] text-[#6F8495] font-mono mt-0.5">Midpoint Check</span>
+                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">Midpoint Check</span>
               </div>
 
-              <div className={`p-1.5 rounded bg-[#07111C] border flex flex-col transition-colors ${
+              <div className={`p-1.5 rounded bg-[#F4F7FA] border flex flex-col transition-colors ${
                 isSim && simH < 168
-                  ? 'border-[#F2B84B]/40'
+                  ? 'border-[#C58A00]/40'
                   : selected.status === 'reject'
-                  ? 'border-[#E5484D]/50'
-                  : 'border-[#22A06B]/40'
+                  ? 'border-[#D9363E]/50'
+                  : 'border-[#168A5B]/40'
               }`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">168h Final</span>
+                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">168h Final</span>
                   {isSim && simH < 168 && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#F2B84B] led" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C58A00] led" />
                   )}
                 </div>
                 <span className={`text-sm font-bold mt-0.5 tabular-nums ${
                   isSim && simH < 168
-                    ? 'text-[#F2B84B]'
+                    ? 'text-[#C58A00]'
                     : selected.status === 'reject'
-                    ? 'text-[#E5484D]'
-                    : 'text-[#22A06B]'
+                    ? 'text-[#D9363E]'
+                    : 'text-[#168A5B]'
                 }`}>
                   {isSim && simH < 168 ? `${simVal.toFixed(1)} \u00B5A` : `${selected.v168.toFixed(1)} \u00B5A`}
                 </span>
                 <span className={`text-[9px] font-mono mt-0.5 ${
-                  liveZ != null && Math.abs(liveZ) > 2 ? 'text-[#E5484D]' : 'text-[#0E88D3]'
+                  liveZ != null && Math.abs(liveZ) > 2 ? 'text-[#D9363E]' : 'text-[#0E88D3]'
                 }`}>
                   z: {liveZ != null ? `${liveZ > 0 ? '+' : ''}${liveZ.toFixed(2)}σ` : '--'}
                 </span>
@@ -303,24 +303,24 @@ export default function ModuleAAnomalyPanel({
             </div>
 
             {/* AI Diagnostics & Statistical Analysis Strip */}
-            <div className="p-2 rounded bg-[#102337] border border-[#1D3A52] text-xs text-[#F1F5F9] flex flex-wrap items-center justify-between gap-2 font-mono">
+            <div className="p-2 rounded bg-[#FFFFFF] border border-[#D9E2EA] text-xs text-[#17212B] flex flex-wrap items-center justify-between gap-2 font-mono">
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <span className="text-[#0E88D3] font-bold text-[10px] uppercase whitespace-nowrap">
                   DIAGNOSIS:
                 </span>
-                <span className="text-xs text-[#F1F5F9] truncate font-sans" title={selected.reason || 'Nominal component telemetry'}>
+                <span className="text-xs text-[#17212B] truncate font-sans" title={selected.reason || 'Nominal component telemetry'}>
                   {selected.reason || 'Nominal HTOL burn-in curve within statistical bounds.'}
                 </span>
               </div>
-              <div className="flex items-center gap-3 text-[10px] text-[#9AAFC0] whitespace-nowrap">
-                <span>&mu;: <b className="text-[#F1F5F9]">{selected.lot_mean?.toFixed(1) ?? '--'}&mu;A</b></span>
-                <span>Limit: <b className="text-[#E5484D]">{(selected.limit_ua || 50).toFixed(1)}&mu;A</b></span>
+              <div className="flex items-center gap-3 text-[10px] text-[#5B6B7A] whitespace-nowrap">
+                <span>&mu;: <b className="text-[#17212B]">{selected.lot_mean?.toFixed(1) ?? '--'}&mu;A</b></span>
+                <span>Limit: <b className="text-[#D9363E]">{(selected.limit_ua || 50).toFixed(1)}&mu;A</b></span>
                 <span>AI Score: <b className="text-[#0E88D3]">{displayedScore.toFixed(1)}/100</b></span>
               </div>
             </div>
           </div>
         ) : (
-          <div className="p-4 text-center text-xs text-[#9AAFC0] bg-[#142B40] rounded-lg border border-[#1D3A52]">
+          <div className="p-4 text-center text-xs text-[#5B6B7A] bg-[#F8FAFC] rounded-lg border border-[#D9E2EA]">
             No component selected. Pick a component above to inspect Module A Silicon Telemetry.
           </div>
         )}
@@ -332,9 +332,9 @@ export default function ModuleAAnomalyPanel({
       </div>
 
       {/* Module A Bezel Bottom Bar */}
-      <div className="bg-[#0B1928] border-t border-[#1D3A52] px-4 py-2 text-xs text-[#9AAFC0] flex justify-between font-mono">
+      <div className="bg-[#FFFFFF] border-t border-[#D9E2EA] px-4 py-2 text-xs text-[#5B6B7A] flex justify-between font-mono">
         <span>DAQ Sampling: 24-Bit Sigma-Delta ADC @ 125&deg;C HTOL</span>
-        <span className="text-[#F1F5F9]">
+        <span className="text-[#17212B]">
           Evaluated: {components.length} components
         </span>
       </div>

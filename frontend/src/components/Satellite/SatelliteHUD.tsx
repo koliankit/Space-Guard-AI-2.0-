@@ -87,7 +87,7 @@ export default function SatelliteHUD({
             className={`text-[10px] px-2 py-1 rounded border transition-all flex items-center gap-1.5 ${
               isAutoRotate
                 ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-bold shadow-sm'
-                : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
+                : 'hud-glass border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B]'
             }`}
             title="Toggle Automatic Orbit Rotation"
           >
@@ -96,11 +96,11 @@ export default function SatelliteHUD({
           </button>
 
           {/* Directional Pad */}
-          <div className="flex items-center gap-0.5 hud-glass rounded p-0.5 border border-slate-700/80">
+          <div className="flex items-center gap-0.5 hud-glass rounded p-0.5 border border-[#D9E2EA]/80">
             <button
               type="button"
               onClick={onRotateLeft}
-              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-amber-400 rounded transition-colors"
+              className="px-1.5 py-0.5 text-[10px] text-[#5B6B7A] hover:text-amber-400 rounded transition-colors"
               title="Rotate Left"
             >
               &#8634;
@@ -108,7 +108,7 @@ export default function SatelliteHUD({
             <button
               type="button"
               onClick={onRotateRight}
-              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-amber-400 rounded transition-colors"
+              className="px-1.5 py-0.5 text-[10px] text-[#5B6B7A] hover:text-amber-400 rounded transition-colors"
               title="Rotate Right"
             >
               &#8635;
@@ -116,7 +116,7 @@ export default function SatelliteHUD({
             <button
               type="button"
               onClick={onTiltUp}
-              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-amber-400 rounded transition-colors"
+              className="px-1.5 py-0.5 text-[10px] text-[#5B6B7A] hover:text-amber-400 rounded transition-colors"
               title="Tilt Up"
             >
               &#9650;
@@ -124,7 +124,7 @@ export default function SatelliteHUD({
             <button
               type="button"
               onClick={onTiltDown}
-              className="px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-amber-400 rounded transition-colors"
+              className="px-1.5 py-0.5 text-[10px] text-[#5B6B7A] hover:text-amber-400 rounded transition-colors"
               title="Tilt Down"
             >
               &#9660;
@@ -138,7 +138,7 @@ export default function SatelliteHUD({
             className={`text-[10px] px-2 py-1 rounded border transition-all ${
               isExploded
                 ? 'bg-amber-500/20 border-amber-400 text-amber-300 font-bold'
-                : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
+                : 'hud-glass border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B]'
             }`}
             title="Explode 3D Subsystems Outward"
           >
@@ -152,7 +152,7 @@ export default function SatelliteHUD({
             className={`text-[10px] px-2 py-1 rounded border transition-all ${
               isXray
                 ? 'bg-amber-500/20 border-amber-500/60 text-white font-bold'
-                : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
+                : 'hud-glass border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B]'
             }`}
             title="X-Ray Translucent Skin"
           >
@@ -163,7 +163,7 @@ export default function SatelliteHUD({
           <button
             type="button"
             onClick={onResetView}
-            className="hud-glass border-slate-700 text-slate-400 hover:text-amber-400 text-[10px] px-2 py-1 rounded border"
+            className="hud-glass border-[#D9E2EA] text-[#5B6B7A] hover:text-amber-400 text-[10px] px-2 py-1 rounded border"
             title="Reset Camera"
           >
             &#8630;
@@ -188,7 +188,7 @@ export default function SatelliteHUD({
               className={`text-[9.5px] px-2 py-0.5 rounded border transition-all ${
                 activePreset === preset.id
                   ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-bold shadow-sm'
-                  : 'hud-glass border-slate-700 text-slate-400 hover:text-white'
+                  : 'hud-glass border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B]'
               }`}
             >
               {preset.label}
@@ -215,7 +215,7 @@ export default function SatelliteHUD({
 
         {/* Subsystems Carousel */}
         {subsystems.length > 0 && (
-          <div className="flex items-center gap-1 overflow-x-auto py-1 px-2 hud-glass rounded-lg border border-slate-800 pointer-events-auto max-w-full">
+          <div className="flex items-center gap-1 overflow-x-auto py-1 px-2 hud-glass rounded-lg border border-[#D9E2EA] pointer-events-auto max-w-full">
             <span className="text-[8.5px] text-amber-400 tracking-wider uppercase px-1 whitespace-nowrap font-bold">
               SUBSYSTEMS:
             </span>
@@ -230,7 +230,7 @@ export default function SatelliteHUD({
                   className={`flex items-center gap-1 px-2 py-0.5 rounded text-[9.5px] whitespace-nowrap transition-all border ${
                     isCurr
                       ? 'bg-amber-500/20 border-amber-500/60 text-white font-bold shadow-sm'
-                      : 'border-transparent text-slate-400 hover:text-white hover:bg-white/5'
+                      : 'border-transparent text-[#5B6B7A] hover:text-[#17212B] hover:bg-white/5'
                   }`}
                 >
                   <span

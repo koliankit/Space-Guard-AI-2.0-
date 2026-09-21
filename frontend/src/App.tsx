@@ -336,7 +336,7 @@ export default function App() {
 
 
   return (
-    <div className="h-screen w-screen overflow-hidden text-slate-100 flex flex-col bg-bg">
+    <div className="h-screen w-screen overflow-hidden text-[#17212B] flex flex-col bg-[#F4F7FA]">
       <div className="grid-overlay" />
       <Header
         streamActive={batchId !== null}
@@ -369,14 +369,14 @@ export default function App() {
 
       {/* Non-Blocking Critical Anomaly Alert Banner (Appears first before full modal) */}
       {quarantineToast && !alertComponent && (
-        <div className="bg-[#24141E] border-b border-[#E5484D]/60 px-5 py-2 flex items-center justify-between gap-3 text-xs font-mono text-[#F1F5F9] animate-alert-once z-30">
+        <div className="bg-[#FEF2F2] border-b border-[#D9363E]/40 px-5 py-2 flex items-center justify-between gap-3 text-xs font-mono text-[#17212B] animate-alert-once z-30">
           <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#E5484D] animate-gentle-pulse" />
-            <span className="font-bold text-[#E5484D] uppercase tracking-wider">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#D9363E] animate-gentle-pulse" />
+            <span className="font-bold text-[#D9363E] uppercase tracking-wider">
               CRITICAL ANOMALY IDENTIFIED:
             </span>
             <span>
-              Part <b className="text-[#F1F5F9] font-bold">{quarantineToast.component_id}</b> in <b className="text-[#F2B84B]">[{quarantineToast.subsystem}] {quarantineToast.subsystem_name}</b> has Risk Score <b className="text-[#E5484D]">{quarantineToast.risk_score}/100</b> ({quarantineToast.v168.toFixed(1)} &micro;A drift).
+              Part <b className="text-[#17212B] font-bold">{quarantineToast.component_id}</b> in <b className="text-[#C58A00]">[{quarantineToast.subsystem}] {quarantineToast.subsystem_name}</b> has Risk Score <b className="text-[#D9363E]">{quarantineToast.risk_score}/100</b> ({quarantineToast.v168.toFixed(1)} &micro;A drift).
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -387,7 +387,7 @@ export default function App() {
                 if (modalTimerId) clearTimeout(modalTimerId)
                 setQuarantineToast(null)
               }}
-              className="px-2 py-1 rounded text-[#9AAFC0] hover:text-[#F1F5F9] text-xs hover:bg-white/10 transition-colors"
+              className="px-2 py-1 rounded text-[#5B6B7A] hover:text-[#17212B] text-xs hover:bg-black/5 transition-colors"
               title="Dismiss Banner"
             >
               &#10005;
@@ -421,7 +421,7 @@ export default function App() {
         />
 
         {/* Right Full Dashboard Workspace */}
-        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#07111C] flex flex-col">
+        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#F4F7FA] flex flex-col">
           {/* OVERVIEW */}
           {(activeTab === 'overview' || activeTab === 'wall') && (
             <MultiScreenWall

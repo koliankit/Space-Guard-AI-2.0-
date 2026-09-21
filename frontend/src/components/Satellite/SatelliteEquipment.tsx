@@ -4,10 +4,10 @@ import * as THREE from 'three'
 import type { ComponentOut, SubsystemStatus } from '../../types'
 
 const STATUS_COLOR: Record<string, string> = {
-  safe: '#22A06B',     // Engineering Green
-  monitor: '#F2B84B',  // Amber
-  reject: '#E5484D',   // Alert Red
-  idle: '#9AAFC0',     // Cool Gray
+  safe: '#168A5B',     // Engineering Green
+  monitor: '#C58A00',  // Amber
+  reject: '#D9363E',   // Alert Red
+  idle: '#5B6B7A',     // Cool Gray
 }
 
 interface EquipmentModuleProps {
@@ -41,15 +41,15 @@ export default function SatelliteEquipment({
 
   // User specification:
   // normal → blue highlight (#0E88D3)
-  // monitor → amber highlight (#F2B84B)
-  // reject → red highlight (#E5484D)
+  // monitor → amber highlight (#C58A00)
+  // reject → red highlight (#D9363E)
   const componentHighlightColor = useMemo(() => {
     if (!selectedComponent) return '#0E88D3'
     if (selectedComponent.status === 'reject' || selectedComponent.behavioral_health === 'CRITICAL') {
-      return '#E5484D' // red highlight
+      return '#D9363E' // red highlight
     }
     if (selectedComponent.status === 'monitor' || selectedComponent.behavioral_health === 'DEGRADING') {
-      return '#F2B84B' // amber highlight
+      return '#C58A00' // amber highlight
     }
     return '#0E88D3'   // normal blue highlight
   }, [selectedComponent])
@@ -102,7 +102,7 @@ export default function SatelliteEquipment({
         color: isSelected ? '#ffffff' : isHovered ? '#FFFFFF' : '#1E293B',
         metalness: 0.88,
         roughness: 0.2,
-        emissive: isSelected ? color : isHovered ? '#F59E0B' : '#102337',
+        emissive: isSelected ? color : isHovered ? '#F59E0B' : '#FFFFFF',
         emissiveIntensity: isSelected ? 0.8 : isHovered ? 0.4 : 0.1,
         transparent: isXray,
         opacity: isXray ? 0.4 : 1.0,
@@ -227,8 +227,8 @@ export default function SatelliteEquipment({
             <mesh position={[0, -0.05, 0]}>
               <boxGeometry args={[0.3, 0.035, 0.24]} />
               <meshStandardMaterial
-                color={isSelected ? '#F59E0B' : '#142B40'}
-                emissive={isSelected ? '#F59E0B' : '#102337'}
+                color={isSelected ? '#F59E0B' : '#F8FAFC'}
+                emissive={isSelected ? '#F59E0B' : '#FFFFFF'}
                 emissiveIntensity={isSelected ? 0.4 : 0.1}
                 metalness={0.85}
               />
@@ -240,7 +240,7 @@ export default function SatelliteEquipment({
                   <cylinderGeometry args={[0.024, 0.024, 0.11, 12]} />
                   <meshStandardMaterial
                     color={isSelected ? '#FFFFFF' : '#334155'}
-                    emissive={isSelected ? '#FFFFFF' : '#102337'}
+                    emissive={isSelected ? '#FFFFFF' : '#FFFFFF'}
                     emissiveIntensity={isSelected ? 0.6 : 0.1}
                     metalness={0.88}
                     roughness={0.2}
@@ -321,7 +321,7 @@ export default function SatelliteEquipment({
             <group rotation={[0.4, 0.2, 0]}>
               <mesh>
                 <cylinderGeometry args={[0.035, 0.048, 0.15, 18]} />
-                <meshStandardMaterial color="#102337" metalness={0.92} roughness={0.1} />
+                <meshStandardMaterial color="#FFFFFF" metalness={0.92} roughness={0.1} />
               </mesh>
               {/* Internal optical lens glass in calibrated emerald */}
               <mesh position={[0, 0.065, 0]}>
@@ -351,7 +351,7 @@ export default function SatelliteEquipment({
               <boxGeometry args={[0.28, 0.24, 0.035]} />
               <meshStandardMaterial
                 color={isSelected ? '#F59E0B' : '#1E293B'}
-                emissive={isSelected ? '#F59E0B' : '#102337'}
+                emissive={isSelected ? '#F59E0B' : '#FFFFFF'}
                 emissiveIntensity={isSelected ? 0.5 : 0.1}
                 metalness={0.88}
                 roughness={0.15}
@@ -377,7 +377,7 @@ export default function SatelliteEquipment({
           <group rotation={[Math.PI / 2, 0, 0]}>
             <mesh>
               <cylinderGeometry args={[0.085, 0.11, 0.24, 22]} />
-              <meshStandardMaterial color="#102337" metalness={0.88} roughness={0.18} />
+              <meshStandardMaterial color="#FFFFFF" metalness={0.88} roughness={0.18} />
             </mesh>
             {/* Front Aperture Hood Ring */}
             <mesh position={[0, 0.12, 0]}>

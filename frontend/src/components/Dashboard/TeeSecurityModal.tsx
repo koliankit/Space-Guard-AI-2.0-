@@ -27,24 +27,24 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
   const isSimulation = mode === 'simulation'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#07111C]/85 backdrop-blur-sm p-4 overflow-y-auto font-sans animate-fadein">
-      <div className="relative w-full max-w-3xl max-h-[90vh] rounded-2xl border border-[#1D3A52] bg-[#102337] text-[#F1F5F9] shadow-2xl overflow-hidden flex flex-col my-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#F4F7FA]/85 backdrop-blur-sm p-4 overflow-y-auto font-sans animate-fadein">
+      <div className="relative w-full max-w-3xl max-h-[90vh] rounded-2xl border border-[#D9E2EA] bg-[#FFFFFF] text-[#17212B] shadow-2xl overflow-hidden flex flex-col my-4">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-[#1D3A52] bg-[#0B1928] flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-[#D9E2EA] bg-[#FFFFFF] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl border border-[#0E88D3]/40 bg-[#142B40] flex items-center justify-center text-[#0E88D3] font-mono text-base font-bold shadow-sm">
+            <div className="w-9 h-9 rounded-xl border border-[#0E88D3]/40 bg-[#F8FAFC] flex items-center justify-center text-[#0E88D3] font-mono text-base font-bold shadow-sm">
               🛡️
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="m-0 text-base font-display font-bold tracking-wider text-[#F1F5F9] uppercase">
+                <h3 className="m-0 text-base font-display font-bold tracking-wider text-[#17212B] uppercase">
                   Trusted Execution Environment (TEE)
                 </h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#142B40] text-[#9AAFC0] border border-[#1D3A52]">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#F8FAFC] text-[#5B6B7A] border border-[#D9E2EA]">
                   DEFENSE-IN-DEPTH LAYER
                 </span>
               </div>
-              <p className="m-0 text-xs text-[#9AAFC0] font-sans mt-0.5">
+              <p className="m-0 text-xs text-[#5B6B7A] font-sans mt-0.5">
                 Confidential computing enclave boundary for flight qualification decisions
               </p>
             </div>
@@ -55,7 +55,7 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
               sounds.playClick()
               onClose()
             }}
-            className="w-8 h-8 rounded-lg border border-[#1D3A52] bg-[#142B40] text-[#9AAFC0] hover:text-[#F1F5F9] hover:bg-[#1D3A52] flex items-center justify-center text-sm transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-lg border border-[#D9E2EA] bg-[#F8FAFC] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#D9E2EA] flex items-center justify-center text-sm transition-colors cursor-pointer"
             title="Close [Esc]"
           >
             ✕
@@ -67,25 +67,25 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
           {/* Status & Mode Banners */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Status Card */}
-            <div className="p-3.5 rounded-xl border border-[#1D3A52] bg-[#142B40] flex flex-col gap-1">
-              <span className="text-[11px] font-mono uppercase text-[#9AAFC0] font-semibold">Security State</span>
+            <div className="p-3.5 rounded-xl border border-[#D9E2EA] bg-[#F8FAFC] flex flex-col gap-1">
+              <span className="text-[11px] font-mono uppercase text-[#5B6B7A] font-semibold">Security State</span>
               <div className="flex items-center gap-2 mt-0.5">
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${
                     !isEnabled
-                      ? 'bg-[#9AAFC0]'
+                      ? 'bg-[#5B6B7A]'
                       : isSimulation
-                      ? 'bg-[#F2B84B] animate-gentle-pulse'
-                      : 'bg-[#22A06B] animate-gentle-pulse'
+                      ? 'bg-[#C58A00] animate-gentle-pulse'
+                      : 'bg-[#168A5B] animate-gentle-pulse'
                   }`}
                 />
                 <span
                   className={`font-mono font-bold text-xs md:text-sm ${
                     !isEnabled
-                      ? 'text-[#9AAFC0]'
+                      ? 'text-[#5B6B7A]'
                       : isSimulation
-                      ? 'text-[#F2B84B]'
-                      : 'text-[#22A06B]'
+                      ? 'text-[#C58A00]'
+                      : 'text-[#168A5B]'
                   }`}
                 >
                   {!isEnabled ? 'DISABLED' : isSimulation ? 'SIMULATION' : 'ENABLED'}
@@ -94,18 +94,18 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
             </div>
 
             {/* Operating Mode Card */}
-            <div className="p-3.5 rounded-xl border border-[#1D3A52] bg-[#142B40] flex flex-col gap-1">
-              <span className="text-[11px] font-mono uppercase text-[#9AAFC0] font-semibold">Execution Mode</span>
-              <span className="font-mono font-bold text-[#F1F5F9] text-xs md:text-sm mt-0.5">
+            <div className="p-3.5 rounded-xl border border-[#D9E2EA] bg-[#F8FAFC] flex flex-col gap-1">
+              <span className="text-[11px] font-mono uppercase text-[#5B6B7A] font-semibold">Execution Mode</span>
+              <span className="font-mono font-bold text-[#17212B] text-xs md:text-sm mt-0.5">
                 {isSimulation ? 'Development (Sim)' : 'Hardware Production'}
               </span>
             </div>
 
             {/* Hardware-backed Card */}
-            <div className="p-3.5 rounded-xl border border-[#1D3A52] bg-[#142B40] flex flex-col gap-1">
-              <span className="text-[11px] font-mono uppercase text-[#9AAFC0] font-semibold">Hardware-Backed</span>
+            <div className="p-3.5 rounded-xl border border-[#D9E2EA] bg-[#F8FAFC] flex flex-col gap-1">
+              <span className="text-[11px] font-mono uppercase text-[#5B6B7A] font-semibold">Hardware-Backed</span>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`text-xs font-mono font-bold ${isHardware ? 'text-[#22A06B]' : 'text-[#F2B84B]'}`}>
+                <span className={`text-xs font-mono font-bold ${isHardware ? 'text-[#168A5B]' : 'text-[#C58A00]'}`}>
                   {isHardware ? 'YES (Confidential VM)' : 'NO (Emulated Perim)'}
                 </span>
               </div>
@@ -113,21 +113,21 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
           </div>
 
           {/* Educational Concept Box */}
-          <div className="p-4 rounded-xl border border-[#0E88D3]/30 bg-[#142B40] flex flex-col gap-2 text-xs">
+          <div className="p-4 rounded-xl border border-[#0E88D3]/30 bg-[#F8FAFC] flex flex-col gap-2 text-xs">
             <div className="flex items-center gap-2 text-[#0E88D3] font-mono font-bold uppercase tracking-wide">
               <span>ℹ️</span>
               <span>Architectural Responsibility</span>
             </div>
-            <p className="text-[#9AAFC0] leading-relaxed m-0">
+            <p className="text-[#5B6B7A] leading-relaxed m-0">
               TEE provides an optional hardware-backed isolation layer for selected sensitive computations. It operates as a{' '}
-              <strong className="text-[#F1F5F9]">security and deployment boundary</strong> rather than an AI algorithm or statistical replacement.
+              <strong className="text-[#17212B]">security and deployment boundary</strong> rather than an AI algorithm or statistical replacement.
               Screening analytics, lot-relative normalization, and temporal drift predictions execute identically whether TEE is active or bypassed.
             </p>
           </div>
 
           {/* Protected Computations List */}
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-mono uppercase text-[#F1F5F9] font-bold tracking-wider flex items-center gap-1.5">
+            <span className="text-xs font-mono uppercase text-[#17212B] font-bold tracking-wider flex items-center gap-1.5">
               <span>🔒</span> Protected Operations Catalog
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -139,13 +139,13 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
               ].map((op, idx) => (
                 <div
                   key={idx}
-                  className="p-3 rounded-lg border border-[#1D3A52] bg-[#142B40] flex flex-col gap-0.5"
+                  className="p-3 rounded-lg border border-[#D9E2EA] bg-[#F8FAFC] flex flex-col gap-0.5"
                 >
-                  <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#F1F5F9]">
-                    <span className="text-[#22A06B]">✓</span>
+                  <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#17212B]">
+                    <span className="text-[#168A5B]">✓</span>
                     {op.title}
                   </div>
-                  <span className="text-[11px] text-[#9AAFC0] font-sans">{op.desc}</span>
+                  <span className="text-[11px] text-[#5B6B7A] font-sans">{op.desc}</span>
                 </div>
               ))}
             </div>
@@ -153,31 +153,31 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
 
           {/* Latest Execution Attestation Token */}
           {status?.latest_attestation && (
-            <div className="p-3.5 rounded-xl border border-[#1D3A52] bg-[#07111C] flex flex-col gap-2 font-mono text-xs">
-              <div className="flex items-center justify-between text-[11px] text-[#9AAFC0] border-b border-[#1D3A52] pb-1.5">
+            <div className="p-3.5 rounded-xl border border-[#D9E2EA] bg-[#F4F7FA] flex flex-col gap-2 font-mono text-xs">
+              <div className="flex items-center justify-between text-[11px] text-[#5B6B7A] border-b border-[#D9E2EA] pb-1.5">
                 <span className="font-bold text-[#0E88D3] uppercase tracking-wider">LATEST ATTESTATION PROOF</span>
-                <span className="text-[#22A06B] font-semibold">{status.latest_attestation.verification}</span>
+                <span className="text-[#168A5B] font-semibold">{status.latest_attestation.verification}</span>
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
-                <div className="text-[#9AAFC0]">Execution ID:</div>
-                <div className="text-[#F1F5F9] truncate" title={status.latest_attestation.execution_id}>
+                <div className="text-[#5B6B7A]">Execution ID:</div>
+                <div className="text-[#17212B] truncate" title={status.latest_attestation.execution_id}>
                   {status.latest_attestation.execution_id}
                 </div>
-                <div className="text-[#9AAFC0]">Enclave Identifier:</div>
-                <div className="text-[#F1F5F9]">{status.latest_attestation.enclave_id}</div>
-                <div className="text-[#9AAFC0]">HMAC-SHA256 Sig:</div>
+                <div className="text-[#5B6B7A]">Enclave Identifier:</div>
+                <div className="text-[#17212B]">{status.latest_attestation.enclave_id}</div>
+                <div className="text-[#5B6B7A]">HMAC-SHA256 Sig:</div>
                 <div className="text-[#0E88D3] font-mono text-[10px] truncate" title={status.latest_attestation.signature}>
                   {status.latest_attestation.signature.substring(0, 24)}...
                 </div>
-                <div className="text-[#9AAFC0]">Timestamp:</div>
-                <div className="text-[#9AAFC0]">{new Date(status.latest_attestation.timestamp).toLocaleTimeString()}</div>
+                <div className="text-[#5B6B7A]">Timestamp:</div>
+                <div className="text-[#5B6B7A]">{new Date(status.latest_attestation.timestamp).toLocaleTimeString()}</div>
               </div>
             </div>
           )}
 
           {/* Explicit Limitations Disclaimer */}
-          <div className="p-3 rounded-xl border border-[#1D3A52] bg-[#0B1928] text-[11px] text-[#9AAFC0] flex flex-col gap-1">
-            <span className="font-mono font-bold uppercase text-[#F1F5F9] text-[10px] tracking-wide">
+          <div className="p-3 rounded-xl border border-[#D9E2EA] bg-[#FFFFFF] text-[11px] text-[#5B6B7A] flex flex-col gap-1">
+            <span className="font-mono font-bold uppercase text-[#17212B] text-[10px] tracking-wide">
               Engineering Limitations & Scope Disclaimer:
             </span>
             <p className="m-0 leading-normal">
@@ -188,7 +188,7 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-[#1D3A52] bg-[#0B1928] flex items-center justify-between text-xs font-mono text-[#9AAFC0]">
+        <div className="px-6 py-3 border-t border-[#D9E2EA] bg-[#FFFFFF] flex items-center justify-between text-xs font-mono text-[#5B6B7A]">
           <span>Config: TEE_ENABLED={isEnabled ? 'true' : 'false'} | MODE={mode}</span>
           <button
             type="button"
@@ -196,7 +196,7 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
               sounds.playClick()
               onClose()
             }}
-            className="px-4 py-1.5 rounded-lg border border-[#1D3A52] bg-[#142B40] text-[#F1F5F9] hover:bg-[#1D3A52] transition-all font-sans font-semibold cursor-pointer"
+            className="px-4 py-1.5 rounded-lg border border-[#D9E2EA] bg-[#F8FAFC] text-[#17212B] hover:bg-[#D9E2EA] transition-all font-sans font-semibold cursor-pointer"
           >
             Acknowledge & Close
           </button>

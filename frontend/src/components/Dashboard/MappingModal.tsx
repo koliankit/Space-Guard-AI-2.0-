@@ -30,16 +30,16 @@ export default function MappingModal({
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
       <div className="bg-panel border border-line rounded-xl p-5 w-[460px] max-w-[92vw] modal-anim">
-        <h3 className="mt-0 text-emerald-100 font-display">Column Mapping</h3>
-        <p className="text-xs text-muted">
+        <h3 className="mt-0 text-[#17212B] font-display">Column Mapping</h3>
+        <p className="text-xs text-[#5B6B7A]">
           We couldn&apos;t confidently auto-detect: <b>{missingFields.join(', ')}</b>. Map the remaining columns below.
         </p>
         <div className="space-y-2.5 mt-3">
           {FIELDS.map(([key, label]) => (
             <div key={key} className="flex items-center gap-2 text-xs">
-              <label className="w-[140px] text-muted">{label}</label>
+              <label className="w-[140px] text-[#5B6B7A]">{label}</label>
               <select
-                className="flex-1 bg-[#020D05] border border-line text-emerald-100 px-2 py-1.5 rounded font-mono text-[11px] focus:border-accent outline-none"
+                className="flex-1 bg-[#FFFFFF] border border-[#D9E2EA] text-[#17212B] px-2 py-1.5 rounded font-mono text-[11px] focus:border-[#0E88D3] outline-none"
                 value={mapping[key] ?? ''}
                 onChange={(e) => setMapping({ ...mapping, [key]: e.target.value })}
               >
@@ -56,7 +56,7 @@ export default function MappingModal({
         <div className="flex gap-2 mt-4">
           <button
             type="button"
-            className="flex-1 font-display text-xs uppercase px-4 py-2.5 rounded border border-accent bg-accent/20 text-accent font-bold shadow-neon-green hover:bg-accent hover:text-bg transition-all"
+            className="flex-1 font-display text-xs uppercase px-4 py-2.5 rounded border border-[#0E88D3] bg-[#0E88D3] text-white font-bold hover:bg-[#0c74b4] transition-all"
             onClick={() => {
               const stillMissing = required.filter((f) => !mapping[f])
               if (stillMissing.length) {
@@ -66,9 +66,9 @@ export default function MappingModal({
               onApply(mapping)
             }}
           >
-            Apply Mapping &amp; Continue
+            Apply &amp; Screen
           </button>
-          <button type="button" className="px-4 py-2.5 rounded border border-line text-xs font-mono text-muted hover:text-white" onClick={onCancel}>
+          <button type="button" className="px-4 py-2.5 rounded border border-[#D9E2EA] text-xs font-mono text-[#5B6B7A] hover:bg-[#F8FAFC]" onClick={onCancel}>
             Cancel
           </button>
         </div>

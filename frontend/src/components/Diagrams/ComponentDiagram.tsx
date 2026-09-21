@@ -9,11 +9,11 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
   return (
     <div className={`flex flex-col gap-4 font-mono select-none ${className}`}>
       {(type === 'avionics' || type === 'all') && (
-        <div className="rounded-xl border border-slate-800 bg-[#0A1020] p-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+        <div className="rounded-xl border border-[#D9E2EA] bg-[#FFFFFF] p-4">
+          <div className="flex items-center justify-between border-b border-[#D9E2EA] pb-2 mb-3">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-400" />
-              <span className="text-xs font-display font-bold tracking-wider text-slate-100 uppercase">
+              <span className="text-xs font-display font-bold tracking-wider text-[#17212B] uppercase">
                 DIAGRAM 1: SPACEGUARD-1 AVIONICS &amp; SUBSYSTEM INTERCONNECT BUS
               </span>
             </div>
@@ -25,30 +25,30 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
           <div className="w-full overflow-x-auto">
             <svg
               viewBox="0 0 760 260"
-              className="w-full min-w-[700px] h-auto text-slate-200"
+              className="w-full min-w-[700px] h-auto text-[#17212B]"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               {/* Background Grid Pattern */}
               <defs>
                 <pattern id="diag-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1E293B" strokeWidth="0.5" />
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#D9E2EA" strokeWidth="0.5" />
                 </pattern>
                 <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#102337" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.9" />
                 </linearGradient>
                 <linearGradient id="safeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#102337" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.9" />
                 </linearGradient>
                 <linearGradient id="rejectGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#EF4444" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#102337" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.9" />
                 </linearGradient>
               </defs>
 
-              <rect width="760" height="260" fill="#0B1928" rx="6" />
+              <rect width="760" height="260" fill="#FFFFFF" rx="6" />
               <rect width="760" height="260" fill="url(#diag-grid)" rx="6" />
 
               {/* CENTRAL SPACECRAFT MIL-STD-1553B / CAN BUS */}
@@ -200,11 +200,11 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
       )}
 
       {(type === 'htol' || type === 'all') && (
-        <div className="rounded-xl border border-slate-800 bg-[#0A1020] p-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+        <div className="rounded-xl border border-[#D9E2EA] bg-[#FFFFFF] p-4">
+          <div className="flex items-center justify-between border-b border-[#D9E2EA] pb-2 mb-3">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-rose-500" />
-              <span className="text-xs font-display font-bold tracking-wider text-slate-100 uppercase">
+              <span className="text-xs font-display font-bold tracking-wider text-[#17212B] uppercase">
                 DIAGRAM 2: MIL-STD-883 METHOD 1005 HTOL SILICON GATE-OXIDE TEST CIRCUIT
               </span>
             </div>
@@ -216,11 +216,11 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
           <div className="w-full overflow-x-auto">
             <svg
               viewBox="0 0 760 210"
-              className="w-full min-w-[700px] h-auto text-slate-200"
+              className="w-full min-w-[700px] h-auto text-[#17212B]"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <rect width="760" height="210" fill="#0B1928" rx="6" />
+              <rect width="760" height="210" fill="#FFFFFF" rx="6" />
 
               {/* Stress Thermal Chamber Boundary */}
               <rect
@@ -229,7 +229,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 width="420"
                 height="180"
                 rx="6"
-                fill="#142B40"
+                fill="#17212B"
                 stroke="#EF4444"
                 strokeWidth="1"
                 strokeDasharray="4 3"
@@ -246,7 +246,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
               </text>
 
               {/* DUT Transistor Device Under Test */}
-              <rect x="150" y="80" width="130" height="70" rx="4" fill="#0A1020" stroke="#10B981" strokeWidth="1.5" />
+              <rect x="150" y="80" width="130" height="70" rx="4" fill="#FFFFFF" stroke="#10B981" strokeWidth="1.5" />
               <text x="215" y="102" fill="#10B981" fontSize="10" fontWeight="bold" textAnchor="middle">
                 RAD-HARD CMOS DUT
               </text>
@@ -262,7 +262,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
 
               {/* In-situ Precision Sensing Resistor Rsense */}
               <g transform="translate(320, 95)">
-                <rect width="40" height="25" fill="#0A1020" stroke="#10B981" strokeWidth="1.5" />
+                <rect width="40" height="25" fill="#FFFFFF" stroke="#10B981" strokeWidth="1.5" />
                 <text x="20" y="16" fill="#10B981" fontSize="8" fontWeight="bold" textAnchor="middle">
                   Rsense
                 </text>
@@ -279,7 +279,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
 
               {/* OUT OF CHAMBER: ISRO SpaceGuard AI Digitizer */}
               <g transform="translate(480, 25)">
-                <rect width="250" height="160" rx="6" fill="#0A1020" stroke="#F59E0B" strokeWidth="1.5" />
+                <rect width="250" height="160" rx="6" fill="#FFFFFF" stroke="#F59E0B" strokeWidth="1.5" />
                 <text x="125" y="25" fill="#F59E0B" fontSize="10" fontWeight="bold" textAnchor="middle">
                   SPACEGUARD AI TELEMETRY DAQ
                 </text>
@@ -288,7 +288,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 </text>
 
                 {/* Sub-blocks in DAQ */}
-                <rect x="20" y="55" width="95" height="38" rx="3" fill="#0B1928" stroke="#F59E0B" strokeWidth="1" />
+                <rect x="20" y="55" width="95" height="38" rx="3" fill="#FFFFFF" stroke="#F59E0B" strokeWidth="1" />
                 <text x="67" y="72" fill="#F59E0B" fontSize="8" fontWeight="bold" textAnchor="middle">
                   Analog Front-End
                 </text>
@@ -296,7 +296,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                   I_leak Sensing (&plusmn;0.05&mu;A)
                 </text>
 
-                <rect x="135" y="55" width="95" height="38" rx="3" fill="#0B1928" stroke="#F59E0B" strokeWidth="1" />
+                <rect x="135" y="55" width="95" height="38" rx="3" fill="#FFFFFF" stroke="#F59E0B" strokeWidth="1" />
                 <text x="182" y="72" fill="#F59E0B" fontSize="8" fontWeight="bold" textAnchor="middle">
                   Digital Filter
                 </text>
@@ -304,7 +304,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                   0h / 48h / 96h / 168h
                 </text>
 
-                <rect x="20" y="105" width="210" height="42" rx="3" fill="#0B1928" stroke="#F59E0B" strokeWidth="1" />
+                <rect x="20" y="105" width="210" height="42" rx="3" fill="#FFFFFF" stroke="#F59E0B" strokeWidth="1" />
                 <text x="125" y="122" fill="#F59E0B" fontSize="8.5" fontWeight="bold" textAnchor="middle">
                   ISRO AI SCREENING ENGINE
                 </text>

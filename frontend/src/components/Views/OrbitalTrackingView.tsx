@@ -42,37 +42,37 @@ export default function OrbitalTrackingView() {
   }, [])
 
   return (
-    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#060B16] font-mono select-none overflow-y-auto text-slate-100 w-full min-h-full">
+    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#FFFFFF] font-mono select-none overflow-y-auto text-[#17212B] w-full min-h-full">
       {/* View Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#D9E2EA] mb-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400" />
-            <h2 className="m-0 text-sm font-display font-black tracking-widest text-slate-100 uppercase">
+            <h2 className="m-0 text-sm font-display font-black tracking-widest text-[#17212B] uppercase">
               ISRO TELEMETRY, TRACKING AND COMMAND NETWORK (ISTRAC)
             </h2>
             <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/40 font-bold">
               LEO 520KM &bull; POLAR SUN-SYNCHRONOUS
             </span>
           </div>
-          <div className="text-[10px] text-slate-400 tracking-wider mt-0.5">
-            Spacecraft: <span className="text-slate-100 font-bold">SPACEGUARD-1</span> &bull; Ground Station Downlink Lock &bull; Real-time Doppler &amp; Orbit Pass Geometry
+          <div className="text-[10px] text-[#5B6B7A] tracking-wider mt-0.5">
+            Spacecraft: <span className="text-[#17212B] font-bold">SPACEGUARD-1</span> &bull; Ground Station Downlink Lock &bull; Real-time Doppler &amp; Orbit Pass Geometry
           </div>
         </div>
 
         {/* Live Status Indicators */}
         <div className="flex items-center gap-2.5 text-xs">
-          <div className="hud-glass px-3 py-1.5 rounded border border-slate-800 flex items-center gap-2">
+          <div className="hud-glass px-3 py-1.5 rounded border border-[#D9E2EA] flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 dot-pulse" />
-            <span className="text-slate-400">CARRIER:</span>
+            <span className="text-[#5B6B7A]">CARRIER:</span>
             <span className="text-amber-400 font-bold">LOCKED (S/X-BAND)</span>
           </div>
-          <div className="hud-glass px-3 py-1.5 rounded border border-slate-800 flex items-center gap-2">
-            <span className="text-slate-400">SNR:</span>
+          <div className="hud-glass px-3 py-1.5 rounded border border-[#D9E2EA] flex items-center gap-2">
+            <span className="text-[#5B6B7A]">SNR:</span>
             <span className="text-emerald-400 font-bold">19.4 dB</span>
           </div>
-          <div className="hud-glass px-3 py-1.5 rounded border border-slate-800 flex items-center gap-2">
-            <span className="text-slate-400">BER:</span>
+          <div className="hud-glass px-3 py-1.5 rounded border border-[#D9E2EA] flex items-center gap-2">
+            <span className="text-[#5B6B7A]">BER:</span>
             <span className="text-amber-300 font-bold">3.8 &times; 10&minus;8</span>
           </div>
         </div>
@@ -81,18 +81,18 @@ export default function OrbitalTrackingView() {
       {/* Grid: Orbital Map (2/3) + Real-Time Telemetry Stream (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 flex-1 min-h-0">
         {/* Large Global Ground Track Radar */}
-        <div className="lg:col-span-2 bg-[#0A1020] p-4 rounded-xl border border-slate-800 shadow-md flex flex-col flex-1 min-h-[360px]">
+        <div className="lg:col-span-2 bg-[#FFFFFF] p-4 rounded-xl border border-[#D9E2EA] shadow-md flex flex-col flex-1 min-h-[360px]">
           <div className="flex items-center justify-between mb-3">
             <div className="text-xs font-display font-bold text-amber-400 tracking-wider uppercase flex items-center gap-2">
               <span className="text-amber-400">&gt;&gt;</span> Global Ground Station Footprint &amp; Sub-Satellite Track
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">
-              LAT: <span className="text-slate-100 font-bold">{currentLat.toFixed(2)}&deg; N</span> &bull; LON:{' '}
-              <span className="text-slate-100 font-bold">{currentLon.toFixed(2)}&deg; E</span>
+            <div className="text-[10px] text-[#5B6B7A] font-mono">
+              LAT: <span className="text-[#17212B] font-bold">{currentLat.toFixed(2)}&deg; N</span> &bull; LON:{' '}
+              <span className="text-[#17212B] font-bold">{currentLon.toFixed(2)}&deg; E</span>
             </div>
           </div>
 
-          <div className="relative flex-1 min-h-[290px] bg-[#060B16] rounded-lg border border-slate-800 overflow-hidden flex items-center justify-center">
+          <div className="relative flex-1 min-h-[290px] bg-[#FFFFFF] rounded-lg border border-[#D9E2EA] overflow-hidden flex items-center justify-center">
             {/* World Map SVG Canvas */}
             <svg viewBox="0 0 720 360" className="w-full h-full block">
               {/* Latitude & Longitude Gridlines */}
@@ -105,7 +105,7 @@ export default function OrbitalTrackingView() {
                     y1={y}
                     x2="720"
                     y2={y}
-                    stroke="#1E293B"
+                    stroke="#FFFFFF"
                     strokeWidth="0.8"
                     strokeDasharray="4,4"
                   />
@@ -120,7 +120,7 @@ export default function OrbitalTrackingView() {
                     y1="0"
                     x2={x}
                     y2="360"
-                    stroke="#1E293B"
+                    stroke="#FFFFFF"
                     strokeWidth="0.8"
                     strokeDasharray="4,4"
                   />
@@ -135,42 +135,42 @@ export default function OrbitalTrackingView() {
               {/* Asia & India */}
               <path
                 d="M 460 70 L 520 80 L 550 110 L 515 150 L 490 200 L 470 170 L 450 120 Z"
-                fill="#0F1C30"
-                stroke="#1E3456"
+                fill="#FFFFFF"
+                stroke="#FFFFFF"
                 strokeWidth="1"
               />
               {/* Africa */}
               <path
                 d="M 340 120 L 400 130 L 420 180 L 390 250 L 360 270 L 330 190 Z"
-                fill="#0F1C30"
-                stroke="#1E3456"
+                fill="#FFFFFF"
+                stroke="#FFFFFF"
                 strokeWidth="1"
               />
               {/* Europe */}
               <path
                 d="M 350 70 L 420 60 L 440 100 L 360 110 Z"
-                fill="#0F1C30"
-                stroke="#1E3456"
+                fill="#FFFFFF"
+                stroke="#FFFFFF"
                 strokeWidth="1"
               />
               {/* Americas */}
               <path
                 d="M 160 60 L 220 70 L 200 140 L 150 120 Z"
-                fill="#0F1C30"
-                stroke="#1E3456"
+                fill="#FFFFFF"
+                stroke="#FFFFFF"
                 strokeWidth="1"
               />
               <path
                 d="M 220 170 L 270 200 L 250 290 L 210 240 Z"
-                fill="#0F1C30"
-                stroke="#1E3456"
+                fill="#FFFFFF"
+                stroke="#FFFFFF"
                 strokeWidth="1"
               />
               {/* Australia */}
               <path
                 d="M 570 230 L 640 240 L 620 290 L 560 280 Z"
-                fill="#0F1C30"
-                stroke="#1E3456"
+                fill="#FFFFFF"
+                stroke="#FFFFFF"
                 strokeWidth="1"
               />
 
@@ -198,7 +198,7 @@ export default function OrbitalTrackingView() {
                       cy={cy}
                       r="3.5"
                       fill={isActive ? '#F59E0B' : '#64748B'}
-                      stroke="#060B16"
+                      stroke="#FFFFFF"
                       strokeWidth="1"
                     />
                     <text
@@ -271,55 +271,55 @@ export default function OrbitalTrackingView() {
         </div>
 
         {/* Real-time Telemetry Stream & Doppler Parameters */}
-        <div className="bg-[#0A1020] p-4 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between flex-1 min-h-[360px]">
+        <div className="bg-[#FFFFFF] p-4 rounded-xl border border-[#D9E2EA] shadow-md flex flex-col justify-between flex-1 min-h-[360px]">
           <div>
             <div className="text-xs font-display font-bold text-amber-400 tracking-wider uppercase mb-3 flex items-center gap-2">
               <span className="text-amber-400">&gt;&gt;</span> Orbital Mechanics Telemetry
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-dashed border-slate-800">
-                <span className="text-slate-400">Orbit Class:</span>
-                <span className="text-slate-100 font-bold">Sun-Synchronous LEO (SSO)</span>
+              <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
+                <span className="text-[#5B6B7A]">Orbit Class:</span>
+                <span className="text-[#17212B] font-bold">Sun-Synchronous LEO (SSO)</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-dashed border-slate-800">
-                <span className="text-slate-400">Mean Altitude:</span>
+              <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
+                <span className="text-[#5B6B7A]">Mean Altitude:</span>
                 <span className="text-amber-300 font-bold">520.42 km</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-dashed border-slate-800">
-                <span className="text-slate-400">Orbital Velocity:</span>
-                <span className="text-slate-100 font-bold">7.612 km/s (27,403 km/h)</span>
+              <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
+                <span className="text-[#5B6B7A]">Orbital Velocity:</span>
+                <span className="text-[#17212B] font-bold">7.612 km/s (27,403 km/h)</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-dashed border-slate-800">
-                <span className="text-slate-400">Inclination:</span>
-                <span className="text-slate-100 font-bold">97.48&deg;</span>
+              <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
+                <span className="text-[#5B6B7A]">Inclination:</span>
+                <span className="text-[#17212B] font-bold">97.48&deg;</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-dashed border-slate-800">
-                <span className="text-slate-400">Orbital Period:</span>
-                <span className="text-slate-100 font-bold">95.02 min</span>
+              <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
+                <span className="text-[#5B6B7A]">Orbital Period:</span>
+                <span className="text-[#17212B] font-bold">95.02 min</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-dashed border-slate-800">
-                <span className="text-slate-400">Apogee / Perigee:</span>
-                <span className="text-slate-100 font-bold">524.1 km / 516.8 km</span>
+              <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
+                <span className="text-[#5B6B7A]">Apogee / Perigee:</span>
+                <span className="text-[#17212B] font-bold">524.1 km / 516.8 km</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-dashed border-slate-800">
-                <span className="text-slate-400">Doppler Shift:</span>
+              <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
+                <span className="text-[#5B6B7A]">Doppler Shift:</span>
                 <span className="text-emerald-400 font-bold">+18.42 kHz</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-dashed border-slate-800">
-                <span className="text-slate-400">Downlink Packets:</span>
+              <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
+                <span className="text-[#5B6B7A]">Downlink Packets:</span>
                 <span className="text-amber-300 font-bold">PKT #{telemetryTick}</span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-slate-400">Frame Sync Status:</span>
+                <span className="text-[#5B6B7A]">Frame Sync Status:</span>
                 <span className="text-emerald-400 font-bold">LOCKED &bull; 0 CRC ERR</span>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 p-2.5 rounded-lg bg-[#142B40] border border-amber-500/30 text-[10px]">
+          <div className="mt-4 p-2.5 rounded-lg bg-[#F8FAFC] border border-amber-500/30 text-[10px]">
             <div className="text-amber-400 font-bold mb-1 uppercase">Next Ground Station Pass:</div>
-            <div className="text-slate-200">
+            <div className="text-[#17212B]">
               <b>Bengaluru ISTRAC NOCC</b> &bull; AOS in <span className="text-emerald-400 font-bold">04m 18s</span> &bull; Max Elevation: 74&deg;
             </div>
           </div>
@@ -327,7 +327,7 @@ export default function OrbitalTrackingView() {
       </div>
 
       {/* Ground Station Table */}
-      <div className="rounded-xl border border-slate-800 bg-[#0A1020] p-4 shadow-md">
+      <div className="rounded-xl border border-[#D9E2EA] bg-[#FFFFFF] p-4 shadow-md">
         <div className="text-xs font-display font-bold text-amber-400 tracking-wider uppercase mb-3">
           ISTRAC Ground Network Status
         </div>
@@ -340,7 +340,7 @@ export default function OrbitalTrackingView() {
                   ? 'bg-amber-500/15 border-amber-500/60 text-white shadow-sm'
                   : gs.status === 'ACQUIRING'
                   ? 'bg-emerald-500/15 border-emerald-500/50 text-white'
-                  : 'bg-[#0B1928] border-slate-800 text-slate-400'
+                  : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A]'
               }`}
             >
               <div className="flex items-center justify-between font-bold">
@@ -355,8 +355,8 @@ export default function OrbitalTrackingView() {
                   }`}
                 />
               </div>
-              <div className="truncate text-[9.5px] mt-0.5 text-slate-300">{gs.name}</div>
-              <div className="text-[9px] text-slate-400 mt-1">
+              <div className="truncate text-[9.5px] mt-0.5 text-[#5B6B7A]">{gs.name}</div>
+              <div className="text-[9px] text-[#5B6B7A] mt-1">
                 EL: {gs.elevation.toFixed(1)}&deg; &bull; AZ: {gs.azimuth.toFixed(0)}&deg;
               </div>
             </div>

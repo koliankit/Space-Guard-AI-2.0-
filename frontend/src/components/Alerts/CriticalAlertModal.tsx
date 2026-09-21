@@ -9,11 +9,11 @@ export default function CriticalAlertModal({
 }) {
   return (
     <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-      <div className="w-[460px] max-w-[94vw] bg-[#102337] border-2 border-reject/80 rounded-lg p-6 shadow-alert-glow modal-anim relative font-mono">
+      <div className="w-[460px] max-w-[94vw] bg-[#FFFFFF] border-2 border-reject/80 rounded-lg p-6 shadow-alert-glow modal-anim relative font-mono">
         <button
           type="button"
           onClick={onAcknowledge}
-          className="absolute top-3.5 right-3.5 text-slate-400 hover:text-white text-sm w-6 h-6 flex items-center justify-center rounded hover:bg-slate-800 transition-colors"
+          className="absolute top-3.5 right-3.5 text-[#5B6B7A] hover:text-[#17212B] text-sm w-6 h-6 flex items-center justify-center rounded hover:bg-[#F8FAFC] transition-colors"
           title="Close Dialog"
         >
           &#10005;
@@ -23,30 +23,30 @@ export default function CriticalAlertModal({
           <span className="w-2.5 h-2.5 rounded-full bg-reject led" />
           <span>CRITICAL COMPONENT ANOMALY DETECTED</span>
         </div>
-        <div className="text-2xl font-mono font-black text-white">{component.component_id}</div>
+        <div className="text-2xl font-mono font-black text-[#17212B]">{component.component_id}</div>
         <div className="text-xs font-mono text-isro-amber mb-4 font-semibold">
           {component.subsystem_name} &bull; [{component.subsystem}] &bull; Lot {component.lot_id}
         </div>
 
-        <div className="text-xs font-mono space-y-2.5 bg-[#060B16] p-3.5 rounded-lg border border-slate-800 mb-5">
-          <div className="flex justify-between border-b border-dashed border-slate-800 pb-1.5">
-            <span className="text-slate-400">Anomaly Risk Score:</span>
+        <div className="text-xs font-mono space-y-2.5 bg-[#FFFFFF] p-3.5 rounded-lg border border-[#D9E2EA] mb-5">
+          <div className="flex justify-between border-b border-dashed border-[#D9E2EA] pb-1.5">
+            <span className="text-[#5B6B7A]">Anomaly Risk Score:</span>
             <b className="text-reject text-sm font-bold">{component.risk_score} / 100</b>
           </div>
-          <div className="flex justify-between border-b border-dashed border-slate-800 pb-1.5">
-            <span className="text-slate-400">Current Leakage (168h):</span>
-            <b className="text-white font-bold">{component.v168.toFixed(2)} &micro;A</b>
+          <div className="flex justify-between border-b border-dashed border-[#D9E2EA] pb-1.5">
+            <span className="text-[#5B6B7A]">Current Leakage (168h):</span>
+            <b className="text-[#17212B] font-bold">{component.v168.toFixed(2)} &micro;A</b>
           </div>
-          <div className="flex justify-between border-b border-dashed border-slate-800 pb-1.5">
-            <span className="text-slate-400">Projected (+96h Future):</span>
+          <div className="flex justify-between border-b border-dashed border-[#D9E2EA] pb-1.5">
+            <span className="text-[#5B6B7A]">Projected (+96h Future):</span>
             <b className="text-isro-amber font-bold">{component.predicted_future.toFixed(2)} &micro;A</b>
           </div>
-          <div className="flex justify-between border-b border-dashed border-slate-800 pb-1.5">
-            <span className="text-slate-400">Datasheet Limit:</span>
-            <b className="text-slate-300">{component.limit_ua.toFixed(0)} &micro;A</b>
+          <div className="flex justify-between border-b border-dashed border-[#D9E2EA] pb-1.5">
+            <span className="text-[#5B6B7A]">Datasheet Limit:</span>
+            <b className="text-[#5B6B7A]">{component.limit_ua.toFixed(0)} &micro;A</b>
           </div>
           <div className="flex justify-between pt-0.5 items-center">
-            <span className="text-slate-400">AI Screening Verdict:</span>
+            <span className="text-[#5B6B7A]">AI Screening Verdict:</span>
             <b className="text-reject bg-reject/20 px-2 py-0.5 rounded border border-reject/50 text-[11px]">
               REJECT (LATENT OXIDE DRIFT)
             </b>

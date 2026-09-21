@@ -4,57 +4,57 @@ export default {
   theme: {
     extend: {
       colors: {
-        // SpaceGuard AI ISRO Aerospace Background System
-        bg: '#07111C',              // Main Background - Deep Space Navy
-        bg2: '#0B1928',             // Secondary Background - Sub-panels & Toolbars
-        panel: '#102337',           // Panel / Card - Surface Navy
-        panel2: '#142B40',          // Elevated Panel - Interactive Hover Navy
-        'panel-critical': '#24141E', // Critical Alert Panel
+        // SpaceGuard AI Part 17 Light Engineering Background System
+        bg: '#F4F7FA',              // Main Background - Light Blue-Gray
+        bg2: '#F8FAFC',             // Secondary Background - Sub-panels & Toolbars
+        panel: '#FFFFFF',           // Panel / Card - Clean White
+        panel2: '#F8FAFC',          // Elevated Panel - Very Subtle Light Blue-Gray
+        'panel-critical': '#FEF2F2', // Critical Alert Panel Light Red Tint
 
-        // Text Hierarchy
-        'text-primary': '#F1F5F9',   // Primary Text
-        'text-secondary': '#9AAFC0', // Secondary Text
-        muted: '#9AAFC0',
-        dim: '#6F8495',             // Muted Text
+        // Text Hierarchy (Dark Navy & Cool Gray)
+        'text-primary': '#17212B',   // Primary Text - Dark Navy
+        'text-secondary': '#5B6B7A', // Secondary Text
+        muted: '#81909D',           // Muted Text
+        dim: '#81909D',
 
         // Borders & Dividers
-        border: '#1D3A52',          // Border / Divider - Clean Precision Blue
-        line: '#1D3A52',
+        border: '#D9E2EA',          // Border / Divider - Clean Precision Light Border
+        line: '#D9E2EA',
 
         // Primary Colors: ISRO Blue (#0E88D3)
         'isro-blue': {
           DEFAULT: '#0E88D3',
-          hover: '#249CE6',
-          dark: '#0A68A3',
-          muted: 'rgba(14, 136, 211, 0.18)',
+          hover: '#0A73B5',
+          dark: '#085B90',
+          muted: 'rgba(14, 136, 211, 0.12)',
         },
         'tech-blue': {
           DEFAULT: '#0E88D3',
-          hover: '#249CE6',
-          dark: '#0A68A3',
-          muted: 'rgba(14, 136, 211, 0.18)',
+          hover: '#0A73B5',
+          dark: '#085B90',
+          muted: 'rgba(14, 136, 211, 0.12)',
         },
         blue: {
           DEFAULT: '#0E88D3',
           400: '#249CE6',
           500: '#0E88D3',
-          600: '#0A68A3',
+          600: '#0A73B5',
         },
         cyan: '#0E88D3',
 
-        // Primary Accent: ISRO Orange (#F47216 - ~7% ratio)
+        // Primary Accent: ISRO Orange (#F47216 - ~3% ratio)
         'isro-orange': {
           DEFAULT: '#F47216',
-          hover: '#FA8838',
-          dark: '#C65507',
-          muted: 'rgba(244, 114, 22, 0.18)',
+          hover: '#DE610D',
+          dark: '#BE5006',
+          muted: 'rgba(244, 114, 22, 0.12)',
         },
         accent: '#F47216',
         gold: {
           DEFAULT: '#F47216',
-          hover: '#FA8838',
-          dark: '#C65507',
-          muted: 'rgba(244, 114, 22, 0.18)',
+          hover: '#DE610D',
+          dark: '#BE5006',
+          muted: 'rgba(244, 114, 22, 0.12)',
         },
         isro: {
           DEFAULT: '#0E88D3',
@@ -65,89 +65,89 @@ export default {
           gold: '#F47216',
         },
 
-        // Status Colors (Strictly Separated from Brand Blue & Orange)
-        // SAFE: Green (#22A06B)
+        // Status Colors (Part 17 Engineering Status Colors)
+        // SAFE: Green (#168A5B)
         safe: {
-          DEFAULT: '#22A06B',
-          hover: '#28BD7E',
-          dark: '#187A50',
-          muted: 'rgba(34, 160, 107, 0.18)',
+          DEFAULT: '#168A5B',
+          hover: '#1B9D68',
+          dark: '#116B46',
+          muted: 'rgba(22, 138, 91, 0.12)',
         },
         emerald: {
-          DEFAULT: '#22A06B',
-          300: '#4ADE80',
-          400: '#28BD7E',
-          500: '#22A06B',
-          600: '#187A50',
-          700: '#15803D',
+          DEFAULT: '#168A5B',
+          300: '#34D399',
+          400: '#1B9D68',
+          500: '#168A5B',
+          600: '#116B46',
+          700: '#0E5537',
         },
         green: {
-          DEFAULT: '#22A06B',
-          400: '#28BD7E',
-          500: '#22A06B',
-          600: '#187A50',
+          DEFAULT: '#168A5B',
+          400: '#1B9D68',
+          500: '#168A5B',
+          600: '#116B46',
         },
 
-        // MONITOR / WARNING: Amber (#F2B84B)
+        // MONITOR: Amber (#C58A00)
         monitor: {
-          DEFAULT: '#F2B84B',
-          hover: '#F5C76E',
-          dark: '#B88428',
-          muted: 'rgba(242, 184, 75, 0.18)',
+          DEFAULT: '#C58A00',
+          hover: '#DB9B05',
+          dark: '#996C00',
+          muted: 'rgba(197, 138, 0, 0.12)',
         },
         amber: {
-          DEFAULT: '#F2B84B',
+          DEFAULT: '#C58A00',
           200: '#FDE68A',
           300: '#F5C76E',
-          400: '#F2B84B',
-          500: '#F2B84B',
-          600: '#B88428',
-          700: '#B45309',
+          400: '#DB9B05',
+          500: '#C58A00',
+          600: '#996C00',
+          700: '#7A5600',
         },
 
-        // REJECT / CRITICAL: Red (#E5484D)
+        // REJECT / CRITICAL: Red (#D9363E)
         reject: {
-          DEFAULT: '#E5484D',
-          hover: '#EB6367',
-          dark: '#B0282C',
-          muted: 'rgba(229, 72, 77, 0.18)',
+          DEFAULT: '#D9363E',
+          hover: '#E8454D',
+          dark: '#B0262D',
+          muted: 'rgba(217, 54, 62, 0.12)',
         },
         rose: {
-          DEFAULT: '#E5484D',
+          DEFAULT: '#D9363E',
           300: '#FDA4AF',
-          400: '#EB6367',
-          500: '#E5484D',
-          600: '#B0282C',
-          700: '#BE123C',
+          400: '#E8454D',
+          500: '#D9363E',
+          600: '#B0262D',
+          700: '#8E1E23',
         },
         red: {
-          DEFAULT: '#E5484D',
-          400: '#EB6367',
-          500: '#E5484D',
-          600: '#B0282C',
+          DEFAULT: '#D9363E',
+          400: '#E8454D',
+          500: '#D9363E',
+          600: '#B0262D',
         },
 
-        // Slate Theme Override to ISRO Aerospace Palette
+        // Slate Theme Tokens
         slate: {
-          950: '#07111C', // Main background
-          900: '#0B1928', // Secondary background
-          850: '#102337', // Panel / card
-          800: '#142B40', // Elevated panel / subtle card
-          700: '#1D3A52', // Border / divider
-          600: '#2A4D6C',
-          500: '#6F8495', // Muted text
-          400: '#9AAFC0', // Secondary text
+          950: '#17212B', // Darkest navy text
+          900: '#233140', // Deep navy
+          850: '#344557',
+          800: '#465A6E',
+          700: '#5B6B7A', // Secondary text
+          600: '#6E8092',
+          500: '#81909D', // Muted text
+          400: '#9BA9B6',
           300: '#CBD5E1',
-          200: '#E2E8F0',
-          100: '#F1F5F9', // Primary text
-          50: '#F8FAFC',
+          200: '#D9E2EA', // Border
+          100: '#F1F5F9', // Elevated surface
+          50: '#F8FAFC',  // Very light surface
         },
 
         telemetry: {
-          slate: '#F1F5F9',
-          steel: '#D0D8E2',
-          dark: '#9AAFC0',
-          muted: '#6F8495',
+          slate: '#17212B',
+          steel: '#5B6B7A',
+          dark: '#81909D',
+          muted: '#81909D',
         },
       },
       fontFamily: {

@@ -4,17 +4,17 @@ export default function MissionMap({ critical }: { critical: boolean }) {
   const coreCol = critical ? '#EF4444' : '#F59E0B'
 
   return (
-    <div className="bg-[#102337] p-4 border-l border-slate-800">
+    <div className="bg-[#FFFFFF] p-4 border-l border-[#D9E2EA]">
       <div className="flex items-center justify-between mb-3">
         <h3 className="m-0 text-xs font-display font-bold tracking-wider uppercase text-amber-400 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-amber-400" />
           Orbital Telemetry Ground Track
         </h3>
-        <span className="font-mono text-[9px] text-slate-400">PASS #14 &bull; LEO 520KM</span>
+        <span className="font-mono text-[9px] text-[#5B6B7A]">PASS #14 &bull; LEO 520KM</span>
       </div>
 
-      <div className="relative h-[195px] bg-[#060B16] border border-slate-800 rounded-lg overflow-hidden">
-        <div className="absolute top-2 left-2.5 font-mono text-[9px] text-slate-400 tracking-wider">
+      <div className="relative h-[195px] bg-[#FFFFFF] border border-[#D9E2EA] rounded-lg overflow-hidden">
+        <div className="absolute top-2 left-2.5 font-mono text-[9px] text-[#5B6B7A] tracking-wider">
           ISRO / ISTRAC DSN TRACKING &bull; <span className="text-amber-400 font-bold">UPLINK SYNCHRONIZED</span>
         </div>
 
@@ -28,19 +28,19 @@ export default function MissionMap({ critical }: { critical: boolean }) {
           </defs>
 
           {/* Earth Grid Coordinates */}
-          <line x1="10" y1="95" x2="290" y2="95" stroke="#1E293B" strokeDasharray="3,3" />
-          <line x1="150" y1="15" x2="150" y2="180" stroke="#1E293B" strokeDasharray="3,3" />
+          <line x1="10" y1="95" x2="290" y2="95" stroke="#FFFFFF" strokeDasharray="3,3" />
+          <line x1="150" y1="15" x2="150" y2="180" stroke="#FFFFFF" strokeDasharray="3,3" />
 
           {/* Continents stylized deep slate landmasses */}
-          <rect x="35" y="45" width="45" height="30" fill="#0F1C30" rx="3" />
-          <rect x="95" y="35" width="70" height="35" fill="#0F1C30" rx="3" />
-          <rect x="180" y="40" width="85" height="45" fill="#0F1C30" rx="3" />
-          <rect x="55" y="105" width="40" height="50" fill="#0F1C30" rx="3" />
-          <rect x="120" y="90" width="45" height="45" fill="#0F1C30" rx="3" />
-          <rect x="205" y="115" width="45" height="35" fill="#0F1C30" rx="3" />
+          <rect x="35" y="45" width="45" height="30" fill="#FFFFFF" rx="3" />
+          <rect x="95" y="35" width="70" height="35" fill="#FFFFFF" rx="3" />
+          <rect x="180" y="40" width="85" height="45" fill="#FFFFFF" rx="3" />
+          <rect x="55" y="105" width="40" height="50" fill="#FFFFFF" rx="3" />
+          <rect x="120" y="90" width="45" height="45" fill="#FFFFFF" rx="3" />
+          <rect x="205" y="115" width="45" height="35" fill="#FFFFFF" rx="3" />
 
           {/* DSN Ground Station */}
-          <circle cx="55" cy="148" r="6" fill="#060B16" stroke="#F59E0B" strokeWidth="1.8" />
+          <circle cx="55" cy="148" r="6" fill="#FFFFFF" stroke="#F59E0B" strokeWidth="1.8" />
           <circle cx="55" cy="148" r="2.5" fill="#F59E0B" />
           <text x="55" y="170" textAnchor="middle" className="fill-amber-400 text-[8.5px] font-mono font-bold">
             SHAR GROUND
@@ -67,7 +67,7 @@ export default function MissionMap({ critical }: { critical: boolean }) {
             <animate attributeName="stroke-dashoffset" from="0" to="60" dur="1.8s" repeatCount="indefinite" />
           </path>
 
-          <rect x="100" y="128" width="100" height="26" rx="3" fill="#0A1020" stroke={coreCol} strokeWidth="1.4" />
+          <rect x="100" y="128" width="100" height="26" rx="3" fill="#FFFFFF" stroke={coreCol} strokeWidth="1.4" />
           <text x="150" y="145" textAnchor="middle" fill={coreCol} className="text-[8.5px] font-mono font-bold tracking-wider">
             AI SCREENING CORE
           </text>

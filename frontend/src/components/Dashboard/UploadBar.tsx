@@ -39,7 +39,7 @@ export default function UploadBar({
   const [showExportMenu, setShowExportMenu] = useState(false)
 
   return (
-    <div className="border-b border-[#1D3A52] bg-[#07111C] px-4 md:px-6 py-3 font-sans select-none">
+    <div className="border-b border-[#D9E2EA] bg-[#F4F7FA] px-4 md:px-6 py-3 font-sans select-none">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         {/* Left Section: Core Telemetry Data Ingestion Actions */}
         <div className="flex items-center gap-3 flex-wrap">
@@ -47,8 +47,8 @@ export default function UploadBar({
           <div
             className={`border rounded-xl px-4 py-2.5 flex items-center gap-2.5 cursor-pointer transition-all shadow-sm ${
               drag
-                ? 'border-[#0E88D3] bg-[#0E88D3]/20 text-[#F1F5F9] ring-2 ring-[#0E88D3]/40'
-                : 'border-[#1D3A52] bg-[#102337] text-[#F1F5F9] hover:border-[#0E88D3]/70 hover:bg-[#142B40]'
+                ? 'border-[#0E88D3] bg-[#0E88D3]/20 text-[#17212B] ring-2 ring-[#0E88D3]/40'
+                : 'border-[#D9E2EA] bg-[#FFFFFF] text-[#17212B] hover:border-[#0E88D3]/70 hover:bg-[#F8FAFC]'
             }`}
             onClick={() => {
               sounds.playClick()
@@ -75,7 +75,7 @@ export default function UploadBar({
           >
             <span className="text-[#0E88D3] font-bold text-lg">📁</span>
             <span className="text-sm font-display font-semibold tracking-wide">
-              <span className="text-[#9AAFC0]">INGEST </span>
+              <span className="text-[#5B6B7A]">INGEST </span>
               <span className="text-[#0E88D3] font-bold underline decoration-[#0E88D3]/50">CSV TELEMETRY</span>
             </span>
             <input
@@ -92,7 +92,7 @@ export default function UploadBar({
           {/* Quick Load Flight Batch */}
           <button
             type="button"
-            className="text-sm font-display font-bold px-4 py-2.5 rounded-xl border border-[#1D3A52] bg-[#142B40] text-[#F1F5F9] hover:bg-[#1D3A52] hover:border-[#0E88D3] transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+            className="text-sm font-display font-bold px-4 py-2.5 rounded-xl border border-[#D9E2EA] bg-[#F8FAFC] text-[#17212B] hover:bg-[#D9E2EA] hover:border-[#0E88D3] transition-all flex items-center gap-2 cursor-pointer shadow-sm"
             onClick={() => {
               sounds.playPing()
               onDemo()
@@ -106,7 +106,7 @@ export default function UploadBar({
           {onResetWorkflow && (
             <button
               type="button"
-              className="text-sm font-display font-bold px-3.5 py-2.5 rounded-xl border border-[#E5484D]/40 bg-[#24141E] text-[#E5484D] hover:bg-[#24141E]/80 hover:text-[#F1F5F9] hover:border-[#E5484D] transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+              className="text-sm font-display font-bold px-3.5 py-2.5 rounded-xl border border-[#D9363E]/40 bg-[#FEF2F2] text-[#D9363E] hover:bg-[#FEF2F2]/80 hover:text-[#17212B] hover:border-[#D9363E] transition-all flex items-center gap-2 cursor-pointer shadow-sm"
               onClick={() => {
                 sounds.playClick()
                 onResetWorkflow()
@@ -127,10 +127,10 @@ export default function UploadBar({
             disabled={!canRun || running}
             className={`text-sm md:text-[15px] font-display font-black px-6 py-2.5 rounded-xl transition-all flex items-center gap-2.5 shadow-lg uppercase tracking-wider cursor-pointer border ${
               running
-                ? 'bg-[#142B40] text-[#0E88D3] border-[#0E88D3]/60 cursor-wait'
+                ? 'bg-[#F8FAFC] text-[#0E88D3] border-[#0E88D3]/60 cursor-wait'
                 : canRun
-                ? 'bg-gradient-to-r from-[#22A06B] to-[#0E88D3] hover:from-[#22A06B]/90 hover:to-[#0E88D3]/90 text-[#F1F5F9] border-[#22A06B]/60 shadow-lg'
-                : 'bg-[#142B40] text-[#9AAFC0] border-[#1D3A52] opacity-50 cursor-not-allowed'
+                ? 'bg-gradient-to-r from-[#168A5B] to-[#0E88D3] hover:from-[#168A5B]/90 hover:to-[#0E88D3]/90 text-[#17212B] border-[#168A5B]/60 shadow-lg'
+                : 'bg-[#F8FAFC] text-[#5B6B7A] border-[#D9E2EA] opacity-50 cursor-not-allowed'
             }`}
             onClick={() => {
               sounds.playPing()
@@ -151,7 +151,7 @@ export default function UploadBar({
                 sounds.playClick()
                 setShowExportMenu((v) => !v)
               }}
-              className="text-sm font-display font-bold px-4 py-2.5 rounded-xl border border-[#1D3A52] bg-[#102337] text-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#0E88D3] transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+              className="text-sm font-display font-bold px-4 py-2.5 rounded-xl border border-[#D9E2EA] bg-[#FFFFFF] text-[#17212B] disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#0E88D3] transition-all flex items-center gap-2 cursor-pointer shadow-sm"
               title="Export Flight Clearance Reports & Logs"
             >
               <span className="text-base">📥</span>
@@ -159,11 +159,11 @@ export default function UploadBar({
             </button>
 
             {showExportMenu && canReport && (
-              <div className="absolute right-0 top-full mt-2 w-60 bg-[#102337] border border-[#1D3A52] rounded-xl shadow-2xl p-2 z-50 animate-modalin flex flex-col gap-1.5">
+              <div className="absolute right-0 top-full mt-2 w-60 bg-[#FFFFFF] border border-[#D9E2EA] rounded-xl shadow-2xl p-2 z-50 animate-modalin flex flex-col gap-1.5">
                 {onReportPdf && (
                   <button
                     type="button"
-                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-[#22A06B] hover:bg-[#142B40] flex items-center justify-between transition-colors cursor-pointer"
+                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-[#168A5B] hover:bg-[#F8FAFC] flex items-center justify-between transition-colors cursor-pointer"
                     onClick={() => {
                       sounds.playSuccess()
                       setShowExportMenu(false)
@@ -171,13 +171,13 @@ export default function UploadBar({
                     }}
                   >
                     <span className="font-semibold">Flight Clearance Certificate</span>
-                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#22A06B]/20 border border-[#22A06B]/30 text-[#22A06B]">.PDF</span>
+                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#168A5B]/20 border border-[#168A5B]/30 text-[#168A5B]">.PDF</span>
                   </button>
                 )}
                 {onReportExcel && (
                   <button
                     type="button"
-                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-[#0E88D3] hover:bg-[#142B40] flex items-center justify-between transition-colors cursor-pointer"
+                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-[#0E88D3] hover:bg-[#F8FAFC] flex items-center justify-between transition-colors cursor-pointer"
                     onClick={() => {
                       sounds.playSuccess()
                       setShowExportMenu(false)
@@ -191,7 +191,7 @@ export default function UploadBar({
                 {onReportCsv && (
                   <button
                     type="button"
-                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-[#0E88D3] hover:bg-[#142B40] flex items-center justify-between transition-colors cursor-pointer"
+                    className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-[#0E88D3] hover:bg-[#F8FAFC] flex items-center justify-between transition-colors cursor-pointer"
                     onClick={() => {
                       sounds.playSuccess()
                       setShowExportMenu(false)
@@ -204,7 +204,7 @@ export default function UploadBar({
                 )}
                 <button
                   type="button"
-                  className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-[#F1F5F9] hover:bg-[#142B40] flex items-center justify-between transition-colors cursor-pointer"
+                  className="w-full text-left px-3.5 py-2.5 rounded-lg text-xs md:text-sm font-sans font-medium text-[#17212B] hover:bg-[#F8FAFC] flex items-center justify-between transition-colors cursor-pointer"
                   onClick={() => {
                     sounds.playSuccess()
                     setShowExportMenu(false)
@@ -221,9 +221,9 @@ export default function UploadBar({
       </div>
 
       {/* Dataset Status Ticker with interactive Lot-Wise Inspector */}
-      <div className="mt-3 pt-3 border-t border-[#1D3A52] flex items-center justify-between gap-3 text-base md:text-lg text-[#F1F5F9] flex-wrap">
+      <div className="mt-3 pt-3 border-t border-[#D9E2EA] flex items-center justify-between gap-3 text-base md:text-lg text-[#17212B] flex-wrap">
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#22A06B] animate-gentle-pulse flex-shrink-0" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#168A5B] animate-gentle-pulse flex-shrink-0" />
           <div
             className="flex items-center gap-2 flex-wrap text-sm md:text-base leading-snug cursor-pointer select-none font-medium"
             onClick={(e) => {
@@ -249,7 +249,7 @@ export default function UploadBar({
                 sounds.playClick()
                 onOpenLotsModal()
               }}
-              className="inline-flex items-center gap-2 text-xs md:text-sm font-mono font-bold bg-[#142B40] hover:bg-[#1D3A52] text-[#0E88D3] hover:text-[#F1F5F9] px-4 py-1.5 rounded-lg border border-[#0E88D3]/60 hover:border-[#0E88D3] transition-all shadow-sm cursor-pointer ml-1.5 group"
+              className="inline-flex items-center gap-2 text-xs md:text-sm font-mono font-bold bg-[#F8FAFC] hover:bg-[#D9E2EA] text-[#0E88D3] hover:text-[#17212B] px-4 py-1.5 rounded-lg border border-[#0E88D3]/60 hover:border-[#0E88D3] transition-all shadow-sm cursor-pointer ml-1.5 group"
               title="Open dedicated Lot-Wise Classification Window"
             >
               <span>📦</span>
@@ -257,7 +257,7 @@ export default function UploadBar({
             </button>
           )}
         </div>
-        <span className="text-[#9AAFC0] text-xs md:text-sm uppercase font-mono font-bold tracking-wider bg-[#0B1928] px-3.5 py-1.5 rounded-lg border border-[#1D3A52] whitespace-nowrap hidden lg:inline-block shadow-sm">
+        <span className="text-[#5B6B7A] text-xs md:text-sm uppercase font-mono font-bold tracking-wider bg-[#FFFFFF] px-3.5 py-1.5 rounded-lg border border-[#D9E2EA] whitespace-nowrap hidden lg:inline-block shadow-sm">
           MIL-STD-883 HTOL 168H RELIABILITY SPEC
         </span>
       </div>

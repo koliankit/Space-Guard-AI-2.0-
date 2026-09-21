@@ -87,17 +87,17 @@ export default function DataIngestModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in font-sans">
-      <div className="relative w-full max-w-2xl bg-[#142B40] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
+      <div className="relative w-full max-w-2xl bg-[#F8FAFC] border border-[#D9E2EA] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-[#102337]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#D9E2EA] bg-[#FFFFFF]">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white" />
-              <h2 className="text-sm font-bold text-white tracking-wide uppercase">
+              <h2 className="text-sm font-bold text-[#17212B] tracking-wide uppercase">
                 Data Ingestion &bull; SpaceGuard AI
               </h2>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#5B6B7A] mt-0.5">
               Satish Dhawan Space Centre SHAR &bull; Telemetry Ingestion Engine
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function DataIngestModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-sm"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC] transition-colors text-sm"
             title="Close"
           >
             ✕
@@ -113,14 +113,14 @@ export default function DataIngestModal({
         </div>
 
         {/* Method Switcher Tabs */}
-        <div className="grid grid-cols-3 bg-[#0B1928] border-b border-slate-800 p-1 text-xs font-mono">
+        <div className="grid grid-cols-3 bg-[#FFFFFF] border-b border-[#D9E2EA] p-1 text-xs font-mono">
           <button
             type="button"
             onClick={() => setActiveTab('upload')}
             className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'upload'
                 ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
             }`}
           >
             <span>📁</span>
@@ -132,7 +132,7 @@ export default function DataIngestModal({
             className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'paste'
                 ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
             }`}
           >
             <span>📋</span>
@@ -144,7 +144,7 @@ export default function DataIngestModal({
             className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'preset'
                 ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
             }`}
           >
             <span>🚀</span>
@@ -166,17 +166,17 @@ export default function DataIngestModal({
                 className={`p-8 rounded-xl border-2 border-dashed text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 ${
                   dragActive
                     ? 'border-white bg-white/10'
-                    : 'border-slate-700 bg-[#0A0F1E] hover:border-slate-500 hover:bg-[#0D152A]'
+                    : 'border-[#D9E2EA] bg-[#FFFFFF] hover:border-slate-500 hover:bg-[#FFFFFF]'
                 }`}
               >
-                <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white text-2xl">
+                <div className="w-12 h-12 rounded-full bg-[#F8FAFC] flex items-center justify-center text-[#17212B] text-2xl">
                   📄
                 </div>
-                <div className="text-sm font-medium text-white">
+                <div className="text-sm font-medium text-[#17212B]">
                   Drag and drop your telemetry CSV here
                 </div>
-                <div className="text-xs text-slate-400">
-                  or <span className="text-white font-semibold underline">browse file from device</span>
+                <div className="text-xs text-[#5B6B7A]">
+                  or <span className="text-[#17212B] font-semibold underline">browse file from device</span>
                 </div>
 
                 <input
@@ -187,8 +187,8 @@ export default function DataIngestModal({
                   className="hidden"
                 />
 
-                <div className="text-[11px] text-slate-400 mt-2">
-                  Required columns: <code className="text-slate-300 font-mono">component_id, lot_id, 0h, 24h, 168h</code>
+                <div className="text-[11px] text-[#5B6B7A] mt-2">
+                  Required columns: <code className="text-[#5B6B7A] font-mono">component_id, lot_id, 0h, 24h, 168h</code>
                 </div>
               </div>
             </div>
@@ -198,11 +198,11 @@ export default function DataIngestModal({
           {activeTab === 'paste' && (
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-300 font-semibold">Paste raw CSV / TSV text below:</span>
+                <span className="text-[#5B6B7A] font-semibold">Paste raw CSV / TSV text below:</span>
                 <button
                   type="button"
                   onClick={() => setPastedText(SAMPLE_CSV)}
-                  className="text-slate-200 hover:text-white underline text-[11px] font-mono"
+                  className="text-[#17212B] hover:text-[#17212B] underline text-[11px] font-mono"
                 >
                   [+] Insert Sample Dataset
                 </button>
@@ -213,14 +213,14 @@ export default function DataIngestModal({
                 onChange={(e) => setPastedText(e.target.value)}
                 placeholder="component_id,lot_id,subsystem,0h,24h,96h,168h,static_limit_ua&#10;FC-ASIC-088,LOT-01,FC,12.4,14.8,22.1,38.9,50.0&#10;..."
                 rows={10}
-                className="w-full bg-[#07111C] border border-slate-700 rounded-xl p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-white leading-relaxed"
+                className="w-full bg-[#F4F7FA] border border-[#D9E2EA] rounded-xl p-3 text-xs font-mono text-[#17212B] placeholder:text-slate-600 focus:outline-none focus:border-white leading-relaxed"
               />
 
               <button
                 type="button"
                 disabled={!pastedText.trim()}
                 onClick={handlePastedSubmit}
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs uppercase transition-colors flex items-center justify-center gap-2 shadow-sm"
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-[#17212B] font-bold text-xs uppercase transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
                 <span>⚡ Parse &amp; Ingest Pasted Telemetry</span>
               </button>
@@ -243,18 +243,18 @@ export default function DataIngestModal({
                       }}
                       className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1 ${
                         isSelected
-                          ? 'bg-white/10 border-white text-white shadow-sm ring-1 ring-white/30'
-                          : 'bg-[#0A0F1E] border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-[#0E172E]'
+                          ? 'bg-white/10 border-white text-[#17212B] shadow-sm ring-1 ring-white/30'
+                          : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A] hover:border-[#D9E2EA] hover:bg-[#FFFFFF]'
                       }`}
                     >
-                      <div className="flex items-center gap-1.5 font-semibold text-xs text-white">
+                      <div className="flex items-center gap-1.5 font-semibold text-xs text-[#17212B]">
                         <span>{m.icon}</span>
                         <span>{m.name}</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 truncate">
+                      <div className="text-[10px] text-[#5B6B7A] truncate">
                         {m.description}
                       </div>
-                      <div className="text-[9px] text-slate-400 font-mono">
+                      <div className="text-[9px] text-[#5B6B7A] font-mono">
                         {m.targetOrbit} &bull; {m.centre}
                       </div>
                     </button>
@@ -274,12 +274,12 @@ export default function DataIngestModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-slate-800 bg-[#102337] flex items-center justify-between text-xs text-slate-400">
+        <div className="px-6 py-3 border-t border-[#D9E2EA] bg-[#FFFFFF] flex items-center justify-between text-xs text-[#5B6B7A]">
           <span>MIL-STD-883 Method 1005 Compliant</span>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white underline text-xs"
+            className="text-[#5B6B7A] hover:text-[#17212B] underline text-xs"
           >
             Close
           </button>

@@ -3,23 +3,42 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #07111C;
-  --color-bg2: #0B1928;
-  --color-panel: #102337;
-  --color-panel2: #142B40;
-  --color-border: #1D3A52;
-  --color-line: #1D3A52;
+  /* PART 17 — FINAL LIGHT ENGINEERING DASHBOARD COLOR SYSTEM */
+  --bg-main: #F4F7FA;
+  --bg-panel: #FFFFFF;
+  --bg-elevated: #F8FAFC;
+  --border: #D9E2EA;
+  --border-subtle: #E5EDF4;
 
-  --color-text-primary: #F1F5F9;
-  --color-text-secondary: #9AAFC0;
-  --color-text-muted: #6F8495;
+  --text-primary: #17212B;
+  --text-secondary: #5B6B7A;
+  --text-muted: #81909D;
+
+  --primary-blue: #0E88D3;
+  --primary-orange: #F47216;
+
+  --status-safe: #168A5B;
+  --status-monitor: #C58A00;
+  --status-critical: #D9363E;
+
+  /* Legacy variable mappings for backward compatibility */
+  --color-bg: #F4F7FA;
+  --color-bg2: #F8FAFC;
+  --color-panel: #FFFFFF;
+  --color-panel2: #F8FAFC;
+  --color-border: #D9E2EA;
+  --color-line: #D9E2EA;
+
+  --color-text-primary: #17212B;
+  --color-text-secondary: #5B6B7A;
+  --color-text-muted: #81909D;
 
   --color-isro-blue: #0E88D3;
   --color-isro-orange: #F47216;
 
-  --color-status-safe: #22A06B;
-  --color-status-monitor: #F2B84B;
-  --color-status-reject: #E5484D;
+  --color-status-safe: #168A5B;
+  --color-status-monitor: #C58A00;
+  --color-status-reject: #D9363E;
 }
 
 @font-face {
@@ -64,8 +83,8 @@ html, body, #root {
 }
 
 body {
-  background: #07111C;
-  color: #F1F5F9;
+  background: #F4F7FA;
+  color: #17212B;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
   font-variation-settings: 'opsz' 14, 'wght' 600;
@@ -83,15 +102,15 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1D3A52;
+  background: #D9E2EA;
   border-radius: 3px;
-  border: 1px solid #142B40;
+  border: 1px solid #F8FAFC;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #0E88D3;
 }
 ::-webkit-scrollbar-track {
-  background: #07111C;
+  background: #F4F7FA;
 }
 
 /* ==============================================================================
@@ -109,10 +128,10 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.28;
+  opacity: 0.35;
   background-image:
-    linear-gradient(rgba(29, 58, 82, 0.35) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(29, 58, 82, 0.35) 1px, transparent 1px);
+    linear-gradient(rgba(217, 226, 234, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 226, 234, 0.5) 1px, transparent 1px);
   background-size: 32px 32px;
   animation: grid-drift 18s linear infinite;
 }
@@ -156,7 +175,7 @@ body {
 /* 5. TEE Subtle Boundary Signal */
 @keyframes tee-subtle-signal {
   0%, 100% {
-    border-color: #1D3A52;
+    border-color: #D9E2EA;
   }
   50% {
     border-color: #0E88D3;
@@ -182,22 +201,22 @@ body {
    ============================================================================== */
 
 .hud-glass {
-  background: rgba(16, 35, 55, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid #1D3A52;
+  background: #FFFFFF;
+  border: 1px solid #D9E2EA;
+  box-shadow: 0 1px 3px rgba(23, 33, 43, 0.05);
 }
 
 .hud-glass-interactive {
-  background: rgba(16, 35, 55, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid #1D3A52;
-  transition: all 0.2s ease;
+  background: #FFFFFF;
+  border: 1px solid #D9E2EA;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(23, 33, 43, 0.04);
 }
 
 .hud-glass-interactive:hover {
-  background: rgba(20, 43, 64, 0.95);
+  background: #F8FAFC;
   border-color: #0E88D3;
+  box-shadow: 0 2px 6px rgba(14, 136, 211, 0.1);
 }
 
 .hud-tag {
@@ -241,22 +260,22 @@ body {
 
 /* Reticle Corners - Green (Safe) */
 .reticle-corner-green::before {
-  border-top: 1.5px solid #22A06B;
-  border-left: 1.5px solid #22A06B;
+  border-top: 1.5px solid #168A5B;
+  border-left: 1.5px solid #168A5B;
 }
 .reticle-corner-green::after {
-  border-bottom: 1.5px solid #22A06B;
-  border-right: 1.5px solid #22A06B;
+  border-bottom: 1.5px solid #168A5B;
+  border-right: 1.5px solid #168A5B;
 }
 
 /* Reticle Corners - Red (Reject / Alert) */
 .reticle-corner-red::before {
-  border-top: 1.5px solid #E5484D;
-  border-left: 1.5px solid #E5484D;
+  border-top: 1.5px solid #D9363E;
+  border-left: 1.5px solid #D9363E;
 }
 .reticle-corner-red::after {
-  border-bottom: 1.5px solid #E5484D;
-  border-right: 1.5px solid #E5484D;
+  border-bottom: 1.5px solid #D9363E;
+  border-right: 1.5px solid #D9363E;
 }
 
 /* Subtle Radar Sweep */
@@ -271,11 +290,11 @@ body {
 
 /* Card & Console Shadows */
 .shadow-isro {
-  box-shadow: 0 2px 10px rgba(14, 136, 211, 0.15);
+  box-shadow: 0 2px 8px rgba(14, 136, 211, 0.12);
 }
 .shadow-orange {
-  box-shadow: 0 2px 10px rgba(244, 114, 22, 0.15);
+  box-shadow: 0 2px 8px rgba(244, 114, 22, 0.15);
 }
 .shadow-alert {
-  box-shadow: 0 2px 10px rgba(229, 72, 77, 0.2);
+  box-shadow: 0 2px 8px rgba(217, 54, 62, 0.15);
 }

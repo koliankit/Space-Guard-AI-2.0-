@@ -25,22 +25,22 @@ export default function ModuleAView({
   const isScreened = mission !== null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#07111C] text-[#F1F5F9] font-sans flex-1 min-h-full">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#F4F7FA] text-[#17212B] font-sans flex-1 min-h-full">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1D3A52] pb-3 bg-[#0B1928]/60 p-3 md:p-4 rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#D9E2EA] pb-3 bg-[#FFFFFF]/60 p-3 md:p-4 rounded-xl">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded bg-[#0E88D3]/15 text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold text-xs uppercase tracking-wider">
               STAGE 2
             </span>
-            <span className="text-xs font-mono text-[#9AAFC0]">
+            <span className="text-xs font-mono text-[#5B6B7A]">
               DYNAMIC LOT-RELATIVE ANOMALY DETECTION
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-mono font-black text-[#F1F5F9] tracking-wide mt-1">
+          <h1 className="text-xl md:text-2xl font-mono font-black text-[#17212B] tracking-wide mt-1">
             Module A — Lot-Relative Anomaly Detection Dashboard
           </h1>
-          <p className="text-xs text-[#9AAFC0] mt-0.5 max-w-3xl">
+          <p className="text-xs text-[#5B6B7A] mt-0.5 max-w-3xl">
             Detects subtle silicon micro-defects and outliers that stay within absolute datasheet limits
             but exhibit abnormal variance relative to their production wafer lot baseline.
           </p>

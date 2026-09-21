@@ -29,22 +29,22 @@ export default function DiagnosticsView({
     null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#07111C] text-[#F1F5F9] font-sans flex-1 min-h-full">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#F4F7FA] text-[#17212B] font-sans flex-1 min-h-full">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1D3A52] pb-3 bg-[#0B1928]/60 p-3 md:p-4 rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#D9E2EA] pb-3 bg-[#FFFFFF]/60 p-3 md:p-4 rounded-xl">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded bg-[#0E88D3]/15 text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold text-xs uppercase tracking-wider">
               DIAGNOSTICS &amp; ACTIONS
             </span>
-            <span className="text-xs font-mono text-[#9AAFC0]">
+            <span className="text-xs font-mono text-[#5B6B7A]">
               PHYSICS OF FAILURE &amp; HARDWARE MITIGATION
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-mono font-black text-[#F1F5F9] tracking-wide mt-1">
+          <h1 className="text-xl md:text-2xl font-mono font-black text-[#17212B] tracking-wide mt-1">
             Component Diagnostics &amp; Prescriptive Controls
           </h1>
-          <p className="text-xs text-[#9AAFC0] mt-0.5 max-w-3xl">
+          <p className="text-xs text-[#5B6B7A] mt-0.5 max-w-3xl">
             Examine underlying semiconductor failure modes, Arrhenius thermal degradation profiles,
             and execute spacecraft command directives such as bus isolation and cold standby failover.
           </p>
@@ -60,8 +60,8 @@ export default function DiagnosticsView({
             }}
             className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
               activeTab === 'prescriptive'
-                ? 'bg-[#142B40] border-[#0E88D3] text-[#F1F5F9] font-bold shadow-sm'
-                : 'bg-[#102337] border-[#1D3A52] text-[#9AAFC0] hover:text-[#F1F5F9]'
+                ? 'bg-[#F8FAFC] border-[#0E88D3] text-[#17212B] font-bold shadow-sm'
+                : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B]'
             }`}
           >
             Prescriptive Actions &amp; Root Cause
@@ -74,8 +74,8 @@ export default function DiagnosticsView({
             }}
             className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
               activeTab === 'subsystems'
-                ? 'bg-[#142B40] border-[#0E88D3] text-[#F1F5F9] font-bold shadow-sm'
-                : 'bg-[#102337] border-[#1D3A52] text-[#9AAFC0] hover:text-[#F1F5F9]'
+                ? 'bg-[#F8FAFC] border-[#0E88D3] text-[#17212B] font-bold shadow-sm'
+                : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B]'
             }`}
           >
             Subsystems Hardware Health

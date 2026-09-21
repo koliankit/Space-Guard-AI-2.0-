@@ -210,23 +210,23 @@ export default function LotArchitectureView({
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-[#07111C] text-[#F1F5F9] font-sans p-3 md:p-5 gap-4 select-none min-h-full w-full">
+    <div className="flex flex-col flex-1 bg-[#F4F7FA] text-[#17212B] font-sans p-3 md:p-5 gap-4 select-none min-h-full w-full">
       {/* Top Banner: Header and Key Metrics */}
-      <div className="bg-[#102337] border border-slate-800 rounded-xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-[#FFFFFF] border border-[#D9E2EA] rounded-xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl text-amber-400 shadow-inner">
             📦
           </div>
           <div>
             <div className="flex items-center gap-2.5">
-              <h2 className="text-base font-bold text-white tracking-wide uppercase font-display m-0">
+              <h2 className="text-base font-bold text-[#17212B] tracking-wide uppercase font-display m-0">
                 Lot-Wise Component Architecture &amp; Physical Spacecraft Allocation
               </h2>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                 {totalLots} QUALIFICATION LOTS &bull; {totalComponents} COMPONENTS
               </span>
             </div>
-            <p className="text-xs text-slate-400 m-0 mt-0.5">
+            <p className="text-xs text-[#5B6B7A] m-0 mt-0.5">
               Tracks the number of components per qualification lot, their physical equipment bay, equipment deck, and 3D satellite chassis coordinates.
             </p>
           </div>
@@ -234,25 +234,25 @@ export default function LotArchitectureView({
 
         {/* Global Summary Metric Cards */}
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-slate-800 text-center min-w-[100px]">
-            <div className="text-[10px] text-slate-400 uppercase font-semibold">Total Lots</div>
+          <div className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] text-center min-w-[100px]">
+            <div className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Total Lots</div>
             <div className="text-base font-bold font-mono text-amber-400 mt-0.5">{totalLots}</div>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-slate-800 text-center min-w-[110px]">
-            <div className="text-[10px] text-slate-400 uppercase font-semibold">Total Parts</div>
-            <div className="text-base font-bold font-mono text-white mt-0.5">{totalComponents}</div>
+          <div className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] text-center min-w-[110px]">
+            <div className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Total Parts</div>
+            <div className="text-base font-bold font-mono text-[#17212B] mt-0.5">{totalComponents}</div>
           </div>
           {isScreened ? (
             <>
-              <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-emerald-500/30 text-center min-w-[90px]">
+              <div className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-emerald-500/30 text-center min-w-[90px]">
                 <div className="text-[10px] text-emerald-400 uppercase font-semibold">Flight Safe</div>
                 <div className="text-base font-bold font-mono text-emerald-300 mt-0.5">{totalSafe}</div>
               </div>
-              <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-amber-500/30 text-center min-w-[90px]">
+              <div className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-amber-500/30 text-center min-w-[90px]">
                 <div className="text-[10px] text-amber-400 uppercase font-semibold">Monitor</div>
                 <div className="text-base font-bold font-mono text-amber-300 mt-0.5">{totalMonitors}</div>
               </div>
-              <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-rose-500/30 text-center min-w-[100px]">
+              <div className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-rose-500/30 text-center min-w-[100px]">
                 <div className="text-[10px] text-rose-400 uppercase font-semibold">Quarantine</div>
                 <div className="text-base font-bold font-mono text-rose-400 mt-0.5">{totalRejects}</div>
               </div>
@@ -262,7 +262,7 @@ export default function LotArchitectureView({
               <span className="w-2 h-2 rounded-full bg-amber-400" />
               <div className="text-left">
                 <div className="text-[10px] text-amber-300 uppercase font-bold">Awaiting AI Screening</div>
-                <div className="text-[11px] text-slate-300">100% components localized to satellite bays</div>
+                <div className="text-[11px] text-[#5B6B7A]">100% components localized to satellite bays</div>
               </div>
               {onRunScreening && (
                 <button
@@ -286,17 +286,17 @@ export default function LotArchitectureView({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 min-h-0 items-stretch w-full">
         {/* Left Column: Qualification Lots Grid + AI Recommendation System */}
         <div className="flex flex-col gap-4 w-full lg:col-span-4 xl:col-span-4 h-full">
-          <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-            <div className="bg-[#142B40] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-display flex items-center gap-2">
+          <div className="flex flex-col bg-[#FFFFFF] border border-[#D9E2EA] rounded-xl overflow-hidden shadow-lg">
+            <div className="bg-[#F8FAFC] px-4 py-2.5 border-b border-[#D9E2EA] flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#17212B] font-display flex items-center gap-2">
                 <span>📦</span> Qualification Lots ({lotGroups.length})
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">Click lot to select &amp; inspect</span>
+              <span className="text-[10px] text-[#5B6B7A] font-mono">Click lot to select &amp; inspect</span>
             </div>
 
             <div className="p-3 overflow-y-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-h-[240px] max-h-[460px]">
               {lotGroups.length === 0 ? (
-                <div className="p-8 text-center text-slate-400 text-xs italic">
+                <div className="p-8 text-center text-[#5B6B7A] text-xs italic">
                   No qualification lots loaded. Upload a CSV file or load an ISRO flight batch to inspect.
                 </div>
               ) : (
@@ -317,8 +317,8 @@ export default function LotArchitectureView({
                         isSelected
                           ? 'bg-amber-950/30 border-amber-500 shadow-md ring-1 ring-amber-400/50'
                           : isRej
-                          ? 'bg-[#150A10] border-rose-900/50 hover:border-rose-700 hover:bg-[#1A0C14]'
-                          : 'bg-[#0B1928] border-slate-800 hover:border-slate-700 hover:bg-[#0D162B]'
+                          ? 'bg-[#FFFFFF] border-rose-900/50 hover:border-rose-700 hover:bg-[#FFFFFF]'
+                          : 'bg-[#FFFFFF] border-[#D9E2EA] hover:border-[#D9E2EA] hover:bg-[#FFFFFF]'
                       }`}
                     >
                       {/* Header: Lot ID and Status Badge */}
@@ -329,7 +329,7 @@ export default function LotArchitectureView({
                               isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400' : isScreened ? 'bg-emerald-400' : 'bg-slate-500'
                             }`}
                           />
-                          <span className="font-mono font-bold text-xs text-white tracking-wide">
+                          <span className="font-mono font-bold text-xs text-[#17212B] tracking-wide">
                             {lot.lot_id}
                           </span>
                         </div>
@@ -341,7 +341,7 @@ export default function LotArchitectureView({
                               ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                               : isScreened
                               ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                              : 'bg-slate-800 text-slate-300 border border-slate-700'
+                              : 'bg-[#F8FAFC] text-[#5B6B7A] border border-[#D9E2EA]'
                           }`}
                         >
                           {isRej
@@ -355,27 +355,27 @@ export default function LotArchitectureView({
                       </div>
 
                       {/* Lot Stats: Total Components and Baseline */}
-                      <div className="flex items-center justify-between text-xs font-mono text-slate-300 mb-2">
+                      <div className="flex items-center justify-between text-xs font-mono text-[#5B6B7A] mb-2">
                         <span>
-                          Size: <b className="text-white font-bold">{lot.total} parts</b> ({pctOfTotal}%)
+                          Size: <b className="text-[#17212B] font-bold">{lot.total} parts</b> ({pctOfTotal}%)
                         </span>
-                        <span className="text-slate-400">
+                        <span className="text-[#5B6B7A]">
                           Baseline &mu;: <b className="text-amber-300 font-bold">{lot.mean.toFixed(1)} &mu;A</b>
                         </span>
                       </div>
 
                       {/* Subsystem Location Distribution Tag Pills */}
-                      <div className="pt-2 border-t border-slate-800/80">
-                        <div className="text-[10px] text-slate-400 uppercase font-semibold mb-1 flex justify-between">
+                      <div className="pt-2 border-t border-[#D9E2EA]/80">
+                        <div className="text-[10px] text-[#5B6B7A] uppercase font-semibold mb-1 flex justify-between">
                           <span>Allocated Subsystems:</span>
-                          <span className="text-slate-300 font-mono">{lot.subsystems.length} bays</span>
+                          <span className="text-[#5B6B7A] font-mono">{lot.subsystems.length} bays</span>
                         </div>
                         <div className="flex flex-wrap gap-1">
                           {Object.entries(lot.subsystemCounts).map(([sub, count]) => {
                             return (
                               <span
                                 key={sub}
-                                className="px-1.5 py-0.5 rounded text-[9.5px] font-mono bg-slate-900 border border-slate-800 text-slate-300"
+                                className="px-1.5 py-0.5 rounded text-[9.5px] font-mono bg-[#FFFFFF] border border-[#D9E2EA] text-[#5B6B7A]"
                               >
                                 [{sub}] {count}
                               </span>
@@ -387,7 +387,7 @@ export default function LotArchitectureView({
                       {/* Health Distribution Bar (if screened) */}
                       {isScreened && (
                         <div className="mt-2.5">
-                          <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden flex mb-1">
+                          <div className="h-1.5 w-full rounded-full bg-[#F8FAFC] overflow-hidden flex mb-1">
                             <div
                               style={{ width: `${(lot.safeCount / (lot.total || 1)) * 100}%` }}
                               className="bg-emerald-500 h-full"
@@ -401,7 +401,7 @@ export default function LotArchitectureView({
                               className="bg-rose-500 h-full"
                             />
                           </div>
-                          <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
+                          <div className="flex items-center justify-between text-[9px] font-mono text-[#5B6B7A]">
                             <span className="text-emerald-400">{lot.safeCount} Safe</span>
                             <span className="text-amber-400">{lot.monitorCount} Monitor</span>
                             <span className="text-rose-400 font-bold">{lot.rejectCount} Quarantine</span>
@@ -424,27 +424,27 @@ export default function LotArchitectureView({
         </div>
 
         {/* Right Column: Selected Lot Deep Dive & Component Location Table */}
-        <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg lg:col-span-8 xl:col-span-8 w-full h-full">
+        <div className="flex flex-col bg-[#FFFFFF] border border-[#D9E2EA] rounded-xl overflow-hidden shadow-lg lg:col-span-8 xl:col-span-8 w-full h-full">
           {activeLot ? (
             <>
               {/* Active Lot Header & Location Allocation Summary */}
-              <div className="bg-[#142B40] p-4 border-b border-slate-800 flex flex-col gap-3">
+              <div className="bg-[#F8FAFC] p-4 border-b border-[#D9E2EA] flex flex-col gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <span className="text-sm sm:text-base font-mono font-bold text-white bg-amber-500/20 px-3 py-1 rounded-lg border border-amber-500/40 shadow-sm">
                         ACTIVE QUALIFICATION LOT: {activeLot.lot_id}
                       </span>
-                      <span className="text-xs sm:text-sm font-mono text-slate-200">
+                      <span className="text-xs sm:text-sm font-mono text-[#17212B]">
                         &bull; <b className="text-emerald-400 font-bold">{activeLot.total} components</b> across{' '}
                         <b className="text-amber-300">{activeLot.subsystems.length} equipment bays</b>
                       </span>
                     </div>
-                    <div className="text-xs sm:text-sm text-slate-300 mt-1.5 font-sans">
+                    <div className="text-xs sm:text-sm text-[#5B6B7A] mt-1.5 font-sans">
                       MIL-STD-883 HTOL 168h Burn-In Baseline &mu; ={' '}
                       <b className="text-amber-400 font-mono">{activeLot.mean.toFixed(2)} &micro;A</b> &bull; &sigma; ={' '}
-                      <b className="text-slate-200 font-mono">{activeLot.std.toFixed(2)}</b> &bull; Status:{' '}
-                      <span className="font-mono font-bold text-white">
+                      <b className="text-[#17212B] font-mono">{activeLot.std.toFixed(2)}</b> &bull; Status:{' '}
+                      <span className="font-mono font-bold text-[#17212B]">
                         {activeLot.rejectCount > 0
                           ? `⚠️ ${activeLot.rejectCount} DEFECTS QUARANTINED`
                           : activeLot.monitorCount > 0
@@ -460,7 +460,7 @@ export default function LotArchitectureView({
                     <button
                       type="button"
                       onClick={handleExportLotCSV}
-                      className="px-3.5 py-1.5 rounded-lg border border-slate-600 bg-[#0B1928] text-slate-100 hover:text-white hover:border-slate-400 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+                      className="px-3.5 py-1.5 rounded-lg border border-[#D9E2EA] bg-[#FFFFFF] text-[#17212B] hover:text-[#17212B] hover:border-slate-400 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
                       title="Download CSV report of components in this lot"
                     >
                       <span>📥</span> Export Lot CSV
@@ -469,8 +469,8 @@ export default function LotArchitectureView({
                 </div>
 
                 {/* Subsystem Location Allocation Breakdown Pills */}
-                <div className="bg-[#0B1928] p-2.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-2 max-h-[96px] overflow-y-auto">
-                  <span className="text-xs text-slate-300 uppercase font-bold tracking-wider">
+                <div className="bg-[#FFFFFF] p-2.5 rounded-xl border border-[#D9E2EA] flex flex-wrap items-center gap-2 max-h-[96px] overflow-y-auto">
+                  <span className="text-xs text-[#5B6B7A] uppercase font-bold tracking-wider">
                     WHERE COMPONENTS LOCATE:
                   </span>
                   {Object.entries(activeLot.subsystemCounts).map(([subKey, count]) => {
@@ -487,13 +487,13 @@ export default function LotArchitectureView({
                         className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all border flex items-center gap-1.5 cursor-pointer ${
                           isFiltered
                             ? 'bg-amber-600 border-amber-400 text-white font-bold shadow-sm'
-                            : 'bg-slate-900/80 border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white'
+                            : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A] hover:border-[#0E88D3] hover:text-[#17212B]'
                         }`}
                         title={`Click to filter by ${loc.name} (${loc.bay})`}
                       >
                         <span className="font-bold text-amber-400">[{subKey}]</span>
-                        <span className="text-white font-semibold">{count} in {loc.name}</span>
-                        <span className="text-xs text-slate-400 hidden xl:inline">({loc.bay})</span>
+                        <span className="text-[#17212B] font-semibold">{count} in {loc.name}</span>
+                        <span className="text-xs text-[#5B6B7A] hidden xl:inline">({loc.bay})</span>
                       </button>
                     )
                   })}
@@ -512,7 +512,7 @@ export default function LotArchitectureView({
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-1.5">
                   {/* Status Filters (if screened) */}
                   {isScreened && (
-                    <div className="flex items-center gap-1.5 bg-[#060B16] p-1 rounded-lg border border-slate-800 text-xs sm:text-sm font-mono">
+                    <div className="flex items-center gap-1.5 bg-[#FFFFFF] p-1 rounded-lg border border-[#D9E2EA] text-xs sm:text-sm font-mono">
                       {[
                         { id: 'ALL', label: `ALL (${activeLot.total})` },
                         { id: 'SAFE', label: `SAFE (${activeLot.safeCount})` },
@@ -537,7 +537,7 @@ export default function LotArchitectureView({
                                   : tab.id === 'MONITOR'
                                   ? 'bg-amber-500/25 text-amber-300 border border-amber-500/60 shadow-sm'
                                   : 'bg-amber-500/25 text-amber-300 border border-amber-500/60 shadow-sm'
-                                : 'text-slate-400 hover:text-white'
+                                : 'text-[#5B6B7A] hover:text-[#17212B]'
                             }`}
                           >
                             {tab.label}
@@ -549,22 +549,22 @@ export default function LotArchitectureView({
 
                   {/* Component Search Input */}
                   <div className="relative flex-1 min-w-[220px] max-w-sm">
-                    <span className="absolute left-3 top-2.5 text-slate-400 text-xs sm:text-sm">🔍</span>
+                    <span className="absolute left-3 top-2.5 text-[#5B6B7A] text-xs sm:text-sm">🔍</span>
                     <input
                       type="text"
                       placeholder="Search Part ID or Location..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 bg-[#060B16] border border-slate-700 rounded-lg text-xs sm:text-sm font-mono text-slate-100 placeholder:text-slate-500 focus:border-amber-500 outline-none transition-colors"
+                      className="w-full pl-9 pr-3 py-2 bg-[#FFFFFF] border border-[#D9E2EA] rounded-lg text-xs sm:text-sm font-mono text-[#17212B] placeholder:text-[#81909D] focus:border-amber-500 outline-none transition-colors"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Components Table with Full Satellite Location Columns - Stretches to fill available space */}
-              <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[280px] border-b border-slate-800">
+              <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[280px] border-b border-[#D9E2EA]">
                 <table className="w-full min-w-[700px] text-left border-collapse text-xs font-mono">
-                  <thead className="bg-[#0B1928] text-[10px] text-slate-400 uppercase tracking-wider sticky top-0 z-10 border-b border-slate-800">
+                  <thead className="bg-[#FFFFFF] text-[10px] text-[#5B6B7A] uppercase tracking-wider sticky top-0 z-10 border-b border-[#D9E2EA]">
                     <tr>
                       <th className="py-2.5 px-3 font-semibold">Part ID</th>
                       <th className="py-2.5 px-2 font-semibold">Subsystem</th>
@@ -582,7 +582,7 @@ export default function LotArchitectureView({
                   <tbody className="divide-y divide-slate-800/60">
                     {displayedComponents.length === 0 ? (
                       <tr>
-                        <td colSpan={11} className="py-12 text-center text-slate-400 text-xs italic font-sans">
+                        <td colSpan={11} className="py-12 text-center text-[#5B6B7A] text-xs italic font-sans">
                           No components match the selected filter in Lot {activeLot.lot_id}.
                         </td>
                       </tr>
@@ -607,10 +607,10 @@ export default function LotArchitectureView({
                                 ? 'bg-rose-950/15 hover:bg-rose-950/30'
                                 : isMon
                                 ? 'bg-amber-950/10 hover:bg-amber-950/20'
-                                : 'hover:bg-slate-800/40'
+                                : 'hover:bg-[#F8FAFC]'
                             }`}
                           >
-                            <td className="py-2 px-3 font-bold text-white flex items-center gap-1.5">
+                            <td className="py-2 px-3 font-bold text-[#17212B] flex items-center gap-1.5">
                               <span
                                 className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
                                   isRej
@@ -627,28 +627,28 @@ export default function LotArchitectureView({
                             <td className="py-2 px-2 text-amber-400 font-bold whitespace-nowrap">
                               [{c.subsystem}] {loc.name}
                             </td>
-                            <td className="py-2 px-2 text-slate-200 font-sans font-medium whitespace-nowrap">
+                            <td className="py-2 px-2 text-[#17212B] font-sans font-medium whitespace-nowrap">
                               {loc.bay}
                             </td>
-                            <td className="py-2 px-2 text-slate-400 font-sans whitespace-nowrap">
+                            <td className="py-2 px-2 text-[#5B6B7A] font-sans whitespace-nowrap">
                               {loc.deck}
                             </td>
-                            <td className="py-2 px-2 text-slate-400 text-[11px] whitespace-nowrap font-mono">
+                            <td className="py-2 px-2 text-[#5B6B7A] text-[11px] whitespace-nowrap font-mono">
                               {formatCoordinates(loc.pos)}
                             </td>
                             <td
                               className={`py-2 px-2 font-mono ${
-                                isRej ? 'text-rose-400 font-bold' : isMon ? 'text-amber-400' : 'text-slate-200'
+                                isRej ? 'text-rose-400 font-bold' : isMon ? 'text-amber-400' : 'text-[#17212B]'
                               }`}
                             >
                               {c.v168?.toFixed(1) ?? '--'}&mu;A
                             </td>
-                            <td className="py-2 px-2 text-slate-400 font-mono">
+                            <td className="py-2 px-2 text-[#5B6B7A] font-mono">
                               {c.lot_mean != null ? `${c.lot_mean.toFixed(1)}` : `${activeLot.mean.toFixed(1)}`}
                             </td>
                             <td
                               className={`py-2 px-2 font-mono ${
-                                isRej ? 'text-rose-400 font-bold' : 'text-slate-300'
+                                isRej ? 'text-rose-400 font-bold' : 'text-[#5B6B7A]'
                               }`}
                             >
                               {c.z168 != null ? `${c.z168 > 0 ? '+' : ''}${c.z168.toFixed(2)}σ` : '--'}
@@ -667,12 +667,12 @@ export default function LotArchitectureView({
                                   {c.status}
                                 </span>
                               ) : (
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#F8FAFC] text-[#5B6B7A] border border-[#D9E2EA]">
                                   INGESTED
                                 </span>
                               )}
                             </td>
-                            <td className="py-2 px-2 font-mono font-bold text-white">
+                            <td className="py-2 px-2 font-mono font-bold text-[#17212B]">
                               {c.risk_score ?? '--'}
                             </td>
                             <td className="py-2 px-3 text-right">
@@ -685,7 +685,7 @@ export default function LotArchitectureView({
                                   if (onFocusIn3D) onFocusIn3D(c)
                                   else onFocusSubsystem(c.subsystem)
                                 }}
-                                className="px-2 py-1 rounded bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 hover:text-white border border-amber-500/30 text-[10px] font-semibold transition-all cursor-pointer"
+                                className="px-2 py-1 rounded bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 hover:text-[#17212B] border border-amber-500/30 text-[10px] font-semibold transition-all cursor-pointer"
                                 title="Locate in 3D Spacecraft View"
                               >
                                 🎯 Locate in 3D
@@ -701,9 +701,9 @@ export default function LotArchitectureView({
 
               {/* Active Component Silicon Telemetry & Spacecraft Bay Diagnostic Terminal - Fills Empty Space */}
               {inspectedComponent && inspectedLoc && (
-                <div className="p-4 bg-[#0B1928] flex flex-col gap-3.5 flex-1 border-t border-slate-800">
+                <div className="p-4 bg-[#FFFFFF] flex flex-col gap-3.5 flex-1 border-t border-[#D9E2EA]">
                   {/* Header Strip */}
-                  <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-slate-800/80">
+                  <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-[#D9E2EA]/80">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <span
                         className={`w-2.5 h-2.5 rounded-full ${
@@ -714,14 +714,14 @@ export default function LotArchitectureView({
                             : 'bg-emerald-400'
                         }`}
                       />
-                      <span className="font-mono font-bold text-sm md:text-base text-white tracking-wide">
+                      <span className="font-mono font-bold text-sm md:text-base text-[#17212B] tracking-wide">
                         {inspectedComponent.component_id}
                       </span>
-                      <span className="text-slate-400 text-xs font-mono">&bull;</span>
+                      <span className="text-[#5B6B7A] text-xs font-mono">&bull;</span>
                       <span className="text-amber-400 font-bold font-mono text-xs">
                         [{inspectedComponent.subsystem}] {inspectedLoc.name}
                       </span>
-                      <span className="text-slate-400 text-xs font-sans">({inspectedLoc.bay})</span>
+                      <span className="text-[#5B6B7A] text-xs font-sans">({inspectedLoc.bay})</span>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -744,7 +744,7 @@ export default function LotArchitectureView({
                           if (onFocusIn3D) onFocusIn3D(inspectedComponent)
                           else onFocusSubsystem(inspectedComponent.subsystem)
                         }}
-                        className="px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 hover:text-white border border-amber-500/30 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1"
+                        className="px-2.5 py-1 rounded bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 hover:text-[#17212B] border border-amber-500/30 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1"
                         title="Locate in 3D Spacecraft Model"
                       >
                         <span>🎯</span> Locate 3D
@@ -753,18 +753,18 @@ export default function LotArchitectureView({
                   </div>
 
                   {/* Location & Bay Coordinates Strip */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-[#07111C] p-2.5 rounded-lg border border-slate-800/80">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-[#F4F7FA] p-2.5 rounded-lg border border-[#D9E2EA]/80">
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">Bay / Deck</span>
-                      <span className="text-white font-bold truncate block">{inspectedLoc.bay}</span>
-                      <span className="text-slate-400 text-[10px] block">{inspectedLoc.deck}</span>
+                      <span className="text-[#5B6B7A] block text-[10px] uppercase font-semibold">Bay / Deck</span>
+                      <span className="text-[#17212B] font-bold truncate block">{inspectedLoc.bay}</span>
+                      <span className="text-[#5B6B7A] text-[10px] block">{inspectedLoc.deck}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">3D Coordinates</span>
+                      <span className="text-[#5B6B7A] block text-[10px] uppercase font-semibold">3D Coordinates</span>
                       <span className="text-amber-300 font-bold block">{formatCoordinates(inspectedLoc.pos)}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">Lot Z-Score</span>
+                      <span className="text-[#5B6B7A] block text-[10px] uppercase font-semibold">Lot Z-Score</span>
                       <span className={`font-bold block ${
                         inspectedComponent.z168 != null && Math.abs(inspectedComponent.z168) >= 2
                           ? 'text-rose-400'
@@ -774,7 +774,7 @@ export default function LotArchitectureView({
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">Future Projection</span>
+                      <span className="text-[#5B6B7A] block text-[10px] uppercase font-semibold">Future Projection</span>
                       <span className="text-rose-400 font-bold block">
                         {inspectedComponent.predicted_future?.toFixed(1) ?? '--'} &mu;A
                       </span>
@@ -783,11 +783,11 @@ export default function LotArchitectureView({
 
                   {/* Failure Physics Callout */}
                   {inspectedComponent.reason && (
-                    <div className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 text-xs text-slate-200 flex items-start gap-2">
+                    <div className="p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] text-xs text-[#17212B] flex items-start gap-2">
                       <span className="text-amber-400 font-bold uppercase whitespace-nowrap text-[11px] mt-0.5">
                         Physics Diagnosis:
                       </span>
-                      <span className="text-slate-200 font-sans leading-relaxed text-[12px]">
+                      <span className="text-[#17212B] font-sans leading-relaxed text-[12px]">
                         {inspectedComponent.reason}
                       </span>
                     </div>
@@ -801,7 +801,7 @@ export default function LotArchitectureView({
               )}
             </>
           ) : (
-            <div className="p-12 text-center text-slate-400 text-xs italic">
+            <div className="p-12 text-center text-[#5B6B7A] text-xs italic">
               Select a qualification lot to view component locations and flight allocations.
             </div>
           )}

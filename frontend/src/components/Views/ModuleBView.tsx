@@ -40,22 +40,22 @@ export default function ModuleBView({
   const isScreened = mission !== null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#07111C] text-[#F1F5F9] font-sans flex-1 min-h-full">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#F4F7FA] text-[#17212B] font-sans flex-1 min-h-full">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1D3A52] pb-3 bg-[#0B1928]/60 p-3 md:p-4 rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#D9E2EA] pb-3 bg-[#FFFFFF]/60 p-3 md:p-4 rounded-xl">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold text-xs uppercase tracking-wider">
               STAGE 3
             </span>
-            <span className="text-xs font-mono text-[#9AAFC0]">
+            <span className="text-xs font-mono text-[#5B6B7A]">
               EARLY TEMPORAL DRIFT &amp; FUTURE RELIABILITY PREDICTION
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-mono font-black text-[#F1F5F9] tracking-wide mt-1">
+          <h1 className="text-xl md:text-2xl font-mono font-black text-[#17212B] tracking-wide mt-1">
             Module B — Early Drift &amp; In-Flight Forecasting Dashboard
           </h1>
-          <p className="text-xs text-[#9AAFC0] mt-0.5 max-w-3xl">
+          <p className="text-xs text-[#5B6B7A] mt-0.5 max-w-3xl">
             Calculates degradation curvature velocity across 0h, 24h, 96h, and 168h milestones.
             Projects parametric drift to 264h (+96h in-flight extension) and flags early limit breaches.
           </p>
@@ -83,16 +83,16 @@ export default function ModuleBView({
       />
 
       {/* Component Quick Selector Bar for Module B */}
-      <div className="p-3 rounded-xl bg-[#102337] border border-[#1D3A52] flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="p-3 rounded-xl bg-[#FFFFFF] border border-[#D9E2EA] flex flex-wrap items-center justify-between gap-3 text-xs">
         {/* Search */}
         <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-[320px]">
-          <span className="text-[#9AAFC0] font-mono text-[11px]">SELECT PART:</span>
+          <span className="text-[#5B6B7A] font-mono text-[11px]">SELECT PART:</span>
           <input
             type="text"
             placeholder="Search Part / Subsystem..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#07111C] border border-[#1D3A52] rounded-lg px-2.5 py-1 text-xs text-[#F1F5F9] font-mono placeholder:text-[#6F8495] focus:outline-none focus:border-[#0E88D3]"
+            className="w-full bg-[#F4F7FA] border border-[#D9E2EA] rounded-lg px-2.5 py-1 text-xs text-[#17212B] font-mono placeholder:text-[#81909D] focus:outline-none focus:border-[#0E88D3]"
           />
         </div>
 
@@ -106,13 +106,13 @@ export default function ModuleBView({
               className={`px-2 py-0.5 rounded transition-colors uppercase ${
                 statusFilter === filter
                   ? filter === 'reject'
-                    ? 'bg-[#E5484D] text-[#F1F5F9] font-bold'
+                    ? 'bg-[#D9363E] text-[#17212B] font-bold'
                     : filter === 'monitor'
-                    ? 'bg-[#F2B84B] text-[#F1F5F9] font-bold'
+                    ? 'bg-[#C58A00] text-[#17212B] font-bold'
                     : filter === 'safe'
-                    ? 'bg-[#22A06B] text-[#F1F5F9] font-bold'
+                    ? 'bg-[#168A5B] text-[#17212B] font-bold'
                     : 'bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/50 font-bold'
-                  : 'text-[#9AAFC0] hover:text-[#F1F5F9] bg-[#07111C] border border-[#1D3A52]'
+                  : 'text-[#5B6B7A] hover:text-[#17212B] bg-[#F4F7FA] border border-[#D9E2EA]'
               }`}
             >
               {filter}
@@ -126,7 +126,7 @@ export default function ModuleBView({
           onChange={(e) => {
             if (e.target.value) onSelectComponent(e.target.value)
           }}
-          className="bg-[#07111C] border border-[#1D3A52] text-[#F1F5F9] text-xs font-mono rounded-lg px-3 py-1.5 max-w-[240px] focus:outline-none focus:border-[#0E88D3]"
+          className="bg-[#F4F7FA] border border-[#D9E2EA] text-[#17212B] text-xs font-mono rounded-lg px-3 py-1.5 max-w-[240px] focus:outline-none focus:border-[#0E88D3]"
         >
           <option value="" disabled>Pick Component ({filteredComponents.length})</option>
           {filteredComponents.slice(0, 100).map((c, idx) => (

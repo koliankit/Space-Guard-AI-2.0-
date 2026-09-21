@@ -102,46 +102,46 @@ export default function SatelliteEquipmentBoard({
   const activeSub = subsystems.find((s) => s.key === focusKey)
 
   return (
-    <div className="bg-[#102337] border border-slate-800 rounded-xl flex flex-col font-sans text-xs select-none shadow-md overflow-hidden">
+    <div className="bg-[#FFFFFF] border border-[#D9E2EA] rounded-xl flex flex-col font-sans text-xs select-none shadow-md overflow-hidden">
       {/* Action Notification Toast */}
       {actionNotif && (
-        <div className="bg-white/10 border-b border-white/20 px-4 py-2 text-center text-white text-xs font-semibold animate-fade-in flex items-center justify-center gap-2">
+        <div className="bg-white/10 border-b border-white/20 px-4 py-2 text-center text-[#17212B] text-xs font-semibold animate-fade-in flex items-center justify-center gap-2">
           <span className="w-2 h-2 rounded-full bg-white" />
           <span dangerouslySetInnerHTML={{ __html: actionNotif }} />
         </div>
       )}
 
       {/* Top Header Bar */}
-      <div className="px-4 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-[#142B40]">
+      <div className="px-4 py-3 border-b border-[#D9E2EA] flex flex-wrap items-center justify-between gap-2 bg-[#F8FAFC]">
         <div className="flex items-center gap-2.5">
           <span className="w-2.5 h-2.5 rounded-full bg-white" />
-          <h3 className="m-0 font-bold text-xs tracking-wide uppercase text-white">
+          <h3 className="m-0 font-bold text-xs tracking-wide uppercase text-[#17212B]">
             Spacecraft Subsystem Hardware &amp; Command Console
           </h3>
           {filterCategory === 'lot' ? (
-            <span className="font-mono text-[11px] text-white bg-white/10 px-2.5 py-0.5 rounded border border-white/20 font-medium">
+            <span className="font-mono text-[11px] text-[#17212B] bg-white/10 px-2.5 py-0.5 rounded border border-white/20 font-medium">
               LOT CLASSIFICATION: {selectedLot || 'ALL FLIGHT LOTS'}
             </span>
           ) : activeSub ? (
-            <span className="font-mono text-[11px] text-white bg-white/10 px-2.5 py-0.5 rounded border border-white/20 font-medium">
+            <span className="font-mono text-[11px] text-[#17212B] bg-white/10 px-2.5 py-0.5 rounded border border-white/20 font-medium">
               FILTER: [{activeSub.key}] {activeSub.name}
             </span>
           ) : (
-            <span className="font-mono text-[10px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
+            <span className="font-mono text-[10px] text-[#5B6B7A] bg-[#F8FAFC] px-2 py-0.5 rounded border border-[#D9E2EA]">
               ALL 11 SUBSYSTEMS REGISTERED
             </span>
           )}
         </div>
 
         {/* View Mode Toggle Buttons */}
-        <div className="flex items-center gap-1 bg-[#080D1A] p-1 rounded-lg border border-slate-800">
+        <div className="flex items-center gap-1 bg-[#080D1A] p-1 rounded-lg border border-[#D9E2EA]">
           <button
             type="button"
             onClick={() => setViewMode('components')}
             className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${
               viewMode === 'components'
                 ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-[#5B6B7A] hover:text-[#17212B]'
             }`}
           >
             Components ({displayedComponents.length})
@@ -152,12 +152,12 @@ export default function SatelliteEquipmentBoard({
             className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 ${
               viewMode === 'lifecycle'
                 ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-[#5B6B7A] hover:text-[#17212B]'
             }`}
           >
             Operational Lifecycle
             {repairList.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9.5px] font-bold font-mono">
+              <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-[#17212B] text-[9.5px] font-bold font-mono">
                 {repairList.length}
               </span>
             )}
@@ -166,16 +166,16 @@ export default function SatelliteEquipmentBoard({
       </div>
 
       {/* Classification Mode & Filter Pills Row */}
-      <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 bg-[#080D1A] border-b border-slate-800/80 text-xs">
+      <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 bg-[#080D1A] border-b border-[#D9E2EA]/80 text-xs">
         {/* Classification Selector: Subsystems vs Lots */}
-        <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded-md p-0.5 mr-1 flex-shrink-0">
+        <div className="flex items-center bg-[#FFFFFF] border border-[#D9E2EA]/80 rounded-md p-0.5 mr-1 flex-shrink-0">
           <button
             type="button"
             onClick={() => setFilterCategory('subsystem')}
             className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
               filterCategory === 'subsystem'
                 ? 'bg-white text-slate-900 shadow-sm font-bold'
-                : 'text-slate-400 hover:text-slate-200'
+                : 'text-[#5B6B7A] hover:text-[#17212B]'
             }`}
           >
             Subsystems
@@ -186,7 +186,7 @@ export default function SatelliteEquipmentBoard({
             className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
               filterCategory === 'lot'
                 ? 'bg-white text-slate-900 shadow-sm font-bold'
-                : 'text-slate-400 hover:text-slate-200'
+                : 'text-[#5B6B7A] hover:text-[#17212B]'
             }`}
           >
             Lots ({lotList.length})
@@ -201,7 +201,7 @@ export default function SatelliteEquipmentBoard({
               className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
                 !focusKey
                   ? 'bg-white border-white text-slate-900 font-bold'
-                  : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                  : 'border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
               }`}
             >
               ALL
@@ -216,7 +216,7 @@ export default function SatelliteEquipmentBoard({
                     ? 'bg-white border-white text-slate-900 font-bold'
                     : s.status === 'reject'
                     ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
-                    : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                    : 'border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
                 }`}
               >
                 <span
@@ -236,7 +236,7 @@ export default function SatelliteEquipmentBoard({
               className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
                 !selectedLot
                   ? 'bg-white border-white text-slate-900 font-bold'
-                  : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                  : 'border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
               }`}
             >
               ALL LOTS
@@ -251,7 +251,7 @@ export default function SatelliteEquipmentBoard({
                     ? 'bg-white border-white text-slate-900 font-bold shadow-sm'
                     : lot.status === 'reject'
                     ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
-                    : 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                    : 'border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
                 }`}
                 title={`Filter components to lot ${lot.lot_id} (${lot.count} components)`}
               >
@@ -272,7 +272,7 @@ export default function SatelliteEquipmentBoard({
       {viewMode === 'components' && (
         <div className="p-4">
           {displayedComponents.length === 0 ? (
-            <div className="p-8 text-center text-slate-400 border border-dashed border-slate-800 rounded-lg">
+            <div className="p-8 text-center text-[#5B6B7A] border border-dashed border-[#D9E2EA] rounded-lg">
               No components registered for this subsystem. Load demo flight telemetry or upload dataset.
             </div>
           ) : (
@@ -293,7 +293,7 @@ export default function SatelliteEquipmentBoard({
                         ? 'bg-white/10 border-white shadow-md ring-1 ring-white/30'
                         : isIsolated
                         ? 'bg-rose-500/5 border-rose-500/40 opacity-75'
-                        : 'bg-[#142B40] border-slate-800 hover:border-slate-700 hover:bg-[#131D33]'
+                        : 'bg-[#F8FAFC] border-[#D9E2EA] hover:border-[#D9E2EA] hover:bg-[#131D33]'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-1.5">
@@ -304,13 +304,13 @@ export default function SatelliteEquipmentBoard({
                               isRej ? 'bg-rose-500' : isMon ? 'bg-amber-400' : 'bg-emerald-400'
                             }`}
                           />
-                          <span className="font-mono font-bold text-white tracking-tight text-xs">
+                          <span className="font-mono font-bold text-[#17212B] tracking-tight text-xs">
                             {c.component_id}
                           </span>
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          Lot: <span className="text-slate-300 font-mono">{c.lot_id}</span> &bull;{' '}
-                          <span className="text-slate-300 font-medium">{c.subsystem}</span>
+                        <div className="text-[10px] text-[#5B6B7A] mt-0.5">
+                          Lot: <span className="text-[#5B6B7A] font-mono">{c.lot_id}</span> &bull;{' '}
+                          <span className="text-[#5B6B7A] font-medium">{c.subsystem}</span>
                         </div>
                       </div>
 
@@ -328,9 +328,9 @@ export default function SatelliteEquipmentBoard({
                     </div>
 
                     {/* Operational Telemetry Metrics */}
-                    <div className="grid grid-cols-3 gap-1 bg-[#0B1928] p-2 rounded border border-slate-800 text-[10px]">
+                    <div className="grid grid-cols-3 gap-1 bg-[#FFFFFF] p-2 rounded border border-[#D9E2EA] text-[10px]">
                       <div>
-                        <div className="text-slate-400 text-[9px]">Drift &Delta;</div>
+                        <div className="text-[#5B6B7A] text-[9px]">Drift &Delta;</div>
                         <div
                           className={`font-mono font-bold ${
                             Math.abs(c.pct_drift ?? 0) > 15 ? 'text-rose-400' : 'text-emerald-400'
@@ -341,13 +341,13 @@ export default function SatelliteEquipmentBoard({
                         </div>
                       </div>
                       <div>
-                        <div className="text-slate-400 text-[9px]">Measured</div>
-                        <div className="font-mono font-bold text-slate-200">
+                        <div className="text-[#5B6B7A] text-[9px]">Measured</div>
+                        <div className="font-mono font-bold text-[#17212B]">
                           {c.v168.toFixed(1)} &mu;A
                         </div>
                       </div>
                       <div>
-                        <div className="text-slate-400 text-[9px]">Risk Score</div>
+                        <div className="text-[#5B6B7A] text-[9px]">Risk Score</div>
                         <div
                           className={`font-mono font-bold ${
                             c.risk_score > 60 ? 'text-rose-400' : c.risk_score > 35 ? 'text-amber-400' : 'text-emerald-400'
@@ -359,7 +359,7 @@ export default function SatelliteEquipmentBoard({
                     </div>
 
                     {/* State Badges & Inspect Action */}
-                    <div className="flex items-center justify-between text-[10px] pt-1 border-t border-slate-800/80">
+                    <div className="flex items-center justify-between text-[10px] pt-1 border-t border-[#D9E2EA]/80">
                       <div>
                         {isIsolated && (
                           <span className="text-rose-300 font-medium text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/40">
@@ -367,12 +367,12 @@ export default function SatelliteEquipmentBoard({
                           </span>
                         )}
                         {isFailover && (
-                          <span className="text-white font-medium text-[9px] px-1.5 py-0.5 rounded bg-white/15 border border-white/30 ml-1">
+                          <span className="text-[#17212B] font-medium text-[9px] px-1.5 py-0.5 rounded bg-white/15 border border-white/30 ml-1">
                             Spare B Active
                           </span>
                         )}
                         {!isIsolated && !isFailover && (
-                          <span className="text-slate-500 text-[9.5px]">Link Nominal</span>
+                          <span className="text-[#81909D] text-[9.5px]">Link Nominal</span>
                         )}
                       </div>
 
@@ -382,7 +382,7 @@ export default function SatelliteEquipmentBoard({
                           e.stopPropagation()
                           onSelectComponent(c.component_id)
                         }}
-                        className="text-slate-200 hover:text-white font-medium text-[10px] hover:underline"
+                        className="text-[#17212B] hover:text-[#17212B] font-medium text-[10px] hover:underline"
                       >
                         Inspect &rarr;
                       </button>
@@ -395,7 +395,7 @@ export default function SatelliteEquipmentBoard({
 
           {/* Diagnostic Deep-Dive (Cause, Reason, Satellite Impact & Improvement) */}
           {activeComponent && (
-            <div className="mt-4 pt-3 border-t border-slate-800">
+            <div className="mt-4 pt-3 border-t border-[#D9E2EA]">
               <ComponentDeepDiveAnalysis
                 component={activeComponent}
                 onIsolateBus={handleToggleIsolate}
@@ -412,11 +412,11 @@ export default function SatelliteEquipmentBoard({
       {viewMode === 'lifecycle' && (
         <div className="p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* COLUMN 1: OPERATIONAL UNITS */}
-          <div className="bg-[#142B40] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
+          <div className="bg-[#F8FAFC] border border-[#D9E2EA]/80 rounded-xl p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#D9E2EA]">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                <h4 className="m-0 font-bold text-xs uppercase text-slate-200">
+                <h4 className="m-0 font-bold text-xs uppercase text-[#17212B]">
                   Operational Flight Units
                 </h4>
               </div>
@@ -425,7 +425,7 @@ export default function SatelliteEquipmentBoard({
               </span>
             </div>
 
-            <div className="text-[11px] text-slate-400 leading-relaxed">
+            <div className="text-[11px] text-[#5B6B7A] leading-relaxed">
               Flight equipment operating nominally within qualified tolerance limits. All channels verified.
             </div>
 
@@ -434,22 +434,22 @@ export default function SatelliteEquipmentBoard({
                 <div
                   key={item.component_id}
                   onClick={() => onSelectComponent(item.component_id)}
-                  className="p-2.5 rounded-lg bg-[#0B1928] border border-slate-800 hover:border-slate-700 cursor-pointer flex items-center justify-between text-xs transition-all"
+                  className="p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] hover:border-[#D9E2EA] cursor-pointer flex items-center justify-between text-xs transition-all"
                 >
                   <div>
-                    <div className="font-mono font-bold text-white text-xs">{item.component_id}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">
+                    <div className="font-mono font-bold text-[#17212B] text-xs">{item.component_id}</div>
+                    <div className="text-[10px] text-[#5B6B7A] mt-0.5">
                       {item.subsystem} &bull; Lot {item.lot_id}
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="font-mono text-emerald-400 font-bold">{item.v168.toFixed(1)} &mu;A</div>
-                    <div className="text-[9.5px] text-slate-400">99.8% HEALTH</div>
+                    <div className="text-[9.5px] text-[#5B6B7A]">99.8% HEALTH</div>
                   </div>
                 </div>
               ))}
               {operationalList.length > 10 && (
-                <div className="text-center text-slate-500 text-[10px] py-1 font-medium">
+                <div className="text-center text-[#81909D] text-[10px] py-1 font-medium">
                   +{operationalList.length - 10} additional nominal flight units
                 </div>
               )}
@@ -457,11 +457,11 @@ export default function SatelliteEquipmentBoard({
           </div>
 
           {/* COLUMN 2: UNDER EXAMINATION */}
-          <div className="bg-[#142B40] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
+          <div className="bg-[#F8FAFC] border border-[#D9E2EA]/80 rounded-xl p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#D9E2EA]">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                <h4 className="m-0 font-bold text-xs uppercase text-slate-200">
+                <h4 className="m-0 font-bold text-xs uppercase text-[#17212B]">
                   Under Examination
                 </h4>
               </div>
@@ -470,13 +470,13 @@ export default function SatelliteEquipmentBoard({
               </span>
             </div>
 
-            <div className="text-[11px] text-slate-400 leading-relaxed">
+            <div className="text-[11px] text-[#5B6B7A] leading-relaxed">
               Components undergoing MIL-STD-883 HTOL burn-in evaluation or exhibiting subtle drift trends.
             </div>
 
             <div className="flex flex-col gap-2 max-h-[280px] overflow-y-auto pr-1">
               {examinationList.length === 0 ? (
-                <div className="p-4 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-lg">
+                <div className="p-4 text-center text-[#81909D] text-xs border border-dashed border-[#D9E2EA] rounded-lg">
                   No components currently flagged for examination.
                 </div>
               ) : (
@@ -484,20 +484,20 @@ export default function SatelliteEquipmentBoard({
                   <div
                     key={item.component_id}
                     onClick={() => onSelectComponent(item.component_id)}
-                    className="p-2.5 rounded-lg bg-[#0B1928] border border-amber-500/30 hover:border-amber-500/60 cursor-pointer flex flex-col gap-1 text-xs transition-all"
+                    className="p-2.5 rounded-lg bg-[#FFFFFF] border border-amber-500/30 hover:border-amber-500/60 cursor-pointer flex flex-col gap-1 text-xs transition-all"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono font-bold text-white text-xs">{item.component_id}</span>
+                      <span className="font-mono font-bold text-[#17212B] text-xs">{item.component_id}</span>
                       <span className="font-mono text-amber-400 font-bold">
                         &Delta; {(item.pct_drift ?? 0) > 0 ? '+' : ''}
                         {(item.pct_drift ?? 0).toFixed(1)}%
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                    <div className="flex items-center justify-between text-[10px] text-[#5B6B7A]">
                       <span>
                         {item.subsystem} &bull; Lot {item.lot_id}
                       </span>
-                      <span className="font-mono font-semibold text-slate-300">Risk {Math.round(item.risk_score)}/100</span>
+                      <span className="font-mono font-semibold text-[#5B6B7A]">Risk {Math.round(item.risk_score)}/100</span>
                     </div>
                   </div>
                 ))
@@ -506,11 +506,11 @@ export default function SatelliteEquipmentBoard({
           </div>
 
           {/* COLUMN 3: REPAIR & QUARANTINE SECTION */}
-          <div className="bg-[#142B40] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
+          <div className="bg-[#F8FAFC] border border-[#D9E2EA]/80 rounded-xl p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#D9E2EA]">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                <h4 className="m-0 font-bold text-xs uppercase text-slate-200">
+                <h4 className="m-0 font-bold text-xs uppercase text-[#17212B]">
                   Quarantine &amp; Mitigation
                 </h4>
               </div>
@@ -519,7 +519,7 @@ export default function SatelliteEquipmentBoard({
               </span>
             </div>
 
-            <div className="text-[11px] text-slate-400 leading-relaxed">
+            <div className="text-[11px] text-[#5B6B7A] leading-relaxed">
               Components flagged with anomalous defect risk. Operators can execute bus isolation or cold spare failover.
             </div>
 
@@ -536,14 +536,14 @@ export default function SatelliteEquipmentBoard({
                   return (
                     <div
                       key={item.component_id}
-                      className="p-2.5 rounded-lg bg-[#0B1928] border border-rose-500/40 flex flex-col gap-2 text-xs"
+                      className="p-2.5 rounded-lg bg-[#FFFFFF] border border-rose-500/40 flex flex-col gap-2 text-xs"
                     >
                       <div
                         onClick={() => onSelectComponent(item.component_id)}
                         className="cursor-pointer flex items-center justify-between"
                       >
                         <div>
-                          <div className="font-mono font-bold text-white flex items-center gap-2 text-xs">
+                          <div className="font-mono font-bold text-[#17212B] flex items-center gap-2 text-xs">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                             {item.component_id}
                           </div>
@@ -560,14 +560,14 @@ export default function SatelliteEquipmentBoard({
                       </div>
 
                       {/* Mitigation Actions */}
-                      <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+                      <div className="flex items-center gap-2 pt-2 border-t border-[#D9E2EA]">
                         <button
                           type="button"
                           onClick={() => handleToggleIsolate(item.component_id)}
                           className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border ${
                             isIsolated
                               ? 'bg-rose-500 text-white border-rose-600 font-bold'
-                              : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500 hover:text-white'
+                              : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500 hover:text-[#17212B]'
                           }`}
                         >
                           {isIsolated ? '✓ Bus Isolated' : 'Isolate Bus'}
@@ -579,7 +579,7 @@ export default function SatelliteEquipmentBoard({
                           className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border ${
                             isFailover
                               ? 'bg-slate-700 text-white border-white/40 font-bold'
-                              : 'bg-white/10 text-white border-white/20 hover:bg-slate-700 hover:text-white'
+                              : 'bg-white/10 text-white border-white/20 hover:bg-[#F8FAFC] hover:text-[#17212B]'
                           }`}
                         >
                           {isFailover ? '✓ Spare B Active' : 'Failover Spare'}
@@ -594,7 +594,7 @@ export default function SatelliteEquipmentBoard({
 
           {/* Diagnostic Deep-Dive in Lifecycle View */}
           {activeComponent && (
-            <div className="mt-4 pt-3 border-t border-slate-800 col-span-1 lg:col-span-3">
+            <div className="mt-4 pt-3 border-t border-[#D9E2EA] col-span-1 lg:col-span-3">
               <ComponentDeepDiveAnalysis
                 component={activeComponent}
                 onIsolateBus={handleToggleIsolate}
