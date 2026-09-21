@@ -241,7 +241,7 @@ export default function UploadBar({
             dangerouslySetInnerHTML={{ __html: metaText }}
           />
 
-          {/* Dedicated quick-access button to open Lot-Wise Classification Window */}
+          {/* Dedicated quick-access button to open Lot Inspection Workspace */}
           {onOpenLotsModal && (
             <button
               type="button"
@@ -249,8 +249,8 @@ export default function UploadBar({
                 sounds.playClick()
                 onOpenLotsModal()
               }}
-              className="inline-flex items-center gap-2 text-xs md:text-sm font-mono font-bold bg-[#F8FAFC] hover:bg-[#D9E2EA] text-[#0E88D3] hover:text-[#17212B] px-4 py-1.5 rounded-lg border border-[#0E88D3]/60 hover:border-[#0E88D3] transition-all shadow-sm cursor-pointer ml-1.5 group"
-              title="Open dedicated Lot-Wise Classification Window"
+              className="inline-flex items-center gap-2 text-xs md:text-sm font-mono font-bold bg-[#F8FAFC] hover:bg-[#E7EEF5] text-[#0E88D3] hover:text-[#0c74b4] px-4 py-1.5 rounded-lg border border-[#0E88D3]/60 hover:border-[#0E88D3] transition-all shadow-sm cursor-pointer ml-1.5 group"
+              title="Open dedicated Lot Inspection Workspace"
             >
               <span>📦</span>
               <span>INSPECT LOTS &rarr;</span>

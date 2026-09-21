@@ -129,6 +129,43 @@ ISRO-GAGAN-FC-003,LOT-2026-A1,FC,12.1,13.9,16.2,18.7,50,uA`
 ISRO-GAGAN-FC-001,LOT-2026-A1,FC,12.4,14.1,16.8,19.2,50,125
 ISRO-GAGAN-FC-002,LOT-2026-A1,FC,11.8,13.5,15.9,18.4,50,999
 ISRO-GAGAN-FC-003,LOT-2026-A1,FC,12.1,13.9,16.2,18.7,50,125`
+  },
+  {
+    id: 'invalid_missing_value',
+    name: '9. Missing Value (Empty lot_id)',
+    description: 'Row 2 has empty/missing lot_id. Triggers MISSING_VALUE error and blocks AI screening.',
+    expectedStatus: 'BLOCKED',
+    expectedErrorType: 'MISSING_VALUE',
+    csvText: `component_id,lot_id,subsystem,value_0h_ua,value_24h_ua,value_96h_ua,value_168h_ua,static_limit_ua
+ISRO-GAGAN-FC-001,LOT-2026-A1,FC,12.4,14.1,16.8,19.2,50
+ISRO-GAGAN-FC-002,,FC,11.8,13.5,15.9,18.4,50
+ISRO-GAGAN-FC-003,LOT-2026-A1,FC,12.1,13.9,16.2,18.7,50`
+  },
+  {
+    id: 'invalid_column_name',
+    name: '10. Invalid Column Names',
+    description: 'Header contains arbitrary unmapped garbage columns with missing core keys. Triggers INVALID_COLUMN_NAME error.',
+    expectedStatus: 'BLOCKED',
+    expectedErrorType: 'INVALID_COLUMN_NAME',
+    csvText: `sensor_raw_tag,wafer_uuid_xyz,voltage_channel_a,random_notes
+CH-01,W-09,1.23,test_notes
+CH-02,W-09,1.45,test_notes`
+  },
+  {
+    id: 'empty_file',
+    name: '11. Empty File (0 Bytes)',
+    description: 'Uploaded CSV file contains 0 bytes or zero records. Triggers EMPTY_FILE error.',
+    expectedStatus: 'BLOCKED',
+    expectedErrorType: 'EMPTY_FILE',
+    csvText: ``
+  },
+  {
+    id: 'invalid_file_format',
+    name: '12. Invalid File Format (Corrupt)',
+    description: 'File contains corrupted binary/non-CSV payload. Triggers INVALID_FILE_FORMAT error.',
+    expectedStatus: 'BLOCKED',
+    expectedErrorType: 'INVALID_FILE_FORMAT',
+    csvText: `\x00\x01\x02\x03\xFF\xFE\xFD BINARY STREAM INVALID CSV`
   }
 ]
 
@@ -137,3 +174,4 @@ export function createTestCsvFile(fixtureId: string): File {
   const blob = new Blob([fixture.csvText], { type: 'text/csv;charset=utf-8;' })
   return new File([blob], `${fixture.id}.csv`, { type: 'text/csv' })
 }
+

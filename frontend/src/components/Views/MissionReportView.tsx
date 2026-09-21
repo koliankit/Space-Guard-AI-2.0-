@@ -48,7 +48,7 @@ export default function MissionReportView({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-full p-3 md:p-5 bg-[#F4F7FA] text-[#17212B] font-mono select-none w-full">
+    <div className="flex flex-col flex-1 min-h-full p-3 md:p-5 bg-[#EEF3F7] text-[#17212B] font-mono select-none w-full">
       {/* Top Header & Actions Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#D9E2EA] mb-6 w-full">
         <div>
@@ -116,7 +116,7 @@ export default function MissionReportView({
           <div className="text-xs text-[#5B6B7A] font-bold tracking-widest uppercase mb-1">
             सतीश धवन अंतरिक्ष केंद्र शार, श्रीहरिकोटा / SATISH DHAWAN SPACE CENTRE SHAR, SRIHARIKOTA
           </div>
-          <h1 className="m-0 font-display text-lg font-black text-white tracking-widest uppercase">
+          <h1 className="m-0 font-display text-lg font-black text-[#17212B] tracking-widest uppercase">
             FLIGHT READINESS COMPONENT SCREENING CLEARANCE CERTIFICATE
           </h1>
           <div className="text-xs text-[#5B6B7A] mt-1 font-mono">
@@ -151,7 +151,7 @@ export default function MissionReportView({
             <span>&gt;&gt;</span> Executive Reliability Finding &bull; Range Safety Directorate:
           </div>
           <p className="text-[#17212B] m-0">
-            SpaceGuard AI performed multi-dimensional screening across 168 hours of High-Temperature Operating Life (HTOL) burn-in data under constant 125&deg;C thermal bias. Traditional fixed-datasheet threshold inspection evaluated <b className="text-white">99.5%</b> of components as passing, which would have allowed <b className="text-reject">{rejected.length} latent silicon gate-oxide defects</b> to escape into flight hardware.
+            SpaceGuard AI performed multi-dimensional screening across 168 hours of High-Temperature Operating Life (HTOL) burn-in data under constant 125&deg;C thermal bias. Traditional fixed-datasheet threshold inspection evaluated <b className="text-[#17212B] font-bold">99.5%</b> of components as passing, which would have allowed <b className="text-reject">{rejected.length} latent silicon gate-oxide defects</b> to escape into flight hardware.
           </p>
           <p className="text-[#17212B] m-0">
             By deploying <b className="text-isro-amber">Lot-Relative Robust z-Scores</b>, <b className="text-safe">Isolation Forest Multivariate Outlier Detection</b>, and <b className="text-isro-amber">Linear Drift Extrapolation (+96h)</b>, anomalous gate dielectrics were intercepted and quarantined before stage stacking at Sriharikota Second Launch Pad (SLP).
@@ -211,7 +211,7 @@ export default function MissionReportView({
                       {c.pct_drift > 0 ? '+' : ''}{c.pct_drift.toFixed(1)}%
                     </td>
                     <td className="py-2 px-3 text-[#5B6B7A]">{c.limit_ua.toFixed(0)} &#956;A</td>
-                    <td className="py-2 px-3 text-amber-300 font-bold">{c.predicted168_from_early != null ? `${c.predicted168_from_early.toFixed(2)} µA` : '-'}</td>
+                    <td className="py-2 px-3 text-[#C58A00] font-bold">{c.predicted168_from_early != null ? `${c.predicted168_from_early.toFixed(2)} µA` : '-'}</td>
                     <td className="py-2 px-3 text-reject font-bold">
                       {c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;
                     </td>

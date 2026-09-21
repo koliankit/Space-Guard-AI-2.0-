@@ -3,16 +3,21 @@
 @tailwind utilities;
 
 :root {
-  /* PART 17 — FINAL LIGHT ENGINEERING DASHBOARD COLOR SYSTEM */
-  --bg-main: #F4F7FA;
+  /* PART 22 — FINAL LIGHT ENGINEERING DASHBOARD COLOR SYSTEM */
+  --bg-main: #EEF3F7;
+  --bg-secondary: #F3F6F9;
   --bg-panel: #FFFFFF;
   --bg-elevated: #F8FAFC;
-  --border: #D9E2EA;
-  --border-subtle: #E5EDF4;
+  --border: #D5DEE7;
+  --border-subtle: #E7EEF5;
+  --hover: #E7EEF5;
 
   --text-primary: #17212B;
-  --text-secondary: #5B6B7A;
-  --text-muted: #81909D;
+  --text-secondary: #4F6170;
+  --text-muted: #718292;
+  --text-heading: #142331;
+  --text-label: #34495A;
+  --text-table: #1F2D38;
 
   --primary-blue: #0E88D3;
   --primary-orange: #F47216;
@@ -22,16 +27,16 @@
   --status-critical: #D9363E;
 
   /* Legacy variable mappings for backward compatibility */
-  --color-bg: #F4F7FA;
-  --color-bg2: #F8FAFC;
+  --color-bg: #EEF3F7;
+  --color-bg2: #F3F6F9;
   --color-panel: #FFFFFF;
   --color-panel2: #F8FAFC;
-  --color-border: #D9E2EA;
-  --color-line: #D9E2EA;
+  --color-border: #D5DEE7;
+  --color-line: #D5DEE7;
 
   --color-text-primary: #17212B;
-  --color-text-secondary: #5B6B7A;
-  --color-text-muted: #81909D;
+  --color-text-secondary: #4F6170;
+  --color-text-muted: #718292;
 
   --color-isro-blue: #0E88D3;
   --color-isro-orange: #F47216;
@@ -40,7 +45,7 @@
   --color-status-monitor: #C58A00;
   --color-status-reject: #D9363E;
 
-  /* PART 21 — DARK TECHNICAL VISUALIZATION THEME */
+  /* PART 21/22 — DARK TECHNICAL VISUALIZATION THEME */
   --tech-bg: #07111C;
   --tech-panel: #0B1928;
   --tech-card: #102337;
@@ -101,7 +106,7 @@ html, body, #root {
 }
 
 body {
-  background: #F4F7FA;
+  background: #EEF3F7;
   color: #17212B;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
@@ -120,7 +125,7 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D9E2EA;
+  background: #D5DEE7;
   border-radius: 3px;
   border: 1px solid #F8FAFC;
 }
@@ -128,7 +133,7 @@ body {
   background: #0E88D3;
 }
 ::-webkit-scrollbar-track {
-  background: #F4F7FA;
+  background: #EEF3F7;
 }
 
 /* ==============================================================================

@@ -68,10 +68,10 @@ export default function SidebarNav({
         },
         {
           id: 'locations',
-          label: 'Lot & Locations',
+          label: 'Lot Inspection Workspace',
           icon: '📦',
           tag: '01',
-          description: 'Qualification Lot Architecture',
+          description: 'Qualification Lot Architecture & Allocation',
         },
         {
           id: 'satellite',
@@ -240,12 +240,12 @@ export default function SidebarNav({
 
       {/* Main Sidebar Frame: full-height left navigation column docked seamlessly */}
       <aside
-        className={`fixed lg:relative top-0 left-0 h-screen lg:h-full w-72 xl:w-80 bg-[#FFFFFF] border-r border-[#D9E2EA] z-40 lg:z-auto flex flex-col justify-between flex-shrink-0 min-h-0 transition-transform duration-200 ease-in-out shadow-sm ${
+        className={`fixed lg:relative top-0 left-0 h-screen lg:h-full w-72 xl:w-80 bg-[#F3F6F9] border-r border-[#D5DEE7] z-40 lg:z-auto flex flex-col justify-between flex-shrink-0 min-h-0 transition-transform duration-200 ease-in-out shadow-sm ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Top Header Identity */}
-        <div className="p-3.5 border-b border-[#D9E2EA] bg-[#FFFFFF] flex flex-col gap-2 flex-shrink-0">
+        <div className="p-3.5 border-b border-[#D5DEE7] bg-[#F3F6F9] flex flex-col gap-2 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F47216]/10 to-[#0E88D3]/10 border border-[#F47216]/60 flex items-center justify-center font-bold text-[#F47216] font-mono text-xs shadow-orange">
@@ -275,7 +275,7 @@ export default function SidebarNav({
           </div>
 
           {/* Active Mission Pill */}
-          <div className="bg-[#F8FAFC] border border-[#D9E2EA] rounded-md px-2.5 py-1 flex items-center justify-between text-[11px] font-mono text-[#5B6B7A]">
+          <div className="bg-[#FFFFFF] border border-[#D5DEE7] rounded-md px-2.5 py-1 flex items-center justify-between text-[11px] font-mono text-[#4F6170]">
             <span className="truncate max-w-[200px]" title={activeMissionName}>
               MISSION: <b className="text-[#17212B]">{activeMissionName}</b>
             </span>
@@ -284,15 +284,15 @@ export default function SidebarNav({
         </div>
 
         {/* Scrollable Navigation Hierarchy */}
-        <nav className="flex-1 overflow-y-auto px-2.5 py-2 space-y-2.5 select-none scrollbar-thin scrollbar-thumb-[#D9E2EA] scrollbar-track-transparent">
+        <nav className="flex-1 overflow-y-auto px-2.5 py-2 space-y-2.5 select-none scrollbar-thin scrollbar-thumb-[#D5DEE7] scrollbar-track-transparent">
           {navSections.map((section) => (
             <div key={section.title} className="space-y-0.5">
               {/* Section Header with Accent Line */}
               <div className="flex items-center justify-between px-2 py-0.5">
-                <span className="text-[9.5px] font-mono font-bold tracking-widest text-[#81909D] uppercase">
+                <span className="text-[9.5px] font-mono font-bold tracking-widest text-[#718292] uppercase">
                   {section.title}
                 </span>
-                <span className="w-10 h-px bg-[#D9E2EA]" />
+                <span className="w-10 h-px bg-[#D5DEE7]" />
               </div>
 
               {/* Navigation Items */}
@@ -306,8 +306,8 @@ export default function SidebarNav({
                       onClick={() => handleSelect(item.id)}
                       className={`w-full group text-left px-2 py-1.5 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer border ${
                         active
-                          ? 'bg-[#EBF5FB] border-[#0E88D3] text-[#0E88D3] shadow-sm font-semibold ring-1 ring-[#0E88D3]/20'
-                          : 'bg-transparent border-transparent text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC] hover:border-[#D9E2EA]'
+                          ? 'bg-[#FFFFFF] border-[#0E88D3] text-[#0E88D3] shadow-sm font-semibold ring-1 ring-[#0E88D3]/20'
+                          : 'bg-transparent border-transparent text-[#4F6170] hover:text-[#17212B] hover:bg-[#E7EEF5] hover:border-[#D5DEE7]'
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0 flex-1">

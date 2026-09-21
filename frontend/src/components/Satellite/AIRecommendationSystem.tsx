@@ -367,15 +367,15 @@ export default function AIRecommendationSystem({
           <div
             className={`px-4 py-2 rounded-lg border text-xs md:text-sm font-bold uppercase tracking-wide flex items-center gap-2 shadow-sm ${
               isReject
-                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                ? 'bg-[#D9363E]/15 text-[#D9363E] border-[#D9363E]/40'
                 : isMonitor
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                ? 'bg-[#C58A00]/15 text-[#C58A00] border-[#C58A00]/40'
+                : 'bg-[#168A5B]/15 text-[#168A5B] border-[#168A5B]/40'
             }`}
           >
             <span
               className={`w-2.5 h-2.5 rounded-full ${
-                isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400 led' : 'bg-emerald-400'
+                isReject ? 'bg-[#D9363E]' : isMonitor ? 'bg-[#C58A00]' : 'bg-[#168A5B]'
               }`}
             />
             <span>
@@ -612,7 +612,7 @@ export default function AIRecommendationSystem({
           <span className="text-[#5B6B7A] text-xs font-mono">ISRO Quality Protocol L-3</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full font-mono text-xs">
           <button
             type="button"
             onClick={() => {
@@ -624,8 +624,8 @@ export default function AIRecommendationSystem({
             }}
             className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
               effectiveIsolated
-                ? 'bg-rose-600 text-white border-rose-500 shadow-sm ring-1 ring-rose-400/50'
-                : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500 hover:text-[#17212B]'
+                ? 'bg-[#D9363E] text-white border-[#D9363E] shadow-sm'
+                : 'bg-[#FEF2F2] text-[#D9363E] border-[#D9363E]/40 hover:bg-[#D9363E] hover:text-white'
             }`}
           >
             <span className="text-sm">⚡</span>
@@ -643,8 +643,8 @@ export default function AIRecommendationSystem({
             }}
             className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
               effectiveFailover
-                ? 'bg-slate-700 text-white border-white/40 shadow-sm ring-1 ring-white/30'
-                : 'bg-white/10 text-white border-white/20 hover:bg-[#F8FAFC] hover:text-[#17212B]'
+                ? 'bg-[#0E88D3] text-white border-[#0E88D3] shadow-sm'
+                : 'bg-[#F8FAFC] text-[#17212B] border-[#D5DEE7] hover:border-[#0E88D3] hover:text-[#0E88D3]'
             }`}
           >
             <span className="text-sm">🔄</span>
@@ -656,8 +656,8 @@ export default function AIRecommendationSystem({
             onClick={handleApplyDerating}
             className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
               derated
-                ? 'bg-amber-500/30 text-amber-300 border-amber-500 shadow-sm ring-1 ring-amber-400/40'
-                : 'bg-[#F8FAFC] text-[#5B6B7A] border-[#D9E2EA] hover:bg-[#F8FAFC] hover:text-[#17212B]'
+                ? 'bg-[#FFFBEB] text-[#C58A00] border-[#C58A00] shadow-sm'
+                : 'bg-[#F8FAFC] text-[#4F6170] border-[#D5DEE7] hover:text-[#17212B]'
             }`}
           >
             <span className="text-sm">🛡️</span>
@@ -667,7 +667,7 @@ export default function AIRecommendationSystem({
           <button
             type="button"
             onClick={handleExportDirective}
-            className="px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer hover:shadow-emerald-950/60"
+            className="px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold bg-[#168A5B] hover:bg-[#126e49] text-white transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
           >
             <span className="text-sm">📋</span>
             <span>{directiveExported ? '✓ Directive Logged' : 'Export ISRO Action Directive'}</span>

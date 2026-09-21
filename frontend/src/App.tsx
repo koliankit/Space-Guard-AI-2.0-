@@ -99,7 +99,7 @@ export default function App() {
     setFocusKey(null)
     setAudit([])
     setDataMetaText(
-      `<span class="font-bold text-white text-base md:text-lg tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-black text-lg md:text-xl text-emerald-400 bg-emerald-500/20 px-3 py-1 rounded-lg border border-emerald-500/50 leading-none shadow-sm mx-1">${result.valid}</span> <span class="text-slate-200 font-semibold text-base">components across</span> <button type="button" class="lot-clickable inline-flex items-center gap-1.5 font-mono font-black text-lg md:text-xl text-amber-400 hover:text-white bg-amber-500/25 hover:bg-amber-500/40 px-3 py-1 rounded-lg border border-amber-500/60 hover:border-amber-400 leading-none shadow-sm mx-1 transition-all cursor-pointer group" title="Click to open Lot-Wise Classification Window"><span class="underline decoration-amber-400/60 group-hover:decoration-white">${result.lots}</span> <span class="text-xs uppercase font-sans font-bold tracking-wider text-amber-300 group-hover:text-white">lots 📦</span></button>`
+      `<span class="font-bold text-[#17212B] text-base md:text-lg tracking-wide">${label} loaded</span> &mdash; <span class="inline-flex items-center font-mono font-black text-lg md:text-xl text-[#168A5B] bg-[#168A5B]/15 px-3 py-1 rounded-lg border border-[#168A5B]/40 leading-none shadow-sm mx-1">${result.valid}</span> <span class="text-[#17212B] font-semibold text-base">components across</span> <button type="button" class="lot-clickable inline-flex items-center gap-1.5 font-mono font-black text-lg md:text-xl text-[#0E88D3] hover:text-[#0c74b4] bg-[#0E88D3]/10 hover:bg-[#0E88D3]/20 px-3 py-1 rounded-lg border border-[#0E88D3]/40 leading-none shadow-sm mx-1 transition-all cursor-pointer group" title="Inspect qualification lots in dedicated workspace"><span class="underline decoration-[#0E88D3]/60">${result.lots}</span> <span class="text-xs uppercase font-sans font-bold tracking-wider text-[#0E88D3]">lots 📦</span></button>`
     )
     log(`Flight dataset uploaded \u2014 ${result.rows} components parsed.`)
     log(`${result.valid} components validated across ${result.lots} qualification lots (${result.missing} rows skipped).`, 'ok')
@@ -384,7 +384,7 @@ export default function App() {
 
 
   return (
-    <div className="h-screen w-screen overflow-hidden text-[#17212B] flex flex-col bg-[#F4F7FA]">
+    <div className="h-screen w-screen overflow-hidden text-[#17212B] flex flex-col bg-[#EEF3F7]">
       <div className="grid-overlay" />
       <Header
         streamActive={batchId !== null}
@@ -469,7 +469,7 @@ export default function App() {
         />
 
         {/* Right Full Dashboard Workspace */}
-        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#F4F7FA] flex flex-col">
+        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#EEF3F7] flex flex-col">
           {/* OVERVIEW */}
           {(activeTab === 'overview' || activeTab === 'wall') && (
             <MultiScreenWall
@@ -482,7 +482,7 @@ export default function App() {
               running={running}
               onRunScreening={() => runScreening()}
               onUploadFile={handleFile}
-              onOpenLotsModal={() => setLotModalOpen(true)}
+              onOpenLotsModal={() => setActiveTab('locations')}
               onNavigateToLotsTab={() => setActiveTab('locations')}
               onNavigateToTab={(tab) => setActiveTab(tab as DashboardTab)}
             />
@@ -615,7 +615,7 @@ export default function App() {
             />
           )}
 
-          {/* SPACECRAFT: Component Locations */}
+          {/* SPACECRAFT: Component Locations & Dedicated Lot Inspection Workspace */}
           {(activeTab === 'locations' || activeTab === 'lots') && (
             <LotArchitectureView
               components={allComponents.length > 0 ? allComponents : flaggedList}
@@ -626,6 +626,7 @@ export default function App() {
               onRunScreening={() => runScreening()}
               running={running}
               selectedId={selected?.component_id ?? null}
+              onNavigateToTab={setActiveTab}
             />
           )}
 
@@ -677,19 +678,6 @@ export default function App() {
         onSelectMission={handleSelectMission}
         onRunScreening={() => runScreening()}
         onOpenTab={setActiveTab}
-      />
-
-      <LotClassificationModal
-        isOpen={lotModalOpen}
-        onClose={() => setLotModalOpen(false)}
-        components={allComponents}
-        batchId={batchId}
-        activeMissionName={activeMission.name}
-        onSelectComponent={(id) => {
-          selectComponent(id)
-          setActiveTab('telemetry')
-        }}
-        onFocusSubsystem={(key) => setFocusKey(key)}
       />
 
       <TeeSecurityModal

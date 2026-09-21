@@ -184,10 +184,19 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
 
     if raw_df is None or len(raw_df) == 0:
         issues.append({
+            "id": "err-empty-file",
             "row": None,
             "column": None,
-            "message": "Uploaded dataset is completely empty (0 rows).",
             "severity": "error",
+            "error_type": "EMPTY_FILE",
+            "group": "SCHEMA",
+            "message": "Uploaded dataset is completely empty (0 rows).",
+            "detected_value": "0 bytes / 0 records",
+            "expected_value": "Valid CSV file with header row and component records",
+            "what": "The uploaded CSV file contains 0 data rows or is completely empty.",
+            "why": "SpaceGuard AI requires component burn-in records to construct baseline distributions and evaluate degradation.",
+            "impact": "No components can be screened, preventing flight clearance certification.",
+            "how_to_fix": "Upload a CSV file containing headers and component burn-in telemetry records.",
         })
         return False, issues
 
@@ -198,10 +207,19 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
     if missing:
         for m in missing:
             issues.append({
+                "id": f"err-missing-col-{m}",
                 "row": None,
                 "column": m,
-                "message": f"Mandatory column '{m}' could not be detected or mapped.",
                 "severity": "error",
+                "error_type": "MISSING_REQUIRED_COLUMN",
+                "group": "SCHEMA",
+                "message": f"Mandatory column '{m}' could not be detected or mapped.",
+                "detected_value": "MISSING",
+                "expected_value": f"Column name matching '{m}' or supported synonym",
+                "what": f"Mandatory column '{m}' is missing from the CSV header row.",
+                "why": "MIL-STD-883 Method 1005 requires serialized identification and burn-in telemetry intervals.",
+                "impact": f"Missing '{m}' prevents data parsing and invalidates flight qualification screening.",
+                "how_to_fix": f"Add the missing column '{m}' to the CSV header row or adjust column mapping.",
             })
         return False, issues
 
@@ -216,10 +234,19 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
         sample_dupes = dupe_ids[:5]
         dupe_count = len(dupe_ids)
         issues.append({
+            "id": "err-duplicate-component-id",
             "row": None,
             "column": comp_col,
-            "message": f"Detected {dupe_count} duplicate component IDs (e.g. {', '.join(sample_dupes)}). Each spaceflight component must have a unique identifier.",
             "severity": "error",
+            "error_type": "DUPLICATE_COMPONENT_ID",
+            "group": "IDENTITY",
+            "message": f"Detected {dupe_count} duplicate component IDs (e.g. {', '.join(sample_dupes)}). Each spaceflight component must have a unique identifier.",
+            "detected_value": f"Duplicate IDs: {', '.join(sample_dupes)}",
+            "expected_value": "Unique serial identifier per component",
+            "what": f"Found duplicate component serial identifiers in column '{comp_col}'.",
+            "why": "Spaceflight qualification requires 100% trace serialization under MIL-PRF-38535 Class V traceability.",
+            "impact": "Telemetry readings will collide, corrupting Module A degradation curves and risk scores.",
+            "how_to_fix": "Assign unique component IDs or serial numbers to each component record before re-uploading.",
         })
 
     # 3. Lot ID Validations
@@ -228,10 +255,19 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
     if empty_lot_mask.any():
         bad_rows = raw_df.index[empty_lot_mask].tolist()[:5]
         issues.append({
+            "id": "err-missing-lot-id",
             "row": bad_rows[0] + 1,
             "column": lot_col,
-            "message": f"Found {empty_lot_mask.sum()} components with empty or invalid lot IDs (rows: {bad_rows}). Components must belong to a production lot for relative screening.",
             "severity": "error",
+            "error_type": "MISSING_VALUE",
+            "group": "DATA",
+            "message": f"Found {empty_lot_mask.sum()} components with empty or invalid lot IDs (rows: {bad_rows}). Components must belong to a production lot for relative screening.",
+            "detected_value": "EMPTY / BLANK",
+            "expected_value": "Valid qualification lot code (e.g. LOT-2026-A1)",
+            "what": f"Component in row #{bad_rows[0] + 1} has an empty lot_id field.",
+            "why": "Module A anomaly detection relies on lot-relative robust statistics (median and MAD).",
+            "impact": "Components without a lot ID cannot be grouped into wafer cohorts for drift analysis.",
+            "how_to_fix": f"Provide a valid qualification lot code in column '{lot_col}' for all rows.",
         })
 
     # 4. Numeric Values Check on Burn-in Hours
@@ -245,11 +281,21 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
         bad_numeric = numeric_series.isna() & raw_df[col].notna()
         if bad_numeric.any():
             bad_idx = raw_df.index[bad_numeric].tolist()[:3]
+            bad_val = str(raw_df.loc[bad_idx[0], col])
             issues.append({
+                "id": f"err-invalid-numeric-{col}-{bad_idx[0]+1}",
                 "row": bad_idx[0] + 1,
                 "column": col,
-                "message": f"Non-numeric values found in '{col}' at rows {[r+1 for r in bad_idx]}.",
                 "severity": "error",
+                "error_type": "INVALID_NUMERIC_VALUE",
+                "group": "DATA",
+                "message": f"Non-numeric values found in '{col}' at rows {[r+1 for r in bad_idx]}.",
+                "detected_value": f"'{bad_val}'",
+                "expected_value": "Decimal numeric value in microamps (e.g. 14.5)",
+                "what": f"Column '{col}' at row #{bad_idx[0] + 1} contains non-numeric text.",
+                "why": "Mathematical drift calculations and Arrhenius modeling require valid floating-point numbers.",
+                "impact": "Non-numeric values prevent calculating rate-of-change and mean baseline drift.",
+                "how_to_fix": f"Replace non-numeric text '{bad_val}' with a valid decimal microamp measurement.",
             })
         
         # Infinite value check
@@ -257,19 +303,38 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
         if inf_mask.any():
             bad_inf = raw_df.index[inf_mask].tolist()[:3]
             issues.append({
+                "id": f"err-inf-val-{col}-{bad_inf[0]+1}",
                 "row": bad_inf[0] + 1,
                 "column": col,
-                "message": f"Infinite or non-finite measurement values found in '{col}' at rows {[r+1 for r in bad_inf]}.",
                 "severity": "error",
+                "error_type": "INVALID_RANGE",
+                "group": "RANGE",
+                "message": f"Infinite or non-finite measurement values found in '{col}' at rows {[r+1 for r in bad_inf]}.",
+                "detected_value": "Infinity / NaN",
+                "expected_value": "Finite positive measurement within [0, 50] µA",
+                "what": f"Measurement value in row #{bad_inf[0] + 1} is infinite or non-finite.",
+                "why": "Infinite values crash statistical dispersion equations (z-score and covariance).",
+                "impact": "Module A algorithm divides by zero or produces NaNs, corrupting the risk engine.",
+                "how_to_fix": "Verify sensor output and replace infinite values with actual recorded readings.",
             })
 
         missing_count = numeric_series.isna().sum()
         if missing_count > 0 and field in REQUIRED_FIELDS:
+            first_empty_row = raw_df.index[raw_df[col].isna()].tolist()
             issues.append({
-                "row": None,
+                "id": f"err-missing-burn-in-{col}",
+                "row": (first_empty_row[0] + 1) if first_empty_row else None,
                 "column": col,
+                "severity": "error" if field in ["v0", "v168"] else "warning",
+                "error_type": "MISSING_BURN_IN_POINT",
+                "group": "BURN_IN",
                 "message": f"Column '{col}' has {missing_count} missing or NaN values.",
-                "severity": "warning" if missing_count < len(raw_df) else "error",
+                "detected_value": "EMPTY / BLANK",
+                "expected_value": "Telemetry reading at standard burn-in interval",
+                "what": f"Measurement at interval '{col}' is missing for {missing_count} component(s).",
+                "why": "MIL-STD-883 Method 1005 requires mandatory burn-in readings at 0h and 168h end-points.",
+                "impact": "Cannot calculate delta degradation (168h - 0h) without initial and final values.",
+                "how_to_fix": f"Record and supply the missing {col} burn-in readings in the CSV file.",
             })
 
     # 5. Datasheet Min/Max Inversion Check
@@ -281,11 +346,22 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
         inverted = (min_vals.notna()) & (max_vals.notna()) & (min_vals >= max_vals)
         if inverted.any():
             inv_rows = raw_df.index[inverted].tolist()[:3]
+            min_v = float(raw_df.loc[inv_rows[0], mapping["datasheet_min"]])
+            max_v = float(raw_df.loc[inv_rows[0], mapping["datasheet_max"]])
             issues.append({
+                "id": f"err-invalid-range-{inv_rows[0]+1}",
                 "row": inv_rows[0] + 1,
                 "column": f"{mapping['datasheet_min']} / {mapping['datasheet_max']}",
-                "message": f"Datasheet min/max inconsistency: minimum limit exceeds maximum limit at rows {[r+1 for r in inv_rows]}.",
                 "severity": "error",
+                "error_type": "INVALID_RANGE",
+                "group": "RANGE",
+                "message": f"Datasheet min/max inconsistency: minimum limit ({min_v}) exceeds maximum limit ({max_v}) at rows {[r+1 for r in inv_rows]}.",
+                "detected_value": f"min={min_v} >= max={max_v}",
+                "expected_value": "datasheet_min < datasheet_max (e.g. 0 < 50 µA)",
+                "what": f"Datasheet minimum limit ({min_v}) is greater than or equal to maximum limit ({max_v}).",
+                "why": "A specification range must have lower bound strictly less than upper bound.",
+                "impact": "Spec boundary checks become logically impossible and fail all components.",
+                "how_to_fix": f"Ensure '{mapping['datasheet_min']}' is strictly less than '{mapping['datasheet_max']}'.",
             })
 
     # 6. Temperature Check (if present)
@@ -295,20 +371,39 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
         extreme_temp = (temps < -65.0) | (temps > 250.0)
         if extreme_temp.any():
             bad_temp_rows = raw_df.index[extreme_temp].tolist()[:3]
+            bad_t_val = str(raw_df.loc[bad_temp_rows[0], temp_col])
             issues.append({
+                "id": f"err-invalid-temp-{bad_temp_rows[0]+1}",
                 "row": bad_temp_rows[0] + 1,
                 "column": temp_col,
+                "severity": "error",
+                "error_type": "INVALID_TEMPERATURE",
+                "group": "RANGE",
                 "message": f"Extreme or out-of-range HTOL temperature (< -65°C or > 250°C) observed at rows {[r+1 for r in bad_temp_rows]}.",
-                "severity": "warning",
+                "detected_value": f"{bad_t_val}°C",
+                "expected_value": "Standard HTOL burn-in temperature: 125°C (range: -55°C to 150°C)",
+                "what": f"Temperature reading {bad_t_val}°C is outside physically plausible HTOL chamber ranges.",
+                "why": "MIL-STD-883 HTOL burn-in operates at 125°C (Class S) to accelerate silicon lattice defects.",
+                "impact": "Unrealistic temperatures produce nonsensical Arrhenius acceleration factors (AF).",
+                "how_to_fix": "Correct the chamber temperature to 125°C (or standard screening temperature).",
             })
 
     # 7. Single component / small cohort warning
     if len(raw_df) == 1:
         issues.append({
+            "id": "warn-small-cohort",
             "row": 1,
             "column": comp_col,
-            "message": "Dataset contains only 1 component; lot-relative cohort screening operates best on cohorts (>= 3 components).",
             "severity": "warning",
+            "error_type": "MISSING_VALUE",
+            "group": "DATA",
+            "message": "Dataset contains only 1 component; lot-relative cohort screening operates best on cohorts (>= 3 components).",
+            "detected_value": "1 component",
+            "expected_value": ">= 3 components per lot cohort",
+            "what": "Dataset contains only a single component.",
+            "why": "Lot-relative screening computes dispersion around lot median to detect subtle anomalies.",
+            "impact": "Statistical lot variance cannot be estimated; static datasheet limits will be used as fallback.",
+            "how_to_fix": "Upload a complete qualification lot batch (typically 10-50 parts) for cohort analysis.",
         })
 
     # Decide overall validity: errors block, warnings alert

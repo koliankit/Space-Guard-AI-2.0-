@@ -2,34 +2,52 @@ export type Status = 'safe' | 'monitor' | 'reject' | 'idle'
 
 export type ValidationErrorType =
   | 'MISSING_REQUIRED_COLUMN'
-  | 'INVALID_NUMERIC_VALUE'
+  | 'INVALID_COLUMN_NAME'
   | 'MISSING_VALUE'
+  | 'INVALID_NUMERIC_VALUE'
   | 'INVALID_UNIT'
   | 'INVALID_RANGE'
   | 'DUPLICATE_COMPONENT_ID'
   | 'INVALID_TEMPERATURE'
   | 'MISSING_BURN_IN_POINT'
+  | 'EMPTY_FILE'
+  | 'INVALID_FILE_FORMAT'
+
+export type ValidationErrorSeverity = 'Critical' | 'Warning' | 'Information'
+export type ValidationErrorGroup = 'SCHEMA' | 'DATA' | 'RANGE' | 'IDENTITY' | 'BURN_IN'
+export type ValidationStage = 'FILE_FORMAT' | 'SCHEMA' | 'ROW_LEVEL' | 'DATA_QUALITY'
 
 export interface ValidationErrorItem {
   id: string
-  severity: 'Critical' | 'Warning'
+  severity: ValidationErrorSeverity
   errorType: ValidationErrorType
-  row?: number
-  column?: string
+  group?: ValidationErrorGroup
+  stage?: ValidationStage
+  row?: number | null
+  column?: string | null
   detectedValue?: string
   expectedValue?: string
+  message: string
+  reason?: string
   impact: string
-  recommendedFix: string
+  recommendedFix?: string
+  what?: string
+  why?: string
+  howToFix?: string
+  technicalDetails?: string
 }
 
 export interface ValidationReport {
   fileName: string
   status: 'PASSED' | 'BLOCKED'
   totalRows: number
+  totalColumns?: number
   validRows: number
+  invalidRows?: number
   errorCount: number
   criticalCount: number
   warningCount: number
+  infoCount?: number
   dataQualityScore: number
   errors: ValidationErrorItem[]
   checks: {

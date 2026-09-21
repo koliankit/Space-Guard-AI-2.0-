@@ -42,16 +42,16 @@ export default function OrbitalTrackingView() {
   }, [])
 
   return (
-    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#FFFFFF] font-mono select-none overflow-y-auto text-[#17212B] w-full min-h-full">
+    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#EEF3F7] font-mono select-none overflow-y-auto text-[#17212B] w-full min-h-full">
       {/* View Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#D9E2EA] mb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400" />
+            <span className="w-2 h-2 rounded-full bg-[#C58A00]" />
             <h2 className="m-0 text-sm font-display font-black tracking-widest text-[#17212B] uppercase">
               ISRO TELEMETRY, TRACKING AND COMMAND NETWORK (ISTRAC)
             </h2>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/40 font-bold">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-[#C58A00] border border-amber-500/40 font-bold">
               LEO 520KM &bull; POLAR SUN-SYNCHRONOUS
             </span>
           </div>
@@ -63,17 +63,17 @@ export default function OrbitalTrackingView() {
         {/* Live Status Indicators */}
         <div className="flex items-center gap-2.5 text-xs">
           <div className="hud-glass px-3 py-1.5 rounded border border-[#D9E2EA] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 dot-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C58A00] dot-pulse" />
             <span className="text-[#5B6B7A]">CARRIER:</span>
-            <span className="text-amber-400 font-bold">LOCKED (S/X-BAND)</span>
+            <span className="text-[#C58A00] font-bold">LOCKED (S/X-BAND)</span>
           </div>
           <div className="hud-glass px-3 py-1.5 rounded border border-[#D9E2EA] flex items-center gap-2">
             <span className="text-[#5B6B7A]">SNR:</span>
-            <span className="text-emerald-400 font-bold">19.4 dB</span>
+            <span className="text-[#168A5B] font-bold">19.4 dB</span>
           </div>
           <div className="hud-glass px-3 py-1.5 rounded border border-[#D9E2EA] flex items-center gap-2">
             <span className="text-[#5B6B7A]">BER:</span>
-            <span className="text-amber-300 font-bold">3.8 &times; 10&minus;8</span>
+            <span className="text-[#C58A00] font-bold">3.8 &times; 10&minus;8</span>
           </div>
         </div>
       </div>
@@ -83,8 +83,8 @@ export default function OrbitalTrackingView() {
         {/* Large Global Ground Track Radar */}
         <div className="lg:col-span-2 bg-[#FFFFFF] p-4 rounded-xl border border-[#D9E2EA] shadow-md flex flex-col flex-1 min-h-[360px]">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-xs font-display font-bold text-amber-400 tracking-wider uppercase flex items-center gap-2">
-              <span className="text-amber-400">&gt;&gt;</span> Global Ground Station Footprint &amp; Sub-Satellite Track
+            <div className="text-xs font-display font-bold text-[#C58A00] tracking-wider uppercase flex items-center gap-2">
+              <span className="text-[#C58A00]">&gt;&gt;</span> Global Ground Station Footprint &amp; Sub-Satellite Track
             </div>
             <div className="text-[10px] text-[#5B6B7A] font-mono">
               LAT: <span className="text-[#17212B] font-bold">{currentLat.toFixed(2)}&deg; N</span> &bull; LON:{' '}
@@ -273,8 +273,8 @@ export default function OrbitalTrackingView() {
         {/* Real-time Telemetry Stream & Doppler Parameters */}
         <div className="bg-[#FFFFFF] p-4 rounded-xl border border-[#D9E2EA] shadow-md flex flex-col justify-between flex-1 min-h-[360px]">
           <div>
-            <div className="text-xs font-display font-bold text-amber-400 tracking-wider uppercase mb-3 flex items-center gap-2">
-              <span className="text-amber-400">&gt;&gt;</span> Orbital Mechanics Telemetry
+            <div className="text-xs font-display font-bold text-[#C58A00] tracking-wider uppercase mb-3 flex items-center gap-2">
+              <span className="text-[#C58A00]">&gt;&gt;</span> Orbital Mechanics Telemetry
             </div>
 
             <div className="space-y-2 text-xs">

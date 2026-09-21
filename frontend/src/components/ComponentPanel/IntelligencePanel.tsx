@@ -268,7 +268,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         {/* Metric 9 */}
         <div className="p-3 rounded-xl bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col justify-between gap-1">
           <span className="text-[#5B6B7A] text-[11px] uppercase font-semibold">Anomaly Score</span>
-          <span className="font-mono text-base font-bold text-purple-300">
+          <span className="font-mono text-base font-bold text-[#7C3AED]">
             {component.lot_anomaly_score != null ? `${component.lot_anomaly_score.toFixed(1)}` : (component.iso_score * 100).toFixed(1)} / 100
           </span>
           <span className="text-[10px] text-[#5B6B7A]">Robust Anomaly Rating</span>
@@ -278,7 +278,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         <div className="p-3 rounded-xl bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col justify-between gap-1">
           <span className="text-[#5B6B7A] text-[11px] uppercase font-semibold">Risk Score &amp; Decision</span>
           <span className={`font-mono text-base font-bold ${
-            isReject ? 'text-rose-400' : isMonitor ? 'text-amber-400' : 'text-emerald-400'
+            isReject ? 'text-[#D9363E]' : isMonitor ? 'text-[#C58A00]' : 'text-[#168A5B]'
           }`}>
             {component.risk_score} / 100 [{(component.status || 'safe').toUpperCase()}]
           </span>
@@ -292,24 +292,24 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
       <div className="pt-2 border-t border-[#D9E2EA]">
         <div className="text-[11px] uppercase font-bold text-[#5B6B7A] tracking-wider mb-2.5 flex items-center justify-between font-sans">
           <span className="flex items-center gap-1.5">
-            <span className="text-amber-400 font-bold">&gt;&gt;</span> WHY WAS THIS COMPONENT FLAGGED?
+            <span className="text-[#C58A00] font-bold">&gt;&gt;</span> WHY WAS THIS COMPONENT FLAGGED?
           </span>
-          <span className="text-[10px] text-amber-300 font-mono font-semibold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+          <span className="text-[10px] text-[#C58A00] font-mono font-semibold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
             XAI EXPLAINABLE INTELLIGENCE ENGINE
           </span>
         </div>
         <div
           className={`p-3.5 rounded-xl border text-xs font-sans leading-relaxed space-y-2 ${
             isReject
-              ? 'bg-rose-500/10 border-rose-500/30 text-rose-200'
+              ? 'bg-[#FEF2F2] border-[#D9363E]/30 text-[#17212B]'
               : isMonitor
-              ? 'bg-amber-500/10 border-amber-500/30 text-amber-200'
-              : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+              ? 'bg-[#FFFBEB] border-[#C58A00]/30 text-[#17212B]'
+              : 'bg-[#F0FDF4] border-[#168A5B]/30 text-[#17212B]'
           }`}
         >
           {explanationPoints.map((pt, idx) => (
             <div key={idx} className="flex items-start gap-2.5">
-              <span className="font-mono font-bold text-amber-400 opacity-90">{idx + 1}.</span>
+              <span className="font-mono font-bold text-[#0E88D3]">{idx + 1}.</span>
               <span className="leading-relaxed">{pt}</span>
             </div>
           ))}

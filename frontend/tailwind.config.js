@@ -4,22 +4,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // SpaceGuard AI Part 17 Light Engineering Background System
-        bg: '#F4F7FA',              // Main Background - Light Blue-Gray
-        bg2: '#F8FAFC',             // Secondary Background - Sub-panels & Toolbars
-        panel: '#FFFFFF',           // Panel / Card - Clean White
-        panel2: '#F8FAFC',          // Elevated Panel - Very Subtle Light Blue-Gray
+        // SpaceGuard AI Part 22 Light Engineering Background System
+        bg: '#EEF3F7',              // Main Application Background
+        bg2: '#F3F6F9',             // Secondary Section Background & Sub-panels
+        panel: '#FFFFFF',           // Card Background - Clean White
+        panel2: '#F8FAFC',          // Elevated Card
+        hover: '#E7EEF5',           // Hover State
         'panel-critical': '#FEF2F2', // Critical Alert Panel Light Red Tint
 
-        // Text Hierarchy (Dark Navy & Cool Gray)
-        'text-primary': '#17212B',   // Primary Text - Dark Navy
-        'text-secondary': '#5B6B7A', // Secondary Text
-        muted: '#81909D',           // Muted Text
-        dim: '#81909D',
+        // Text Hierarchy (Dark Engineering Colors)
+        'text-primary': '#17212B',   // Primary Text
+        'text-secondary': '#4F6170', // Secondary Text
+        muted: '#718292',           // Muted Text
+        dim: '#718292',
+        heading: '#142331',         // Headings
+        label: '#34495A',           // Labels
+        'table-text': '#1F2D38',    // Table Text
+        'input-text': '#17212B',    // Input Text
+        'input-placeholder': '#7A8996', // Input Placeholder
 
         // Borders & Dividers
-        border: '#D9E2EA',          // Border / Divider - Clean Precision Light Border
-        line: '#D9E2EA',
+        border: '#D5DEE7',          // Border / Divider
+        line: '#D5DEE7',
 
         // Primary Colors: ISRO Blue (#0E88D3)
         'isro-blue': {

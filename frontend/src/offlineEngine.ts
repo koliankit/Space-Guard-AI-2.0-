@@ -514,34 +514,71 @@ class ClientISROEngine {
   }
 
   /**
-   * Real client-side CSV parser supporting user uploads with full MIL-STD-883 Typed Validation & Blocking Rules.
+   * Real client-side CSV parser supporting user uploads with full MIL-STD-883 Typed Validation & Explainable Error Guidance.
    */
   loadCSVText(csvText: string, fileName = 'uploaded_telemetry.csv'): UploadResult {
-    const rawLines = csvText.split(/\r?\n/)
-    const lines = rawLines.map((l) => l.trim()).filter((l) => l.length > 0)
     const errors: ValidationErrorItem[] = []
 
+    // 0. File Format Check
+    if (fileName && !fileName.toLowerCase().endsWith('.csv') && !fileName.toLowerCase().endsWith('.tsv') && !fileName.toLowerCase().endsWith('.txt')) {
+      errors.push({
+        id: 'err-file-format',
+        severity: 'Critical',
+        errorType: 'INVALID_FILE_FORMAT',
+        group: 'SCHEMA',
+        stage: 'FILE_FORMAT',
+        row: null,
+        column: null,
+        detectedValue: fileName.split('.').pop() ? `.${fileName.split('.').pop()}` : 'Unknown format',
+        expectedValue: '.csv (RFC 4180 standard comma-separated text)',
+        message: `Invalid file format: "${fileName}" is not a supported CSV file.`,
+        reason: 'The uploaded file extension does not match expected delimited text standards (.csv/.tsv).',
+        impact: 'The automated qualification parser cannot parse binary or non-tabular structures.',
+        recommendedFix: 'Export or save the telemetry data in standard comma-separated (.csv) format and re-upload.',
+        technicalDetails: `Format check failed on fileName "${fileName}". Expected MIME text/csv.`,
+      })
+    }
+
+    const rawLines = csvText.split(/\r?\n/)
+    const lines = rawLines.map((l) => l.trim()).filter((l) => l.length > 0)
+
+    // Check for Empty File
     if (lines.length < 2) {
       errors.push({
         id: 'err-file-empty',
         severity: 'Critical',
-        errorType: 'MISSING_VALUE',
-        impact: 'Uploaded CSV is empty or missing data rows.',
-        recommendedFix: 'Provide a valid CSV file with a header row and at least one component record.',
-        detectedValue: 'EMPTY_FILE',
-        expectedValue: 'Header + Data rows',
+        errorType: 'EMPTY_FILE',
+        group: 'SCHEMA',
+        stage: 'FILE_FORMAT',
+        row: null,
+        column: null,
+        detectedValue: lines.length === 0 ? '0 lines (0 bytes)' : '1 line (header only, 0 data records)',
+        expectedValue: 'Header row + >= 1 data records',
+        message: 'CSV contains no usable data records.',
+        reason: 'The uploaded file is empty or contains only a header line with zero component telemetry rows.',
+        impact: 'No component-level or lot-relative screening analysis can be executed.',
+        recommendedFix: 'Upload a CSV containing the required MIL-STD-883 column headers followed by valid component measurement rows.',
+        technicalDetails: `Parsed ${lines.length} non-empty lines from ${csvText.length} raw characters.`,
       })
 
       const report: ValidationReport = {
         fileName,
         status: 'BLOCKED',
         totalRows: 0,
+        totalColumns: 0,
         validRows: 0,
+        invalidRows: 0,
         errorCount: errors.length,
-        criticalCount: 1,
-        warningCount: 0,
+        criticalCount: errors.filter((e) => e.severity === 'Critical').length,
+        warningCount: errors.filter((e) => e.severity === 'Warning').length,
         dataQualityScore: 0,
-        errors,
+        errors: errors.map((e) => ({
+          ...e,
+          what: e.what || e.message,
+          why: e.why || e.reason || 'Violates MIL-STD-883 Class S screening specifications.',
+          impact: e.impact,
+          howToFix: e.howToFix || e.recommendedFix || 'Correct the highlighted cells in the CSV and re-upload the telemetry file.',
+        })),
         checks: {
           formatValid: false,
           schemaValid: false,
@@ -563,7 +600,7 @@ class ClientISROEngine {
         lots: 0,
         has_ground_truth: false,
         error: 'validation_failed',
-        message: 'Uploaded CSV must contain at least a header row and one data row.',
+        message: 'Uploaded CSV contains no usable component telemetry records.',
         validation_report: report,
       }
     }
@@ -580,13 +617,13 @@ class ClientISROEngine {
       return -1
     }
 
-    const colId = findColIndex(['component_id', 'component', 'part_id', 'id'])
-    const colLot = findColIndex(['lot_id', 'lot', 'batch_id', 'batch'])
-    const colV0 = findColIndex(['value_0h_ua', 'value_0h', '0h', 'v0', 'reading_0h'])
-    const colV24 = findColIndex(['value_24h_ua', 'value_24h', '24h', 'v24', 'reading_24h'])
-    const colV96 = findColIndex(['value_96h_ua', 'value_96h', '96h', 'v96', 'reading_96h'])
-    const colV168 = findColIndex(['value_168h_ua', 'value_168h', '168h', 'v168', 'reading_168h', 'value'])
-    const colLimit = findColIndex(['static_limit_ua', 'static_limit', 'limit', 'spec_limit'])
+    const colId = findColIndex(['component_id', 'component', 'part_id', 'id', 'serial_number'])
+    const colLot = findColIndex(['lot_id', 'lot', 'batch_id', 'batch', 'wafer_lot'])
+    const colV0 = findColIndex(['value_0h_ua', 'value_0h', '0h', 'v0', 'reading_0h', 'val_0h'])
+    const colV24 = findColIndex(['value_24h_ua', 'value_24h', '24h', 'v24', 'reading_24h', 'val_24h'])
+    const colV96 = findColIndex(['value_96h_ua', 'value_96h', '96h', 'v96', 'reading_96h', 'val_96h'])
+    const colV168 = findColIndex(['value_168h_ua', 'value_168h', '168h', 'v168', 'reading_168h', 'val_168h', 'value'])
+    const colLimit = findColIndex(['static_limit_ua', 'static_limit', 'limit', 'spec_limit', 'datasheet_max'])
     const colSub = findColIndex(['subsystem', 'subsystem_name', 'sub', 'module'])
     const colGt = findColIndex(['ground_truth', 'ground_truth_latent_defect', 'label', 'is_defect'])
     const colTemp = findColIndex(['temperature_c', 'temperature', 'temp_c', 'temp'])
@@ -594,65 +631,143 @@ class ClientISROEngine {
     const colMin = findColIndex(['datasheet_min', 'spec_min', 'min_limit'])
     const colMax = findColIndex(['datasheet_max', 'spec_max', 'max_limit'])
 
-    // 1. Mandatory Header Checks
-    if (colId === -1) {
+    // Check for near-match invalid column names
+    rawHeaders.forEach((origH) => {
+      const hClean = origH.toLowerCase().replace(/[^a-z0-9]/g, '')
+      if (hClean === 'componentid' || hClean === 'compid' || hClean === 'partid' || hClean === 'partno') {
+        if (colId === -1) {
+          errors.push({
+            id: 'err-invalid-colname-compid',
+            severity: 'Critical',
+            errorType: 'INVALID_COLUMN_NAME',
+            group: 'SCHEMA',
+            stage: 'SCHEMA',
+            row: 1,
+            column: origH,
+            detectedValue: origH,
+            expectedValue: 'component_id',
+            message: `Invalid column name: "${origH}" should be renamed to "component_id".`,
+            reason: 'The uploaded column header does not match the canonical MIL-STD-883 schema field name.',
+            impact: 'The screening pipeline cannot identify component serial numbers for qualification tracing.',
+            recommendedFix: `Rename column "${origH}" to "component_id" in the CSV header and upload again.`,
+            technicalDetails: `Header alias check detected near-match "${origH}" for canonical "component_id".`,
+          })
+        }
+      } else if (hClean === 'lotid' || hClean === 'batchid' || hClean === 'lotno') {
+        if (colLot === -1) {
+          errors.push({
+            id: 'err-invalid-colname-lotid',
+            severity: 'Critical',
+            errorType: 'INVALID_COLUMN_NAME',
+            group: 'SCHEMA',
+            stage: 'SCHEMA',
+            row: 1,
+            column: origH,
+            detectedValue: origH,
+            expectedValue: 'lot_id',
+            message: `Invalid column name: "${origH}" should be renamed to "lot_id".`,
+            reason: 'The qualification lot column does not follow standard naming conventions.',
+            impact: 'Wafer lot grouping and lot-relative anomaly scoring cannot be initialized.',
+            recommendedFix: `Rename column "${origH}" to "lot_id" in the CSV header and upload again.`,
+            technicalDetails: `Header alias check detected near-match "${origH}" for canonical "lot_id".`,
+          })
+        }
+      }
+    })
+
+    // 1. Mandatory Header Checks (SCHEMA & BURN_IN errors)
+    if (colId === -1 && !errors.some((e) => e.errorType === 'INVALID_COLUMN_NAME' && e.expectedValue === 'component_id')) {
       errors.push({
         id: 'err-missing-component_id',
         severity: 'Critical',
         errorType: 'MISSING_REQUIRED_COLUMN',
+        group: 'SCHEMA',
+        stage: 'SCHEMA',
+        row: 1,
         column: 'component_id',
-        detectedValue: 'MISSING',
+        detectedValue: 'NOT DETECTED',
         expectedValue: 'component_id',
-        impact: 'Component identification and passport serialization impossible.',
-        recommendedFix: 'Add component_id column to CSV header.',
+        message: 'Missing required column: component_id',
+        reason: 'Every spaceflight component must have a unique identifier so the system can track its screening history and analysis.',
+        impact: 'Component-level anomaly detection, serial passport tracing, and 3D spacecraft mapping cannot be performed.',
+        recommendedFix: 'Add a `component_id` column to the CSV containing a unique alphanumeric ID for each component.',
+        technicalDetails: `Headers found: [${rawHeaders.join(', ')}]. Expected required field "component_id".`,
       })
     }
-    if (colLot === -1) {
+
+    if (colLot === -1 && !errors.some((e) => e.errorType === 'INVALID_COLUMN_NAME' && e.expectedValue === 'lot_id')) {
       errors.push({
         id: 'err-missing-lot_id',
         severity: 'Critical',
         errorType: 'MISSING_REQUIRED_COLUMN',
+        group: 'SCHEMA',
+        stage: 'SCHEMA',
+        row: 1,
         column: 'lot_id',
-        detectedValue: 'MISSING',
+        detectedValue: 'NOT DETECTED',
         expectedValue: 'lot_id',
-        impact: 'Lot-relative anomaly detection cannot run.',
-        recommendedFix: 'Add lot_id to every applicable component record.',
+        message: 'Missing required column: lot_id',
+        reason: 'Components must be organized by wafer production lot to establish the statistical lot mean (µ) and dispersion (σ).',
+        impact: 'Module A dynamic lot-relative screening cannot run without production lot grouping.',
+        recommendedFix: 'Add a `lot_id` column to the CSV header and specify the production lot (e.g. LOT-01, LOT-02) for each row.',
+        technicalDetails: `Headers found: [${rawHeaders.join(', ')}]. Expected required field "lot_id".`,
       })
     }
+
     if (colV0 === -1) {
       errors.push({
         id: 'err-missing-v0',
         severity: 'Critical',
         errorType: 'MISSING_REQUIRED_COLUMN',
-        column: 'value_0h_ua',
-        detectedValue: 'MISSING',
-        expectedValue: 'value_0h_ua',
-        impact: 'Initial burn-in baseline (0h) unavailable for drift calculation.',
-        recommendedFix: 'Include 0h leakage measurement column (value_0h_ua).',
+        group: 'BURN_IN',
+        stage: 'SCHEMA',
+        row: 1,
+        column: 'value_0h',
+        detectedValue: 'NOT DETECTED',
+        expectedValue: 'value_0h or value_0h_ua',
+        message: 'Missing required burn-in column: value_0h',
+        reason: 'The pre-burn-in 0-hour baseline measurement is mandatory under MIL-STD-883 Method 1005.',
+        impact: 'Baseline electrical drift cannot be measured because pre-stress reference values are absent.',
+        recommendedFix: 'Add the `value_0h` column to the CSV and provide the initial pre-burn-in leakage current for each component.',
+        technicalDetails: 'Required burn-in milestone T=0h missing from dataset headers.',
       })
     }
+
     if (colV24 === -1) {
       errors.push({
         id: 'err-missing-v24',
         severity: 'Critical',
         errorType: 'MISSING_REQUIRED_COLUMN',
-        column: 'value_24h_ua',
-        detectedValue: 'MISSING',
-        expectedValue: 'value_24h_ua',
-        impact: 'Early inflection point (24h) unavailable for Arrhenius velocity.',
-        recommendedFix: 'Include 24h leakage measurement column (value_24h_ua).',
+        group: 'BURN_IN',
+        stage: 'SCHEMA',
+        row: 1,
+        column: 'value_24h',
+        detectedValue: 'NOT DETECTED',
+        expectedValue: 'value_24h or value_24h_ua',
+        message: 'Missing required burn-in column: value_24h',
+        reason: 'The 24-hour intermediate burn-in measurement is required to evaluate early inflection dynamics.',
+        impact: 'Module B early drift acceleration modeling and Arrhenius slope calculation cannot be completed.',
+        recommendedFix: 'Add the `value_24h` column to the CSV with the 24-hour post-bake measurement for each component.',
+        technicalDetails: 'Required burn-in milestone T=24h missing from dataset headers.',
       })
     }
+
     if (colV168 === -1) {
       errors.push({
         id: 'err-missing-v168',
         severity: 'Critical',
         errorType: 'MISSING_REQUIRED_COLUMN',
-        column: 'value_168h_ua',
-        detectedValue: 'MISSING',
-        expectedValue: 'value_168h_ua',
-        impact: 'Final MIL-STD-883 168h qualification milestone missing.',
-        recommendedFix: 'Include 168h qualification measurement column (value_168h_ua).',
+        group: 'BURN_IN',
+        stage: 'SCHEMA',
+        row: 1,
+        column: 'value_168h',
+        detectedValue: 'NOT DETECTED',
+        expectedValue: 'value_168h or value_168h_ua',
+        message: 'Missing required column: value_168h',
+        reason: 'The 168-hour burn-in measurement is the primary MIL-STD-883 HTOL flight acceptance milestone.',
+        impact: 'Module A and Module B cannot perform final anomaly scoring or latent defect isolation.',
+        recommendedFix: 'Add the `value_168h` column to the CSV and provide the 168-hour measurement for each component.',
+        technicalDetails: 'Final HTOL qualification milestone T=168h missing from dataset headers.',
       })
     }
 
@@ -660,9 +775,11 @@ class ClientISROEngine {
     const parsedParts: RawPart[] = []
     const seenIds = new Set<string>()
     const dataLines = lines.slice(1)
+    let invalidRowIndices = new Set<number>()
 
     for (let idx = 0; idx < dataLines.length; idx++) {
       const rowNum = idx + 2 // 1-indexed, header is row 1
+      let rowHasCritical = false
       const parts = dataLines[idx].split(',').map((p) => p.replace(/["'\r]/g, '').trim())
 
       const id = colId !== -1 ? parts[colId] : ''
@@ -681,28 +798,38 @@ class ClientISROEngine {
       // Check Component ID
       if (colId !== -1) {
         if (!id) {
+          rowHasCritical = true
           errors.push({
             id: `err-missing-id-${rowNum}`,
             severity: 'Critical',
             errorType: 'MISSING_VALUE',
+            group: 'IDENTITY',
+            stage: 'ROW_LEVEL',
             row: rowNum,
             column: 'component_id',
             detectedValue: 'EMPTY',
-            expectedValue: 'Alphanumeric component identifier',
-            impact: 'Component cannot be tracked or audited.',
-            recommendedFix: 'Provide a valid component_id.',
+            expectedValue: 'Alphanumeric component ID (e.g. COMP-0001)',
+            message: `Missing component ID in Row ${rowNum}.`,
+            reason: 'Every component must possess a non-empty identifier for flight serialization.',
+            impact: 'Component cannot be tracked or audited in flight clearance manifests.',
+            recommendedFix: `Enter a valid component ID in Row ${rowNum} and re-upload the file.`,
           })
         } else if (seenIds.has(id)) {
+          rowHasCritical = true
           errors.push({
             id: `err-dup-id-${rowNum}`,
             severity: 'Critical',
             errorType: 'DUPLICATE_COMPONENT_ID',
+            group: 'IDENTITY',
+            stage: 'ROW_LEVEL',
             row: rowNum,
             column: 'component_id',
             detectedValue: `"${id}"`,
-            expectedValue: 'Unique Component UID',
-            impact: 'Component ID appears more than once. Causes passport and hardware collisions.',
-            recommendedFix: `Ensure UID "${id}" is unique across the screening batch.`,
+            expectedValue: 'Unique Component Identifier',
+            message: `Duplicate component ID: "${id}" detected at Row ${rowNum}.`,
+            reason: 'The same component identifier appears more than once where unique identification is required.',
+            impact: 'Component traceability and historical drift records become ambiguous.',
+            recommendedFix: `Correct the duplicate ID "${id}" in Row ${rowNum} to ensure each component has a distinct identifier.`,
           })
         } else {
           seenIds.add(id)
@@ -711,16 +838,21 @@ class ClientISROEngine {
 
       // Check Lot ID
       if (colLot !== -1 && !lot) {
+        rowHasCritical = true
         errors.push({
           id: `err-missing-lot-${rowNum}`,
           severity: 'Critical',
           errorType: 'MISSING_VALUE',
+          group: 'IDENTITY',
+          stage: 'ROW_LEVEL',
           row: rowNum,
           column: 'lot_id',
           detectedValue: 'EMPTY',
-          expectedValue: 'Lot identifier (e.g. LOT-2026-A1)',
-          impact: 'Wafer lot grouping and lot-relative baseline cannot be formed.',
-          recommendedFix: 'Provide lot_id for this component.',
+          expectedValue: 'Qualification lot code (e.g. LOT-01)',
+          message: `Missing qualification lot ID in Row ${rowNum}.`,
+          reason: 'Every component must belong to a production wafer lot to compute statistical distribution baselines.',
+          impact: 'Component cannot be included in lot-relative z-score calculations.',
+          recommendedFix: `Specify the qualification lot code in Row ${rowNum}.`,
         })
       }
 
@@ -728,16 +860,21 @@ class ClientISROEngine {
       const checkMeasurement = (rawVal: string | undefined, colName: string, isRequired: boolean) => {
         if (rawVal === '' || rawVal === undefined) {
           if (isRequired) {
+            rowHasCritical = true
             errors.push({
               id: `err-missing-${colName}-${rowNum}`,
               severity: 'Critical',
               errorType: 'MISSING_BURN_IN_POINT',
+              group: 'BURN_IN',
+              stage: 'ROW_LEVEL',
               row: rowNum,
               column: colName,
               detectedValue: 'EMPTY',
               expectedValue: 'Numeric measurement (µA)',
-              impact: `Required burn-in measurement (${colName}) is missing.`,
-              recommendedFix: `Provide the ${colName} burn-in reading.`,
+              message: `Missing burn-in measurement in ${colName} at Row ${rowNum}.`,
+              reason: `The ${colName} burn-in reading is missing for this component.`,
+              impact: 'The time-series analysis for this component is incomplete and cannot be verified.',
+              recommendedFix: `Enter the correct ${colName} measurement in Row ${rowNum} and re-upload the file.`,
             })
           }
           return null
@@ -745,16 +882,21 @@ class ClientISROEngine {
 
         const num = parseFloat(rawVal)
         if (isNaN(num)) {
+          rowHasCritical = true
           errors.push({
             id: `err-invalid-num-${colName}-${rowNum}`,
             severity: 'Critical',
             errorType: 'INVALID_NUMERIC_VALUE',
+            group: 'DATA',
+            stage: 'ROW_LEVEL',
             row: rowNum,
             column: colName,
             detectedValue: `"${rawVal}"`,
-            expectedValue: 'Numeric value',
-            impact: 'Cannot calculate burn-in slope or anomaly score.',
-            recommendedFix: `Replace "${rawVal}" with a valid numeric measurement.`,
+            expectedValue: 'Numeric value (e.g. 12.4)',
+            message: `Invalid numeric value in ${colName} at Row ${rowNum}: "${rawVal}".`,
+            reason: `The ${colName} field must contain a pure numeric measurement, while the uploaded value contains non-numeric text or symbols.`,
+            impact: 'The AI model cannot parse string characters into floating-point telemetry.',
+            recommendedFix: `Remove non-numeric characters from "${rawVal}" in Row ${rowNum} (enter numeric value only, e.g. ${parseFloat(rawVal.replace(/[^0-9.]/g, '')) || 0}).`,
           })
           return null
         }
@@ -764,74 +906,92 @@ class ClientISROEngine {
             id: `err-range-neg-${colName}-${rowNum}`,
             severity: 'Warning',
             errorType: 'INVALID_RANGE',
+            group: 'RANGE',
+            stage: 'DATA_QUALITY',
             row: rowNum,
             column: colName,
             detectedValue: `${num}`,
             expectedValue: '>= 0.0 µA',
-            impact: 'Negative silicon leakage current detected, which violates physical diode parameters.',
-            recommendedFix: 'Verify meter zeroing or calibration offset.',
+            message: `Negative leakage measurement (${num} µA) at Row ${rowNum}.`,
+            reason: 'Diode reverse leakage current is physically non-negative under standard bias.',
+            impact: 'Negative current readings may skew regression slopes and drift variance calculations.',
+            recommendedFix: `Verify sensor calibration or zero offset for Row ${rowNum}.`,
           })
         }
 
         return num
       }
 
-      const v0 = colV0 !== -1 ? checkMeasurement(rawV0, 'value_0h_ua', true) : null
-      const v24 = colV24 !== -1 ? checkMeasurement(rawV24, 'value_24h_ua', true) : null
-      const v168 = colV168 !== -1 ? checkMeasurement(rawV168, 'value_168h_ua', true) : null
-      
+      const v0 = colV0 !== -1 ? checkMeasurement(rawV0, 'value_0h', true) : null
+      const v24 = colV24 !== -1 ? checkMeasurement(rawV24, 'value_24h', true) : null
+      const v168 = colV168 !== -1 ? checkMeasurement(rawV168, 'value_168h', true) : null
+
       // Optional v96
       let v96: number | null = null
       if (colV96 !== -1) {
         if (rawV96 === '' || rawV96 === undefined) {
           errors.push({
             id: `err-missing-v96-${rowNum}`,
-            severity: 'Warning',
+            severity: 'Information',
             errorType: 'MISSING_VALUE',
+            group: 'BURN_IN',
+            stage: 'ROW_LEVEL',
             row: rowNum,
-            column: 'value_96h_ua',
+            column: 'value_96h',
             detectedValue: 'EMPTY',
             expectedValue: 'Numeric measurement (optional)',
-            impact: 'Burn-in trend analysis is incomplete (will be imputed via spline).',
-            recommendedFix: 'Provide the 96h measurement if available.',
+            message: `Intermediate 96-hour burn-in reading missing at Row ${rowNum}.`,
+            reason: 'MIL-STD-883 permits 96h interpolation if 0h, 24h, and 168h milestones are fully present.',
+            impact: 'Midpoint trajectory will be estimated using monotonic spline extrapolation.',
+            recommendedFix: 'Provide 96h telemetry if recorded during chamber inspection.',
           })
         } else {
-          v96 = checkMeasurement(rawV96, 'value_96h_ua', false)
+          v96 = checkMeasurement(rawV96, 'value_96h', false)
         }
       }
 
       // Check Unit if present
       if (colUnit !== -1 && rawUnit) {
         const uLower = rawUnit.toLowerCase().trim()
-        if (!['ua', 'µa', 'u_a', 'microamp', 'microamps', 'a', 'ma'].includes(uLower)) {
+        if (!['ua', 'µa', 'u_a', 'microamp', 'microamps'].includes(uLower)) {
+          const isMilli = uLower === 'ma' || uLower === 'milliamp'
           errors.push({
             id: `err-unit-${rowNum}`,
-            severity: 'Warning',
+            severity: isMilli ? 'Critical' : 'Warning',
             errorType: 'INVALID_UNIT',
+            group: 'DATA',
+            stage: 'DATA_QUALITY',
             row: rowNum,
             column: 'unit',
             detectedValue: `"${rawUnit}"`,
             expectedValue: 'µA or uA',
-            impact: 'Unsupported unit detected; values may be scaled incorrectly.',
-            recommendedFix: 'Standardize unit to microamperes (µA).',
+            message: `Invalid unit: "${rawUnit}" detected at Row ${rowNum}.`,
+            reason: `The uploaded unit "${rawUnit}" does not match the required microampere (µA) scale.`,
+            impact: 'Using milliampere (mA) or uncalibrated units will result in 1000x magnitude error and erroneous quarantine decisions.',
+            recommendedFix: `Convert measurement values to microamperes (µA) and set unit to "µA" in Row ${rowNum}.`,
           })
+          if (isMilli) rowHasCritical = true
         }
       }
 
       // Check Temperature if present
       if (colTemp !== -1 && rawTemp) {
         const tVal = parseFloat(rawTemp)
-        if (isNaN(tVal) || tVal < -50 || tVal > 250) {
+        if (isNaN(tVal) || tVal < -55 || tVal > 200) {
           errors.push({
             id: `err-temp-${rowNum}`,
             severity: 'Warning',
             errorType: 'INVALID_TEMPERATURE',
+            group: 'RANGE',
+            stage: 'DATA_QUALITY',
             row: rowNum,
             column: 'temperature_c',
             detectedValue: `"${rawTemp}"`,
-            expectedValue: '125°C (100°C - 150°C typical for MIL-STD-883 HTOL)',
-            impact: 'temperature_c contains an invalid value outside physical burn-in limits.',
-            recommendedFix: 'Specify a valid HTOL burn-in chamber temperature.',
+            expectedValue: '125°C (acceptable range: -55°C to 200°C)',
+            message: `Invalid temperature value at Row ${rowNum}: "${rawTemp}".`,
+            reason: 'The temperature value is non-numeric or outside acceptable MIL-STD-883 HTOL thermal chamber operating envelopes.',
+            impact: 'Thermal acceleration factor and Arrhenius failure time projections may become inaccurate.',
+            recommendedFix: `Provide the correct burn-in thermal setpoint (e.g. 125.0°C) for Row ${rowNum}.`,
           })
         }
       }
@@ -840,23 +1000,32 @@ class ClientISROEngine {
       if (colMin !== -1 && colMax !== -1 && rawMin && rawMax) {
         const minVal = parseFloat(rawMin)
         const maxVal = parseFloat(rawMax)
-        if (!isNaN(minVal) && !isNaN(maxVal) && minVal > maxVal) {
+        if (!isNaN(minVal) && !isNaN(maxVal) && minVal >= maxVal) {
+          rowHasCritical = true
           errors.push({
             id: `err-range-minmax-${rowNum}`,
             severity: 'Critical',
             errorType: 'INVALID_RANGE',
+            group: 'RANGE',
+            stage: 'DATA_QUALITY',
             row: rowNum,
-            column: 'datasheet_min / datasheet_max',
-            detectedValue: `min: ${minVal} > max: ${maxVal}`,
-            expectedValue: 'datasheet_min <= datasheet_max',
-            impact: 'datasheet_min is greater than datasheet_max.',
-            recommendedFix: 'Correct specification boundary limits.',
+            column: 'datasheet_min',
+            detectedValue: `datasheet_min (${minVal}) >= datasheet_max (${maxVal})`,
+            expectedValue: 'datasheet_min < datasheet_max',
+            message: `Invalid datasheet range at Row ${rowNum}: minimum limit (${minVal}) exceeds maximum limit (${maxVal}).`,
+            reason: 'The specified lower specification limit is greater than or equal to the upper specification ceiling.',
+            impact: 'Datasheet acceptance window cannot be computed, blocking traditional pass/fail comparison.',
+            recommendedFix: `Correct the minimum and maximum limit boundaries in Row ${rowNum}.`,
           })
         }
       }
 
+      if (rowHasCritical) {
+        invalidRowIndices.add(rowNum)
+      }
+
       // If valid, build part
-      if (id && lot && v0 !== null && v24 !== null && v168 !== null) {
+      if (id && lot && v0 !== null && v24 !== null && v168 !== null && !rowHasCritical) {
         let sub = ''
         if (colSub !== -1 && parts[colSub]) {
           const rawSub = parts[colSub].toUpperCase()
@@ -899,9 +1068,11 @@ class ClientISROEngine {
 
     const criticalCount = errors.filter((e) => e.severity === 'Critical').length
     const warningCount = errors.filter((e) => e.severity === 'Warning').length
+    const infoCount = errors.filter((e) => e.severity === 'Information').length
     const totalDataRows = dataLines.length
+    const invalidRowsCount = invalidRowIndices.size
     const qualityScore = totalDataRows > 0
-      ? Math.max(0, Math.min(100, Math.round(100 - (criticalCount * 25 + warningCount * 4) / Math.max(1, totalDataRows / 10))))
+      ? Math.max(0, Math.min(100, Math.round(100 - (criticalCount * 20 + warningCount * 4) / Math.max(1, totalDataRows / 10))))
       : 0
 
     const isBlocked = criticalCount > 0
@@ -909,15 +1080,24 @@ class ClientISROEngine {
       fileName,
       status: isBlocked ? 'BLOCKED' : 'PASSED',
       totalRows: totalDataRows,
+      totalColumns: rawHeaders.length,
       validRows: parsedParts.length,
+      invalidRows: invalidRowsCount,
       errorCount: errors.length,
       criticalCount,
       warningCount,
+      infoCount,
       dataQualityScore: isBlocked ? Math.min(45, qualityScore) : Math.max(65, qualityScore),
-      errors,
+      errors: errors.map((e) => ({
+        ...e,
+        what: e.what || e.message,
+        why: e.why || e.reason || 'Violates MIL-STD-883 Class S screening specifications.',
+        impact: e.impact,
+        howToFix: e.howToFix || e.recommendedFix || 'Correct the highlighted cells in the CSV and re-upload the telemetry file.',
+      })),
       checks: {
-        formatValid: lines.length >= 2,
-        schemaValid: !errors.some((e) => e.errorType === 'MISSING_REQUIRED_COLUMN'),
+        formatValid: lines.length >= 2 && !errors.some((e) => e.errorType === 'INVALID_FILE_FORMAT'),
+        schemaValid: !errors.some((e) => e.errorType === 'MISSING_REQUIRED_COLUMN' || e.errorType === 'INVALID_COLUMN_NAME'),
         requiredColumnsValid: !errors.some((e) => e.errorType === 'MISSING_REQUIRED_COLUMN'),
         rowValidationPassed: criticalCount === 0,
         dataQualityAcceptable: !isBlocked && qualityScore >= 60,
@@ -928,35 +1108,32 @@ class ClientISROEngine {
       this.rawParts = []
       this.scoredParts = []
       this.analyzed = false
-
       return {
         batch_id: 0,
         rows: totalDataRows,
         valid: 0,
-        missing: totalDataRows,
+        missing: invalidRowsCount,
         lots: 0,
         has_ground_truth: false,
         error: 'validation_failed',
-        message: `DATA VALIDATION FAILED: ${criticalCount} critical error(s) detected. AI screening blocked.`,
+        message: 'Dataset validation failed. Critical integrity errors detected. AI screening blocked.',
         validation_report: report,
       }
     }
 
-    // Success state
     this.rawParts = parsedParts
-    this.scoredParts = []
     this.analyzed = false
-    this.currentBatchId++
+    this.scoredParts = []
 
-    const lotsSet = new Set(this.rawParts.map((p) => p.lot_id))
-    const hasGt = this.rawParts.some((p) => p.ground_truth != null)
+    const lots = new Set(parsedParts.map((p) => p.lot_id)).size
+    const hasGt = parsedParts.some((p) => p.ground_truth !== null)
 
     return {
-      batch_id: this.currentBatchId,
+      batch_id: Date.now(),
       rows: totalDataRows,
-      valid: this.rawParts.length,
-      missing: totalDataRows - this.rawParts.length,
-      lots: lotsSet.size,
+      valid: parsedParts.length,
+      missing: totalDataRows - parsedParts.length,
+      lots,
       has_ground_truth: hasGt,
       validation_report: report,
     }
