@@ -31,6 +31,15 @@ export default function ModuleAAnomalyPanel({
     })
   }, [components, statusFilter, searchQuery])
 
+  const counts = useMemo(() => {
+    return {
+      ALL: components.length,
+      reject: components.filter((c) => c.status === 'reject').length,
+      monitor: components.filter((c) => c.status === 'monitor').length,
+      safe: components.filter((c) => c.status === 'safe').length,
+    }
+  }, [components])
+
   const [simData, setSimData] = useState<{
     progress: number
     simHour: number
@@ -118,7 +127,7 @@ export default function ModuleAAnomalyPanel({
   }
 
   return (
-    <div className={`flex flex-col rounded-xl bg-[#FFFFFF] border shadow-xl overflow-hidden h-full transition-colors ${
+    <div className={`flex flex-col rounded-xl bg-[#FFFFFF] border shadow-xl transition-colors w-full flex-1 ${
       isReject ? 'border-[#D9363E]/60' : 'border-[#D9E2EA]'
     }`}>
       {/* Module A Top Bezel Bar */}
@@ -160,33 +169,30 @@ export default function ModuleAAnomalyPanel({
               key={filter}
               type="button"
               onClick={() => setStatusFilter(filter)}
-              className={`px-2 py-0.5 rounded transition-colors uppercase ${
+              className={`px-2.5 py-1 rounded font-bold uppercase transition-all cursor-pointer ${
                 statusFilter === filter
                   ? filter === 'reject'
-                    ? 'bg-[#D9363E] text-[#17212B] font-bold'
+                    ? 'bg-[#D9363E] text-white shadow-sm'
                     : filter === 'monitor'
-                    ? 'bg-[#C58A00] text-[#17212B] font-bold'
+                    ? 'bg-[#C58A00] text-white shadow-sm'
                     : filter === 'safe'
-                    ? 'bg-[#168A5B] text-[#17212B] font-bold'
-                    : 'bg-[#0E88D3]/30 text-[#0E88D3] border border-[#0E88D3]/50 font-bold'
-                  : 'text-[#5B6B7A] hover:text-[#17212B] bg-[#F4F7FA] border border-[#D9E2EA]'
+                    ? 'bg-[#168A5B] text-white shadow-sm'
+                    : 'bg-[#0E88D3] text-white shadow-sm'
+                  : 'bg-[#F4F7FA] text-[#5B6B7A] hover:text-[#17212B] border border-[#D9E2EA]'
               }`}
             >
-              {filter}
+              {filter} ({counts[filter]})
             </button>
           ))}
         </div>
 
-        {/* Quick Dropdown Picker */}
+        {/* Component Selector Dropdown */}
         <select
           value={selected?.component_id || ''}
-          onChange={(e) => {
-            if (e.target.value) onSelectComponent(e.target.value)
-          }}
-          className="bg-[#F4F7FA] border border-[#D9E2EA] text-[#17212B] text-xs font-mono rounded px-2 py-1 max-w-[200px] focus:outline-none focus:border-[#0E88D3]"
+          onChange={(e) => onSelectComponent(e.target.value)}
+          className="bg-[#F4F7FA] border border-[#D9E2EA] rounded px-2.5 py-1 text-xs text-[#17212B] font-mono focus:outline-none focus:border-[#0E88D3] cursor-pointer"
         >
-          <option value="" disabled>Select Component ({filteredComponents.length})</option>
-          {filteredComponents.slice(0, 100).map((c, idx) => (
+          {filteredComponents.map((c, idx) => (
             <option key={c.component_id} value={c.component_id}>
               {idx + 1}. {c.component_id} [{(c.status || 'safe').toUpperCase()}] ({c.v168.toFixed(1)} &mu;A)
             </option>
@@ -195,11 +201,15 @@ export default function ModuleAAnomalyPanel({
       </div>
 
       {/* Main Content Area */}
-      {/* Main Content Area */}
-      <div className="p-2.5 flex-1 flex flex-col gap-2.5">
-        {/* Selected Component Header Profile */}
+      <div className="p-3 flex-1 flex flex-col gap-3">
+        {/* MAIN GRAPH: HTOL 168H OSCILLOSCOPE (Section 6 layout) */}
+        <div className="flex flex-col flex-1 min-h-[380px] md:min-h-[440px] w-full">
+          <ModuleAAnomalyGraph component={selected} onSimUpdate={setSimData} />
+        </div>
+
+        {/* LOT STATISTICS | COMPONENT ANALYSIS | DECISION (Section 6 layout) */}
         {selected ? (
-          <div className={`p-2.5 rounded-lg border flex flex-col gap-2 transition-colors ${
+          <div className={`p-3 rounded-lg border flex flex-col gap-2.5 transition-colors ${
             isReject ? 'bg-[#FEF2F2] border-[#D9363E]/50' : 'bg-[#F8FAFC] border-[#D9E2EA]'
           }`}>
             {/* Top Identity & Location Row */}
@@ -261,15 +271,15 @@ export default function ModuleAAnomalyPanel({
               </div>
             </div>
 
-            {/* HTOL Telemetry Reading Grid (4-box harmonized with Module B) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-mono">
-              <div className="p-1.5 rounded bg-[#F4F7FA] border border-[#168A5B]/30 flex flex-col">
+            {/* HTOL Telemetry Reading Grid (Lot Statistics - 4-box) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+              <div className="p-2 rounded bg-[#FFFFFF] border border-[#168A5B]/30 flex flex-col shadow-xs">
                 <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">0h Initial</span>
                 <span className="text-sm font-bold text-[#17212B] mt-0.5 tabular-nums">{selected.v0.toFixed(1)} &mu;A</span>
                 <span className="text-[9px] text-[#81909D] font-mono mt-0.5">T=0 Baseline</span>
               </div>
 
-              <div className={`p-1.5 rounded bg-[#F4F7FA] border flex flex-col transition-colors ${
+              <div className={`p-2 rounded bg-[#FFFFFF] border flex flex-col shadow-xs transition-colors ${
                 isSim && simH < 24
                   ? 'border-[#D9E2EA] opacity-60'
                   : 'border-[#168A5B]/40'
@@ -283,7 +293,7 @@ export default function ModuleAAnomalyPanel({
                 </span>
               </div>
 
-              <div className={`p-1.5 rounded bg-[#F4F7FA] border flex flex-col transition-colors ${
+              <div className={`p-2 rounded bg-[#FFFFFF] border flex flex-col shadow-xs transition-colors ${
                 isSim && simH < 96
                   ? 'border-[#D9E2EA] opacity-60'
                   : 'border-[#168A5B]/40'
@@ -295,7 +305,7 @@ export default function ModuleAAnomalyPanel({
                 <span className="text-[9px] text-[#81909D] font-mono mt-0.5">Midpoint Check</span>
               </div>
 
-              <div className={`p-1.5 rounded bg-[#F4F7FA] border flex flex-col transition-colors ${
+              <div className={`p-2 rounded bg-[#FFFFFF] border flex flex-col shadow-xs transition-colors ${
                 isSim && simH < 168
                   ? 'border-[#C58A00]/40'
                   : selected.status === 'reject'
@@ -326,12 +336,12 @@ export default function ModuleAAnomalyPanel({
             </div>
 
             {/* AI Diagnostics & Statistical Analysis Strip */}
-            <div className="p-2 rounded bg-[#FFFFFF] border border-[#D9E2EA] text-xs text-[#17212B] flex flex-wrap items-center justify-between gap-2 font-mono">
+            <div className="p-2.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] text-xs text-[#17212B] flex flex-wrap items-center justify-between gap-2 font-mono shadow-xs">
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <span className="text-[#0E88D3] font-bold text-[10px] uppercase whitespace-nowrap">
                   DIAGNOSIS:
                 </span>
-                <span className="text-xs text-[#17212B] truncate font-sans" title={selected.reason || 'Nominal component telemetry'}>
+                <span className="text-xs text-[#17212B] truncate font-sans font-semibold" title={selected.reason || 'Nominal component telemetry'}>
                   {selected.reason || 'Nominal HTOL burn-in curve within statistical bounds.'}
                 </span>
               </div>
@@ -347,11 +357,6 @@ export default function ModuleAAnomalyPanel({
             No component selected. Pick a component above to inspect Module A Silicon Telemetry.
           </div>
         )}
-
-        {/* Module A Dedicated Graph: Parametric Waveform Oscilloscope - Dynamically occupies full remaining height */}
-        <div className="mt-0.5 flex flex-col flex-1 min-h-[280px] w-full">
-          <ModuleAAnomalyGraph component={selected} onSimUpdate={setSimData} />
-        </div>
       </div>
 
       {/* Module A Bezel Bottom Bar */}

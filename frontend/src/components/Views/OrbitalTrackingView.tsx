@@ -92,7 +92,7 @@ export default function OrbitalTrackingView() {
             </div>
           </div>
 
-          <div className="relative flex-1 min-h-[290px] bg-[#FFFFFF] rounded-lg border border-[#D9E2EA] overflow-hidden flex items-center justify-center">
+          <div className="relative flex-1 min-h-[290px] bg-[#07111C] rounded-lg border border-[#1D3A52] overflow-hidden flex items-center justify-center">
             {/* World Map SVG Canvas */}
             <svg viewBox="0 0 720 360" className="w-full h-full block">
               {/* Latitude & Longitude Gridlines */}
@@ -105,7 +105,7 @@ export default function OrbitalTrackingView() {
                     y1={y}
                     x2="720"
                     y2={y}
-                    stroke="#FFFFFF"
+                    stroke="#1D3A52"
                     strokeWidth="0.8"
                     strokeDasharray="4,4"
                   />
@@ -120,7 +120,7 @@ export default function OrbitalTrackingView() {
                     y1="0"
                     x2={x}
                     y2="360"
-                    stroke="#FFFFFF"
+                    stroke="#1D3A52"
                     strokeWidth="0.8"
                     strokeDasharray="4,4"
                   />
@@ -128,49 +128,49 @@ export default function OrbitalTrackingView() {
               })}
 
               {/* Equator & Prime Meridian Highlight */}
-              <line x1="0" y1="180" x2="720" y2="180" stroke="#334155" strokeWidth="1.2" />
-              <line x1="360" y1="0" x2="360" y2="360" stroke="#334155" strokeWidth="1.2" />
+              <line x1="0" y1="180" x2="720" y2="180" stroke="#2A5375" strokeWidth="1.2" />
+              <line x1="360" y1="0" x2="360" y2="360" stroke="#2A5375" strokeWidth="1.2" />
 
-              {/* Stylized Continents Outlines in Deep Slate */}
+              {/* Stylized Continents Outlines */}
               {/* Asia & India */}
               <path
                 d="M 460 70 L 520 80 L 550 110 L 515 150 L 490 200 L 470 170 L 450 120 Z"
-                fill="#FFFFFF"
-                stroke="#FFFFFF"
+                fill="#0B1928"
+                stroke="#2A5375"
                 strokeWidth="1"
               />
               {/* Africa */}
               <path
                 d="M 340 120 L 400 130 L 420 180 L 390 250 L 360 270 L 330 190 Z"
-                fill="#FFFFFF"
-                stroke="#FFFFFF"
+                fill="#0B1928"
+                stroke="#2A5375"
                 strokeWidth="1"
               />
               {/* Europe */}
               <path
                 d="M 350 70 L 420 60 L 440 100 L 360 110 Z"
-                fill="#FFFFFF"
-                stroke="#FFFFFF"
+                fill="#0B1928"
+                stroke="#2A5375"
                 strokeWidth="1"
               />
               {/* Americas */}
               <path
                 d="M 160 60 L 220 70 L 200 140 L 150 120 Z"
-                fill="#FFFFFF"
-                stroke="#FFFFFF"
+                fill="#0B1928"
+                stroke="#2A5375"
                 strokeWidth="1"
               />
               <path
                 d="M 220 170 L 270 200 L 250 290 L 210 240 Z"
-                fill="#FFFFFF"
-                stroke="#FFFFFF"
+                fill="#0B1928"
+                stroke="#2A5375"
                 strokeWidth="1"
               />
               {/* Australia */}
               <path
                 d="M 570 230 L 640 240 L 620 290 L 560 280 Z"
-                fill="#FFFFFF"
-                stroke="#FFFFFF"
+                fill="#0B1928"
+                stroke="#2A5375"
                 strokeWidth="1"
               />
 
@@ -186,9 +186,9 @@ export default function OrbitalTrackingView() {
                       cx={cx}
                       cy={cy}
                       r="45"
-                      fill={isActive ? '#F59E0B' : '#334155'}
-                      fillOpacity={isActive ? '0.12' : '0.04'}
-                      stroke={isActive ? '#F59E0B' : '#475569'}
+                      fill={isActive ? '#0E88D3' : '#1E293B'}
+                      fillOpacity={isActive ? '0.2' : '0.1'}
+                      stroke={isActive ? '#38BDF8' : '#334155'}
                       strokeWidth="1"
                       strokeDasharray={isActive ? 'none' : '3,3'}
                     />
@@ -197,8 +197,8 @@ export default function OrbitalTrackingView() {
                       cx={cx}
                       cy={cy}
                       r="3.5"
-                      fill={isActive ? '#F59E0B' : '#64748B'}
-                      stroke="#FFFFFF"
+                      fill={isActive ? '#38BDF8' : '#64748B'}
+                      stroke="#07111C"
                       strokeWidth="1"
                     />
                     <text
@@ -206,7 +206,7 @@ export default function OrbitalTrackingView() {
                       y={cy - 7}
                       textAnchor="middle"
                       className={`text-[8px] font-mono font-bold ${
-                        isActive ? 'fill-amber-400' : 'fill-slate-500'
+                        isActive ? 'fill-[#38BDF8]' : 'fill-[#64748B]'
                       }`}
                     >
                       {gs.code}
@@ -250,7 +250,7 @@ export default function OrbitalTrackingView() {
                       y1={satY}
                       x2={360 + (77.59 / 180) * 360}
                       y2={180 - (12.97 / 90) * 180}
-                      stroke="#FFFFFF"
+                      stroke="#38BDF8"
                       strokeWidth="1.5"
                       strokeDasharray="4,2"
                     />
@@ -284,7 +284,7 @@ export default function OrbitalTrackingView() {
               </div>
               <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
                 <span className="text-[#5B6B7A]">Mean Altitude:</span>
-                <span className="text-amber-300 font-bold">520.42 km</span>
+                <span className="text-[#B45309] font-bold">520.42 km</span>
               </div>
               <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
                 <span className="text-[#5B6B7A]">Orbital Velocity:</span>
@@ -304,23 +304,23 @@ export default function OrbitalTrackingView() {
               </div>
               <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
                 <span className="text-[#5B6B7A]">Doppler Shift:</span>
-                <span className="text-emerald-400 font-bold">+18.42 kHz</span>
+                <span className="text-[#168A5B] font-bold">+18.42 kHz</span>
               </div>
               <div className="flex justify-between py-1 border-b border-dashed border-[#D9E2EA]">
                 <span className="text-[#5B6B7A]">Downlink Packets:</span>
-                <span className="text-amber-300 font-bold">PKT #{telemetryTick}</span>
+                <span className="text-[#0E88D3] font-bold">PKT #{telemetryTick}</span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-[#5B6B7A]">Frame Sync Status:</span>
-                <span className="text-emerald-400 font-bold">LOCKED &bull; 0 CRC ERR</span>
+                <span className="text-[#168A5B] font-bold">LOCKED &bull; 0 CRC ERR</span>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 p-2.5 rounded-lg bg-[#F8FAFC] border border-amber-500/30 text-[10px]">
-            <div className="text-amber-400 font-bold mb-1 uppercase">Next Ground Station Pass:</div>
+          <div className="mt-4 p-2.5 rounded-lg bg-[#F8FAFC] border border-[#0E88D3]/30 text-[10px]">
+            <div className="text-[#0E88D3] font-bold mb-1 uppercase">Next Ground Station Pass:</div>
             <div className="text-[#17212B]">
-              <b>Bengaluru ISTRAC NOCC</b> &bull; AOS in <span className="text-emerald-400 font-bold">04m 18s</span> &bull; Max Elevation: 74&deg;
+              <b>Bengaluru ISTRAC NOCC</b> &bull; AOS in <span className="text-[#168A5B] font-bold">04m 18s</span> &bull; Max Elevation: 74&deg;
             </div>
           </div>
         </div>
@@ -328,7 +328,7 @@ export default function OrbitalTrackingView() {
 
       {/* Ground Station Table */}
       <div className="rounded-xl border border-[#D9E2EA] bg-[#FFFFFF] p-4 shadow-md">
-        <div className="text-xs font-display font-bold text-amber-400 tracking-wider uppercase mb-3">
+        <div className="text-xs font-display font-bold text-[#0E88D3] tracking-wider uppercase mb-3">
           ISTRAC Ground Network Status
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 text-xs">
@@ -337,9 +337,9 @@ export default function OrbitalTrackingView() {
               key={gs.code}
               className={`p-2.5 rounded-lg border font-mono text-[10.5px] transition-all ${
                 gs.status === 'ACTIVE'
-                  ? 'bg-amber-500/15 border-amber-500/60 text-white shadow-sm'
+                  ? 'bg-[#0E88D3]/15 border-[#0E88D3]/60 text-[#17212B] font-bold shadow-sm'
                   : gs.status === 'ACQUIRING'
-                  ? 'bg-emerald-500/15 border-emerald-500/50 text-white'
+                  ? 'bg-[#168A5B]/15 border-[#168A5B]/50 text-[#17212B]'
                   : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A]'
               }`}
             >
@@ -348,9 +348,9 @@ export default function OrbitalTrackingView() {
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
                     gs.status === 'ACTIVE'
-                      ? 'bg-amber-400'
+                      ? 'bg-[#0E88D3]'
                       : gs.status === 'ACQUIRING'
-                      ? 'bg-emerald-400'
+                      ? 'bg-[#168A5B]'
                       : 'bg-slate-600'
                   }`}
                 />

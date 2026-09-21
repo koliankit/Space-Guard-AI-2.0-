@@ -39,6 +39,24 @@
   --color-status-safe: #168A5B;
   --color-status-monitor: #C58A00;
   --color-status-reject: #D9363E;
+
+  /* PART 21 — DARK TECHNICAL VISUALIZATION THEME */
+  --tech-bg: #07111C;
+  --tech-panel: #0B1928;
+  --tech-card: #102337;
+  --tech-border: #1D3A52;
+  --tech-border-subtle: #162E42;
+  --tech-text-primary: #F1F5F9;
+  --tech-text-secondary: #9AAFC0;
+  --tech-text-muted: #7F93A5;
+  --tech-blue: #0E88D3;
+  --tech-orange: #F47216;
+}
+
+.tech-instrument-panel {
+  background-color: #07111C;
+  border-color: #1D3A52;
+  color: #F1F5F9;
 }
 
 @font-face {

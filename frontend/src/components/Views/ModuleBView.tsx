@@ -106,12 +106,12 @@ export default function ModuleBView({
               className={`px-2 py-0.5 rounded transition-colors uppercase ${
                 statusFilter === filter
                   ? filter === 'reject'
-                    ? 'bg-[#D9363E] text-[#17212B] font-bold'
+                    ? 'bg-[#D9363E] text-white font-bold'
                     : filter === 'monitor'
-                    ? 'bg-[#C58A00] text-[#17212B] font-bold'
+                    ? 'bg-[#C58A00] text-white font-bold'
                     : filter === 'safe'
-                    ? 'bg-[#168A5B] text-[#17212B] font-bold'
-                    : 'bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/50 font-bold'
+                    ? 'bg-[#168A5B] text-white font-bold'
+                    : 'bg-[#0E88D3] text-white font-bold'
                   : 'text-[#5B6B7A] hover:text-[#17212B] bg-[#F4F7FA] border border-[#D9E2EA]'
               }`}
             >

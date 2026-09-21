@@ -52,6 +52,8 @@ export default function ModuleBFutureDriftPanel({
 
   const isAccelerating = selected?.drift_trend === 'ACCELERATING POSITIVE DRIFT'
 
+  const early168 = selected ? selected.v0 + (selected.v24 - selected.v0) * 7 : 0
+
   if (!components || components.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-[#FFFFFF] border border-[#D9E2EA] rounded-xl shadow-sm text-center my-auto min-h-[360px]">
@@ -69,7 +71,7 @@ export default function ModuleBFutureDriftPanel({
   }
 
   return (
-    <div className={`flex flex-col rounded-xl bg-[#FFFFFF] border shadow-xl overflow-hidden h-full transition-colors ${
+    <div className={`flex flex-col rounded-xl bg-[#FFFFFF] border shadow-xl transition-colors w-full flex-1 ${
       willBreach ? 'border-[#D9363E]/60' : 'border-[#D9E2EA]'
     }`}>
       {/* Module B Top Bezel Bar */}
@@ -111,9 +113,15 @@ export default function ModuleBFutureDriftPanel({
       </div>
 
       {/* Main Content Area */}
-      <div className="p-2.5 flex-1 flex flex-col gap-2.5">
+      <div className="p-3 flex-1 flex flex-col gap-3">
+        {/* MAIN GRAPH: DRIFT / PREDICTION GRAPH (Section 7 layout) */}
+        <div className="flex flex-col flex-1 min-h-[380px] md:min-h-[440px] w-full">
+          <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
+        </div>
+
+        {/* 6 STRUCTURED METRIC CARDS BELOW GRAPH (Section 7 layout) */}
         {selected ? (
-          <div className={`p-2.5 rounded-lg border flex flex-col gap-2 transition-colors ${
+          <div className={`p-3 rounded-lg border flex flex-col gap-2.5 transition-colors ${
             willBreach ? 'bg-[#FEF2F2] border-[#D9363E]/50' : 'bg-[#F8FAFC] border-[#D9E2EA]'
           }`}>
             {/* Top Identity & Drift Classification Row */}
@@ -156,44 +164,78 @@ export default function ModuleBFutureDriftPanel({
                   )}
                 </span>
                 {willBreach && (
-                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#D9363E] text-[#17212B] animate-alert-once">
+                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#D9363E] text-white animate-alert-once">
                     CRITICAL BREACH
                   </span>
                 )}
               </div>
             </div>
 
-            {/* In-Flight Reliability Forecast Metrics Grid (4-box harmonized with Module A) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-mono">
-              <div className="p-1.5 rounded bg-[#F4F7FA] border border-[#D9E2EA] flex flex-col">
+            {/* Row 1: Drift Rate | Predicted 168h | Safety Slope */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+              <div className="p-2.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Drift Velocity</span>
+                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Drift Rate</span>
                   {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] led" />}
                 </div>
-                <span className={`text-sm font-bold mt-0.5 tabular-nums ${liveVel > 50 ? 'text-[#D9363E]' : 'text-[#F47216]'}`}>
-                  {liveVel.toFixed(2)} <span className="text-[10px] font-normal text-[#5B6B7A]">nA/hr</span>
+                <span className={`text-base font-bold mt-0.5 tabular-nums ${liveVel > 50 ? 'text-[#D9363E]' : 'text-[#F47216]'}`}>
+                  {liveVel.toFixed(2)} <span className="text-xs font-normal text-[#5B6B7A]">nA/hr</span>
                 </span>
-                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">Arrhenius Slope</span>
+                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">Arrhenius Drift Velocity</span>
               </div>
 
-              <div className="p-1.5 rounded bg-[#F4F7FA] border border-[#D9E2EA] flex flex-col">
+              <div className="p-2.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">264h Extrapolated</span>
+                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Predicted 168h</span>
                   {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] led" />}
                 </div>
-                <span className={`text-sm font-bold mt-0.5 tabular-nums ${willBreach ? 'text-[#D9363E]' : 'text-[#17212B]'}`}>
-                  {liveProj.toFixed(1)} <span className="text-[10px] font-normal text-[#5B6B7A]">&mu;A</span>
+                <span className="text-base font-bold mt-0.5 tabular-nums text-[#17212B]">
+                  {early168.toFixed(1)} <span className="text-xs font-normal text-[#5B6B7A]">&mu;A</span>
+                  <span className="text-xs font-normal text-[#5B6B7A] ml-2">(Act: {selected.v168.toFixed(1)}&mu;A)</span>
                 </span>
-                <span className="text-[9px] text-[#0E88D3] font-mono mt-0.5">In-Flight Target</span>
+                <span className="text-[9px] text-[#0E88D3] font-mono mt-0.5">
+                  Error: &plusmn;{(selected?.prediction_error_168 ?? 0.42).toFixed(2)} &mu;A vs Measured
+                </span>
               </div>
 
-              <div className="p-1.5 rounded bg-[#F4F7FA] border border-[#D9E2EA] flex flex-col">
+              <div className="p-2.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Future Margin</span>
+                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Safety Slope</span>
+                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] led" />}
+                </div>
+                <span className={`text-base font-bold mt-0.5 tabular-nums ${isAccelerating ? 'text-[#D9363E]' : 'text-[#168A5B]'}`}>
+                  {(slope * 1000).toFixed(2)} <span className="text-xs font-normal text-[#5B6B7A]">nA/hr</span>
+                </span>
+                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">
+                  {isAccelerating ? 'Accelerating Positive Drift' : 'Linear Thermal Degradation'}
+                </span>
+              </div>
+            </div>
+
+            {/* Row 2: Breach Time | Safety Margin | Advisory */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+              <div className="p-2.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Breach Time</span>
+                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] led" />}
+                </div>
+                <span className={`text-base font-bold mt-0.5 tabular-nums ${breachHour && breachHour <= 300 ? 'text-[#D9363E]' : 'text-[#168A5B]'}`}>
+                  {breachHour && breachHour > 0 && breachHour < 1000
+                    ? `T+${Math.round(breachHour)}h`
+                    : 'NO BREACH (>1000h)'}
+                </span>
+                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">
+                  {breachHour && breachHour <= 300 ? 'Critical Limit Exceedance' : 'Safe Orbit Margin (>Mission Life)'}
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Safety Margin</span>
                   {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] led" />}
                 </div>
                 <span
-                  className={`text-sm font-bold mt-0.5 tabular-nums ${
+                  className={`text-base font-bold mt-0.5 tabular-nums ${
                     liveMarg < 5
                       ? 'text-[#D9363E]'
                       : liveMarg < 15
@@ -201,36 +243,24 @@ export default function ModuleBFutureDriftPanel({
                       : 'text-[#168A5B]'
                   }`}
                 >
-                  {liveMarg.toFixed(1)} <span className="text-[10px] font-normal text-[#5B6B7A]">&mu;A</span>
+                  {liveMarg.toFixed(1)} <span className="text-xs font-normal text-[#5B6B7A]">&mu;A</span>
                 </span>
-                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">Datasheet Headroom</span>
+                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">
+                  Datasheet Headroom ({limitVal.toFixed(1)} &mu;A Spec)
+                </span>
               </div>
 
-              <div className="p-1.5 rounded bg-[#F4F7FA] border border-[#D9E2EA] flex flex-col">
-                <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Breach Horizon</span>
-                <span className={`text-sm font-bold mt-0.5 tabular-nums ${breachHour && breachHour <= 300 ? 'text-[#D9363E]' : 'text-[#168A5B]'}`}>
-                  {breachHour && breachHour > 0 && breachHour < 1000
-                    ? `T+${Math.round(breachHour)}h`
-                    : 'NO BREACH (>1000h)'}
+              <div className="p-2.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-[#F47216] uppercase font-bold">Reliability Advisory</span>
+                  <span className="text-[9px] text-[#0E88D3] font-semibold">Ea=0.7eV</span>
+                </div>
+                <span className="text-xs font-bold mt-0.5 text-[#17212B] truncate font-sans" title={selected.drift_classification || selected.drift_trend || 'Nominal Arrhenius thermal degradation'}>
+                  {selected.drift_classification || selected.drift_trend || 'Nominal Arrhenius thermal degradation within flight envelope.'}
                 </span>
-                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">Safety Boundary</span>
-              </div>
-            </div>
-
-            {/* In-Flight Physics & Reliability Horizon Strip (Matching Module A exactly) */}
-            <div className="p-2 rounded bg-[#FFFFFF] border border-[#D9E2EA] text-xs text-[#17212B] flex flex-wrap items-center justify-between gap-2 font-mono">
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="text-[#F47216] font-bold text-[10px] uppercase whitespace-nowrap">
-                  MODEL:
+                <span className="text-[9px] text-[#5B6B7A] font-mono mt-0.5">
+                  AF: 38.4x @ 125&deg;C &bull; JEDEC JESD22-A108
                 </span>
-                <span className="text-xs text-[#17212B] truncate font-sans" title="Empirical Arrhenius Thermal Activation Model (Ea=0.7eV)">
-                  Arrhenius Thermal Degradation &bull; Dynamic Confidence Cone
-                </span>
-              </div>
-              <div className="flex items-center gap-3 text-[10px] text-[#5B6B7A] whitespace-nowrap">
-                <span>Pred Error: <b className="text-[#17212B]">&plusmn;{(selected?.prediction_error_168 ?? 0.42).toFixed(2)}&mu;A</b></span>
-                <span>Spec Limit: <b className="text-[#D9363E]">{limitVal.toFixed(1)}&mu;A</b></span>
-                <span>Horizon: <b className="text-[#0E88D3]">264H (+96H)</b></span>
               </div>
             </div>
           </div>
@@ -239,11 +269,6 @@ export default function ModuleBFutureDriftPanel({
             No component selected. Pick a component to run Module B Future Drift Forecast.
           </div>
         )}
-
-        {/* Module B Dedicated Graph: Predictive Extrapolation Canvas - Dynamically occupies full remaining height */}
-        <div className="mt-0.5 flex flex-col flex-1 min-h-[280px] w-full">
-          <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
-        </div>
       </div>
 
       {/* Module B Bezel Bottom Bar */}
