@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo } from 'react'
 import type { ComponentOut, UploadResult } from '../../types'
 import { downloadSampleCSV, ISRO_MISSIONS, type RawPart } from '../../offlineEngine'
+import { TEST_FIXTURES, createTestCsvFile } from '../../utils/testFixtures'
 import { sounds } from '../../utils/soundEffects'
 import * as api from '../../api'
 
@@ -295,6 +296,54 @@ export default function CsvIntakeView({
                   <div className="text-[10px] text-[#81909D]">{m.code}</div>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Validation Gate Test Harness (1-Click Error Scenario Injectors) */}
+          <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col gap-2.5">
+            <div className="flex items-center justify-between border-b border-[#D9E2EA] pb-1.5">
+              <span className="text-xs font-mono font-bold uppercase text-[#5B6B7A] flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#F47216]" />
+                Validation Gate Test Harness
+              </span>
+              <span className="text-[10px] font-mono text-[#81909D]">
+                MIL-STD-883 QA
+              </span>
+            </div>
+            <p className="text-[11px] text-[#5B6B7A]">
+              1-click test fixtures to test validation gating &amp; error table:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {TEST_FIXTURES.map((fixture) => {
+                const isValid = fixture.expectedStatus === 'PASSED'
+                return (
+                  <button
+                    key={fixture.id}
+                    type="button"
+                    onClick={() => {
+                      const file = createTestCsvFile(fixture.id)
+                      handleFileInput(file)
+                    }}
+                    disabled={uploading}
+                    className={`p-2 rounded-lg border text-left transition-all text-xs font-mono flex flex-col gap-0.5 cursor-pointer ${
+                      isValid
+                        ? 'bg-[#F0FDF4] hover:bg-[#DCFCE7] border-[#168A5B]/40 text-[#168A5B]'
+                        : 'bg-[#FEF2F2] hover:bg-[#FEE2E2] border-[#D9363E]/40 text-[#D9363E]'
+                    }`}
+                    title={fixture.description}
+                  >
+                    <div className="font-bold text-[11px] flex items-center justify-between">
+                      <span className="truncate">{fixture.name}</span>
+                      <span className="text-[9px] px-1 py-0.2 rounded font-bold uppercase">
+                        {isValid ? 'PASS' : 'BLOCK'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] text-[#5B6B7A] truncate">
+                      {fixture.expectedErrorType || 'Schema Compliant'}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>

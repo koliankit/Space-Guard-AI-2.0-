@@ -56,12 +56,14 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const cr = entry.contentRect
-        const w = cr.width || el.clientWidth
-        const h = cr.height || el.clientHeight
+        const w = Math.round(cr.width || el.clientWidth)
+        const h = Math.round(Math.max(240, cr.height || el.clientHeight))
         if (w > 0 && h > 0) {
-          setChartDims({
-            width: Math.round(w),
-            height: Math.round(Math.max(240, h)),
+          setChartDims((prev) => {
+            if (Math.abs(prev.width - w) < 3 && Math.abs(prev.height - h) < 3) {
+              return prev
+            }
+            return { width: w, height: h }
           })
         }
       }
@@ -228,19 +230,24 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
     }
   }, [isPaused, startSweepAnimation])
 
-  // Auto-trigger sweep when component changes or stage filter changes
+  // Ensure full graph is visible immediately when component changes
   useEffect(() => {
-    if (component?.component_id) {
-      startSweepAnimation(true)
+    setAnimProgress(1)
+    setIsSimulating(false)
+    setIsPaused(false)
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current)
+      animFrameRef.current = null
     }
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    }
-  }, [component?.component_id, stageH, startSweepAnimation])
+  }, [component?.component_id, stageH])
 
-  // Notify parent dashboard of live simulation state
+  // Throttle live updates to parent dashboard to avoid 60 FPS panel re-renders
+  const lastSimUpdateRef = useRef<number>(0)
   useEffect(() => {
-    if (onSimUpdate) {
+    if (!onSimUpdate) return
+    const now = performance.now()
+    if (!isSimulating || animProgress >= 1 || now - lastSimUpdateRef.current > 100) {
+      lastSimUpdateRef.current = now
       onSimUpdate({
         progress: animProgress,
         simHour,

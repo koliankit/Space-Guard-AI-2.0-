@@ -49,7 +49,7 @@ export async function uploadFile(file: File, columnMapping?: Record<string, stri
     }
   }
   const text = await file.text()
-  return offlineISRO.loadCSVText(text)
+  return offlineISRO.loadCSVText(text, file.name)
 }
 
 export function resetTelemetryState(): void {

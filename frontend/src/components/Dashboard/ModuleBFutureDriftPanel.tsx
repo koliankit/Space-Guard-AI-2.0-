@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { ComponentOut } from '../../types'
 import ModuleBFutureDriftGraph from '../Charts/ModuleBFutureDriftGraph'
 import { getSubsystemLocation } from '../../utils/satelliteLocations'
@@ -11,9 +11,18 @@ interface ModuleBFutureDriftPanelProps {
 }
 
 export default function ModuleBFutureDriftPanel({
+  components,
   selected,
+  onSelectComponent,
   onSelectSubsystem,
 }: ModuleBFutureDriftPanelProps) {
+  // Automatically select first component if none is selected
+  useEffect(() => {
+    if (!selected && components && components.length > 0) {
+      onSelectComponent(components[0].component_id)
+    }
+  }, [selected, components, onSelectComponent])
+
   const [simData, setSimData] = useState<{
     progress: number
     p1: number
@@ -42,6 +51,22 @@ export default function ModuleBFutureDriftPanel({
       : null
 
   const isAccelerating = selected?.drift_trend === 'ACCELERATING POSITIVE DRIFT'
+
+  if (!components || components.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 bg-[#FFFFFF] border border-[#D9E2EA] rounded-xl shadow-sm text-center my-auto min-h-[360px]">
+        <div className="w-14 h-14 rounded-full bg-[#0E88D3]/10 border border-[#0E88D3]/30 flex items-center justify-center text-[#0E88D3] font-mono text-2xl font-black mb-3">
+          &bull;
+        </div>
+        <h2 className="text-base font-mono font-bold text-[#17212B] uppercase tracking-wider mb-1">
+          NO DATASET LOADED FOR SCREENING
+        </h2>
+        <p className="text-xs text-[#5B6B7A] max-w-md font-sans mb-4">
+          Please upload a flight qualification telemetry CSV in Stage 0 (CSV Intake) and run the validation gate to inspect Module B Future Drift Telemetry.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className={`flex flex-col rounded-xl bg-[#FFFFFF] border shadow-xl overflow-hidden h-full transition-colors ${

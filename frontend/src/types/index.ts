@@ -1,5 +1,46 @@
 export type Status = 'safe' | 'monitor' | 'reject' | 'idle'
 
+export type ValidationErrorType =
+  | 'MISSING_REQUIRED_COLUMN'
+  | 'INVALID_NUMERIC_VALUE'
+  | 'MISSING_VALUE'
+  | 'INVALID_UNIT'
+  | 'INVALID_RANGE'
+  | 'DUPLICATE_COMPONENT_ID'
+  | 'INVALID_TEMPERATURE'
+  | 'MISSING_BURN_IN_POINT'
+
+export interface ValidationErrorItem {
+  id: string
+  severity: 'Critical' | 'Warning'
+  errorType: ValidationErrorType
+  row?: number
+  column?: string
+  detectedValue?: string
+  expectedValue?: string
+  impact: string
+  recommendedFix: string
+}
+
+export interface ValidationReport {
+  fileName: string
+  status: 'PASSED' | 'BLOCKED'
+  totalRows: number
+  validRows: number
+  errorCount: number
+  criticalCount: number
+  warningCount: number
+  dataQualityScore: number
+  errors: ValidationErrorItem[]
+  checks: {
+    formatValid: boolean
+    schemaValid: boolean
+    requiredColumnsValid: boolean
+    rowValidationPassed: boolean
+    dataQualityAcceptable: boolean
+  }
+}
+
 export interface ValidationIssue {
   row: number | null
   column: string
@@ -21,6 +62,7 @@ export interface UploadResult {
   detected_headers?: string[]
   auto_mapping?: Record<string, string>
   missing_fields?: string[]
+  validation_report?: ValidationReport
 }
 
 export type AnomalyCategory =

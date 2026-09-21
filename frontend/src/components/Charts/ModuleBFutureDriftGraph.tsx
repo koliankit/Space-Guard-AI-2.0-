@@ -61,12 +61,14 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const cr = entry.contentRect
-        const w = cr.width || el.clientWidth
-        const h = cr.height || el.clientHeight
+        const w = Math.round(cr.width || el.clientWidth)
+        const h = Math.round(Math.max(240, cr.height || el.clientHeight))
         if (w > 0 && h > 0) {
-          setChartDims({
-            width: Math.round(w),
-            height: Math.round(Math.max(240, h)),
+          setChartDims((prev) => {
+            if (Math.abs(prev.width - w) < 3 && Math.abs(prev.height - h) < 3) {
+              return prev
+            }
+            return { width: w, height: h }
           })
         }
       }
@@ -154,15 +156,16 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     }
   }, [isPaused, startSimulation])
 
-  // Auto-trigger simulation when component or horizon changes
+  // Ensure full forecast and points are visible immediately when component changes
   useEffect(() => {
-    if (component?.component_id) {
-      startSimulation(true)
+    setAnimProgress(1)
+    setIsSimulating(false)
+    setIsPaused(false)
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current)
+      animFrameRef.current = null
     }
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    }
-  }, [component?.component_id, activeHorizon, startSimulation])
+  }, [component?.component_id, activeHorizon])
 
   // Piecewise value interpolation along curve and projection zone for manual checking
   const getValAtHourB = useCallback(
@@ -344,9 +347,13 @@ export default function ModuleBFutureDriftGraph({ component, onSimUpdate }: Modu
     }
   }, [animProgress, p1, v0, v24, v96, v168, currentExtrapH, currentExtrapVal, toX, toY])
 
-  // Notify parent dashboard panel of live simulation telemetry
+  // Throttle live simulation telemetry to avoid 60 FPS panel re-renders
+  const lastSimUpdateBRef = useRef<number>(0)
   useEffect(() => {
-    if (onSimUpdate) {
+    if (!onSimUpdate) return
+    const now = performance.now()
+    if (!isSimulating || animProgress >= 1 || now - lastSimUpdateBRef.current > 100) {
+      lastSimUpdateBRef.current = now
       onSimUpdate({
         progress: animProgress,
         p1,

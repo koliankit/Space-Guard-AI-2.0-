@@ -38,7 +38,7 @@ import { sounds } from './utils/soundEffects'
 import { generateCertificatePdf, generateTechnicalReportPdf } from './utils/pdfGenerator'
 import { generateExcelReport } from './utils/excelGenerator'
 import * as api from './api'
-import type { ComponentOut, MissionStatus, UploadResult, TeeSecurityStatus } from './types'
+import type { ComponentOut, MissionStatus, UploadResult, TeeSecurityStatus, ValidationReport } from './types'
 
 export default function App() {
   const [operationalPhase, setOperationalPhase] = useState<'onboarding' | 'dashboard'>('dashboard')
@@ -46,8 +46,9 @@ export default function App() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [batchId, setBatchId] = useState<number | null>(null)
   const [uploadMeta, setUploadMeta] = useState<UploadResult | null>(null)
+  const [validationReport, setValidationReport] = useState<ValidationReport | null>(null)
   const [dataMetaText, setDataMetaText] = useState(
-    '<span class="text-slate-200 font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry to commence qualification clearance.</span>'
+    '<span class="text-[#5B6B7A] font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry to commence qualification clearance.</span>'
   )
 
   const [activeMissionId, setActiveMissionId] = useState<string>('GAGANYAAN')
@@ -121,12 +122,60 @@ export default function App() {
         setMappingModal(result)
         return
       }
+
+      if (result.error === 'validation_failed') {
+        if (modalTimerId) clearTimeout(modalTimerId)
+        setValidationReport(result.validation_report || null)
+        setUploadMeta(null)
+        setBatchId(null)
+        setAllComponents([])
+        setFlaggedList([])
+        setSelected(null)
+        setMission(null)
+        setAnalysisRun(false)
+        setDataMetaText(
+          `<span class="font-bold text-[#D9363E] text-base md:text-lg tracking-wide">Validation BLOCKED</span> &mdash; <span class="text-[#17212B] font-semibold text-base">${file.name} contains critical schema/data integrity error(s).</span>`
+        )
+        log(`Data validation FAILED for ${file.name}. AI screening blocked.`, 'flag')
+        sounds.playAlert()
+        setActiveTab('validation')
+        return
+      }
+
+      // Valid dataset passed validation gate
+      if (modalTimerId) clearTimeout(modalTimerId)
+      setQuarantineToast(null)
+      setAlertComponent(null)
+      setValidationReport(result.validation_report || null)
       setUploadMeta(result)
-      resetForNewBatch(result, 'Dataset')
+      setBatchId(result.batch_id)
+      setAnalysisRun(false)
+      setMission(null)
+      setFlaggedList([])
+      setSelected(null)
+      setFocusKey(null)
+      setDataMetaText(
+        `<span class="font-bold text-[#168A5B] text-base md:text-lg tracking-wide">${file.name} VALIDATED</span> &mdash; <span class="inline-flex items-center font-mono font-black text-lg md:text-xl text-[#168A5B] bg-[#168A5B]/15 px-3 py-1 rounded-lg border border-[#168A5B]/40 leading-none shadow-sm mx-1">${result.valid}</span> <span class="text-[#17212B] font-semibold text-base">components across</span> <span class="inline-flex items-center font-mono font-bold text-[#0E88D3] px-2 py-0.5 rounded bg-[#0E88D3]/10 border border-[#0E88D3]/30 mx-1">${result.lots} lots</span>`
+      )
+      log(`Flight dataset "${file.name}" uploaded \u2014 ${result.rows} components parsed.`)
+      log(`Validation PASSED across ${result.lots} qualification lots. Ready for AI screening.`, 'ok')
+      sounds.playSuccess()
+
+      try {
+        const list = await api.listComponents(result.batch_id, { limit: 1000 })
+        if (list?.components?.length) {
+          setAllComponents(list.components)
+          setSelected(list.components[0])
+        }
+      } catch {
+        // fallback
+      }
+
+      setActiveTab('validation')
     } catch (e: any) {
       alert('Upload failed: ' + e.message)
     }
-  }, [])
+  }, [modalTimerId])
 
   async function applyMapping(mapping: Record<string, string>) {
     if (!pendingFile) return
@@ -149,7 +198,6 @@ export default function App() {
     setActiveMissionId(mId)
     const m = ISRO_MISSIONS.find((x) => x.id === mId) || ISRO_MISSIONS[0]
     log(`Selected mission qualification profile: ${m.name} (${m.code}) \u2014 ${m.centre}.`, 'ok')
-    await handleDemo(mId)
   }
 
   async function handleDemo(missionIdOverride?: string, autoScreen = false) {
@@ -175,6 +223,7 @@ export default function App() {
     if (modalTimerId) clearTimeout(modalTimerId)
     setBatchId(null)
     setUploadMeta(null)
+    setValidationReport(null)
     setMission(null)
     setFlaggedList([])
     setAllComponents([])
@@ -184,10 +233,10 @@ export default function App() {
     setQuarantineToast(null)
     setAnalysisRun(false)
     setDataMetaText(
-      '<span class="text-slate-200 font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry to commence qualification clearance.</span>'
+      '<span class="text-[#5B6B7A] font-semibold text-base">No dataset loaded &mdash; ingest CSV telemetry to commence qualification clearance.</span>'
     )
-    setOperationalPhase('onboarding')
-    log('Flight telemetry purged. System reset to Window 1 CSV Ingest.', 'ok')
+    setOperationalPhase('dashboard')
+    log('Flight telemetry purged. System reset.', 'ok')
   }
 
   // Keyboard shortcut listener for ISRO Briefing Deck (Press 'P')
@@ -202,15 +251,18 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Initial mount: load flight batch so Mission Control Dashboard is pre-populated, and query TEE status
+  // Initial mount: query TEE status without auto-loading predefined demo batch
   useEffect(() => {
-    handleDemo('GAGANYAAN', false)
     api.getTeeSecurityStatus().then(setTeeStatus).catch(() => {})
   }, [])
 
   async function runScreening(idOverride?: number) {
     const id = idOverride ?? batchId
     if (!id || running) return
+    if (validationReport && validationReport.status === 'BLOCKED') {
+      alert('Cannot start AI screening: Uploaded dataset has critical validation errors.')
+      return
+    }
     setRunning(true)
     log('ISRO AI screening pipeline initialized &bull; MIL-STD-883 Method 1005.')
   }
@@ -232,14 +284,10 @@ export default function App() {
       setAnalysisRun(true)
       log('ISRO Anomaly detection completed across all qualification lots.', 'ok')
 
-      if (result.tee_security) {
-        setTeeStatus(result.tee_security)
-        if (result.tee_security.enabled) {
-          log(
-            `TEE Security Layer active [${(result.tee_security.mode || 'simulated').toUpperCase()}] \u2014 Risk computation executed in protected enclave boundary.`,
-            'ok'
-          )
-        }
+      const chosen = result.top_flagged || list.components[0]
+      if (chosen) {
+        setSelected(chosen)
+        setFocusKey(chosen.subsystem)
       }
 
       if (result.top_flagged) {
@@ -249,17 +297,17 @@ export default function App() {
         log(`Risk scoring complete across ${ms.safe + ms.monitor + ms.reject} spaceflight components.`)
         log(`${worst.component_id} localized to ${worst.subsystem_name} subsystem.`)
         log(`REJECT decision generated for ${worst.component_id} &bull; Quarantine initiated.`, 'flag')
-        setSelected(worst)
-        setFocusKey(worst.subsystem)
-        
-        // Show non-blocking prominent banner
         setQuarantineToast(worst)
       } else {
         sounds.playSuccess()
         log('No component exceeded the anomaly threshold \u2014 spacecraft nominal.', 'ok')
       }
+
+      // Automatically transition to Module A so graphs are visible immediately
+      setActiveTab('module_a')
     } catch (e: any) {
-      log('Analysis failed: ' + e.message, 'flag')
+      log('AI Screening encountered an error: ' + e.message, 'flag')
+      alert('Screening error: ' + e.message)
     } finally {
       setRunning(false)
     }
@@ -460,6 +508,8 @@ export default function App() {
             <ValidationView
               batchId={batchId}
               uploadMeta={uploadMeta}
+              validationReport={validationReport}
+              onFileUploaded={handleFile}
               allComponents={allComponents}
               mission={mission}
               running={running}

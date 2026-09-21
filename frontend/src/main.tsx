@@ -28,7 +28,7 @@ class ErrorBoundary extends React.Component<
           <div style={{ display: 'inline-block', border: '1px solid #F59E0B', padding: '4px 12px', borderRadius: 4, background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', fontWeight: 'bold', marginBottom: 16 }}>
             ISRO SPACEGUARD AI &bull; MISSION CONTROL CRITICAL EXCEPTION
           </div>
-          <h2 style={{ color: '#fff', fontSize: 18, margin: '8px 0' }}>An unexpected error prevented the control deck from loading:</h2>
+          <h2 style={{ color: '#17212B', fontSize: 18, margin: '8px 0' }}>An unexpected error prevented the control deck from loading:</h2>
           <div style={{ color: '#F59E0B', fontSize: 14, fontWeight: 'bold', margin: '12px 0' }}>
             {this.state.error?.name}: {this.state.error?.message}
           </div>

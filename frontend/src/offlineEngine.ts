@@ -10,6 +10,9 @@ import type {
   Status,
   SubsystemStatus,
   UploadResult,
+  ValidationErrorItem,
+  ValidationReport,
+  ValidationErrorType,
 } from './types'
 
 export const ISRO_MISSIONS: MissionProfile[] = [
@@ -511,12 +514,58 @@ class ClientISROEngine {
   }
 
   /**
-   * Real client-side CSV parser supporting user uploads when backend is offline/on Vercel.
+   * Real client-side CSV parser supporting user uploads with full MIL-STD-883 Typed Validation & Blocking Rules.
    */
-  loadCSVText(csvText: string): UploadResult {
-    const lines = csvText.trim().split(/\r?\n/).filter((l) => l.trim().length > 0)
+  loadCSVText(csvText: string, fileName = 'uploaded_telemetry.csv'): UploadResult {
+    const rawLines = csvText.split(/\r?\n/)
+    const lines = rawLines.map((l) => l.trim()).filter((l) => l.length > 0)
+    const errors: ValidationErrorItem[] = []
+
     if (lines.length < 2) {
-      throw new Error('Uploaded CSV must contain at least a header row and one data row.')
+      errors.push({
+        id: 'err-file-empty',
+        severity: 'Critical',
+        errorType: 'MISSING_VALUE',
+        impact: 'Uploaded CSV is empty or missing data rows.',
+        recommendedFix: 'Provide a valid CSV file with a header row and at least one component record.',
+        detectedValue: 'EMPTY_FILE',
+        expectedValue: 'Header + Data rows',
+      })
+
+      const report: ValidationReport = {
+        fileName,
+        status: 'BLOCKED',
+        totalRows: 0,
+        validRows: 0,
+        errorCount: errors.length,
+        criticalCount: 1,
+        warningCount: 0,
+        dataQualityScore: 0,
+        errors,
+        checks: {
+          formatValid: false,
+          schemaValid: false,
+          requiredColumnsValid: false,
+          rowValidationPassed: false,
+          dataQualityAcceptable: false,
+        },
+      }
+
+      this.rawParts = []
+      this.scoredParts = []
+      this.analyzed = false
+
+      return {
+        batch_id: 0,
+        rows: 0,
+        valid: 0,
+        missing: 0,
+        lots: 0,
+        has_ground_truth: false,
+        error: 'validation_failed',
+        message: 'Uploaded CSV must contain at least a header row and one data row.',
+        validation_report: report,
+      }
     }
 
     const headerLine = lines[0]
@@ -540,73 +589,360 @@ class ClientISROEngine {
     const colLimit = findColIndex(['static_limit_ua', 'static_limit', 'limit', 'spec_limit'])
     const colSub = findColIndex(['subsystem', 'subsystem_name', 'sub', 'module'])
     const colGt = findColIndex(['ground_truth', 'ground_truth_latent_defect', 'label', 'is_defect'])
+    const colTemp = findColIndex(['temperature_c', 'temperature', 'temp_c', 'temp'])
+    const colUnit = findColIndex(['unit', 'leakage_unit', 'measurement_unit'])
+    const colMin = findColIndex(['datasheet_min', 'spec_min', 'min_limit'])
+    const colMax = findColIndex(['datasheet_max', 'spec_max', 'max_limit'])
 
-    if (colId === -1 || colLot === -1 || colV0 === -1 || colV24 === -1 || colV168 === -1) {
-      const missing = []
-      if (colId === -1) missing.push('component_id')
-      if (colLot === -1) missing.push('lot_id')
-      if (colV0 === -1) missing.push('value_0h')
-      if (colV24 === -1) missing.push('value_24h')
-      if (colV168 === -1) missing.push('value_168h')
-      throw new Error(`CSV missing required columns: ${missing.join(', ')}`)
+    // 1. Mandatory Header Checks
+    if (colId === -1) {
+      errors.push({
+        id: 'err-missing-component_id',
+        severity: 'Critical',
+        errorType: 'MISSING_REQUIRED_COLUMN',
+        column: 'component_id',
+        detectedValue: 'MISSING',
+        expectedValue: 'component_id',
+        impact: 'Component identification and passport serialization impossible.',
+        recommendedFix: 'Add component_id column to CSV header.',
+      })
     }
-
-    const parsedParts: RawPart[] = []
-    let dropped = 0
-
-    for (let i = 1; i < lines.length; i++) {
-      const parts = lines[i].split(',').map((p) => p.replace(/["'\r]/g, '').trim())
-      const id = parts[colId]
-      const lot = parts[colLot]
-      const v0 = parseFloat(parts[colV0])
-      const v24 = parseFloat(parts[colV24])
-      const v168 = parseFloat(parts[colV168])
-      const v96 = colV96 !== -1 && parts[colV96] ? parseFloat(parts[colV96]) : null
-      const limit = colLimit !== -1 && parts[colLimit] ? parseFloat(parts[colLimit]) : 50
-      const gt = colGt !== -1 && parts[colGt] !== '' ? parseInt(parts[colGt], 10) : null
-
-      if (!id || !lot || isNaN(v0) || isNaN(v24) || isNaN(v168)) {
-        dropped++
-        continue
-      }
-
-      let sub = ''
-      if (colSub !== -1 && parts[colSub]) {
-        const rawSub = parts[colSub].toUpperCase()
-        const found = SUBSYSTEMS.find((s) => s.key === rawSub || s.name.toUpperCase() === rawSub)
-        sub = found ? found.key : rawSub
-      } else {
-        // Infer subsystem from ID if possible
-        const idUpper = id.toUpperCase()
-        for (const s of SUBSYSTEMS) {
-          if (idUpper.includes(`-${s.key}-`) || idUpper.startsWith(`${s.key}-`) || idUpper.endsWith(`-${s.key}`) || idUpper.includes(s.key)) {
-            sub = s.key
-            break
-          }
-        }
-        if (!sub) {
-          // Deterministic hash distribution across all 11 satellite subsystems
-          let h = 0
-          for (let c = 0; c < id.length; c++) {
-            h = (h * 31 + id.charCodeAt(c)) >>> 0
-          }
-          sub = SUBSYSTEMS[h % SUBSYSTEMS.length].key
-        }
-      }
-
-      parsedParts.push({
-        component_id: id,
-        lot_id: lot,
-        subsystem: sub,
-        v0,
-        v24,
-        v96: isNaN(v96 as number) ? null : v96,
-        v168,
-        limit_ua: isNaN(limit) ? 50 : limit,
-        ground_truth: isNaN(gt as number) ? null : gt,
+    if (colLot === -1) {
+      errors.push({
+        id: 'err-missing-lot_id',
+        severity: 'Critical',
+        errorType: 'MISSING_REQUIRED_COLUMN',
+        column: 'lot_id',
+        detectedValue: 'MISSING',
+        expectedValue: 'lot_id',
+        impact: 'Lot-relative anomaly detection cannot run.',
+        recommendedFix: 'Add lot_id to every applicable component record.',
+      })
+    }
+    if (colV0 === -1) {
+      errors.push({
+        id: 'err-missing-v0',
+        severity: 'Critical',
+        errorType: 'MISSING_REQUIRED_COLUMN',
+        column: 'value_0h_ua',
+        detectedValue: 'MISSING',
+        expectedValue: 'value_0h_ua',
+        impact: 'Initial burn-in baseline (0h) unavailable for drift calculation.',
+        recommendedFix: 'Include 0h leakage measurement column (value_0h_ua).',
+      })
+    }
+    if (colV24 === -1) {
+      errors.push({
+        id: 'err-missing-v24',
+        severity: 'Critical',
+        errorType: 'MISSING_REQUIRED_COLUMN',
+        column: 'value_24h_ua',
+        detectedValue: 'MISSING',
+        expectedValue: 'value_24h_ua',
+        impact: 'Early inflection point (24h) unavailable for Arrhenius velocity.',
+        recommendedFix: 'Include 24h leakage measurement column (value_24h_ua).',
+      })
+    }
+    if (colV168 === -1) {
+      errors.push({
+        id: 'err-missing-v168',
+        severity: 'Critical',
+        errorType: 'MISSING_REQUIRED_COLUMN',
+        column: 'value_168h_ua',
+        detectedValue: 'MISSING',
+        expectedValue: 'value_168h_ua',
+        impact: 'Final MIL-STD-883 168h qualification milestone missing.',
+        recommendedFix: 'Include 168h qualification measurement column (value_168h_ua).',
       })
     }
 
+    // 2. Row by row checks
+    const parsedParts: RawPart[] = []
+    const seenIds = new Set<string>()
+    const dataLines = lines.slice(1)
+
+    for (let idx = 0; idx < dataLines.length; idx++) {
+      const rowNum = idx + 2 // 1-indexed, header is row 1
+      const parts = dataLines[idx].split(',').map((p) => p.replace(/["'\r]/g, '').trim())
+
+      const id = colId !== -1 ? parts[colId] : ''
+      const lot = colLot !== -1 ? parts[colLot] : ''
+      const rawV0 = colV0 !== -1 ? parts[colV0] : ''
+      const rawV24 = colV24 !== -1 ? parts[colV24] : ''
+      const rawV96 = colV96 !== -1 ? parts[colV96] : ''
+      const rawV168 = colV168 !== -1 ? parts[colV168] : ''
+      const rawLimit = colLimit !== -1 ? parts[colLimit] : ''
+      const rawGt = colGt !== -1 ? parts[colGt] : ''
+      const rawTemp = colTemp !== -1 ? parts[colTemp] : ''
+      const rawUnit = colUnit !== -1 ? parts[colUnit] : ''
+      const rawMin = colMin !== -1 ? parts[colMin] : ''
+      const rawMax = colMax !== -1 ? parts[colMax] : ''
+
+      // Check Component ID
+      if (colId !== -1) {
+        if (!id) {
+          errors.push({
+            id: `err-missing-id-${rowNum}`,
+            severity: 'Critical',
+            errorType: 'MISSING_VALUE',
+            row: rowNum,
+            column: 'component_id',
+            detectedValue: 'EMPTY',
+            expectedValue: 'Alphanumeric component identifier',
+            impact: 'Component cannot be tracked or audited.',
+            recommendedFix: 'Provide a valid component_id.',
+          })
+        } else if (seenIds.has(id)) {
+          errors.push({
+            id: `err-dup-id-${rowNum}`,
+            severity: 'Critical',
+            errorType: 'DUPLICATE_COMPONENT_ID',
+            row: rowNum,
+            column: 'component_id',
+            detectedValue: `"${id}"`,
+            expectedValue: 'Unique Component UID',
+            impact: 'Component ID appears more than once. Causes passport and hardware collisions.',
+            recommendedFix: `Ensure UID "${id}" is unique across the screening batch.`,
+          })
+        } else {
+          seenIds.add(id)
+        }
+      }
+
+      // Check Lot ID
+      if (colLot !== -1 && !lot) {
+        errors.push({
+          id: `err-missing-lot-${rowNum}`,
+          severity: 'Critical',
+          errorType: 'MISSING_VALUE',
+          row: rowNum,
+          column: 'lot_id',
+          detectedValue: 'EMPTY',
+          expectedValue: 'Lot identifier (e.g. LOT-2026-A1)',
+          impact: 'Wafer lot grouping and lot-relative baseline cannot be formed.',
+          recommendedFix: 'Provide lot_id for this component.',
+        })
+      }
+
+      // Check Burn-in measurements v0, v24, v168
+      const checkMeasurement = (rawVal: string | undefined, colName: string, isRequired: boolean) => {
+        if (rawVal === '' || rawVal === undefined) {
+          if (isRequired) {
+            errors.push({
+              id: `err-missing-${colName}-${rowNum}`,
+              severity: 'Critical',
+              errorType: 'MISSING_BURN_IN_POINT',
+              row: rowNum,
+              column: colName,
+              detectedValue: 'EMPTY',
+              expectedValue: 'Numeric measurement (µA)',
+              impact: `Required burn-in measurement (${colName}) is missing.`,
+              recommendedFix: `Provide the ${colName} burn-in reading.`,
+            })
+          }
+          return null
+        }
+
+        const num = parseFloat(rawVal)
+        if (isNaN(num)) {
+          errors.push({
+            id: `err-invalid-num-${colName}-${rowNum}`,
+            severity: 'Critical',
+            errorType: 'INVALID_NUMERIC_VALUE',
+            row: rowNum,
+            column: colName,
+            detectedValue: `"${rawVal}"`,
+            expectedValue: 'Numeric value',
+            impact: 'Cannot calculate burn-in slope or anomaly score.',
+            recommendedFix: `Replace "${rawVal}" with a valid numeric measurement.`,
+          })
+          return null
+        }
+
+        if (num < 0) {
+          errors.push({
+            id: `err-range-neg-${colName}-${rowNum}`,
+            severity: 'Warning',
+            errorType: 'INVALID_RANGE',
+            row: rowNum,
+            column: colName,
+            detectedValue: `${num}`,
+            expectedValue: '>= 0.0 µA',
+            impact: 'Negative silicon leakage current detected, which violates physical diode parameters.',
+            recommendedFix: 'Verify meter zeroing or calibration offset.',
+          })
+        }
+
+        return num
+      }
+
+      const v0 = colV0 !== -1 ? checkMeasurement(rawV0, 'value_0h_ua', true) : null
+      const v24 = colV24 !== -1 ? checkMeasurement(rawV24, 'value_24h_ua', true) : null
+      const v168 = colV168 !== -1 ? checkMeasurement(rawV168, 'value_168h_ua', true) : null
+      
+      // Optional v96
+      let v96: number | null = null
+      if (colV96 !== -1) {
+        if (rawV96 === '' || rawV96 === undefined) {
+          errors.push({
+            id: `err-missing-v96-${rowNum}`,
+            severity: 'Warning',
+            errorType: 'MISSING_VALUE',
+            row: rowNum,
+            column: 'value_96h_ua',
+            detectedValue: 'EMPTY',
+            expectedValue: 'Numeric measurement (optional)',
+            impact: 'Burn-in trend analysis is incomplete (will be imputed via spline).',
+            recommendedFix: 'Provide the 96h measurement if available.',
+          })
+        } else {
+          v96 = checkMeasurement(rawV96, 'value_96h_ua', false)
+        }
+      }
+
+      // Check Unit if present
+      if (colUnit !== -1 && rawUnit) {
+        const uLower = rawUnit.toLowerCase().trim()
+        if (!['ua', 'µa', 'u_a', 'microamp', 'microamps', 'a', 'ma'].includes(uLower)) {
+          errors.push({
+            id: `err-unit-${rowNum}`,
+            severity: 'Warning',
+            errorType: 'INVALID_UNIT',
+            row: rowNum,
+            column: 'unit',
+            detectedValue: `"${rawUnit}"`,
+            expectedValue: 'µA or uA',
+            impact: 'Unsupported unit detected; values may be scaled incorrectly.',
+            recommendedFix: 'Standardize unit to microamperes (µA).',
+          })
+        }
+      }
+
+      // Check Temperature if present
+      if (colTemp !== -1 && rawTemp) {
+        const tVal = parseFloat(rawTemp)
+        if (isNaN(tVal) || tVal < -50 || tVal > 250) {
+          errors.push({
+            id: `err-temp-${rowNum}`,
+            severity: 'Warning',
+            errorType: 'INVALID_TEMPERATURE',
+            row: rowNum,
+            column: 'temperature_c',
+            detectedValue: `"${rawTemp}"`,
+            expectedValue: '125°C (100°C - 150°C typical for MIL-STD-883 HTOL)',
+            impact: 'temperature_c contains an invalid value outside physical burn-in limits.',
+            recommendedFix: 'Specify a valid HTOL burn-in chamber temperature.',
+          })
+        }
+      }
+
+      // Check Datasheet range if present
+      if (colMin !== -1 && colMax !== -1 && rawMin && rawMax) {
+        const minVal = parseFloat(rawMin)
+        const maxVal = parseFloat(rawMax)
+        if (!isNaN(minVal) && !isNaN(maxVal) && minVal > maxVal) {
+          errors.push({
+            id: `err-range-minmax-${rowNum}`,
+            severity: 'Critical',
+            errorType: 'INVALID_RANGE',
+            row: rowNum,
+            column: 'datasheet_min / datasheet_max',
+            detectedValue: `min: ${minVal} > max: ${maxVal}`,
+            expectedValue: 'datasheet_min <= datasheet_max',
+            impact: 'datasheet_min is greater than datasheet_max.',
+            recommendedFix: 'Correct specification boundary limits.',
+          })
+        }
+      }
+
+      // If valid, build part
+      if (id && lot && v0 !== null && v24 !== null && v168 !== null) {
+        let sub = ''
+        if (colSub !== -1 && parts[colSub]) {
+          const rawSub = parts[colSub].toUpperCase()
+          const found = SUBSYSTEMS.find((s) => s.key === rawSub || s.name.toUpperCase() === rawSub)
+          sub = found ? found.key : rawSub
+        } else {
+          // Infer subsystem from ID
+          const idUpper = id.toUpperCase()
+          for (const s of SUBSYSTEMS) {
+            if (idUpper.includes(`-${s.key}-`) || idUpper.startsWith(`${s.key}-`) || idUpper.endsWith(`-${s.key}`) || idUpper.includes(s.key)) {
+              sub = s.key
+              break
+            }
+          }
+          if (!sub) {
+            let h = 0
+            for (let c = 0; c < id.length; c++) {
+              h = (h * 31 + id.charCodeAt(c)) >>> 0
+            }
+            sub = SUBSYSTEMS[h % SUBSYSTEMS.length].key
+          }
+        }
+
+        const limit = colLimit !== -1 && rawLimit && !isNaN(parseFloat(rawLimit)) ? parseFloat(rawLimit) : 50
+        const gt = colGt !== -1 && rawGt !== '' && !isNaN(parseInt(rawGt, 10)) ? parseInt(rawGt, 10) : null
+
+        parsedParts.push({
+          component_id: id,
+          lot_id: lot,
+          subsystem: sub,
+          v0,
+          v24,
+          v96,
+          v168,
+          limit_ua: limit,
+          ground_truth: gt,
+        })
+      }
+    }
+
+    const criticalCount = errors.filter((e) => e.severity === 'Critical').length
+    const warningCount = errors.filter((e) => e.severity === 'Warning').length
+    const totalDataRows = dataLines.length
+    const qualityScore = totalDataRows > 0
+      ? Math.max(0, Math.min(100, Math.round(100 - (criticalCount * 25 + warningCount * 4) / Math.max(1, totalDataRows / 10))))
+      : 0
+
+    const isBlocked = criticalCount > 0
+    const report: ValidationReport = {
+      fileName,
+      status: isBlocked ? 'BLOCKED' : 'PASSED',
+      totalRows: totalDataRows,
+      validRows: parsedParts.length,
+      errorCount: errors.length,
+      criticalCount,
+      warningCount,
+      dataQualityScore: isBlocked ? Math.min(45, qualityScore) : Math.max(65, qualityScore),
+      errors,
+      checks: {
+        formatValid: lines.length >= 2,
+        schemaValid: !errors.some((e) => e.errorType === 'MISSING_REQUIRED_COLUMN'),
+        requiredColumnsValid: !errors.some((e) => e.errorType === 'MISSING_REQUIRED_COLUMN'),
+        rowValidationPassed: criticalCount === 0,
+        dataQualityAcceptable: !isBlocked && qualityScore >= 60,
+      },
+    }
+
+    if (isBlocked) {
+      this.rawParts = []
+      this.scoredParts = []
+      this.analyzed = false
+
+      return {
+        batch_id: 0,
+        rows: totalDataRows,
+        valid: 0,
+        missing: totalDataRows,
+        lots: 0,
+        has_ground_truth: false,
+        error: 'validation_failed',
+        message: `DATA VALIDATION FAILED: ${criticalCount} critical error(s) detected. AI screening blocked.`,
+        validation_report: report,
+      }
+    }
+
+    // Success state
     this.rawParts = parsedParts
     this.scoredParts = []
     this.analyzed = false
@@ -617,11 +953,12 @@ class ClientISROEngine {
 
     return {
       batch_id: this.currentBatchId,
-      rows: lines.length - 1,
+      rows: totalDataRows,
       valid: this.rawParts.length,
-      missing: dropped,
+      missing: totalDataRows - this.rawParts.length,
       lots: lotsSet.size,
       has_ground_truth: hasGt,
+      validation_report: report,
     }
   }
 
