@@ -7,20 +7,31 @@ interface Node {
   vy: number
   radius: number
   baseAlpha: number
+  isActiveHub: boolean
+  hubPhase: number
 }
 
 interface Pulse {
   fromNode: number
   toNode: number
   progress: number // 0 to 1
-  speed: number
+  duration: number // seconds (3-6s)
   color: string
+}
+
+interface AtmosphericParticle {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  radius: number
+  alpha: number
 }
 
 export default function TelemetryNetworkBackground({
   className = '',
-  nodeCount = 28,
-  connectionDistance = 145,
+  nodeCount = 32,
+  connectionDistance = 165,
 }: {
   className?: string
   nodeCount?: number
@@ -57,23 +68,41 @@ export default function TelemetryNetworkBackground({
     handleResize()
     window.addEventListener('resize', handleResize)
 
-    // Initialize calm nodes
+    // Initialize calm nodes (12-25s movement)
     const nodes: Node[] = []
     for (let i = 0; i < nodeCount; i++) {
+      const isActiveHub = i % 7 === 0 // few active telemetry hubs (0.45-0.65 opacity)
       nodes.push({
         x: Math.random() * (width || window.innerWidth),
         y: Math.random() * (height || window.innerHeight),
-        // Very slow, calm motion (approx. 15-25s across screen)
-        vx: (Math.random() - 0.5) * 0.22,
-        vy: (Math.random() - 0.5) * 0.22,
-        radius: 1.4 + Math.random() * 1.2,
-        baseAlpha: 0.25 + Math.random() * 0.3,
+        // Very slow, calm motion (15-25s across screen)
+        vx: (Math.random() - 0.5) * 0.16,
+        vy: (Math.random() - 0.5) * 0.16,
+        radius: isActiveHub ? 2.0 : 1.3 + Math.random() * 0.6,
+        baseAlpha: isActiveHub ? 0.48 + Math.random() * 0.16 : 0.18 + Math.random() * 0.22,
+        isActiveHub,
+        hubPhase: Math.random() * Math.PI * 2,
       })
     }
 
-    // Occasional subtle data packets
+    // Atmospheric micro-particles (faint floating particles)
+    const particles: AtmosphericParticle[] = []
+    const particleCount = 16
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * (width || window.innerWidth),
+        y: Math.random() * (height || window.innerHeight),
+        vx: (Math.random() - 0.5) * 0.08,
+        vy: -0.04 - Math.random() * 0.06,
+        radius: 0.8 + Math.random() * 0.5,
+        alpha: 0.08 + Math.random() * 0.12,
+      })
+    }
+
+    // Telemetry transmission signal points (slow moving 3-6s, then wait)
     const pulses: Pulse[] = []
     let lastPulseTime = 0
+    let nextPulseDelay = 3500 + Math.random() * 2000
 
     // Visibility change handler (pause when tab hidden)
     let isVisible = !document.hidden
@@ -83,6 +112,7 @@ export default function TelemetryNetworkBackground({
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
     let lastTime = performance.now()
+    let orbitalAngle = 0
 
     // Render loop
     const render = (time: number) => {
@@ -92,12 +122,51 @@ export default function TelemetryNetworkBackground({
       if (isVisible && width > 0 && height > 0) {
         ctx.clearRect(0, 0, width, height)
 
-        // Update nodes if motion not reduced
+        // 1. Draw Faint Orbital Arcs in background
+        orbitalAngle += dt * 0.015 // very slow drift (approx. 400s per rotation)
+        ctx.save()
+        ctx.strokeStyle = 'rgba(14, 136, 211, 0.08)'
+        ctx.lineWidth = 1.0
+        ctx.setLineDash([6, 16])
+
+        // Orbital Arc 1: Top-right to bottom-left orbit
+        ctx.beginPath()
+        ctx.ellipse(width * 0.75, height * 0.35, width * 0.55, height * 0.42, 0.38 + Math.sin(orbitalAngle) * 0.04, 0, Math.PI * 2)
+        ctx.stroke()
+
+        // Orbital Arc 2: Lower sweeping trajectory
+        ctx.strokeStyle = 'rgba(14, 136, 211, 0.05)'
+        ctx.beginPath()
+        ctx.ellipse(width * 0.25, height * 0.75, width * 0.65, height * 0.38, -0.25 + Math.cos(orbitalAngle) * 0.03, 0, Math.PI * 2)
+        ctx.stroke()
+
+        ctx.setLineDash([])
+        ctx.restore()
+
+        // 2. Update and Draw Atmospheric Micro-Particles
+        if (!prefersReducedMotion) {
+          for (let i = 0; i < particles.length; i++) {
+            const p = particles[i]
+            p.x += p.vx
+            p.y += p.vy
+            if (p.x < -10) p.x = width + 10
+            if (p.x > width + 10) p.x = -10
+            if (p.y < -10) p.y = height + 10
+
+            ctx.beginPath()
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(14, 136, 211, ${p.alpha})`
+            ctx.fill()
+          }
+        }
+
+        // 3. Update telemetry nodes if motion not reduced
         if (!prefersReducedMotion) {
           for (let i = 0; i < nodes.length; i++) {
             const n = nodes[i]
             n.x += n.vx
             n.y += n.vy
+            n.hubPhase += dt * 0.8
 
             // Wrap around edges smoothly
             if (n.x < -20) n.x = width + 20
@@ -107,7 +176,7 @@ export default function TelemetryNetworkBackground({
           }
         }
 
-        // Draw connections
+        // 4. Draw Connecting Lines (rgba(14,136,211, 0.10–0.18))
         const activeConnections: [number, number][] = []
         for (let i = 0; i < nodes.length; i++) {
           for (let j = i + 1; j < nodes.length; j++) {
@@ -116,12 +185,12 @@ export default function TelemetryNetworkBackground({
             const dist = Math.sqrt(dx * dx + dy * dy)
 
             if (dist < connectionDistance) {
-              const alpha = (1 - dist / connectionDistance) * 0.16
+              const alpha = (1 - dist / connectionDistance) * 0.16 // 0.00 to 0.16
               ctx.beginPath()
               ctx.moveTo(nodes[i].x, nodes[i].y)
               ctx.lineTo(nodes[j].x, nodes[j].y)
-              ctx.strokeStyle = `rgba(14, 136, 211, ${alpha})`
-              ctx.lineWidth = 0.85
+              ctx.strokeStyle = `rgba(14, 136, 211, ${Math.max(0.04, alpha)})`
+              ctx.lineWidth = 0.75
               ctx.stroke()
 
               activeConnections.push([i, j])
@@ -129,25 +198,27 @@ export default function TelemetryNetworkBackground({
           }
         }
 
-        // Periodically spawn a telemetry packet pulse along an active connection
-        if (!prefersReducedMotion && time - lastPulseTime > 3200 && activeConnections.length > 0) {
+        // 5. Occasionally spawn moving telemetry signal point along connection line (Section 5)
+        // Duration: 3–6 seconds. Then wait before another signal appears.
+        if (!prefersReducedMotion && time - lastPulseTime > nextPulseDelay && activeConnections.length > 0) {
           lastPulseTime = time
+          nextPulseDelay = 3500 + Math.random() * 2500 // 3.5 - 6.0 seconds interval
           const [fromNode, toNode] = activeConnections[Math.floor(Math.random() * activeConnections.length)]
-          // Occasional orange accent telemetry pulse, predominantly ISRO blue
-          const isOrange = Math.random() < 0.2
+          const duration = 3.2 + Math.random() * 2.2 // 3.2 - 5.4 seconds travel time
+          const isOrange = Math.random() < 0.25 // occasional ISRO orange packet
           pulses.push({
             fromNode,
             toNode,
             progress: 0,
-            speed: 0.35 + Math.random() * 0.2, // ~2.5-3 seconds travel time
-            color: isOrange ? 'rgba(244, 114, 22, 0.75)' : 'rgba(14, 136, 211, 0.7)',
+            duration,
+            color: isOrange ? 'rgba(244, 114, 22, 0.75)' : 'rgba(14, 136, 211, 0.75)',
           })
         }
 
-        // Update and draw pulses
+        // 6. Update and Draw Moving Telemetry Signal Points
         for (let i = pulses.length - 1; i >= 0; i--) {
           const p = pulses[i]
-          p.progress += p.speed * dt
+          p.progress += (dt / p.duration)
 
           if (p.progress >= 1) {
             pulses.splice(i, 1)
@@ -160,20 +231,42 @@ export default function TelemetryNetworkBackground({
             const px = from.x + (to.x - from.x) * p.progress
             const py = from.y + (to.y - from.y) * p.progress
 
+            // Soft glowing telemetry signal packet
             ctx.beginPath()
-            ctx.arc(px, py, 1.8, 0, Math.PI * 2)
+            ctx.arc(px, py, 2.2, 0, Math.PI * 2)
             ctx.fillStyle = p.color
+            ctx.fill()
+
+            // Faint subtle trailing glow
+            ctx.beginPath()
+            ctx.arc(px, py, 4.5, 0, Math.PI * 2)
+            ctx.fillStyle = p.color.replace('0.75', '0.15')
             ctx.fill()
           }
         }
 
-        // Draw nodes
+        // 7. Draw Telemetry Nodes (Section 4: Primary #0E88D3, Opacity 0.15-0.45, active 0.45-0.65)
         for (let i = 0; i < nodes.length; i++) {
           const n = nodes[i]
+          let currentAlpha = n.baseAlpha
+          if (n.isActiveHub) {
+            // Calm breathing for active hubs
+            currentAlpha = 0.45 + 0.15 * Math.sin(n.hubPhase)
+          }
+
           ctx.beginPath()
           ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(14, 136, 211, ${n.baseAlpha})`
+          ctx.fillStyle = `rgba(14, 136, 211, ${currentAlpha})`
           ctx.fill()
+
+          // Active telemetry hubs have faint concentric locator ring
+          if (n.isActiveHub) {
+            ctx.beginPath()
+            ctx.arc(n.x, n.y, n.radius * 2.8, 0, Math.PI * 2)
+            ctx.strokeStyle = `rgba(14, 136, 211, ${currentAlpha * 0.35})`
+            ctx.lineWidth = 0.6
+            ctx.stroke()
+          }
         }
       }
 
@@ -198,11 +291,21 @@ export default function TelemetryNetworkBackground({
   }, [nodeCount, connectionDistance])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`pointer-events-none absolute inset-0 w-full h-full select-none ${className}`}
-      style={{ zIndex: 0 }}
+    <div
+      className={`pointer-events-none absolute inset-0 w-full h-full overflow-hidden select-none ${className}`}
+      style={{
+        zIndex: 0,
+        backgroundColor: '#EEF4F8',
+        backgroundImage: `
+          radial-gradient(circle at 18% 22%, rgba(14, 136, 211, 0.08) 0%, transparent 55%),
+          radial-gradient(circle at 78% 35%, rgba(220, 238, 249, 0.55) 0%, transparent 60%),
+          radial-gradient(circle at 50% 75%, rgba(14, 136, 211, 0.06) 0%, transparent 65%),
+          radial-gradient(circle at 88% 85%, rgba(234, 245, 251, 0.75) 0%, transparent 55%)
+        `,
+      }}
       aria-hidden="true"
-    />
+    >
+      <canvas ref={canvasRef} className="w-full h-full block" />
+    </div>
   )
 }

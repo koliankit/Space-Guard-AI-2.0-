@@ -429,7 +429,7 @@ export default function App() {
 
       {/* Non-Blocking Critical Anomaly Alert Banner (Appears first before full modal) */}
       {quarantineToast && !alertComponent && (
-        <div className="bg-[#FEF2F2] border-b border-[#D9363E]/40 px-5 py-2 flex items-center justify-between gap-3 text-xs font-mono text-[#17212B] animate-alert-once z-30">
+        <div className="bg-[#FEF2F2] border-b border-[#D9363E]/40 border-l-4 border-l-[#D9363E] px-5 py-2 flex items-center justify-between gap-3 text-xs font-mono text-[#17212B] animate-alert-once z-30">
           <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#D9363E] animate-gentle-pulse" />
             <span className="font-bold text-[#D9363E] uppercase tracking-wider">
@@ -481,7 +481,7 @@ export default function App() {
         />
 
         {/* Right Full Dashboard Workspace with Subtle Telemetry Atmosphere */}
-        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#EEF3F7] flex flex-col relative">
+        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#EEF4F8] flex flex-col relative">
           <TelemetryNetworkBackground />
           <div className="relative z-[1] flex-1 flex flex-col min-h-full">
           {/* OVERVIEW */}

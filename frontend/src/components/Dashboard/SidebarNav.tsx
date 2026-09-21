@@ -240,12 +240,12 @@ export default function SidebarNav({
 
       {/* Main Sidebar Frame: full-height left navigation column docked seamlessly */}
       <aside
-        className={`fixed lg:relative top-0 left-0 h-screen lg:h-full w-72 xl:w-80 bg-[#F3F6F9] border-r border-[#D5DEE7] z-40 lg:z-auto flex flex-col justify-between flex-shrink-0 min-h-0 transition-transform duration-200 ease-in-out shadow-sm ${
+        className={`fixed lg:relative top-0 left-0 h-screen lg:h-full w-72 xl:w-80 bg-[#F4F8FB] border-r border-[#D5E2EA] z-40 lg:z-auto flex flex-col justify-between flex-shrink-0 min-h-0 transition-transform duration-200 ease-in-out shadow-sm ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Top Header Identity */}
-        <div className="p-3.5 border-b border-[#D5DEE7] bg-[#F3F6F9] flex flex-col gap-2 flex-shrink-0">
+        <div className="p-3.5 border-b border-[#D5E2EA] bg-[#F4F8FB] flex flex-col gap-2 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F47216]/10 to-[#0E88D3]/10 border border-[#F47216]/60 flex items-center justify-center font-bold text-[#F47216] font-mono text-xs shadow-orange">
@@ -275,7 +275,7 @@ export default function SidebarNav({
           </div>
 
           {/* Active Mission Pill */}
-          <div className="bg-[#FFFFFF] border border-[#D5DEE7] rounded-md px-2.5 py-1 flex items-center justify-between text-[11px] font-mono text-[#4F6170]">
+          <div className="bg-[#FFFFFF] border border-[#D5E2EA] rounded-md px-2.5 py-1 flex items-center justify-between text-[11px] font-mono text-[#4F6170]">
             <span className="truncate max-w-[200px]" title={activeMissionName}>
               MISSION: <b className="text-[#17212B]">{activeMissionName}</b>
             </span>
@@ -284,7 +284,7 @@ export default function SidebarNav({
         </div>
 
         {/* Scrollable Navigation Hierarchy */}
-        <nav className="flex-1 overflow-y-auto px-2.5 py-2 space-y-2.5 select-none scrollbar-thin scrollbar-thumb-[#D5DEE7] scrollbar-track-transparent">
+        <nav className="flex-1 overflow-y-auto px-2.5 py-2 space-y-2.5 select-none scrollbar-thin scrollbar-thumb-[#D5E2EA] scrollbar-track-transparent">
           {navSections.map((section) => (
             <div key={section.title} className="space-y-0.5">
               {/* Section Header with Accent Line */}
@@ -292,7 +292,7 @@ export default function SidebarNav({
                 <span className="text-[9.5px] font-mono font-bold tracking-widest text-[#718292] uppercase">
                   {section.title}
                 </span>
-                <span className="w-10 h-px bg-[#D5DEE7]" />
+                <span className="w-10 h-px bg-[#D5E2EA]" />
               </div>
 
               {/* Navigation Items */}
@@ -304,10 +304,10 @@ export default function SidebarNav({
                       key={`${section.title}-${item.id}-${idx}`}
                       type="button"
                       onClick={() => handleSelect(item.id)}
-                      className={`w-full group text-left px-2 py-1.5 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer border ${
+                      className={`w-full group text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer border ${
                         active
-                          ? 'bg-[#FFFFFF] border-[#0E88D3] text-[#0E88D3] shadow-sm font-semibold ring-1 ring-[#0E88D3]/20'
-                          : 'bg-transparent border-transparent text-[#4F6170] hover:text-[#17212B] hover:bg-[#E7EEF5] hover:border-[#D5DEE7]'
+                          ? 'bg-[#EBF5FB] border-[#0E88D3] text-[#075B8C] shadow-sm font-semibold ring-1 ring-[#0E88D3]/20'
+                          : 'bg-transparent border-transparent text-[#4F6170] hover:text-[#17212B] hover:bg-[#E6F1F8] hover:border-[#D5E2EA]'
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -318,8 +318,8 @@ export default function SidebarNav({
                               <span
                                 className={`text-[9px] font-mono px-1 rounded ${
                                   active
-                                    ? 'bg-[#0E88D3]/20 text-[#0E88D3] font-bold'
-                                    : 'bg-[#F8FAFC] text-[#81909D]'
+                                    ? 'bg-[#0E88D3]/20 text-[#075B8C] font-bold'
+                                    : 'bg-[#F8FBFD] text-[#718292] border border-[#D5E2EA]'
                                 }`}
                               >
                                 {item.tag}
@@ -327,14 +327,14 @@ export default function SidebarNav({
                             )}
                             <div
                               className={`text-[11.5px] font-mono tracking-wide truncate ${
-                                active ? 'text-[#0E88D3] font-bold' : 'text-[#17212B] group-hover:text-[#0E88D3]'
+                                active ? 'text-[#075B8C] font-bold' : 'text-[#17212B] group-hover:text-[#0E88D3]'
                               }`}
                             >
                               {item.label}
                             </div>
                           </div>
                           {item.description && (
-                            <div className="text-[9.5px] text-[#81909D] truncate font-sans">
+                            <div className="text-[9.5px] text-[#718292] truncate font-sans">
                               {item.description}
                             </div>
                           )}
@@ -345,16 +345,16 @@ export default function SidebarNav({
                       {item.badge && (
                         <span
                           className={`ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold border flex-shrink-0 ${
-                            item.badgeColor || 'bg-[#F8FAFC] text-[#5B6B7A] border-[#D9E2EA]'
+                            item.badgeColor || 'bg-[#F8FBFD] text-[#4F6170] border-[#D5E2EA]'
                           }`}
                         >
                           {item.badge}
                         </span>
                       )}
 
-                      {/* Active Indicator Bar */}
+                      {/* Active Indicator Bar (Section 9: clear blue indicator) */}
                       {active && (
-                        <span className="w-1 h-3.5 rounded-full bg-[#0E88D3] ml-1.5 flex-shrink-0" />
+                        <span className="w-1.5 h-4 rounded-full bg-[#0E88D3] ml-1.5 flex-shrink-0" />
                       )}
                     </button>
                   )

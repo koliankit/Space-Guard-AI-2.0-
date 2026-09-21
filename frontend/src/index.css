@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  /* PART 22 — FINAL LIGHT ENGINEERING DASHBOARD COLOR SYSTEM */
-  --bg-main: #EEF3F7;
-  --bg-secondary: #F3F6F9;
+  /* FINAL SPACEGUARD AI — LIGHT SPACE TELEMETRY COLOR SYSTEM (SECTION 30) */
+  --bg-main: #EEF4F8;
+  --bg-secondary: #E6F1F8;
   --bg-panel: #FFFFFF;
-  --bg-elevated: #F8FAFC;
-  --border: #D5DEE7;
-  --border-subtle: #E7EEF5;
-  --hover: #E7EEF5;
+  --bg-elevated: #F8FBFD;
+  --border: #D5E2EA;
+  --border-subtle: #E6EEF5;
+  --hover: #E6F1F8;
 
   --text-primary: #17212B;
   --text-secondary: #4F6170;
@@ -20,19 +20,25 @@
   --text-table: #1F2D38;
 
   --primary-blue: #0E88D3;
+  --primary-dark-blue: #075B8C;
   --primary-orange: #F47216;
 
   --status-safe: #168A5B;
   --status-monitor: #C58A00;
   --status-critical: #D9363E;
 
+  --space-blue-glow: rgba(14, 136, 211, 0.08);
+  --telemetry-line: rgba(14, 136, 211, 0.12);
+  --telemetry-dot: rgba(14, 136, 211, 0.35);
+  --card-shadow: 0 4px 18px rgba(14, 50, 80, 0.06);
+
   /* Legacy variable mappings for backward compatibility */
-  --color-bg: #EEF3F7;
-  --color-bg2: #F3F6F9;
+  --color-bg: #EEF4F8;
+  --color-bg2: #E6F1F8;
   --color-panel: #FFFFFF;
-  --color-panel2: #F8FAFC;
-  --color-border: #D5DEE7;
-  --color-line: #D5DEE7;
+  --color-panel2: #F8FBFD;
+  --color-border: #D5E2EA;
+  --color-line: #D5E2EA;
 
   --color-text-primary: #17212B;
   --color-text-secondary: #4F6170;
@@ -106,7 +112,7 @@ html, body, #root {
 }
 
 body {
-  background: #EEF3F7;
+  background: #EEF4F8;
   color: #17212B;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
@@ -125,15 +131,15 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D5DEE7;
+  background: #D5E2EA;
   border-radius: 3px;
-  border: 1px solid #F8FAFC;
+  border: 1px solid #F8FBFD;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #0E88D3;
 }
 ::-webkit-scrollbar-track {
-  background: #EEF3F7;
+  background: #EEF4F8;
 }
 
 /* ==============================================================================

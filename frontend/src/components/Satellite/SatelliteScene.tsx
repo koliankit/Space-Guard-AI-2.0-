@@ -104,11 +104,11 @@ function SpacecraftModel({
 }) {
   const groupRef = useRef<THREE.Group>(null)
 
-  // Controlled slow rotation: ~28 seconds per full revolution (2*PI/28 = ~0.22 rad/s)
+  // Controlled slow rotation: ~35 seconds per full revolution (2*PI / 35 = ~0.18 rad/s)
   // Pauses when component or subsystem is being inspected
   useFrame((_, delta) => {
     if (groupRef.current && isRotating && !selectedKey && !selectedComponent) {
-      groupRef.current.rotation.y += delta * 0.22
+      groupRef.current.rotation.y += delta * 0.18
     }
   })
 
@@ -337,6 +337,81 @@ function EarthBackground() {
   )
 }
 
+function OrbitalTelemetryNetwork() {
+  const signalRef1 = useRef<THREE.Mesh>(null)
+  const signalRef2 = useRef<THREE.Mesh>(null)
+  const groupRef = useRef<THREE.Group>(null)
+
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime
+    if (groupRef.current) {
+      groupRef.current.rotation.y = t * 0.035 // very calm drift
+    }
+    if (signalRef1.current) {
+      // Signal 1 moving slowly around inner orbit (radius 3.6, ~5s period)
+      const angle1 = (t * 0.32) % (Math.PI * 2)
+      signalRef1.current.position.set(Math.cos(angle1) * 3.6, Math.sin(angle1) * 0.5, Math.sin(angle1) * 3.6)
+    }
+    if (signalRef2.current) {
+      // Signal 2 moving slowly around outer orbit (radius 4.8, ~6s period)
+      const angle2 = (t * 0.22 + Math.PI) % (Math.PI * 2)
+      signalRef2.current.position.set(Math.cos(angle2) * 4.8, Math.sin(angle2) * -0.4, Math.sin(angle2) * 4.8)
+    }
+  })
+
+  // Fixed telemetry nodes along orbital paths (Section 19: ●────●────●)
+  const nodes = useMemo(() => {
+    const pts: { pos: [number, number, number]; key: number }[] = []
+    const innerRadius = 3.6
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2
+      pts.push({ pos: [Math.cos(a) * innerRadius, Math.sin(a) * 0.5, Math.sin(a) * innerRadius], key: i })
+    }
+    const outerRadius = 4.8
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2
+      pts.push({ pos: [Math.cos(a) * outerRadius, Math.sin(a) * -0.4, Math.sin(a) * outerRadius], key: i + 6 })
+    }
+    return pts
+  }, [])
+
+  return (
+    <group ref={groupRef}>
+      {/* Orbital Path 1 */}
+      <mesh rotation={[Math.PI / 6, 0, 0]}>
+        <ringGeometry args={[3.58, 3.62, 64]} />
+        <meshBasicMaterial color="#0E88D3" transparent opacity={0.14} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Orbital Path 2 */}
+      <mesh rotation={[-Math.PI / 8, 0, Math.PI / 4]}>
+        <ringGeometry args={[4.78, 4.82, 64]} />
+        <meshBasicMaterial color="#0E88D3" transparent opacity={0.11} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Static Telemetry Nodes */}
+      {nodes.map((n) => (
+        <mesh key={n.key} position={n.pos}>
+          <sphereGeometry args={[0.045, 12, 12]} />
+          <meshBasicMaterial color="#0E88D3" transparent opacity={0.35} />
+        </mesh>
+      ))}
+
+      {/* Moving Telemetry Signal 1 */}
+      <mesh ref={signalRef1}>
+        <sphereGeometry args={[0.075, 12, 12]} />
+        <meshBasicMaterial color="#0E88D3" transparent opacity={0.8} />
+      </mesh>
+
+      {/* Moving Telemetry Signal 2 */}
+      <mesh ref={signalRef2}>
+        <sphereGeometry args={[0.07, 12, 12]} />
+        <meshBasicMaterial color="#F47216" transparent opacity={0.75} />
+      </mesh>
+    </group>
+  )
+}
+
 
 export default function SatelliteScene({
   subsystems,
@@ -453,7 +528,7 @@ export default function SatelliteScene({
     <div
       className="relative w-full h-full overflow-hidden select-none"
       style={{
-        background: 'linear-gradient(180deg, #EAF4FB 0%, #F4F8FB 50%, #DCECF7 100%)',
+        background: 'linear-gradient(180deg, #E8F5FC 0%, #DCEEF8 50%, #CFE5F2 100%)',
       }}
     >
       {/* Subtle blue radial space glow behind the satellite */}
@@ -517,6 +592,9 @@ export default function SatelliteScene({
 
         {/* Holographic Concentric Radar Floor */}
         <HologramFloor />
+
+        {/* Subtle Orbital Space Telemetry Paths & Nodes (Section 19: ●────●────●) */}
+        <OrbitalTelemetryNetwork />
 
         {/* Detailed Modular Spacecraft with Controlled Slow Rotation */}
         <SpacecraftModel
