@@ -86,7 +86,7 @@ export default function SidebarNav({
           icon: '▦',
           tag: '03',
           badge: totalComponents > 0 ? `${totalComponents} parts` : undefined,
-          badgeColor: 'bg-[#16253A] text-[#E8EDF2] border-[#26384D]',
+          badgeColor: 'bg-[#142B40] text-[#F1F5F9] border-[#1D3A52]',
           description: 'Comprehensive Screening Matrix',
         },
       ],
@@ -99,7 +99,7 @@ export default function SidebarNav({
           label: 'CSV Intake',
           icon: '📥',
           badge: totalComponents > 0 ? `${totalComponents} loaded` : undefined,
-          badgeColor: 'bg-[#111E30] text-[#C99A2E] border-[#C99A2E]/40',
+          badgeColor: 'bg-[#102337] text-[#0E88D3] border-[#0E88D3]/40',
           description: 'Telemetry File Ingestion & Parsing',
         },
         {
@@ -136,7 +136,7 @@ export default function SidebarNav({
           label: 'Screening Matrix',
           icon: '▦',
           badge: rejectCount > 0 ? `${rejectCount} REJECT` : undefined,
-          badgeColor: 'bg-[#D94B5B]/20 text-[#D94B5B] border-[#D94B5B]/50',
+          badgeColor: 'bg-[#E5484D]/20 text-[#E5484D] border-[#E5484D]/50',
           description: 'All-Component Decision Grid & Filters',
         },
         {
@@ -191,7 +191,7 @@ export default function SidebarNav({
           label: 'Clearance Report & PDF',
           icon: '📄',
           badge: rejectCount > 0 ? `${rejectCount} REJ` : undefined,
-          badgeColor: 'bg-[#D94B5B] text-white border-transparent',
+          badgeColor: 'bg-[#E5484D] text-white border-transparent',
           description: 'Official ISRO Flight Readiness Certificate',
         },
       ],
@@ -204,7 +204,7 @@ export default function SidebarNav({
           label: 'Settings & Security',
           icon: '⚙️',
           badge: teeStatus?.enabled ? 'ENCLAVE' : undefined,
-          badgeColor: 'bg-[#3B82B6]/20 text-[#3B82B6] border-[#3B82B6]/40',
+          badgeColor: 'bg-[#0E88D3]/20 text-[#0E88D3] border-[#0E88D3]/40',
           description: 'TEE Enclave, Physics Limits & Display',
         },
       ],
@@ -240,22 +240,22 @@ export default function SidebarNav({
 
       {/* Main Sidebar Frame: full-height left navigation column docked seamlessly */}
       <aside
-        className={`fixed lg:relative top-0 left-0 h-screen lg:h-full w-72 xl:w-80 bg-[#070D18] border-r border-[#26384D] z-40 lg:z-auto flex flex-col justify-between flex-shrink-0 min-h-0 transition-transform duration-200 ease-in-out ${
+        className={`fixed lg:relative top-0 left-0 h-screen lg:h-full w-72 xl:w-80 bg-[#07111C] border-r border-[#1D3A52] z-40 lg:z-auto flex flex-col justify-between flex-shrink-0 min-h-0 transition-transform duration-200 ease-in-out ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Top Header Identity */}
-        <div className="p-3.5 border-b border-[#26384D] bg-[#0D1726]/90 flex flex-col gap-2 flex-shrink-0">
+        <div className="p-3.5 border-b border-[#1D3A52] bg-[#0B1928] flex flex-col gap-2 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#111E30] border border-[#C99A2E]/60 flex items-center justify-center font-bold text-[#C99A2E] font-mono text-xs shadow-isro">
+              <div className="w-8 h-8 rounded-lg bg-[#102337] border border-[#F47216]/70 flex items-center justify-center font-bold text-[#F47216] font-mono text-xs shadow-orange">
                 ISRO
               </div>
               <div>
-                <div className="font-mono font-black text-sm text-[#E8EDF2] tracking-wider uppercase flex items-center gap-1.5">
-                  SPACEGUARD <span className="text-[#C99A2E]">AI</span>
+                <div className="font-mono font-black text-sm text-[#F1F5F9] tracking-wider uppercase flex items-center gap-1.5">
+                  SPACEGUARD <span className="text-[#F47216]">AI</span>
                 </div>
-                <div className="text-[10px] font-mono text-[#91A0B2] uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-[#9AAFC0] uppercase tracking-wider">
                   Mission Control Deck
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function SidebarNav({
               <button
                 type="button"
                 onClick={onCloseMobile}
-                className="lg:hidden p-1 rounded text-[#91A0B2] hover:text-white"
+                className="lg:hidden p-1 rounded text-[#9AAFC0] hover:text-white"
                 title="Close sidebar"
               >
                 ✕
@@ -275,24 +275,24 @@ export default function SidebarNav({
           </div>
 
           {/* Active Mission Pill */}
-          <div className="bg-[#111E30] border border-[#26384D] rounded-md px-2.5 py-1 flex items-center justify-between text-[11px] font-mono text-[#91A0B2]">
+          <div className="bg-[#102337] border border-[#1D3A52] rounded-md px-2.5 py-1 flex items-center justify-between text-[11px] font-mono text-[#9AAFC0]">
             <span className="truncate max-w-[200px]" title={activeMissionName}>
-              MISSION: <b className="text-[#E8EDF2]">{activeMissionName}</b>
+              MISSION: <b className="text-[#F1F5F9]">{activeMissionName}</b>
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#22A06B] animate-gentle-pulse" />
           </div>
         </div>
 
         {/* Scrollable Navigation Hierarchy */}
-        <nav className="flex-1 overflow-y-auto px-2.5 py-2 space-y-2.5 select-none scrollbar-thin scrollbar-thumb-[#26384D] scrollbar-track-transparent">
+        <nav className="flex-1 overflow-y-auto px-2.5 py-2 space-y-2.5 select-none scrollbar-thin scrollbar-thumb-[#1D3A52] scrollbar-track-transparent">
           {navSections.map((section) => (
             <div key={section.title} className="space-y-0.5">
               {/* Section Header with Accent Line */}
               <div className="flex items-center justify-between px-2 py-0.5">
-                <span className="text-[9.5px] font-mono font-bold tracking-widest text-[#5A6E85] uppercase">
+                <span className="text-[9.5px] font-mono font-bold tracking-widest text-[#6F8495] uppercase">
                   {section.title}
                 </span>
-                <span className="w-10 h-px bg-[#26384D]" />
+                <span className="w-10 h-px bg-[#1D3A52]" />
               </div>
 
               {/* Navigation Items */}
@@ -306,8 +306,8 @@ export default function SidebarNav({
                       onClick={() => handleSelect(item.id)}
                       className={`w-full group text-left px-2 py-1.5 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer border ${
                         active
-                          ? 'bg-[#16253A] border-[#C99A2E]/70 text-[#E8EDF2] shadow-sm font-semibold ring-1 ring-[#C99A2E]/30'
-                          : 'bg-transparent border-transparent text-[#91A0B2] hover:text-[#E8EDF2] hover:bg-[#111E30] hover:border-[#26384D]'
+                          ? 'bg-[#142B40] border-[#0E88D3] text-[#F1F5F9] shadow-sm font-semibold ring-1 ring-[#0E88D3]/30'
+                          : 'bg-transparent border-transparent text-[#9AAFC0] hover:text-[#F1F5F9] hover:bg-[#102337] hover:border-[#1D3A52]'
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -318,8 +318,8 @@ export default function SidebarNav({
                               <span
                                 className={`text-[9px] font-mono px-1 rounded ${
                                   active
-                                    ? 'bg-[#C99A2E]/25 text-[#C99A2E] font-bold'
-                                    : 'bg-[#070D18] text-[#5A6E85]'
+                                    ? 'bg-[#0E88D3]/20 text-[#0E88D3] font-bold'
+                                    : 'bg-[#07111C] text-[#6F8495]'
                                 }`}
                               >
                                 {item.tag}
@@ -327,14 +327,14 @@ export default function SidebarNav({
                             )}
                             <div
                               className={`text-[11.5px] font-mono tracking-wide truncate ${
-                                active ? 'text-[#E8EDF2] font-bold' : 'group-hover:text-[#E8EDF2]'
+                                active ? 'text-[#F1F5F9] font-bold' : 'group-hover:text-[#F1F5F9]'
                               }`}
                             >
                               {item.label}
                             </div>
                           </div>
                           {item.description && (
-                            <div className="text-[9.5px] text-[#5A6E85] truncate font-sans">
+                            <div className="text-[9.5px] text-[#6F8495] truncate font-sans">
                               {item.description}
                             </div>
                           )}
@@ -345,7 +345,7 @@ export default function SidebarNav({
                       {item.badge && (
                         <span
                           className={`ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold border flex-shrink-0 ${
-                            item.badgeColor || 'bg-[#111E30] text-[#91A0B2] border-[#26384D]'
+                            item.badgeColor || 'bg-[#102337] text-[#9AAFC0] border-[#1D3A52]'
                           }`}
                         >
                           {item.badge}
@@ -354,7 +354,7 @@ export default function SidebarNav({
 
                       {/* Active Indicator Bar */}
                       {active && (
-                        <span className="w-1 h-3.5 rounded-full bg-[#C99A2E] ml-1.5 flex-shrink-0" />
+                        <span className="w-1 h-3.5 rounded-full bg-[#0E88D3] ml-1.5 flex-shrink-0" />
                       )}
                     </button>
                   )
@@ -364,61 +364,61 @@ export default function SidebarNav({
           ))}
 
           {/* Active Flight Telemetry HUD Widget - Uses the empty space intelligently */}
-          <div className="mt-3 p-3 rounded-xl bg-[#0D1726] border border-[#26384D] space-y-2 text-xs font-mono">
-            <div className="flex items-center justify-between border-b border-[#26384D] pb-1 text-[10px] text-[#5A6E85] uppercase tracking-wider font-bold">
+          <div className="mt-3 p-3 rounded-xl bg-[#0B1928] border border-[#1D3A52] space-y-2 text-xs font-mono">
+            <div className="flex items-center justify-between border-b border-[#1D3A52] pb-1 text-[10px] text-[#6F8495] uppercase tracking-wider font-bold">
               <span>ACTIVE TELEMETRY HUD</span>
-              <span className="text-[#3FA66B] font-bold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
+              <span className="text-[#22A06B] font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22A06B] animate-gentle-pulse" />
                 LIVE
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-              <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D]">
-                <div className="text-[9px] text-[#91A0B2]">BATCH SIZE</div>
-                <div className="font-bold text-[#E8EDF2] mt-0.5">{totalComponents > 0 ? `${totalComponents} Parts` : '0 Parts'}</div>
+              <div className="bg-[#07111C] p-1.5 rounded border border-[#1D3A52]">
+                <div className="text-[9px] text-[#9AAFC0]">BATCH SIZE</div>
+                <div className="font-bold text-[#F1F5F9] mt-0.5">{totalComponents > 0 ? `${totalComponents} Parts` : '0 Parts'}</div>
               </div>
-              <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D]">
-                <div className="text-[9px] text-[#91A0B2]">GATE STATUS</div>
-                <div className={`font-bold mt-0.5 ${rejectCount > 0 ? 'text-[#D94B5B]' : 'text-[#3FA66B]'}`}>
+              <div className="bg-[#07111C] p-1.5 rounded border border-[#1D3A52]">
+                <div className="text-[9px] text-[#9AAFC0]">GATE STATUS</div>
+                <div className={`font-bold mt-0.5 ${rejectCount > 0 ? 'text-[#E5484D]' : 'text-[#22A06B]'}`}>
                   {rejectCount > 0 ? `${rejectCount} REJECT` : 'FLIGHT OK'}
                 </div>
               </div>
             </div>
 
             {/* Subsystem Quick Health Mini-Matrix */}
-            <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D] space-y-1">
-              <div className="flex items-center justify-between text-[9px] text-[#91A0B2]">
+            <div className="bg-[#07111C] p-1.5 rounded border border-[#1D3A52] space-y-1">
+              <div className="flex items-center justify-between text-[9px] text-[#9AAFC0]">
                 <span>SUBSYSTEM HEALTH</span>
-                <span className="text-[#3FA66B]">NOMINAL</span>
+                <span className="text-[#22A06B]">NOMINAL</span>
               </div>
               <div className="grid grid-cols-4 gap-1 text-[9px] text-center font-bold">
-                <span className="bg-[#111E30] text-[#3FA66B] py-0.5 rounded border border-[#3FA66B]/30">PWR 98%</span>
-                <span className="bg-[#111E30] text-[#D94B5B] py-0.5 rounded border border-[#D94B5B]/40">FC 84%</span>
-                <span className="bg-[#111E30] text-[#3FA66B] py-0.5 rounded border border-[#3FA66B]/30">COM 96%</span>
-                <span className="bg-[#111E30] text-[#3FA66B] py-0.5 rounded border border-[#3FA66B]/30">SEN 95%</span>
+                <span className="bg-[#102337] text-[#22A06B] py-0.5 rounded border border-[#22A06B]/30">PWR 98%</span>
+                <span className="bg-[#102337] text-[#E5484D] py-0.5 rounded border border-[#E5484D]/40">FC 84%</span>
+                <span className="bg-[#102337] text-[#22A06B] py-0.5 rounded border border-[#22A06B]/30">COM 96%</span>
+                <span className="bg-[#102337] text-[#22A06B] py-0.5 rounded border border-[#22A06B]/30">SEN 95%</span>
               </div>
             </div>
 
-            <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D] flex items-center justify-between text-[10px]">
-              <span className="text-[#91A0B2]">ENCLAVE CRYPTO:</span>
-              <span className="text-[#3B82B6] font-bold">HMAC-SHA256</span>
+            <div className="bg-[#07111C] p-1.5 rounded border border-[#1D3A52] flex items-center justify-between text-[10px]">
+              <span className="text-[#9AAFC0]">ENCLAVE CRYPTO:</span>
+              <span className="text-[#0E88D3] font-bold">HMAC-SHA256</span>
             </div>
 
-            <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D] flex items-center justify-between text-[10px]">
-              <span className="text-[#91A0B2]">DSN LINK:</span>
-              <span className="text-[#3FA66B] font-bold">BYL-32 (LOCK)</span>
+            <div className="bg-[#07111C] p-1.5 rounded border border-[#1D3A52] flex items-center justify-between text-[10px]">
+              <span className="text-[#9AAFC0]">DSN LINK:</span>
+              <span className="text-[#22A06B] font-bold">BYL-32 (LOCK)</span>
             </div>
 
-            <div className="bg-[#070D18] p-1.5 rounded border border-[#26384D] flex items-center justify-between text-[10px]">
-              <span className="text-[#91A0B2]">BUS TELEMETRY:</span>
-              <span className="text-[#C99A2E] font-bold">28.12V &bull; 23.4&deg;C</span>
+            <div className="bg-[#07111C] p-1.5 rounded border border-[#1D3A52] flex items-center justify-between text-[10px]">
+              <span className="text-[#9AAFC0]">BUS TELEMETRY:</span>
+              <span className="text-[#0E88D3] font-bold">28.12V &bull; 23.4&deg;C</span>
             </div>
           </div>
         </nav>
 
         {/* Bottom Operational Footer */}
-        <div className="p-3 border-t border-[#26384D] bg-[#0D1726]/90 flex flex-col gap-2 flex-shrink-0 text-xs font-mono">
+        <div className="p-3 border-t border-[#1D3A52] bg-[#0B1928] flex flex-col gap-2 flex-shrink-0 text-xs font-mono">
           {/* TEE Security Chip */}
           {teeStatus && onOpenTeeModal && (
             <button
@@ -427,28 +427,28 @@ export default function SidebarNav({
                 sounds.playClick()
                 onOpenTeeModal()
               }}
-              className="w-full bg-[#111E30] hover:bg-[#16253A] border border-[#26384D] hover:border-[#3B82B6] p-2 rounded-md flex items-center justify-between text-[11px] transition-colors cursor-pointer group"
+              className="w-full bg-[#102337] hover:bg-[#142B40] border border-[#1D3A52] hover:border-[#0E88D3] p-2 rounded-md flex items-center justify-between text-[11px] transition-colors cursor-pointer group"
               title="Click to view TEE Attestation and Confidential Computing parameters"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <span className="w-2 h-2 rounded-full bg-[#C99A2E] animate-gentle-pulse flex-shrink-0" />
-                <span className="text-[#91A0B2] group-hover:text-[#E8EDF2] font-bold truncate">
+                <span className="w-2 h-2 rounded-full bg-[#0E88D3] animate-gentle-pulse flex-shrink-0" />
+                <span className="text-[#9AAFC0] group-hover:text-[#F1F5F9] font-bold truncate">
                   TEE {(teeStatus?.mode || 'simulated').toUpperCase()}
                 </span>
               </div>
-              <span className="text-[10px] text-[#3B82B6] border border-[#3B82B6]/40 px-1 rounded uppercase flex-shrink-0">
+              <span className="text-[10px] text-[#0E88D3] border border-[#0E88D3]/40 px-1 rounded uppercase flex-shrink-0">
                 ENCLAVE
               </span>
             </button>
           )}
 
           {/* Quick Utility Row */}
-          <div className="flex items-center justify-between pt-1 text-[#91A0B2] text-[11px]">
+          <div className="flex items-center justify-between pt-1 text-[#9AAFC0] text-[11px]">
             {/* Audio Toggle */}
             <button
               type="button"
               onClick={toggleSound}
-              className="hover:text-[#E8EDF2] flex items-center gap-1 transition-colors cursor-pointer"
+              className="hover:text-[#F1F5F9] flex items-center gap-1 transition-colors cursor-pointer"
               title="Toggle Audio Feedback"
             >
               <span>{soundOn ? '🔊' : '🔇'}</span>
@@ -463,7 +463,7 @@ export default function SidebarNav({
                   sounds.playClick()
                   onOpenPitchModal()
                 }}
-                className="hover:text-[#C99A2E] transition-colors cursor-pointer"
+                className="hover:text-[#F47216] transition-colors cursor-pointer"
                 title="ISRO Briefing Deck (Press 'P')"
               >
                 DECK [P]
@@ -474,7 +474,7 @@ export default function SidebarNav({
             <button
               type="button"
               onClick={() => handleSelect('settings')}
-              className="hover:text-[#3B82B6] transition-colors cursor-pointer"
+              className="hover:text-[#0E88D3] transition-colors cursor-pointer"
               title="Open System & Security Settings"
             >
               SETTINGS ⚙️

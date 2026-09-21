@@ -315,7 +315,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   // If no component is selected, render empty state (all hooks have been unconditionally called above)
   if (!component) {
     return (
-      <div className="bg-[#071120] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2 flex-1 h-full min-h-[400px]">
+      <div className="bg-[#07111C] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2 flex-1 h-full min-h-[400px]">
         <div className="flex items-center justify-between text-xs">
           <span className="font-mono font-bold text-white flex items-center gap-1.5 text-[11px] uppercase">
             <span className="w-2 h-2 rounded-full bg-white led" />
@@ -323,7 +323,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
           </span>
           <span className="text-[10px] text-slate-400 font-mono">CHANNEL: 24-BIT SIGMA-DELTA ADC</span>
         </div>
-        <div className="flex-1 min-h-[360px] md:min-h-[440px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#050B16] text-slate-400 text-xs font-mono">
+        <div className="flex-1 min-h-[360px] md:min-h-[440px] flex items-center justify-center rounded-lg border border-slate-800/80 bg-[#07111C] text-slate-400 text-xs font-mono">
           [ AWAITING COMPONENT SELECTION TO DISPLAY SILICON OSCILLOSCOPE ]
         </div>
       </div>
@@ -332,7 +332,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
   const isRej = component.status === 'reject'
   const isMon = component.status === 'monitor'
-  const curveColor = isRej ? '#EF4444' : isMon ? '#F59E0B' : '#10B981'
+  const curveColor = isRej ? '#E5484D' : isMon ? '#F2B84B' : '#22A06B'
 
   // Live interpolated readouts for dashboard synchronization
   const finalDelta = (component.v168 ?? 0) - (component.v0 ?? 0)
@@ -360,18 +360,18 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
   }
 
   return (
-    <div className="bg-[#070E1C] border border-slate-800/90 rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none flex-1 h-full w-full min-h-[300px]">
+    <div className="bg-[#07111C] border border-[#1D3A52] rounded-xl p-3 flex flex-col gap-2 shadow-lg select-none flex-1 h-full w-full min-h-[300px]">
       {/* Top Header & Stage Scrubbing Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-800/80 pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-[#1D3A52] pb-2">
         <div className="flex items-center gap-2">
           <span
-            className="w-2.5 h-2.5 rounded-full led"
+            className="w-2.5 h-2.5 rounded-full"
             style={{ backgroundColor: curveColor }}
           />
-          <span className="font-display font-bold text-xs md:text-sm text-white tracking-wider uppercase">
+          <span className="font-display font-bold text-xs md:text-sm text-[#F1F5F9] tracking-wider uppercase">
             GRAPH A &bull; HTOL 168H OSCILLOSCOPE
           </span>
-          <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-200 font-bold">
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#142B40] border border-[#1D3A52] text-[#F1F5F9] font-bold">
             {component.component_id}
           </span>
         </div>
@@ -384,8 +384,8 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
             onClick={() => setZoomMode((z) => (z === 'focus' ? 'full' : 'focus'))}
             className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all border cursor-pointer ${
               zoomMode === 'focus'
-                ? 'bg-[#C99A2E]/25 text-[#C99A2E] border-[#C99A2E]/60 shadow-sm'
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+                ? 'bg-[#0E88D3]/20 text-[#0E88D3] border-[#0E88D3]/60 shadow-sm'
+                : 'bg-[#142B40] text-[#9AAFC0] border-[#1D3A52] hover:text-[#F1F5F9]'
             }`}
             title={zoomMode === 'focus' ? 'Switch to Full Spec Scale (0-50µA)' : 'Focus Zoom on Telemetry Data Curve'}
           >
@@ -393,12 +393,12 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
           </button>
 
           {/* Playback Controls & Speed Toggle */}
-          <div className="flex items-center gap-1.5 bg-[#050914] p-1 rounded-lg border border-slate-800">
+          <div className="flex items-center gap-1.5 bg-[#0B1928] p-1 rounded-lg border border-[#1D3A52]">
             {isSimulating ? (
               <button
                 type="button"
                 onClick={togglePause}
-                className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold hover:bg-amber-500/30 transition-all cursor-pointer"
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/40 text-[10px] font-mono font-bold hover:bg-[#0E88D3]/30 transition-all cursor-pointer"
                 title={isPaused ? 'Resume Simulation' : 'Pause Simulation'}
               >
                 <span>{isPaused ? '▶ RESUME' : '⏸ PAUSE'}</span>
@@ -407,7 +407,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
               <button
                 type="button"
                 onClick={() => startSweepAnimation(true)}
-                className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-white border border-slate-700 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#142B40] hover:bg-[#1D3A52] text-[#0E88D3] hover:text-[#F1F5F9] border border-[#1D3A52] text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm"
                 title="Replay oscilloscope live telemetry sweep"
               >
                 <span>↺</span> REPLAY
@@ -415,7 +415,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
             )}
 
             {/* Speed Selector */}
-            <div className="flex items-center gap-0.5 pl-1 border-l border-slate-700 text-[9.5px] font-mono">
+            <div className="flex items-center gap-0.5 pl-1 border-l border-[#1D3A52] text-[9.5px] font-mono">
               {([0.5, 1, 2] as const).map((spd) => (
                 <button
                   key={spd}
@@ -423,8 +423,8 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
                   onClick={() => setSimSpeed(spd)}
                   className={`px-1.5 py-0.5 rounded ${
                     simSpeed === spd
-                      ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-[#0E88D3]/30 text-[#0E88D3] font-bold border border-[#0E88D3]/50'
+                      : 'text-[#9AAFC0] hover:text-[#F1F5F9]'
                   }`}
                   title={spd === 0.5 ? 'Ultra Slow (16s)' : spd === 1 ? 'Slow Observation (8s)' : 'Fast (4s)'}
                 >
@@ -435,14 +435,14 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
 
             {/* Live Telemetry Progress Pill */}
             {isSimulating && (
-              <span className="text-[9.5px] font-mono font-bold text-emerald-400 px-1 animate-pulse">
+              <span className="text-[9.5px] font-mono font-bold text-[#22A06B] px-1 animate-pulse">
                 {isPaused ? 'PAUSED' : `T+${Math.round(simHour)}h`}
               </span>
             )}
           </div>
 
           {/* Scrub Stage Filters */}
-          <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 text-xs">
+          <div className="flex items-center gap-1 bg-[#07111C] p-1 rounded-lg border border-slate-800 text-xs">
             <span className="text-slate-400 font-mono text-[10px] uppercase mr-1">STAGE:</span>
             {STAGES.map((h) => (
               <button
@@ -465,7 +465,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       {/* Main SVG Chart Canvas with Interactive Manual Line Section & Cursor */}
       <div
         ref={containerRef}
-        className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#040812] w-full flex-1 transition-all duration-300 min-h-[230px] md:min-h-[250px] h-[250px] md:h-[270px]"
+        className="relative rounded-lg overflow-hidden border border-slate-800/80 bg-[#07111C] w-full flex-1 transition-all duration-300 min-h-[230px] md:min-h-[250px] h-[250px] md:h-[270px]"
       >
         <svg
           viewBox={`0 0 ${W} ${H}`}
@@ -517,7 +517,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
             const val = minY + (maxY - minY) * f
             return (
               <g key={f}>
-                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#162238" strokeWidth={0.8} />
+                <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#142B40" strokeWidth={0.8} />
                 <text
                   x={padL - 6}
                   y={y + 3.5}
@@ -540,7 +540,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
                   x2={x}
                   y1={padT}
                   y2={H - padB}
-                  stroke="#152033"
+                  stroke="#142B40"
                   strokeDasharray="2 2"
                   strokeWidth={0.8}
                 />
@@ -593,7 +593,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
             </>
           ) : (
             <g transform={`translate(${W - padR - 195}, ${padT + 4})`}>
-              <rect x="0" y="0" width="190" height="18" rx="4" fill="#111E30" stroke="#EF4444" strokeWidth="0.8" opacity="0.92" />
+              <rect x="0" y="0" width="190" height="18" rx="4" fill="#102337" stroke="#EF4444" strokeWidth="0.8" opacity="0.92" />
               <text x="8" y="12.5" fill="#F87171" fontSize="8" fontFamily="monospace" fontWeight="bold">
                 ▲ SPEC LIMIT {limitVal.toFixed(1)}&mu;A (+{(limitVal - v168).toFixed(1)}&mu;A Margin)
               </text>
@@ -603,16 +603,16 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
           {/* Lot Peer Gaussian Distribution Meter in Top Canvas Space */}
           {zoomMode === 'focus' && (
             <g transform={`translate(${W - padR - 225}, ${padT + 26})`} opacity={0.92}>
-              <rect x="0" y="0" width="220" height="42" rx="5" fill="#070D18" stroke="#26384D" strokeWidth="0.8" />
-              <text x="8" y="12" fill="#91A0B2" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
+              <rect x="0" y="0" width="220" height="42" rx="5" fill="#07111C" stroke="#1D3A52" strokeWidth="0.8" />
+              <text x="8" y="12" fill="#9AAFC0" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
                 LOT STATISTICAL SPREAD (N={component.lot_id || 'LOT'})
               </text>
-              <text x="8" y="24" fill="#C99A2E" fontSize="8" fontFamily="monospace">
+              <text x="8" y="24" fill="#0E88D3" fontSize="8" fontFamily="monospace">
                 &mu;={lotMean.toFixed(1)}&mu;A &bull; &sigma;=&plusmn;{lotStd.toFixed(2)} &bull; z={finalZ != null ? `${finalZ > 0 ? '+' : ''}${finalZ.toFixed(2)}&sigma;` : '--'}
               </text>
               {/* Visual sigma meter */}
-              <rect x="8" y="30" width="204" height="6" rx="3" fill="#111E30" />
-              <rect x="42" y="30" width="136" height="6" rx="2" fill="#3FA66B" opacity={0.35} />
+              <rect x="8" y="30" width="204" height="6" rx="3" fill="#102337" />
+              <rect x="42" y="30" width="136" height="6" rx="2" fill="#22A06B" opacity={0.35} />
               <line x1="110" x2="110" y1="28" y2="38" stroke="#FFFFFF" strokeWidth="1.5" />
               <circle
                 cx={Math.min(206, Math.max(12, 110 + (finalZ || 0) * 32))}
@@ -684,7 +684,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
                   cy={cy}
                   r={isWorstPoint ? 5 : 4}
                   fill={isWorstPoint ? '#EF4444' : curveColor}
-                  stroke="#040812"
+                  stroke="#07111C"
                   strokeWidth={1.5}
                 />
                 <text

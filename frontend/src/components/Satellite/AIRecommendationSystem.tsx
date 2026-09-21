@@ -333,9 +333,9 @@ export default function AIRecommendationSystem({
   }
 
   return (
-    <div className="bg-[#0B1120] border border-slate-700/80 rounded-xl p-5 md:p-6 font-sans text-xs select-none shadow-xl flex flex-col gap-4 w-full flex-1 min-h-0">
+    <div className="bg-[#102337] border border-slate-700/80 rounded-xl p-5 md:p-6 font-sans text-xs select-none shadow-xl flex flex-col gap-4 w-full flex-1 min-h-0">
       {/* ================= HEADER BANNER ================= */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 bg-[#0F172A] -m-5 md:-m-6 p-5 md:p-6 mb-0 rounded-t-xl">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 bg-[#142B40] -m-5 md:-m-6 p-5 md:p-6 mb-0 rounded-t-xl">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white text-2xl shadow-sm">
             <span>🤖</span>
@@ -387,7 +387,7 @@ export default function AIRecommendationSystem({
 
       {/* ================= COMPONENT SUMMARY STRIP ================= */}
       {component && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[#070D1A] border border-slate-800">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[#0B1928] border border-slate-800">
           <div className="min-w-0">
             <span className="text-slate-400 block text-xs uppercase font-semibold">Target Component</span>
             <span className="font-mono text-sm md:text-base font-bold text-white truncate block" title={component.component_id}>
@@ -423,7 +423,7 @@ export default function AIRecommendationSystem({
       )}
 
       {/* ================= PREDICTIVE DEGRADATION FORECAST CALLOUT ================= */}
-      <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      <div className="p-4 rounded-xl bg-[#142B40] border border-slate-700/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
         <div className="flex items-start gap-3">
           <span className="text-amber-400 text-xl mt-0.5">⚠️</span>
           <div>
@@ -436,7 +436,7 @@ export default function AIRecommendationSystem({
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 self-end md:self-center font-mono text-xs md:text-sm text-slate-300 bg-[#070D1A] px-3.5 py-2 rounded-lg border border-slate-800">
+        <div className="flex items-center gap-2.5 self-end md:self-center font-mono text-xs md:text-sm text-slate-300 bg-[#0B1928] px-3.5 py-2 rounded-lg border border-slate-800">
           <span className="text-slate-400 uppercase font-semibold">Physical Failure:</span>
           <span className="text-white font-bold">{profile.failureMechanism.slice(0, 52)}...</span>
         </div>
@@ -487,7 +487,7 @@ export default function AIRecommendationSystem({
           {profile.actions.map((act, idx) => (
             <div
               key={idx}
-              className="p-4 md:p-5 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col justify-between gap-3.5 hover:border-slate-600 transition-colors shadow-sm"
+              className="p-4 md:p-5 rounded-xl bg-[#142B40] border border-slate-700/80 flex flex-col justify-between gap-3.5 hover:border-slate-600 transition-colors shadow-sm"
             >
               <div>
                 <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 mb-3 gap-2">
@@ -512,7 +512,7 @@ export default function AIRecommendationSystem({
                   {act.action}
                 </p>
 
-                <div className="text-xs md:text-sm text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed space-y-1.5 font-sans">
+                <div className="text-xs md:text-sm text-slate-300 bg-[#0B1928] p-3 rounded-lg border border-slate-800 leading-relaxed space-y-1.5 font-sans">
                   <div>
                     <span className="text-slate-100 font-bold">Engineering Rationale: </span>
                     {act.rationale}
@@ -525,7 +525,7 @@ export default function AIRecommendationSystem({
 
               <div className="pt-2.5 border-t border-slate-800 text-xs md:text-sm text-slate-300 font-mono flex flex-wrap items-center justify-between gap-1.5">
                 <span className="text-slate-400 uppercase text-[11px] font-semibold">Timeframe:</span>
-                <span className="text-white font-bold bg-[#070D1A] px-2.5 py-1 rounded-md border border-slate-800 text-xs">
+                <span className="text-white font-bold bg-[#0B1928] px-2.5 py-1 rounded-md border border-slate-800 text-xs">
                   {act.timeframe}
                 </span>
               </div>
@@ -536,7 +536,7 @@ export default function AIRecommendationSystem({
 
       {/* ================= TAB 2: OPERATIONAL MEASURES ================= */}
       {activeTab === 'measures' && (
-        <div className="p-4 md:p-5 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col gap-3.5">
+        <div className="p-4 md:p-5 rounded-xl bg-[#142B40] border border-slate-700/80 flex flex-col gap-3.5">
           <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
             <span className="text-sm md:text-base font-bold text-white uppercase tracking-wide">
               Real-Time In-Flight Operational Measures &amp; Flight Envelope Limits
@@ -548,7 +548,7 @@ export default function AIRecommendationSystem({
             {profile.operationalMeasures.map((measure, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-3"
+                className="p-4 rounded-lg bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-3"
               >
                 <div className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-white/15 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
@@ -570,7 +570,7 @@ export default function AIRecommendationSystem({
 
       {/* ================= TAB 3: MANUFACTURING COUNTERMEASURES ================= */}
       {activeTab === 'manufacturing' && (
-        <div className="p-4 md:p-5 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col gap-3.5">
+        <div className="p-4 md:p-5 rounded-xl bg-[#142B40] border border-slate-700/80 flex flex-col gap-3.5">
           <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
             <span className="text-sm md:text-base font-bold text-white uppercase tracking-wide">
               Supply Chain &amp; Wafer Fabrication Quality Countermeasures
@@ -582,7 +582,7 @@ export default function AIRecommendationSystem({
             {profile.manufacturingCountermeasures.map((cm, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-lg bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-3"
+                className="p-4 rounded-lg bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-3"
               >
                 <div className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
@@ -603,7 +603,7 @@ export default function AIRecommendationSystem({
       )}
 
       {/* ================= INTERACTIVE ACTION EXECUTION BAR ================= */}
-      <div className="p-4 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col gap-3">
+      <div className="p-4 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs md:text-sm text-slate-200">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 led" />

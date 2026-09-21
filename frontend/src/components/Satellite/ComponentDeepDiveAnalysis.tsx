@@ -134,9 +134,9 @@ export default function ComponentDeepDiveAnalysis({
   const risk = Math.round(component.risk_score || (isReject ? 84 : isMonitor ? 48 : 12))
 
   return (
-    <div className="bg-[#0B1120] border border-slate-700/80 rounded-xl p-5 font-sans text-xs select-none animate-fade-in flex flex-col gap-4 shadow-lg">
+    <div className="bg-[#102337] border border-slate-700/80 rounded-xl p-5 font-sans text-xs select-none animate-fade-in flex flex-col gap-4 shadow-lg">
       {/* --- Section Header: Component Identity & Status Badges --- */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-800 bg-[#0F172A] -m-5 p-5 mb-0 rounded-t-xl">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-800 bg-[#142B40] -m-5 p-5 mb-0 rounded-t-xl">
         <div className="flex items-center gap-3.5">
           <span
             className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${
@@ -187,7 +187,7 @@ export default function ComponentDeepDiveAnalysis({
       </div>
 
       {/* --- Section Subtitle Bar --- */}
-      <div className="flex items-center justify-between text-xs text-slate-300 bg-[#070D1A] px-3.5 py-2 rounded-lg border border-slate-800">
+      <div className="flex items-center justify-between text-xs text-slate-300 bg-[#0B1928] px-3.5 py-2 rounded-lg border border-slate-800">
         <span className="text-slate-200 font-semibold tracking-wide flex items-center gap-2">
           <span>📋</span> Engineering Root Cause, Telemetry Justification &amp; Corrective Disposition
         </span>
@@ -199,7 +199,7 @@ export default function ComponentDeepDiveAnalysis({
       {/* --- 4 Distinct Information Sections --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* ================= SECTION 1: PHYSICAL ROOT CAUSE ================= */}
-        <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-700/80 flex flex-col justify-between gap-3">
+        <div className="p-4 rounded-xl bg-[#142B40] border border-slate-700/80 flex flex-col justify-between gap-3">
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2.5">
               <div className="flex items-center gap-2 text-slate-100 font-semibold text-xs">
@@ -215,7 +215,7 @@ export default function ComponentDeepDiveAnalysis({
               {domain.cause}
             </p>
 
-            <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed">
+            <div className="text-[11.5px] text-slate-300 bg-[#0B1928] p-3 rounded-lg border border-slate-800 leading-relaxed">
               <span className="text-slate-400 font-semibold block mb-1">Underlying Degradation Mechanism:</span>
               {domain.mechanism}
             </div>
@@ -242,7 +242,7 @@ export default function ComponentDeepDiveAnalysis({
 
             {/* Metrics Breakdown Grid with LARGE READABLE NUMBERS */}
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800">
+              <div className="bg-[#0B1928] p-2.5 rounded-lg border border-slate-800">
                 <span className="text-slate-400 block text-[10px] uppercase font-medium">Lot z-Score</span>
                 <div className={`font-mono text-lg font-bold mt-0.5 ${Math.abs(parseFloat(zScore)) > 2.5 ? 'text-rose-400' : 'text-amber-400'}`}>
                   {parseFloat(zScore) > 0 ? '+' : ''}{zScore}&sigma;
@@ -250,7 +250,7 @@ export default function ComponentDeepDiveAnalysis({
                 <span className="text-slate-500 text-[9.5px] block mt-0.5">Divergence from lot median</span>
               </div>
 
-              <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800">
+              <div className="bg-[#0B1928] p-2.5 rounded-lg border border-slate-800">
                 <span className="text-slate-400 block text-[10px] uppercase font-medium">168h Drift Extrapolation</span>
                 <div className="font-mono text-lg font-bold text-rose-400 mt-0.5">
                   +{driftPct}%
@@ -258,7 +258,7 @@ export default function ComponentDeepDiveAnalysis({
                 <span className="text-slate-500 text-[9.5px] block mt-0.5">From 0h baseline burn-in</span>
               </div>
 
-              <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800">
+              <div className="bg-[#0B1928] p-2.5 rounded-lg border border-slate-800">
                 <span className="text-slate-400 block text-[10px] uppercase font-medium">Measured 168h Value</span>
                 <div className="font-mono text-lg font-bold text-white mt-0.5">
                   {v168} <span className="text-xs font-normal text-slate-400">&micro;A</span>
@@ -266,7 +266,7 @@ export default function ComponentDeepDiveAnalysis({
                 <span className="text-slate-500 text-[9.5px] block mt-0.5">Datasheet limit: {limit} &micro;A</span>
               </div>
 
-              <div className="bg-[#070D1A] p-2.5 rounded-lg border border-slate-800">
+              <div className="bg-[#0B1928] p-2.5 rounded-lg border border-slate-800">
                 <span className="text-slate-400 block text-[10px] uppercase font-medium">Projected Future (264h)</span>
                 <div className={`font-mono text-lg font-bold mt-0.5 ${parseFloat(predFuture) > parseFloat(limit) ? 'text-rose-400' : 'text-amber-300'}`}>
                   {predFuture} <span className="text-xs font-normal text-slate-400">&micro;A</span>
@@ -277,7 +277,7 @@ export default function ComponentDeepDiveAnalysis({
               </div>
             </div>
 
-            <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed">
+            <div className="text-[11.5px] text-slate-300 bg-[#0B1928] p-3 rounded-lg border border-slate-800 leading-relaxed">
               <span className="text-white font-semibold">Decision Justification: </span>
               {component.traditional_decision === 'PASS' && isReject ? (
                 <span>
@@ -314,7 +314,7 @@ export default function ComponentDeepDiveAnalysis({
               {domain.satelliteImpact}
             </p>
 
-            <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed">
+            <div className="text-[11.5px] text-slate-300 bg-[#0B1928] p-3 rounded-lg border border-slate-800 leading-relaxed">
               <span className="text-amber-300 font-semibold block mb-1">Worst-Case Orbit Mission Consequence:</span>
               {domain.missionConsequence}
             </div>
@@ -343,7 +343,7 @@ export default function ComponentDeepDiveAnalysis({
               {domain.improvement}
             </p>
 
-            <div className="text-[11.5px] text-slate-300 bg-[#070D1A] p-3 rounded-lg border border-slate-800 leading-relaxed mb-3">
+            <div className="text-[11.5px] text-slate-300 bg-[#0B1928] p-3 rounded-lg border border-slate-800 leading-relaxed mb-3">
               <span className="text-emerald-400 font-semibold block mb-1">Immediate Spacecraft Failover Protocol:</span>
               {domain.mitigation}
             </div>

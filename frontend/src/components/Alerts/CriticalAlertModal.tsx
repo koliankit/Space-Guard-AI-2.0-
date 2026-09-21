@@ -9,7 +9,7 @@ export default function CriticalAlertModal({
 }) {
   return (
     <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-      <div className="w-[460px] max-w-[94vw] bg-[#0B1120] border-2 border-reject/80 rounded-lg p-6 shadow-alert-glow modal-anim relative font-mono">
+      <div className="w-[460px] max-w-[94vw] bg-[#102337] border-2 border-reject/80 rounded-lg p-6 shadow-alert-glow modal-anim relative font-mono">
         <button
           type="button"
           onClick={onAcknowledge}

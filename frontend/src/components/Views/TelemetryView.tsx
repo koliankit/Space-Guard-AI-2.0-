@@ -31,22 +31,22 @@ export default function TelemetryView({
     null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1 min-h-full">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#07111C] text-[#F1F5F9] font-sans flex-1 min-h-full">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1D3A52] pb-3 bg-[#0B1928]/60 p-3 md:p-4 rounded-xl">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded bg-[#3B82B6]/20 text-[#3B82B6] border border-[#3B82B6]/40 font-mono font-bold text-xs uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold text-xs uppercase tracking-wider">
               TELEMETRY DAQ
             </span>
-            <span className="text-xs font-mono text-[#91A0B2]">
+            <span className="text-xs font-mono text-[#9AAFC0]">
               24-BIT PARAMETRIC WAVEFORM OSCILLOSCOPE
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-mono font-black text-[#E8EDF2] tracking-wide mt-1">
+          <h1 className="text-xl md:text-2xl font-mono font-black text-[#F1F5F9] tracking-wide mt-1">
             Flight Telemetry Waveform Dashboard
           </h1>
-          <p className="text-xs text-[#91A0B2] mt-0.5 max-w-3xl">
+          <p className="text-xs text-[#9AAFC0] mt-0.5 max-w-3xl">
             Real-time parametric waveform oscilloscope tracking reverse leakage drift across burn-in milestones.
             Features reticle probe inspections, interactive timebase scaling, and multi-channel HUD readouts.
           </p>
@@ -54,15 +54,15 @@ export default function TelemetryView({
 
         {/* Oscilloscope status */}
         <div className="flex items-center gap-2 text-xs font-mono">
-          <span className="w-2 h-2 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
-          <span className="text-[#91A0B2]">SAMPLING: 24-BIT SIGMA-DELTA @ 125°C</span>
+          <span className="w-2 h-2 rounded-full bg-[#22A06B] animate-gentle-pulse" />
+          <span className="text-[#9AAFC0]">SAMPLING: 24-BIT SIGMA-DELTA @ 125°C</span>
         </div>
       </div>
 
       {/* Main Content Layout: Pinned Sidebar Component Monitor + Full Telemetry Chart */}
       <div className="flex flex-col xl:flex-row gap-5 items-stretch flex-1 min-h-0 w-full">
         {/* Component Monitor Selector */}
-        <div className="w-full xl:w-[360px] 2xl:w-[400px] flex-shrink-0 flex flex-col rounded-xl overflow-hidden border border-[#26384D] bg-[#111E30] shadow-md h-full">
+        <div className="w-full xl:w-[360px] 2xl:w-[400px] flex-shrink-0 flex flex-col rounded-xl overflow-hidden border border-[#1D3A52] bg-[#102337] shadow-md h-full">
           <ComponentMonitor
             subsystems={subsystems}
             components={components}

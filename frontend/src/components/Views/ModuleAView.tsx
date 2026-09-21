@@ -25,22 +25,22 @@ export default function ModuleAView({
   const isScreened = mission !== null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1 min-h-full">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#07111C] text-[#F1F5F9] font-sans flex-1 min-h-full">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1D3A52] pb-3 bg-[#0B1928]/60 p-3 md:p-4 rounded-xl">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded bg-[#C99A2E]/20 text-[#C99A2E] border border-[#C99A2E]/40 font-mono font-bold text-xs uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded bg-[#0E88D3]/15 text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold text-xs uppercase tracking-wider">
               STAGE 2
             </span>
-            <span className="text-xs font-mono text-[#91A0B2]">
+            <span className="text-xs font-mono text-[#9AAFC0]">
               DYNAMIC LOT-RELATIVE ANOMALY DETECTION
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-mono font-black text-[#E8EDF2] tracking-wide mt-1">
+          <h1 className="text-xl md:text-2xl font-mono font-black text-[#F1F5F9] tracking-wide mt-1">
             Module A — Lot-Relative Anomaly Detection Dashboard
           </h1>
-          <p className="text-xs text-[#91A0B2] mt-0.5 max-w-3xl">
+          <p className="text-xs text-[#9AAFC0] mt-0.5 max-w-3xl">
             Detects subtle silicon micro-defects and outliers that stay within absolute datasheet limits
             but exhibit abnormal variance relative to their production wafer lot baseline.
           </p>
@@ -51,7 +51,7 @@ export default function ModuleAView({
           <button
             type="button"
             onClick={() => onSelectStage('module_b')}
-            className="px-4 py-2.5 rounded-lg bg-[#C99A2E] hover:bg-[#D6A33A] text-[#070D18] font-mono font-bold text-xs md:text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-[#C99A2E]/10"
+            className="px-4 py-2.5 rounded-lg bg-[#F47216] hover:bg-[#FA8838] text-white font-mono font-bold text-xs md:text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-none"
           >
             <span>Proceed to Module B: Future Drift</span>
             <span>&rarr;</span>

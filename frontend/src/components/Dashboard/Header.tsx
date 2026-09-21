@@ -90,7 +90,7 @@ export default function Header({
   }
 
   return (
-    <header className="border-b border-[#26384D] bg-[#070D18] sticky top-0 z-40 font-sans select-none flex-shrink-0">
+    <header className="border-b border-[#1D3A52] bg-[#07111C] sticky top-0 z-40 font-sans select-none flex-shrink-0">
       <div className="flex items-center justify-between px-3 md:px-5 py-2 gap-2.5 w-full">
         {/* Left Section: Mobile Menu, ISRO Crest & SpaceGuard AI Brand */}
         <div className="flex items-center gap-3 min-w-0">
@@ -98,27 +98,27 @@ export default function Header({
             <button
               type="button"
               onClick={onToggleSidebar}
-              className="lg:hidden p-1.5 rounded-lg bg-[#111E30] border border-[#26384D] text-[#E8EDF2] hover:text-[#C99A2E] hover:border-[#C99A2E] transition-colors flex-shrink-0 cursor-pointer"
+              className="lg:hidden p-1.5 rounded-lg bg-[#102337] border border-[#1D3A52] text-[#F1F5F9] hover:text-[#0E88D3] hover:border-[#0E88D3] transition-colors flex-shrink-0 cursor-pointer"
               title="Toggle Navigation Menu"
             >
               <span className="text-sm">☰</span>
             </button>
           )}
 
-          <div className="w-8 h-8 rounded-lg border border-[#C99A2E]/50 bg-gradient-to-br from-[#C99A2E]/25 to-[#3B82B6]/25 flex flex-col items-center justify-center text-white font-display font-bold text-xs shadow-isro flex-shrink-0">
-            <span className="tracking-tight text-[11px] text-[#C99A2E] font-black leading-none">ISRO</span>
-            <span className="text-[7.5px] text-[#91A0B2] font-mono tracking-widest leading-none mt-0.5">MOX</span>
+          <div className="w-8 h-8 rounded-lg border border-[#F47216]/50 bg-gradient-to-br from-[#F47216]/20 to-[#0E88D3]/20 flex flex-col items-center justify-center text-white font-display font-bold text-xs shadow-orange flex-shrink-0">
+            <span className="tracking-tight text-[11px] text-[#F47216] font-black leading-none">ISRO</span>
+            <span className="text-[7.5px] text-[#9AAFC0] font-mono tracking-widest leading-none mt-0.5">MOX</span>
           </div>
 
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm md:text-base font-display font-black tracking-wider text-[#E8EDF2] uppercase truncate">
-                SpaceGuard <span className="text-[#C99A2E]">AI</span>
+              <span className="text-sm md:text-base font-display font-black tracking-wider text-[#F1F5F9] uppercase truncate">
+                SpaceGuard <span className="text-[#F47216]">AI</span>
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-[#111E30] text-[#91A0B2] border border-[#26384D] font-mono font-medium hidden sm:inline-block">
+              <span className="text-[10px] px-2 py-0.5 rounded bg-[#102337] text-[#9AAFC0] border border-[#1D3A52] font-mono font-medium hidden sm:inline-block">
                 SDSC SHAR // LCC-01
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-[#0D1726] text-[#C99A2E] border border-[#C99A2E]/40 font-mono font-bold truncate max-w-[160px] md:max-w-xs hidden md:inline-block">
+              <span className="text-[10px] px-2 py-0.5 rounded bg-[#0B1928] text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold truncate max-w-[160px] md:max-w-xs hidden md:inline-block">
                 {activeMissionName}
               </span>
             </div>
@@ -127,21 +127,21 @@ export default function Header({
 
         {/* Center Section: Telemetry Clocks & Ground Station */}
         <div className="hidden md:flex items-center gap-2 text-xs font-mono flex-shrink-0">
-          <div className="px-2.5 py-1 rounded-lg bg-[#0D1726] border border-[#26384D] flex items-center gap-1.5 shadow-sm">
-            <span className="text-[10px] text-[#91A0B2] uppercase font-semibold">IST</span>
-            <span className="font-bold text-[#E8EDF2] tabular-nums text-xs">{istTime || '16:15:00'}</span>
+          <div className="px-2.5 py-1 rounded-lg bg-[#0B1928] border border-[#1D3A52] flex items-center gap-1.5 shadow-sm">
+            <span className="text-[10px] text-[#9AAFC0] uppercase font-semibold">IST</span>
+            <span className="font-bold text-[#F1F5F9] tabular-nums text-xs">{istTime || '16:15:00'}</span>
           </div>
 
-          <div className="px-2.5 py-1 rounded-lg bg-[#0D1726] border border-[#C99A2E]/40 flex items-center gap-1.5 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-[#C99A2E] led" />
-            <span className="text-[10px] text-[#C99A2E] uppercase font-bold">MET</span>
-            <span className="font-bold text-[#C99A2E] tabular-nums text-xs">{formatMet(metSeconds)}</span>
+          <div className="px-2.5 py-1 rounded-lg bg-[#0B1928] border border-[#0E88D3]/40 flex items-center gap-1.5 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#0E88D3] led" />
+            <span className="text-[10px] text-[#0E88D3] uppercase font-bold">MET</span>
+            <span className="font-bold text-[#0E88D3] tabular-nums text-xs">{formatMet(metSeconds)}</span>
           </div>
 
-          <div className="px-2.5 py-1 rounded-lg bg-[#0D1726] border border-[#26384D] items-center gap-1.5 hidden xl:flex shadow-sm">
-            <span className={`w-2 h-2 rounded-full ${streamActive ? 'bg-[#3FA66B] led' : 'bg-[#5A6E85]'}`} />
-            <span className="text-[10px] text-[#91A0B2] font-semibold">BYL-32 DSN</span>
-            <span className={`text-xs font-bold ${streamActive ? 'text-[#3FA66B]' : 'text-[#5A6E85]'}`}>
+          <div className="px-2.5 py-1 rounded-lg bg-[#0B1928] border border-[#1D3A52] items-center gap-1.5 hidden xl:flex shadow-sm">
+            <span className={`w-2 h-2 rounded-full ${streamActive ? 'bg-[#22A06B] led' : 'bg-[#6F8495]'}`} />
+            <span className="text-[10px] text-[#9AAFC0] font-semibold">BYL-32 DSN</span>
+            <span className={`text-xs font-bold ${streamActive ? 'text-[#22A06B]' : 'text-[#6F8495]'}`}>
               {streamActive ? 'CARRIER LOCK' : 'STANDBY'}
             </span>
           </div>
@@ -151,12 +151,12 @@ export default function Header({
         <div className="flex items-center gap-2 text-xs font-mono flex-shrink-0">
           {/* Active Dataset Status & Run Button */}
           {totalComponents > 0 && (
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#111E30] border border-[#26384D]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3FA66B]" />
-              <span className="text-[#E8EDF2] font-bold">{totalComponents}</span>
-              <span className="text-[#91A0B2] text-[10.5px]">PARTS</span>
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#102337] border border-[#1D3A52]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22A06B]" />
+              <span className="text-[#F1F5F9] font-bold">{totalComponents}</span>
+              <span className="text-[#9AAFC0] text-[10.5px]">PARTS</span>
               {rejectCount > 0 && (
-                <span className="ml-1 px-1.5 py-0.2 rounded bg-[#D94B5B] text-white text-[10px] font-black">
+                <span className="ml-1 px-1.5 py-0.2 rounded bg-[#E5484D] text-white text-[10px] font-black">
                   {rejectCount} REJ
                 </span>
               )}
@@ -172,7 +172,7 @@ export default function Header({
                 onRunScreening()
               }}
               disabled={running}
-              className="px-3 py-1 rounded-lg bg-gradient-to-r from-[#C99A2E] to-[#D6A33A] text-slate-950 font-display font-black text-xs hover:brightness-110 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg bg-[#F47216] hover:bg-[#FA8838] text-[#07111C] font-display font-black text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-orange disabled:opacity-50"
               title="Execute SpaceGuard AI Silicon Screening Pipeline"
             >
               <span>{running ? '⏳' : '⚡'}</span>
@@ -189,20 +189,18 @@ export default function Header({
             }}
             className={`px-2.5 py-1 rounded-lg border transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm select-none ${
               !teeStatus?.enabled
-                ? 'border-[#26384D] bg-[#0D1726] text-[#91A0B2] hover:border-[#3B82B6] hover:text-[#E8EDF2]'
+                ? 'border-[#1D3A52] bg-[#0B1928] text-[#9AAFC0] hover:border-[#0E88D3] hover:text-[#F1F5F9]'
                 : teeStatus.mode === 'simulation'
-                ? 'border-[#C99A2E]/50 bg-[#C99A2E]/10 text-[#C99A2E] hover:bg-[#C99A2E]/20'
-                : 'border-[#3B82B6]/50 bg-[#3B82B6]/10 text-[#3B82B6] hover:bg-[#3B82B6]/20'
+                ? 'border-[#0E88D3]/50 bg-[#0E88D3]/10 text-[#0E88D3] hover:bg-[#0E88D3]/20'
+                : 'border-[#0E88D3]/50 bg-[#0E88D3]/15 text-[#0E88D3] hover:bg-[#0E88D3]/25'
             }`}
             title="Inspect TEE Security Enclave Status & Cryptographic Attestation"
           >
             <span
               className={`w-2 h-2 rounded-full ${
                 !teeStatus?.enabled
-                  ? 'border border-[#5A6E85] bg-transparent'
-                  : teeStatus.mode === 'simulation'
-                  ? 'bg-[#C99A2E] led'
-                  : 'bg-[#3B82B6] led'
+                  ? 'border border-[#6F8495] bg-transparent'
+                  : 'bg-[#0E88D3] led'
               }`}
             />
             <span className="text-[11px] font-mono font-bold tracking-wide">
@@ -218,7 +216,7 @@ export default function Header({
                 sounds.playPing()
                 onOpenPitchModal()
               }}
-              className="text-xs font-sans font-semibold px-2.5 py-1 rounded-lg border border-[#26384D] bg-[#111E30] text-[#E8EDF2] hover:border-[#C99A2E]/70 hover:text-[#C99A2E] transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="text-xs font-sans font-semibold px-2.5 py-1 rounded-lg border border-[#1D3A52] bg-[#102337] text-[#F1F5F9] hover:border-[#0E88D3] hover:text-[#0E88D3] transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
               title="View Official ISRO Briefing Deck (Press 'P')"
             >
               <span>📑</span>
@@ -234,7 +232,7 @@ export default function Header({
                 sounds.playClick()
                 onResetWorkflow()
               }}
-              className="text-xs font-mono font-bold px-2 py-1 rounded-lg border border-[#D94B5B]/40 bg-[#D94B5B]/15 text-[#D94B5B] hover:bg-[#D94B5B]/25 hover:text-white transition-colors flex items-center gap-1 cursor-pointer shadow-sm"
+              className="text-xs font-mono font-bold px-2 py-1 rounded-lg border border-[#E5484D]/40 bg-[#E5484D]/15 text-[#E5484D] hover:bg-[#E5484D]/25 hover:text-white transition-colors flex items-center gap-1 cursor-pointer shadow-sm"
               title="Reset flight telemetry data"
             >
               <span>🔄</span>
@@ -251,7 +249,7 @@ export default function Header({
                 setSoundOn(newState)
                 if (newState) sounds.playPing()
               }}
-              className="p-1.5 rounded-lg border border-[#26384D] bg-[#0D1726] text-[#91A0B2] hover:text-[#E8EDF2] hover:border-[#3B82B6] text-xs flex items-center justify-center transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#1D3A52] bg-[#0B1928] text-[#9AAFC0] hover:text-[#F1F5F9] hover:border-[#0E88D3] text-xs flex items-center justify-center transition-colors cursor-pointer"
               title="Toggle Audio Feedback"
             >
               <span>{soundOn ? '🔊' : '🔇'}</span>
@@ -267,7 +265,7 @@ export default function Header({
                   document.exitFullscreen().catch(() => {})
                 }
               }}
-              className="p-1.5 rounded-lg border border-[#26384D] bg-[#0D1726] text-[#91A0B2] hover:text-[#E8EDF2] hover:border-[#3B82B6] text-xs flex items-center justify-center transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#1D3A52] bg-[#0B1928] text-[#9AAFC0] hover:text-[#F1F5F9] hover:border-[#0E88D3] text-xs flex items-center justify-center transition-colors cursor-pointer"
               title="Toggle Fullscreen"
             >
               <span>⛶</span>

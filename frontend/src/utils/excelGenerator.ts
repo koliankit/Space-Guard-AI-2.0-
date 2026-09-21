@@ -64,15 +64,15 @@ export function generateExcelReport(
       <g transform="translate(160, 60)" font-family="'Times New Roman', Times, serif" font-size="10">
         <!-- Safe -->
         <rect x="0" y="0" width="12" height="12" rx="2" fill="#10B981"/>
-        <text x="18" y="10" fill="#0F172A" font-weight="bold">Safe: ${safe.length} (${safePct}%)</text>
+        <text x="18" y="10" fill="#142B40" font-weight="bold">Safe: ${safe.length} (${safePct}%)</text>
         
         <!-- Monitor -->
         <rect x="0" y="24" width="12" height="12" rx="2" fill="#F59E0B"/>
-        <text x="18" y="34" fill="#0F172A" font-weight="bold">Monitor: ${monitor.length} (${monPct}%)</text>
+        <text x="18" y="34" fill="#142B40" font-weight="bold">Monitor: ${monitor.length} (${monPct}%)</text>
         
         <!-- Reject -->
         <rect x="0" y="48" width="12" height="12" rx="2" fill="#EF4444"/>
-        <text x="18" y="58" fill="#0F172A" font-weight="bold">Reject: ${reject.length} (${rejPct}%)</text>
+        <text x="18" y="58" fill="#142B40" font-weight="bold">Reject: ${reject.length} (${rejPct}%)</text>
       </g>
     </svg>
   `.trim()
@@ -85,7 +85,7 @@ export function generateExcelReport(
         body, table, td, th {
           font-family: 'Times New Roman', Times, serif;
           font-size: 11pt;
-          color: #0F172A;
+          color: #142B40;
         }
         .header-title {
           font-size: 18pt;
@@ -341,7 +341,7 @@ export function generateExcelReport(
                 <td style="color: #64748B;">${part.lot_id}</td>
                 <td style="text-align: right;">${part.v0.toFixed(2)} &mu;A</td>
                 <td style="text-align: right;">${part.v24.toFixed(2)} &mu;A</td>
-                <td style="text-align: right; font-weight: bold; color: ${isRej ? '#C5221F' : '#0F172A'};">${part.v168.toFixed(2)} &mu;A</td>
+                <td style="text-align: right; font-weight: bold; color: ${isRej ? '#C5221F' : '#142B40'};">${part.v168.toFixed(2)} &mu;A</td>
                 <td style="text-align: right; color: #64748B;">${part.limit_ua.toFixed(0)} &mu;A</td>
                 <td style="text-align: right;">${part.lot_mean != null ? part.lot_mean.toFixed(2) + ' &mu;A' : '--'}</td>
                 <td style="text-align: right; font-weight: bold; color: ${Math.abs(part.z168) >= 3 ? '#C5221F' : Math.abs(part.z168) >= 2 ? '#B06000' : '#137333'};">${zStr}</td>

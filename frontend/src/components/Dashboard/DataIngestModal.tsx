@@ -87,9 +87,9 @@ export default function DataIngestModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in font-sans">
-      <div className="relative w-full max-w-2xl bg-[#0F172A] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
+      <div className="relative w-full max-w-2xl bg-[#142B40] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-[#0B1120]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-[#102337]">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-white" />
@@ -113,7 +113,7 @@ export default function DataIngestModal({
         </div>
 
         {/* Method Switcher Tabs */}
-        <div className="grid grid-cols-3 bg-[#070D1A] border-b border-slate-800 p-1 text-xs font-mono">
+        <div className="grid grid-cols-3 bg-[#0B1928] border-b border-slate-800 p-1 text-xs font-mono">
           <button
             type="button"
             onClick={() => setActiveTab('upload')}
@@ -213,7 +213,7 @@ export default function DataIngestModal({
                 onChange={(e) => setPastedText(e.target.value)}
                 placeholder="component_id,lot_id,subsystem,0h,24h,96h,168h,static_limit_ua&#10;FC-ASIC-088,LOT-01,FC,12.4,14.8,22.1,38.9,50.0&#10;..."
                 rows={10}
-                className="w-full bg-[#050B16] border border-slate-700 rounded-xl p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-white leading-relaxed"
+                className="w-full bg-[#07111C] border border-slate-700 rounded-xl p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-white leading-relaxed"
               />
 
               <button
@@ -274,7 +274,7 @@ export default function DataIngestModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-slate-800 bg-[#0B1120] flex items-center justify-between text-xs text-slate-400">
+        <div className="px-6 py-3 border-t border-slate-800 bg-[#102337] flex items-center justify-between text-xs text-slate-400">
           <span>MIL-STD-883 Method 1005 Compliant</span>
           <button
             type="button"

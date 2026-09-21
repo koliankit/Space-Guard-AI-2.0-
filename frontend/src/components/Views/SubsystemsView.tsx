@@ -173,7 +173,7 @@ export default function SubsystemsView({
 
         {/* Classification Mode Switcher */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-[#070D1A] border border-slate-700/80 rounded-lg p-0.5">
+          <div className="flex items-center bg-[#0B1928] border border-slate-700/80 rounded-lg p-0.5">
             <button
               type="button"
               onClick={() => setViewMode('lots')}
@@ -253,7 +253,7 @@ export default function SubsystemsView({
                   </div>
 
                   {/* Lot Statistical Specs */}
-                  <div className="space-y-1 text-[10px] bg-[#070D1A] p-2 rounded-lg border border-slate-800/80 mb-2.5 font-mono">
+                  <div className="space-y-1 text-[10px] bg-[#0B1928] p-2 rounded-lg border border-slate-800/80 mb-2.5 font-mono">
                     <div className="flex justify-between">
                       <span className="text-slate-400 font-sans">Sample Size:</span>
                       <span className="text-slate-100 font-bold">{lot.parts.length} components</span>
@@ -318,7 +318,7 @@ export default function SubsystemsView({
                               ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/40 font-bold'
                               : c.status === 'monitor'
                               ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/40'
-                              : 'bg-[#070D1A] text-slate-300 border-slate-800 hover:border-amber-500/60 hover:text-white'
+                              : 'bg-[#0B1928] text-slate-300 border-slate-800 hover:border-amber-500/60 hover:text-white'
                           }`}
                           title={`Click to inspect component ${c.component_id} [${c.subsystem}]`}
                         >
@@ -408,7 +408,7 @@ export default function SubsystemsView({
                   </div>
 
                   {/* Technical Specs */}
-                  <div className="space-y-1 text-[10px] bg-[#070D1A] p-2 rounded-lg border border-slate-800/80 mb-2.5 font-mono">
+                  <div className="space-y-1 text-[10px] bg-[#0B1928] p-2 rounded-lg border border-slate-800/80 mb-2.5 font-mono">
                     <div className="flex justify-between">
                       <span className="text-slate-400 font-sans">Redundancy:</span>
                       <span className="text-slate-200 font-semibold truncate max-w-[140px]" title={details.redundancy}>
@@ -438,7 +438,7 @@ export default function SubsystemsView({
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {details.subComponents.map((item, idx) => (
-                        <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-[#070D1A] text-slate-300 border border-slate-800 font-mono">
+                        <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-[#0B1928] text-slate-300 border border-slate-800 font-mono">
                           {item}
                         </span>
                       ))}

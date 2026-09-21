@@ -317,7 +317,7 @@ export default function OrbitalTrackingView() {
             </div>
           </div>
 
-          <div className="mt-4 p-2.5 rounded-lg bg-[#0F172A] border border-amber-500/30 text-[10px]">
+          <div className="mt-4 p-2.5 rounded-lg bg-[#142B40] border border-amber-500/30 text-[10px]">
             <div className="text-amber-400 font-bold mb-1 uppercase">Next Ground Station Pass:</div>
             <div className="text-slate-200">
               <b>Bengaluru ISTRAC NOCC</b> &bull; AOS in <span className="text-emerald-400 font-bold">04m 18s</span> &bull; Max Elevation: 74&deg;
@@ -340,7 +340,7 @@ export default function OrbitalTrackingView() {
                   ? 'bg-amber-500/15 border-amber-500/60 text-white shadow-sm'
                   : gs.status === 'ACQUIRING'
                   ? 'bg-emerald-500/15 border-emerald-500/50 text-white'
-                  : 'bg-[#070D1A] border-slate-800 text-slate-400'
+                  : 'bg-[#0B1928] border-slate-800 text-slate-400'
               }`}
             >
               <div className="flex items-center justify-between font-bold">

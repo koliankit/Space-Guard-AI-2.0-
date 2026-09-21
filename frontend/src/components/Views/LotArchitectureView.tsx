@@ -210,9 +210,9 @@ export default function LotArchitectureView({
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-[#070D18] text-[#E8EDF2] font-sans p-3 md:p-5 gap-4 select-none min-h-full w-full">
+    <div className="flex flex-col flex-1 bg-[#07111C] text-[#F1F5F9] font-sans p-3 md:p-5 gap-4 select-none min-h-full w-full">
       {/* Top Banner: Header and Key Metrics */}
-      <div className="bg-[#0B1120] border border-slate-800 rounded-xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-[#102337] border border-slate-800 rounded-xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl text-amber-400 shadow-inner">
             📦
@@ -234,25 +234,25 @@ export default function LotArchitectureView({
 
         {/* Global Summary Metric Cards */}
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 text-center min-w-[100px]">
+          <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-slate-800 text-center min-w-[100px]">
             <div className="text-[10px] text-slate-400 uppercase font-semibold">Total Lots</div>
             <div className="text-base font-bold font-mono text-amber-400 mt-0.5">{totalLots}</div>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-slate-800 text-center min-w-[110px]">
+          <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-slate-800 text-center min-w-[110px]">
             <div className="text-[10px] text-slate-400 uppercase font-semibold">Total Parts</div>
             <div className="text-base font-bold font-mono text-white mt-0.5">{totalComponents}</div>
           </div>
           {isScreened ? (
             <>
-              <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-emerald-500/30 text-center min-w-[90px]">
+              <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-emerald-500/30 text-center min-w-[90px]">
                 <div className="text-[10px] text-emerald-400 uppercase font-semibold">Flight Safe</div>
                 <div className="text-base font-bold font-mono text-emerald-300 mt-0.5">{totalSafe}</div>
               </div>
-              <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-amber-500/30 text-center min-w-[90px]">
+              <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-amber-500/30 text-center min-w-[90px]">
                 <div className="text-[10px] text-amber-400 uppercase font-semibold">Monitor</div>
                 <div className="text-base font-bold font-mono text-amber-300 mt-0.5">{totalMonitors}</div>
               </div>
-              <div className="px-3 py-1.5 rounded-lg bg-[#070D1A] border border-rose-500/30 text-center min-w-[100px]">
+              <div className="px-3 py-1.5 rounded-lg bg-[#0B1928] border border-rose-500/30 text-center min-w-[100px]">
                 <div className="text-[10px] text-rose-400 uppercase font-semibold">Quarantine</div>
                 <div className="text-base font-bold font-mono text-rose-400 mt-0.5">{totalRejects}</div>
               </div>
@@ -287,7 +287,7 @@ export default function LotArchitectureView({
         {/* Left Column: Qualification Lots Grid + AI Recommendation System */}
         <div className="flex flex-col gap-4 w-full lg:col-span-4 xl:col-span-4 h-full">
           <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-            <div className="bg-[#0F172A] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
+            <div className="bg-[#142B40] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-display flex items-center gap-2">
                 <span>📦</span> Qualification Lots ({lotGroups.length})
               </span>
@@ -318,7 +318,7 @@ export default function LotArchitectureView({
                           ? 'bg-amber-950/30 border-amber-500 shadow-md ring-1 ring-amber-400/50'
                           : isRej
                           ? 'bg-[#150A10] border-rose-900/50 hover:border-rose-700 hover:bg-[#1A0C14]'
-                          : 'bg-[#070D1A] border-slate-800 hover:border-slate-700 hover:bg-[#0D162B]'
+                          : 'bg-[#0B1928] border-slate-800 hover:border-slate-700 hover:bg-[#0D162B]'
                       }`}
                     >
                       {/* Header: Lot ID and Status Badge */}
@@ -428,7 +428,7 @@ export default function LotArchitectureView({
           {activeLot ? (
             <>
               {/* Active Lot Header & Location Allocation Summary */}
-              <div className="bg-[#0F172A] p-4 border-b border-slate-800 flex flex-col gap-3">
+              <div className="bg-[#142B40] p-4 border-b border-slate-800 flex flex-col gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2.5 flex-wrap">
@@ -460,7 +460,7 @@ export default function LotArchitectureView({
                     <button
                       type="button"
                       onClick={handleExportLotCSV}
-                      className="px-3.5 py-1.5 rounded-lg border border-slate-600 bg-[#070D1A] text-slate-100 hover:text-white hover:border-slate-400 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+                      className="px-3.5 py-1.5 rounded-lg border border-slate-600 bg-[#0B1928] text-slate-100 hover:text-white hover:border-slate-400 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
                       title="Download CSV report of components in this lot"
                     >
                       <span>📥</span> Export Lot CSV
@@ -469,7 +469,7 @@ export default function LotArchitectureView({
                 </div>
 
                 {/* Subsystem Location Allocation Breakdown Pills */}
-                <div className="bg-[#070D1A] p-2.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-2 max-h-[96px] overflow-y-auto">
+                <div className="bg-[#0B1928] p-2.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-2 max-h-[96px] overflow-y-auto">
                   <span className="text-xs text-slate-300 uppercase font-bold tracking-wider">
                     WHERE COMPONENTS LOCATE:
                   </span>
@@ -564,7 +564,7 @@ export default function LotArchitectureView({
               {/* Components Table with Full Satellite Location Columns - Stretches to fill available space */}
               <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[280px] border-b border-slate-800">
                 <table className="w-full min-w-[700px] text-left border-collapse text-xs font-mono">
-                  <thead className="bg-[#070D1A] text-[10px] text-slate-400 uppercase tracking-wider sticky top-0 z-10 border-b border-slate-800">
+                  <thead className="bg-[#0B1928] text-[10px] text-slate-400 uppercase tracking-wider sticky top-0 z-10 border-b border-slate-800">
                     <tr>
                       <th className="py-2.5 px-3 font-semibold">Part ID</th>
                       <th className="py-2.5 px-2 font-semibold">Subsystem</th>
@@ -701,7 +701,7 @@ export default function LotArchitectureView({
 
               {/* Active Component Silicon Telemetry & Spacecraft Bay Diagnostic Terminal - Fills Empty Space */}
               {inspectedComponent && inspectedLoc && (
-                <div className="p-4 bg-[#070D1A] flex flex-col gap-3.5 flex-1 border-t border-slate-800">
+                <div className="p-4 bg-[#0B1928] flex flex-col gap-3.5 flex-1 border-t border-slate-800">
                   {/* Header Strip */}
                   <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-slate-800/80">
                     <div className="flex items-center gap-2.5 flex-wrap">
@@ -753,7 +753,7 @@ export default function LotArchitectureView({
                   </div>
 
                   {/* Location & Bay Coordinates Strip */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-[#050B16] p-2.5 rounded-lg border border-slate-800/80">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-[#07111C] p-2.5 rounded-lg border border-slate-800/80">
                     <div>
                       <span className="text-slate-400 block text-[10px] uppercase font-semibold">Bay / Deck</span>
                       <span className="text-white font-bold truncate block">{inspectedLoc.bay}</span>

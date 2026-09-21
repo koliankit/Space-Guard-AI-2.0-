@@ -32,7 +32,7 @@ class ErrorBoundary extends React.Component<
           <div style={{ color: '#F59E0B', fontSize: 14, fontWeight: 'bold', margin: '12px 0' }}>
             {this.state.error?.name}: {this.state.error?.message}
           </div>
-          <pre style={{ background: '#0B1120', color: '#94A3B8', padding: 16, borderRadius: 6, border: '1px solid #1E293B', overflowX: 'auto', fontSize: 12, lineHeight: 1.5 }}>
+          <pre style={{ background: '#102337', color: '#94A3B8', padding: 16, borderRadius: 6, border: '1px solid #1E293B', overflowX: 'auto', fontSize: 12, lineHeight: 1.5 }}>
             {this.state.error?.stack}
           </pre>
           <button

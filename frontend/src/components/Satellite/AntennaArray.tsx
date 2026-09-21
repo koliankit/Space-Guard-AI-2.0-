@@ -107,7 +107,7 @@ export default function AntennaArray({
         {/* Main Carbon-composite Parabolic Reflector Dish */}
         <mesh geometry={dishGeometry} rotation={[Math.PI, 0, 0]}>
           <meshStandardMaterial
-            color={isSelected ? '#1E293B' : isHovered ? '#111827' : '#0B1120'}
+            color={isSelected ? '#1E293B' : isHovered ? '#111827' : '#102337'}
             emissive={isSelected ? '#F59E0B' : isHovered ? '#D97706' : '#334155'}
             emissiveIntensity={isSelected ? 0.45 : isHovered ? 0.25 : 0.1}
             metalness={0.88}

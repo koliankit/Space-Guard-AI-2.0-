@@ -112,22 +112,22 @@ export default function RiskEngineView({
   const totalCount = components.length || 1
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1 min-h-full">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#07111C] text-[#F1F5F9] font-sans flex-1 min-h-full">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1D3A52] pb-3 bg-[#0B1928]/60 p-3 md:p-4 rounded-xl">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded bg-[#C99A2E]/20 text-[#C99A2E] border border-[#C99A2E]/40 font-mono font-bold text-xs uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded bg-[#0E88D3]/15 text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold text-xs uppercase tracking-wider">
               ANALYSIS ENGINE
             </span>
-            <span className="text-xs font-mono text-[#91A0B2]">
+            <span className="text-xs font-mono text-[#9AAFC0]">
               BAYESIAN MULTI-FACTOR RISK SCORING &amp; QUALIFICATION GATES
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-mono font-black text-[#E8EDF2] tracking-wide mt-1">
+          <h1 className="text-xl md:text-2xl font-mono font-black text-[#F1F5F9] tracking-wide mt-1">
             Risk Engine Dashboard &amp; Decision Synthesis
           </h1>
-          <p className="text-xs text-[#91A0B2] mt-0.5 max-w-3xl">
+          <p className="text-xs text-[#9AAFC0] mt-0.5 max-w-3xl">
             Fuses absolute datasheet limits, lot-relative statistical deviations, Arrhenius temporal drift,
             and machine-learning defect evidence into calibrated 0–100 risk scores and qualification gates.
           </p>
@@ -135,78 +135,78 @@ export default function RiskEngineView({
 
         {/* Global Risk Distribution Summary */}
         <div className="flex items-center gap-2 text-xs font-mono">
-          <div className="bg-[#111E30] border border-[#3FA66B]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#3FA66B]" />
-            <span className="text-[#3FA66B] font-bold">{safeCount} SAFE</span>
+          <div className="bg-[#102337] border border-[#22A06B]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#22A06B]" />
+            <span className="text-[#22A06B] font-bold">{safeCount} SAFE</span>
           </div>
-          <div className="bg-[#111E30] border border-[#D6A33A]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#D6A33A]" />
-            <span className="text-[#D6A33A] font-bold">{monitorCount} MONITOR</span>
+          <div className="bg-[#102337] border border-[#F2B84B]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#F2B84B]" />
+            <span className="text-[#F2B84B] font-bold">{monitorCount} MONITOR</span>
           </div>
-          <div className="bg-[#111E30] border border-[#D94B5B]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#D94B5B]" />
-            <span className="text-[#D94B5B] font-bold">{rejectCount} REJECT</span>
+          <div className="bg-[#102337] border border-[#E5484D]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#E5484D]" />
+            <span className="text-[#E5484D] font-bold">{rejectCount} REJECT</span>
           </div>
         </div>
       </div>
 
       {/* Row 1: The 3-Step Decision Gate Architecture */}
-      <div className="p-4 md:p-5 rounded-xl bg-[#111E30] border border-[#26384D] flex flex-col gap-4">
-        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#91A0B2]">
+      <div className="p-4 md:p-5 rounded-xl bg-[#102337] border border-[#1D3A52] flex flex-col gap-4">
+        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#9AAFC0]">
           Decision Synthesis Pipeline
         </span>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
           {/* Step 1: Input Evidence */}
-          <div className="p-3.5 rounded-lg bg-[#0D1726] border border-[#26384D] flex flex-col gap-2">
-            <div className="text-[#C99A2E] font-bold flex items-center gap-1.5">
+          <div className="p-3.5 rounded-lg bg-[#0B1928] border border-[#1D3A52] flex flex-col gap-2">
+            <div className="text-[#0E88D3] font-bold flex items-center gap-1.5">
               <span>①</span> EVIDENCE ACQUISITION
             </div>
-            <ul className="text-[#91A0B2] text-[11px] space-y-1 font-sans">
-              <li>&bull; <b className="text-[#E8EDF2]">Datasheet Limits:</b> 50 µA max reverse leakage</li>
-              <li>&bull; <b className="text-[#E8EDF2]">Lot Baseline:</b> Median / MAD z-score tracking</li>
-              <li>&bull; <b className="text-[#E8EDF2]">Degradation Drift:</b> Arrhenius polynomial slope</li>
-              <li>&bull; <b className="text-[#E8EDF2]">Machine Learning:</b> Isolation Forest anomaly trees</li>
+            <ul className="text-[#9AAFC0] text-[11px] space-y-1 font-sans">
+              <li>&bull; <b className="text-[#F1F5F9]">Datasheet Limits:</b> 50 µA max reverse leakage</li>
+              <li>&bull; <b className="text-[#F1F5F9]">Lot Baseline:</b> Median / MAD z-score tracking</li>
+              <li>&bull; <b className="text-[#F1F5F9]">Degradation Drift:</b> Arrhenius polynomial slope</li>
+              <li>&bull; <b className="text-[#F1F5F9]">Machine Learning:</b> Isolation Forest anomaly trees</li>
             </ul>
           </div>
 
           {/* Step 2: Calibrated Bayesian Scoring */}
-          <div className="p-3.5 rounded-lg bg-[#0D1726] border border-[#26384D] flex flex-col gap-2">
-            <div className="text-[#3B82B6] font-bold flex items-center gap-1.5">
+          <div className="p-3.5 rounded-lg bg-[#0B1928] border border-[#1D3A52] flex flex-col gap-2">
+            <div className="text-[#0E88D3] font-bold flex items-center gap-1.5">
               <span>②</span> CALIBRATED RISK SCORING
             </div>
-            <div className="text-xl font-bold text-[#E8EDF2] font-mono">
+            <div className="text-xl font-bold text-[#F1F5F9] font-mono">
               Risk = &sum; (w<sub>i</sub> &times; Factor<sub>i</sub>)
             </div>
-            <p className="text-[#91A0B2] text-[11px] font-sans">
+            <p className="text-[#9AAFC0] text-[11px] font-sans">
               Weighted multi-evidence synthesis produces normalized 0 to 100 mission risk index.
             </p>
           </div>
 
           {/* Step 3: Screening Verdict Gates */}
-          <div className="p-3.5 rounded-lg bg-[#0D1726] border border-[#26384D] flex flex-col gap-2">
-            <div className="text-[#3FA66B] font-bold flex items-center gap-1.5">
+          <div className="p-3.5 rounded-lg bg-[#0B1928] border border-[#1D3A52] flex flex-col gap-2">
+            <div className="text-[#22A06B] font-bold flex items-center gap-1.5">
               <span>③</span> MIL-STD-883 VERDICT GATES
             </div>
             <div className="space-y-1 text-[11px] font-mono">
-              <div className="text-[#3FA66B]">SAFE (0-39): Flight Approved</div>
-              <div className="text-[#D6A33A]">MONITOR (40-69): In-Situ Telemetry Polling</div>
-              <div className="text-[#D94B5B]">REJECT (&ge;70 or Limit Breach): Quarantined</div>
+              <div className="text-[#22A06B]">SAFE (0-39): Flight Approved</div>
+              <div className="text-[#F2B84B]">MONITOR (40-69): In-Situ Telemetry Polling</div>
+              <div className="text-[#E5484D]">REJECT (&ge;70 or Limit Breach): Quarantined</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Row 2: Component Selector Bar */}
-      <div className="p-3 rounded-xl bg-[#111E30] border border-[#26384D] flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="p-3 rounded-xl bg-[#102337] border border-[#1D3A52] flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-[320px]">
-          <span className="text-[#91A0B2] font-mono text-[11px]">INSPECT COMPONENT:</span>
+          <span className="text-[#9AAFC0] font-mono text-[11px]">INSPECT COMPONENT:</span>
           <input
             type="text"
             placeholder="Search Component ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#070D18] border border-[#26384D] rounded-lg px-2.5 py-1 text-xs text-[#E8EDF2] font-mono placeholder:text-[#5A6E85] focus:outline-none focus:border-[#3B82B6]"
+            className="w-full bg-[#07111C] border border-[#1D3A52] rounded-lg px-2.5 py-1 text-xs text-[#F1F5F9] font-mono placeholder:text-[#6F8495] focus:outline-none focus:border-[#0E88D3]"
           />
         </div>
 
@@ -219,13 +219,13 @@ export default function RiskEngineView({
               className={`px-2 py-0.5 rounded transition-colors uppercase ${
                 statusFilter === filter
                   ? filter === 'reject'
-                    ? 'bg-[#D94B5B] text-[#E8EDF2] font-bold'
+                    ? 'bg-[#E5484D] text-[#F1F5F9] font-bold'
                     : filter === 'monitor'
-                    ? 'bg-[#D6A33A] text-[#E8EDF2] font-bold'
+                    ? 'bg-[#F2B84B] text-[#F1F5F9] font-bold'
                     : filter === 'safe'
-                    ? 'bg-[#3FA66B] text-[#E8EDF2] font-bold'
-                    : 'bg-[#C99A2E]/30 text-[#C99A2E] border border-[#C99A2E]/50 font-bold'
-                  : 'text-[#91A0B2] hover:text-[#E8EDF2] bg-[#070D18] border border-[#26384D]'
+                    ? 'bg-[#22A06B] text-[#F1F5F9] font-bold'
+                    : 'bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/50 font-bold'
+                  : 'text-[#9AAFC0] hover:text-[#F1F5F9] bg-[#07111C] border border-[#1D3A52]'
               }`}
             >
               {filter}
@@ -238,7 +238,7 @@ export default function RiskEngineView({
           onChange={(e) => {
             if (e.target.value) onSelectComponent(e.target.value)
           }}
-          className="bg-[#070D18] border border-[#26384D] text-[#E8EDF2] text-xs font-mono rounded-lg px-3 py-1.5 max-w-[240px] focus:outline-none focus:border-[#C99A2E]"
+          className="bg-[#07111C] border border-[#1D3A52] text-[#F1F5F9] text-xs font-mono rounded-lg px-3 py-1.5 max-w-[240px] focus:outline-none focus:border-[#0E88D3]"
         >
           <option value="" disabled>Select Component ({filteredComponents.length})</option>
           {filteredComponents.slice(0, 100).map((c) => (
@@ -255,55 +255,55 @@ export default function RiskEngineView({
           {/* Left Column: Overall Risk Gauge & Decision Card */}
           <div className={`p-5 rounded-xl border flex flex-col justify-between gap-4 h-full ${
             targetPart.status === 'reject'
-              ? 'bg-[#28131D] border-[#D94B5B]/60'
+              ? 'bg-[#24141E] border-[#E5484D]/60'
               : targetPart.status === 'monitor'
-              ? 'bg-[#111E30] border-[#D6A33A]/60'
-              : 'bg-[#111E30] border-[#3FA66B]/60'
+              ? 'bg-[#102337] border-[#F2B84B]/60'
+              : 'bg-[#102337] border-[#22A06B]/60'
           }`}>
             <div>
-              <div className="flex items-center justify-between border-b border-[#26384D] pb-3">
-                <span className="text-xs font-mono uppercase text-[#91A0B2]">
+              <div className="flex items-center justify-between border-b border-[#1D3A52] pb-3">
+                <span className="text-xs font-mono uppercase text-[#9AAFC0]">
                   Qualification Decision
                 </span>
                 <span className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase ${
                   targetPart.status === 'reject'
-                    ? 'bg-[#D94B5B] text-white'
+                    ? 'bg-[#E5484D] text-white'
                     : targetPart.status === 'monitor'
-                    ? 'bg-[#D6A33A] text-slate-900'
-                    : 'bg-[#3FA66B] text-white'
+                    ? 'bg-[#F2B84B] text-slate-900'
+                    : 'bg-[#22A06B] text-white'
                 }`}>
                   {(targetPart.status || 'safe').toUpperCase()}
                 </span>
               </div>
 
               <div className="py-6 flex flex-col items-center justify-center text-center">
-                <div className="text-xs font-mono uppercase text-[#91A0B2] mb-1">
+                <div className="text-xs font-mono uppercase text-[#9AAFC0] mb-1">
                   CALIBRATED RISK SCORE
                 </div>
                 <div className={`text-6xl font-mono font-black tabular-nums tracking-tight ${
                   targetPart.status === 'reject'
-                    ? 'text-[#D94B5B]'
+                    ? 'text-[#E5484D]'
                     : targetPart.status === 'monitor'
-                    ? 'text-[#D6A33A]'
-                    : 'text-[#3FA66B]'
+                    ? 'text-[#F2B84B]'
+                    : 'text-[#22A06B]'
                 }`}>
                   {riskScore}
-                  <span className="text-2xl font-light text-[#5A6E85]">/100</span>
+                  <span className="text-2xl font-light text-[#6F8495]">/100</span>
                 </div>
-                <div className="text-xs font-mono text-[#91A0B2] mt-2">
-                  Component: <b className="text-[#E8EDF2]">{targetPart.component_id}</b> ({targetPart.lot_id})
+                <div className="text-xs font-mono text-[#9AAFC0] mt-2">
+                  Component: <b className="text-[#F1F5F9]">{targetPart.component_id}</b> ({targetPart.lot_id})
                 </div>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-[#070D18] h-2.5 rounded-full overflow-hidden border border-[#26384D]">
+              <div className="w-full bg-[#07111C] h-2.5 rounded-full overflow-hidden border border-[#1D3A52]">
                 <div
                   className={`h-full transition-all duration-500 ${
                     targetPart.status === 'reject'
-                      ? 'bg-[#D94B5B]'
+                      ? 'bg-[#E5484D]'
                       : targetPart.status === 'monitor'
-                      ? 'bg-[#D6A33A]'
-                      : 'bg-[#3FA66B]'
+                      ? 'bg-[#F2B84B]'
+                      : 'bg-[#22A06B]'
                   }`}
                   style={{ width: `${Math.min(100, riskScore)}%` }}
                 />
@@ -311,18 +311,18 @@ export default function RiskEngineView({
             </div>
 
             {/* Subsystem & Location Details */}
-            <div className="pt-3 border-t border-[#26384D] text-xs font-mono space-y-1.5">
+            <div className="pt-3 border-t border-[#1D3A52] text-xs font-mono space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-[#91A0B2]">Subsystem:</span>
-                <span className="text-[#3B82B6] font-bold">[{targetPart.subsystem}] {loc?.name}</span>
+                <span className="text-[#9AAFC0]">Subsystem:</span>
+                <span className="text-[#0E88D3] font-bold">[{targetPart.subsystem}] {loc?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#91A0B2]">Equipment Bay:</span>
-                <span className="text-[#E8EDF2]">{loc?.bay || 'Main Payload Deck'}</span>
+                <span className="text-[#9AAFC0]">Equipment Bay:</span>
+                <span className="text-[#F1F5F9]">{loc?.bay || 'Main Payload Deck'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#91A0B2]">Traditional Spec Verdict:</span>
-                <span className={targetPart.v168 > limitVal ? 'text-[#D94B5B] font-bold' : 'text-[#3FA66B] font-bold'}>
+                <span className="text-[#9AAFC0]">Traditional Spec Verdict:</span>
+                <span className={targetPart.v168 > limitVal ? 'text-[#E5484D] font-bold' : 'text-[#22A06B] font-bold'}>
                   {targetPart.v168 > limitVal ? 'FAIL' : 'PASS'}
                 </span>
               </div>
@@ -330,8 +330,8 @@ export default function RiskEngineView({
           </div>
 
           {/* Right Column (Span 2): Multi-Factor Risk Breakdown Table */}
-          <div className="lg:col-span-2 p-5 rounded-xl bg-[#111E30] border border-[#26384D] flex flex-col gap-4">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#91A0B2]">
+          <div className="lg:col-span-2 p-5 rounded-xl bg-[#102337] border border-[#1D3A52] flex flex-col gap-4">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#9AAFC0]">
               Risk Factor Evidence Breakdown
             </span>
 
@@ -339,36 +339,36 @@ export default function RiskEngineView({
               {factors.map((f, i) => (
                 <div
                   key={i}
-                  className="p-3 rounded-lg bg-[#0D1726] border border-[#26384D] flex flex-col gap-2"
+                  className="p-3 rounded-lg bg-[#0B1928] border border-[#1D3A52] flex flex-col gap-2"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
                     <div className="flex items-center gap-2">
-                      <span className="text-[#C99A2E] font-bold">{f.code}</span>
-                      <span className="text-[#5A6E85]">&bull;</span>
-                      <span className="text-[#91A0B2]">Weight: {f.weight}</span>
+                      <span className="text-[#0E88D3] font-bold">{f.code}</span>
+                      <span className="text-[#6F8495]">&bull;</span>
+                      <span className="text-[#9AAFC0]">Weight: {f.weight}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="text-[#91A0B2]">Score:</span>
+                      <span className="text-[#9AAFC0]">Score:</span>
                       <span className={`font-bold tabular-nums ${
                         f.severity === 'critical'
-                          ? 'text-[#D94B5B]'
+                          ? 'text-[#E5484D]'
                           : f.severity === 'warning'
-                          ? 'text-[#D6A33A]'
-                          : 'text-[#3FA66B]'
+                          ? 'text-[#F2B84B]'
+                          : 'text-[#22A06B]'
                       }`}>
                         {f.score}/100
                       </span>
-                      <span className="text-[#5A6E85]">(&rarr; +{f.contribution} pts)</span>
+                      <span className="text-[#6F8495]">(&rarr; +{f.contribution} pts)</span>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-                    <span className="text-[#E8EDF2] font-semibold">{f.name}</span>
-                    <span className="text-[#C99A2E]">{f.raw}</span>
+                    <span className="text-[#F1F5F9] font-semibold">{f.name}</span>
+                    <span className="text-[#0E88D3]">{f.raw}</span>
                   </div>
 
-                  <p className="text-[11px] text-[#91A0B2] font-sans">
+                  <p className="text-[11px] text-[#9AAFC0] font-sans">
                     {f.description}
                   </p>
                 </div>
@@ -377,11 +377,11 @@ export default function RiskEngineView({
 
             {/* AI Diagnostics & Failure Physics */}
             {targetPart.reason && (
-              <div className="p-3 rounded-lg bg-[#070D18] border border-[#26384D] text-xs flex items-start gap-2">
-                <span className="text-[#C99A2E] font-mono font-bold uppercase whitespace-nowrap">
+              <div className="p-3 rounded-lg bg-[#07111C] border border-[#1D3A52] text-xs flex items-start gap-2">
+                <span className="text-[#0E88D3] font-mono font-bold uppercase whitespace-nowrap">
                   Physics Explanation:
                 </span>
-                <span className="text-[#E8EDF2] font-sans">
+                <span className="text-[#F1F5F9] font-sans">
                   {targetPart.reason}
                 </span>
               </div>
@@ -389,7 +389,7 @@ export default function RiskEngineView({
           </div>
         </div>
       ) : (
-        <div className="p-10 text-center text-xs text-[#91A0B2] bg-[#111E30] rounded-xl border border-[#26384D]">
+        <div className="p-10 text-center text-xs text-[#9AAFC0] bg-[#102337] rounded-xl border border-[#1D3A52]">
           No components available. Please ingest data to synthesize Bayesian risk evaluations.
         </div>
       )}

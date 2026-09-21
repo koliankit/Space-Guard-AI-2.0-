@@ -242,7 +242,7 @@ export default function ISROOnboardingFlow({
   const totalPages = Math.ceil(rawParts.length / ROWS_PER_PAGE) || 1
 
   return (
-    <div className="min-h-screen bg-[#070D18] text-slate-100 flex flex-col items-center justify-start p-4 md:p-6 font-sans select-none relative">
+    <div className="min-h-screen bg-[#07111C] text-slate-100 flex flex-col items-center justify-start p-4 md:p-6 font-sans select-none relative">
       {/* Top ISRO Banner & 3-Step Clearance Gate */}
       <div className="w-full max-w-6xl flex flex-col gap-4 mb-5">
         {/* Aerospace Mission Header - Clean & Professional without flashy lighting */}
@@ -267,17 +267,17 @@ export default function ISROOnboardingFlow({
           </div>
 
           <div className="flex items-center gap-2.5 text-xs font-mono">
-            <div className="bg-[#111E30] border border-[#26384D] px-3 py-1.5 rounded-md flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
-              <span className="text-[#91A0B2]">SYSTEM OPERATIONAL</span>
+            <div className="bg-[#102337] border border-[#1D3A52] px-3 py-1.5 rounded-md flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#22A06B] animate-gentle-pulse" />
+              <span className="text-[#9AAFC0]">SYSTEM OPERATIONAL</span>
             </div>
-            <div className="bg-[#111E30] border border-[#26384D] px-3 py-1.5 rounded-md text-[#91A0B2]">
-              MISSION: <span className="text-[#E8EDF2] font-bold">{activeMissionName}</span>
+            <div className="bg-[#102337] border border-[#1D3A52] px-3 py-1.5 rounded-md text-[#9AAFC0]">
+              MISSION: <span className="text-[#F1F5F9] font-bold">{activeMissionName}</span>
             </div>
             <button
               type="button"
               onClick={onCompleteToDashboard}
-              className="bg-[#16253A] hover:bg-[#C99A2E] text-[#E8EDF2] hover:text-[#070D18] border border-[#26384D] hover:border-[#C99A2E] px-3.5 py-1.5 rounded-md font-mono font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm ml-2"
+              className="bg-[#142B40] hover:bg-[#0E88D3] text-[#F1F5F9] hover:text-[#07111C] border border-[#1D3A52] hover:border-[#0E88D3] px-3.5 py-1.5 rounded-md font-mono font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm ml-2"
               title="Enter Mission Control Dashboard directly"
             >
               <span>ENTER DASHBOARD</span>
@@ -618,7 +618,7 @@ export default function ISROOnboardingFlow({
                         <th className="py-2.5 px-3 font-semibold uppercase text-right">Drift (168-0h)</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60 bg-[#070D18]">
+                    <tbody className="divide-y divide-slate-800/60 bg-[#07111C]">
                       {paginatedParts.map((p, idx) => {
                         const drift = p.v168 - p.v0
                         const isOverLimit = p.v168 > p.limit_ua

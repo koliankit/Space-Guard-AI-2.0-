@@ -65,38 +65,38 @@ export default function PipelineOverlay({ onDone }: { onDone: () => void }) {
   const progressPercent = Math.min(100, Math.round((activeIdx / STAGES.length) * 100))
 
   return (
-    <div className="fixed inset-0 bg-[#070D18]/85 flex items-center justify-center p-4 z-50 backdrop-blur-sm font-sans select-none animate-fadeIn">
+    <div className="fixed inset-0 bg-[#07111C]/85 flex items-center justify-center p-4 z-50 backdrop-blur-sm font-sans select-none animate-fadeIn">
       {/* Aerospace Card with Slate Navy & Steel Blue Borders */}
-      <div className="bg-[#111E30] border border-[#26384D] rounded-2xl shadow-2xl max-w-2xl w-full p-6 sm:p-7 flex flex-col gap-4">
+      <div className="bg-[#102337] border border-[#1D3A52] rounded-2xl shadow-2xl max-w-2xl w-full p-6 sm:p-7 flex flex-col gap-4">
         {/* Header Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#26384D] pb-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1D3A52] pb-3.5">
           <div className="flex items-center gap-3">
-            <div className="w-3.5 h-3.5 rounded-full bg-[#3B82B6] flex items-center justify-center">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#E8EDF2] animate-gentle-pulse" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#0E88D3] flex items-center justify-center">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F1F5F9] animate-gentle-pulse" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-display font-bold text-[#E8EDF2] tracking-wider uppercase">
+              <h2 className="text-base sm:text-lg font-display font-bold text-[#F1F5F9] tracking-wider uppercase">
                 AI Screening Pipeline
               </h2>
-              <p className="text-xs font-mono text-[#3B82B6]">
+              <p className="text-xs font-mono text-[#0E88D3]">
                 MIL-STD-883 METHOD 1005 &bull; AUTOMATED SCREENING ENGINE
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 font-mono">
-            <span className="px-2.5 py-1 rounded-md bg-[#3B82B6]/15 text-[#3B82B6] border border-[#3B82B6]/30 text-xs sm:text-sm font-bold">
+            <span className="px-2.5 py-1 rounded-md bg-[#0E88D3]/15 text-[#0E88D3] border border-[#0E88D3]/30 text-xs sm:text-sm font-bold">
               {progressPercent}%
             </span>
-            <span className="text-xs text-[#91A0B2]">
+            <span className="text-xs text-[#9AAFC0]">
               STEP {Math.min(activeIdx + 1, STAGES.length)} / {STAGES.length}
             </span>
           </div>
         </div>
 
         {/* Crisp Progress Bar */}
-        <div className="w-full bg-[#0D1726] rounded-full h-1.5 overflow-hidden border border-[#26384D]">
+        <div className="w-full bg-[#0B1928] rounded-full h-1.5 overflow-hidden border border-[#1D3A52]">
           <div
-            className="bg-gradient-to-r from-[#3B82B6] to-[#C99A2E] h-full transition-all duration-300 ease-out"
+            className="bg-gradient-to-r from-[#0E88D3] to-[#F47216] h-full transition-all duration-300 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -112,24 +112,24 @@ export default function PipelineOverlay({ onDone }: { onDone: () => void }) {
                 key={stage.title}
                 className={`flex items-start gap-3 p-2.5 rounded-xl border transition-all duration-200 ${
                   isCurrent
-                    ? 'bg-[#16253A] border-[#3B82B6]/60 shadow-sm'
+                    ? 'bg-[#142B40] border-[#0E88D3]/60 shadow-sm'
                     : isDone
-                    ? 'bg-[#16253A]/40 border-[#26384D]/80'
+                    ? 'bg-[#142B40]/40 border-[#1D3A52]/80'
                     : 'bg-transparent border-transparent opacity-40'
                 }`}
               >
                 {/* Step Status Icon */}
                 <div className="mt-0.5 flex-shrink-0">
                   {isDone ? (
-                    <span className="w-5 h-5 rounded-full bg-[#3FA66B]/20 text-[#3FA66B] border border-[#3FA66B]/40 flex items-center justify-center text-xs font-bold">
+                    <span className="w-5 h-5 rounded-full bg-[#22A06B]/20 text-[#22A06B] border border-[#22A06B]/40 flex items-center justify-center text-xs font-bold">
                       ✓
                     </span>
                   ) : isCurrent ? (
-                    <span className="w-5 h-5 rounded-full bg-[#3B82B6] text-[#E8EDF2] flex items-center justify-center text-xs font-bold animate-gentle-pulse">
+                    <span className="w-5 h-5 rounded-full bg-[#0E88D3] text-[#F1F5F9] flex items-center justify-center text-xs font-bold animate-gentle-pulse">
                       ▶
                     </span>
                   ) : (
-                    <span className="w-5 h-5 rounded-full bg-[#0D1726] text-[#91A0B2] border border-[#26384D] flex items-center justify-center text-[10px]">
+                    <span className="w-5 h-5 rounded-full bg-[#0B1928] text-[#9AAFC0] border border-[#1D3A52] flex items-center justify-center text-[10px]">
                       {i + 1}
                     </span>
                   )}
@@ -141,10 +141,10 @@ export default function PipelineOverlay({ onDone }: { onDone: () => void }) {
                     <span
                       className={`text-xs sm:text-sm tracking-wide uppercase ${
                         isCurrent
-                          ? 'text-[#E8EDF2] font-bold'
+                          ? 'text-[#F1F5F9] font-bold'
                           : isDone
-                          ? 'text-[#E8EDF2] font-semibold'
-                          : 'text-[#91A0B2]'
+                          ? 'text-[#F1F5F9] font-semibold'
+                          : 'text-[#9AAFC0]'
                       }`}
                     >
                       {stage.title}
@@ -152,10 +152,10 @@ export default function PipelineOverlay({ onDone }: { onDone: () => void }) {
                     <span
                       className={`text-[10px] uppercase shrink-0 font-bold ${
                         isCurrent
-                          ? 'text-[#3B82B6]'
+                          ? 'text-[#0E88D3]'
                           : isDone
-                          ? 'text-[#3FA66B]'
-                          : 'text-[#91A0B2]'
+                          ? 'text-[#22A06B]'
+                          : 'text-[#9AAFC0]'
                       }`}
                     >
                       {isDone ? 'COMPLETED' : isCurrent ? 'PROCESSING...' : 'QUEUED'}
@@ -164,10 +164,10 @@ export default function PipelineOverlay({ onDone }: { onDone: () => void }) {
                   <p
                     className={`text-[11px] mt-0.5 leading-normal font-sans ${
                       isCurrent
-                        ? 'text-[#91A0B2]'
+                        ? 'text-[#9AAFC0]'
                         : isDone
-                        ? 'text-[#91A0B2]'
-                        : 'text-[#91A0B2]/60'
+                        ? 'text-[#9AAFC0]'
+                        : 'text-[#9AAFC0]/60'
                     }`}
                   >
                     {stage.detail}
@@ -179,10 +179,10 @@ export default function PipelineOverlay({ onDone }: { onDone: () => void }) {
         </div>
 
         {/* Footer Bar */}
-        <div className="pt-3 border-t border-[#26384D] flex items-center justify-between text-xs font-mono">
-          <span className="text-[#91A0B2] text-[11px]">ISRO RELIABILITY INFERENCE ENGINE</span>
-          <span className="text-[#3B82B6] font-bold flex items-center gap-1.5 text-[11px]">
-            <span className="w-2 h-2 rounded-full bg-[#3B82B6] animate-gentle-pulse" />
+        <div className="pt-3 border-t border-[#1D3A52] flex items-center justify-between text-xs font-mono">
+          <span className="text-[#9AAFC0] text-[11px]">ISRO RELIABILITY INFERENCE ENGINE</span>
+          <span className="text-[#0E88D3] font-bold flex items-center gap-1.5 text-[11px]">
+            <span className="w-2 h-2 rounded-full bg-[#0E88D3] animate-gentle-pulse" />
             {activeIdx >= STAGES.length ? 'VERDICT SYNCHRONIZED' : 'ANALYZING TELEMETRY STREAMS...'}
           </span>
         </div>

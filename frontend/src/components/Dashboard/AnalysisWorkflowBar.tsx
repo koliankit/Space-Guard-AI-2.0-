@@ -47,10 +47,10 @@ export default function AnalysisWorkflowBar({
   }
 
   return (
-    <div className="w-full bg-[#0D1726] border border-[#26384D] rounded-xl p-2.5 flex flex-col md:flex-row items-center justify-between gap-2 text-xs font-mono shadow-sm">
-      <div className="flex items-center gap-2 text-[#91A0B2] px-2 whitespace-nowrap">
-        <span className="text-[#C99A2E] font-bold">ANALYSIS PIPELINE:</span>
-        <span className="text-[11px] text-[#5A6E85] hidden xl:inline">
+    <div className="w-full bg-[#0B1928] border border-[#1D3A52] rounded-xl p-2.5 flex flex-col md:flex-row items-center justify-between gap-2 text-xs font-mono shadow-sm">
+      <div className="flex items-center gap-2 text-[#9AAFC0] px-2 whitespace-nowrap">
+        <span className="text-[#0E88D3] font-bold">ANALYSIS PIPELINE:</span>
+        <span className="text-[11px] text-[#6F8495] hidden xl:inline">
           MIL-STD-883 Sequential Qualification
         </span>
       </div>
@@ -69,19 +69,19 @@ export default function AnalysisWorkflowBar({
                 onClick={() => handleClick(step.id)}
                 className={`flex-1 flex items-center gap-2.5 px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#16253A] border-[#C99A2E] text-[#E8EDF2] shadow-sm'
+                    ? 'bg-[#142B40] border-[#0E88D3] text-[#F1F5F9] shadow-sm'
                     : isDone
-                    ? 'bg-[#111E30] border-[#3FA66B]/50 text-[#91A0B2] hover:text-[#E8EDF2]'
-                    : 'bg-[#111E30] border-[#26384D] text-[#91A0B2] hover:text-[#E8EDF2] hover:border-[#3B82B6]'
+                    ? 'bg-[#102337] border-[#22A06B]/50 text-[#9AAFC0] hover:text-[#F1F5F9]'
+                    : 'bg-[#102337] border-[#1D3A52] text-[#9AAFC0] hover:text-[#F1F5F9] hover:border-[#0E88D3]'
                 }`}
               >
                 <span
                   className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[11px] ${
                     isActive
-                      ? 'bg-[#C99A2E] text-[#070D18]'
+                      ? 'bg-[#0E88D3] text-[#07111C]'
                       : isDone
-                      ? 'bg-[#3FA66B]/20 text-[#3FA66B]'
-                      : 'bg-[#16253A] text-[#91A0B2]'
+                      ? 'bg-[#22A06B]/20 text-[#22A06B]'
+                      : 'bg-[#142B40] text-[#9AAFC0]'
                   }`}
                 >
                   {isDone ? '✓' : step.num}
@@ -90,19 +90,19 @@ export default function AnalysisWorkflowBar({
                 <div className="text-left min-w-0">
                   <div
                     className={`font-bold tracking-wide truncate text-[11px] ${
-                      isActive ? 'text-[#E8EDF2]' : 'text-[#91A0B2]'
+                      isActive ? 'text-[#F1F5F9]' : 'text-[#9AAFC0]'
                     }`}
                   >
                     {step.title}
                   </div>
-                  <div className="text-[9.5px] text-[#5A6E85] truncate font-sans">
+                  <div className="text-[9.5px] text-[#6F8495] truncate font-sans">
                     {step.subtitle}
                   </div>
                 </div>
               </button>
 
               {idx < steps.length - 1 && (
-                <span className="text-[#5A6E85] font-bold text-xs select-none hidden sm:inline">
+                <span className="text-[#6F8495] font-bold text-xs select-none hidden sm:inline">
                   &rarr;
                 </span>
               )}
@@ -111,8 +111,8 @@ export default function AnalysisWorkflowBar({
         })}
       </div>
 
-      <div className="hidden lg:flex items-center gap-2 text-[11px] text-[#91A0B2] px-2">
-        <span className="w-2 h-2 rounded-full bg-[#3FA66B] animate-gentle-pulse" />
+      <div className="hidden lg:flex items-center gap-2 text-[11px] text-[#9AAFC0] px-2">
+        <span className="w-2 h-2 rounded-full bg-[#22A06B] animate-gentle-pulse" />
         <span>ARRHENIUS ENGINE READY</span>
       </div>
     </div>

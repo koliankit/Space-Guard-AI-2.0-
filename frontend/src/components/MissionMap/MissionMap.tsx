@@ -4,7 +4,7 @@ export default function MissionMap({ critical }: { critical: boolean }) {
   const coreCol = critical ? '#EF4444' : '#F59E0B'
 
   return (
-    <div className="bg-[#0B1120] p-4 border-l border-slate-800">
+    <div className="bg-[#102337] p-4 border-l border-slate-800">
       <div className="flex items-center justify-between mb-3">
         <h3 className="m-0 text-xs font-display font-bold tracking-wider uppercase text-amber-400 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-amber-400" />

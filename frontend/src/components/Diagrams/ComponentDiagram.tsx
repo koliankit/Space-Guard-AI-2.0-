@@ -36,19 +36,19 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 </pattern>
                 <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#0B1120" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#102337" stopOpacity="0.9" />
                 </linearGradient>
                 <linearGradient id="safeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#0B1120" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#102337" stopOpacity="0.9" />
                 </linearGradient>
                 <linearGradient id="rejectGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#EF4444" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#0B1120" stopOpacity="0.9" />
+                  <stop offset="100%" stopColor="#102337" stopOpacity="0.9" />
                 </linearGradient>
               </defs>
 
-              <rect width="760" height="260" fill="#070D1A" rx="6" />
+              <rect width="760" height="260" fill="#0B1928" rx="6" />
               <rect width="760" height="260" fill="url(#diag-grid)" rx="6" />
 
               {/* CENTRAL SPACECRAFT MIL-STD-1553B / CAN BUS */}
@@ -220,7 +220,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <rect width="760" height="210" fill="#070D1A" rx="6" />
+              <rect width="760" height="210" fill="#0B1928" rx="6" />
 
               {/* Stress Thermal Chamber Boundary */}
               <rect
@@ -229,7 +229,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 width="420"
                 height="180"
                 rx="6"
-                fill="#0F172A"
+                fill="#142B40"
                 stroke="#EF4444"
                 strokeWidth="1"
                 strokeDasharray="4 3"
@@ -288,7 +288,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                 </text>
 
                 {/* Sub-blocks in DAQ */}
-                <rect x="20" y="55" width="95" height="38" rx="3" fill="#070D1A" stroke="#F59E0B" strokeWidth="1" />
+                <rect x="20" y="55" width="95" height="38" rx="3" fill="#0B1928" stroke="#F59E0B" strokeWidth="1" />
                 <text x="67" y="72" fill="#F59E0B" fontSize="8" fontWeight="bold" textAnchor="middle">
                   Analog Front-End
                 </text>
@@ -296,7 +296,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                   I_leak Sensing (&plusmn;0.05&mu;A)
                 </text>
 
-                <rect x="135" y="55" width="95" height="38" rx="3" fill="#070D1A" stroke="#F59E0B" strokeWidth="1" />
+                <rect x="135" y="55" width="95" height="38" rx="3" fill="#0B1928" stroke="#F59E0B" strokeWidth="1" />
                 <text x="182" y="72" fill="#F59E0B" fontSize="8" fontWeight="bold" textAnchor="middle">
                   Digital Filter
                 </text>
@@ -304,7 +304,7 @@ export default function ComponentDiagram({ type = 'all', className = '' }: Compo
                   0h / 48h / 96h / 168h
                 </text>
 
-                <rect x="20" y="105" width="210" height="42" rx="3" fill="#070D1A" stroke="#F59E0B" strokeWidth="1" />
+                <rect x="20" y="105" width="210" height="42" rx="3" fill="#0B1928" stroke="#F59E0B" strokeWidth="1" />
                 <text x="125" y="122" fill="#F59E0B" fontSize="8.5" fontWeight="bold" textAnchor="middle">
                   ISRO AI SCREENING ENGINE
                 </text>

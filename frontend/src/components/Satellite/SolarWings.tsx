@@ -54,8 +54,8 @@ export default function SolarWings({
   const cellMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: isSelected ? '#1e293b' : isHovered ? '#0f172a' : '#080d1a',
-        emissive: isSelected ? '#FFFFFF' : isHovered ? '#64748B' : '#0f172a',
+        color: isSelected ? '#1e293b' : isHovered ? '#142B40' : '#080d1a',
+        emissive: isSelected ? '#FFFFFF' : isHovered ? '#64748B' : '#142B40',
         emissiveIntensity: isSelected ? 0.65 : isHovered ? 0.45 : 0.2,
         metalness: 0.95,
         roughness: 0.12,

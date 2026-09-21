@@ -85,7 +85,7 @@ export default function ComponentMonitor({
   }, [components, selectedLot, selectedSubKey])
 
   return (
-    <div className="bg-[#0B1120] p-4 sm:p-5 border-r border-slate-800 flex flex-col h-full overflow-hidden font-sans text-xs sm:text-sm">
+    <div className="bg-[#102337] p-4 sm:p-5 border-r border-slate-800 flex flex-col h-full overflow-hidden font-sans text-xs sm:text-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="m-0 text-sm sm:text-base font-bold uppercase tracking-wider text-white flex items-center gap-2 font-display">
@@ -99,7 +99,7 @@ export default function ComponentMonitor({
       <div className="relative mb-3">
         <span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
         <input
-          className="w-full pl-9 pr-3 py-2 bg-[#070D1A] border border-slate-700 rounded-lg text-slate-100 font-mono text-xs sm:text-sm focus:border-amber-500 outline-none transition-all placeholder:text-slate-500"
+          className="w-full pl-9 pr-3 py-2 bg-[#0B1928] border border-slate-700 rounded-lg text-slate-100 font-mono text-xs sm:text-sm focus:border-amber-500 outline-none transition-all placeholder:text-slate-500"
           placeholder="Search Component ID..."
           onChange={(e) => onSearch(e.target.value)}
         />
@@ -123,7 +123,7 @@ export default function ComponentMonitor({
               key={f}
               type="button"
               className={`flex-1 py-1.5 px-2 text-xs font-bold uppercase rounded-lg border transition-all cursor-pointer ${
-                isActive ? activeClass : 'border-slate-800 bg-[#070D1A] text-slate-400 hover:text-white hover:border-slate-700'
+                isActive ? activeClass : 'border-slate-800 bg-[#0B1928] text-slate-400 hover:text-white hover:border-slate-700'
               }`}
               onClick={() => {
                 setFilter(f)
@@ -137,7 +137,7 @@ export default function ComponentMonitor({
       </div>
 
       {/* Classification Mode Switcher: LOTS vs SUBSYSTEMS */}
-      <div className="flex items-center justify-between gap-1.5 mb-2.5 p-1 bg-[#070D1A] border border-slate-800 rounded-lg">
+      <div className="flex items-center justify-between gap-1.5 mb-2.5 p-1 bg-[#0B1928] border border-slate-800 rounded-lg">
         <button
           type="button"
           onClick={() => {
@@ -185,7 +185,7 @@ export default function ComponentMonitor({
         {classificationMode === 'lots' && (
           <>
             {lotGroups.length === 0 && (
-              <div className="text-slate-500 text-xs py-3 text-center bg-[#070D1A] rounded-lg border border-slate-800">
+              <div className="text-slate-500 text-xs py-3 text-center bg-[#0B1928] rounded-lg border border-slate-800">
                 No lots registered
               </div>
             )}
@@ -197,7 +197,7 @@ export default function ComponentMonitor({
                   className={`flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer text-xs sm:text-sm transition-all border ${
                     isSelected
                       ? 'border-amber-500 bg-amber-500/20 text-white font-bold shadow-sm'
-                      : 'border-slate-800/80 bg-[#070D1A] hover:bg-slate-800/60 hover:border-slate-700 text-slate-200'
+                      : 'border-slate-800/80 bg-[#0B1928] hover:bg-slate-800/60 hover:border-slate-700 text-slate-200'
                   }`}
                   onClick={() => {
                     if (selectedLot === lot.lot_id) {
@@ -296,12 +296,12 @@ export default function ComponentMonitor({
         </div>
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
           {!analysisRun && (
-            <div className="text-slate-400 text-xs sm:text-sm px-3 py-4 text-center bg-[#070D1A] rounded-lg border border-slate-800">
+            <div className="text-slate-400 text-xs sm:text-sm px-3 py-4 text-center bg-[#0B1928] rounded-lg border border-slate-800">
               Awaiting AI Screening execution
             </div>
           )}
           {analysisRun && displayedComponents.length === 0 && (
-            <div className="text-slate-400 text-xs sm:text-sm px-3 py-4 text-center bg-[#070D1A] rounded-lg border border-slate-800">
+            <div className="text-slate-400 text-xs sm:text-sm px-3 py-4 text-center bg-[#0B1928] rounded-lg border border-slate-800">
               No matching components in this selection
             </div>
           )}
@@ -312,7 +312,7 @@ export default function ComponentMonitor({
                 className={`flex justify-between items-center py-2.5 px-3 rounded-lg cursor-pointer text-xs sm:text-sm transition-all border ${
                   selectedId === c.component_id
                     ? 'border-amber-500 bg-amber-500/20 text-white font-bold shadow-sm'
-                    : 'border-slate-800/80 bg-[#070D1A] hover:border-slate-700 hover:bg-slate-800/50'
+                    : 'border-slate-800/80 bg-[#0B1928] hover:border-slate-700 hover:bg-slate-800/50'
                 }`}
                 onClick={() => onSelectComponent(c.component_id)}
               >

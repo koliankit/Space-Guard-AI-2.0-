@@ -242,7 +242,7 @@ export default function LotClassificationModal({
 
           <div className="flex items-center gap-2.5">
             {/* View Mode Toggle: Table Focus (Expanded Right Section) vs Stacked */}
-            <div className="flex items-center gap-1 bg-[#050914] p-1 rounded-lg border border-slate-800 font-mono text-xs">
+            <div className="flex items-center gap-1 bg-[#07111C] p-1 rounded-lg border border-slate-800 font-mono text-xs">
               <button
                 type="button"
                 onClick={() => {
@@ -293,7 +293,7 @@ export default function LotClassificationModal({
               </button>
             </div>
 
-            <span className="text-xs md:text-sm text-slate-300 font-mono hidden sm:inline-block bg-[#070D1A] px-3 py-1.5 rounded-lg border border-slate-800">
+            <span className="text-xs md:text-sm text-slate-300 font-mono hidden sm:inline-block bg-[#0B1928] px-3 py-1.5 rounded-lg border border-slate-800">
               🛰️ {activeMissionName}
             </span>
             <button
@@ -302,7 +302,7 @@ export default function LotClassificationModal({
                 sounds.playClick()
                 onClose()
               }}
-              className="w-9 h-9 rounded-lg bg-[#070D1A] border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white flex items-center justify-center text-xl transition-colors cursor-pointer"
+              className="w-9 h-9 rounded-lg bg-[#0B1928] border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white flex items-center justify-center text-xl transition-colors cursor-pointer"
               title="Close window (Esc)"
             >
               &times;
@@ -342,7 +342,7 @@ export default function LotClassificationModal({
         >
           {/* Section 1: Qualification Lots Selector Sidebar */}
           {isLotsCollapsed && splitMode === 'sideBySide' ? (
-            <div className="hidden lg:flex flex-col items-center py-3 px-1.5 bg-[#070D1A] border-r border-slate-800 gap-3">
+            <div className="hidden lg:flex flex-col items-center py-3 px-1.5 bg-[#0B1928] border-r border-slate-800 gap-3">
               <button
                 type="button"
                 onClick={() => setIsLotsCollapsed(false)}
@@ -361,7 +361,7 @@ export default function LotClassificationModal({
                 splitMode === 'sideBySide'
                   ? 'w-full lg:w-[30%] xl:w-[28%] min-w-[310px] max-w-[420px] h-full border-b lg:border-b-0 lg:border-r'
                   : 'w-full h-[28%] min-h-[170px] max-h-[220px] border-b'
-              } border-slate-800 flex flex-col overflow-hidden bg-[#070D1A] flex-shrink-0`}
+              } border-slate-800 flex flex-col overflow-hidden bg-[#0B1928] flex-shrink-0`}
             >
               <div className="px-4 py-2.5 bg-[#091122] border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2 flex-shrink-0">
                 <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-200 font-mono flex items-center gap-1.5">
@@ -514,7 +514,7 @@ export default function LotClassificationModal({
                       <button
                         type="button"
                         onClick={handleExportLotCSV}
-                        className="px-3.5 py-1.5 rounded-lg border border-slate-600 bg-[#070D1A] text-slate-100 hover:text-white hover:border-amber-400 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+                        className="px-3.5 py-1.5 rounded-lg border border-slate-600 bg-[#0B1928] text-slate-100 hover:text-white hover:border-amber-400 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
                         title="Download CSV report of components in this lot"
                       >
                         <span>📥</span> Export CSV
@@ -523,7 +523,7 @@ export default function LotClassificationModal({
                   </div>
 
                   {/* Where Components Locate Breakdown Tags */}
-                  <div className="bg-[#070D1A] p-2.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5 my-2 max-h-[96px] overflow-y-auto">
+                  <div className="bg-[#0B1928] p-2.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5 my-2 max-h-[96px] overflow-y-auto">
                     <span className="text-xs text-slate-300 uppercase font-bold tracking-wider mr-1.5">
                       LOCATE:
                     </span>
@@ -635,7 +635,7 @@ export default function LotClassificationModal({
                   ) : (
                     <table className="w-full text-left border-collapse text-xs md:text-sm font-mono">
                       <thead>
-                        <tr className="border-b border-slate-800 bg-[#070D1A] text-xs text-slate-300 uppercase tracking-wider sticky top-0 z-10 font-mono">
+                        <tr className="border-b border-slate-800 bg-[#0B1928] text-xs text-slate-300 uppercase tracking-wider sticky top-0 z-10 font-mono">
                           <th className="py-3 px-4 font-bold whitespace-nowrap">Component ID</th>
                           <th className="py-3 px-3 font-bold whitespace-nowrap">Subsystem &amp; Bay Location</th>
                           <th className="py-3 px-3 font-bold whitespace-nowrap">3D Pos [X, Y, Z]</th>
@@ -755,7 +755,7 @@ export default function LotClassificationModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-slate-800 bg-[#070D1A] flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 font-sans">
+        <div className="px-6 py-3 border-t border-slate-800 bg-[#0B1928] flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 font-sans">
           <div className="flex items-center gap-2">
             <span className="text-emerald-400 font-bold font-mono">● MIL-STD-883 HTOL 168H SPEC</span>
             <span className="text-slate-500">&bull;</span>

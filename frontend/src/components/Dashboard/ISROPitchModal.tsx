@@ -113,7 +113,7 @@ export default function ISROPitchModal({
           {/* SLIDE 0: EXECUTIVE MANDATE */}
           {activeSlide === 0 && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="bg-[#0A1322] p-4 rounded border border-isro-amber/30 flex items-start gap-4">
+              <div className="bg-[#0B1928] p-4 rounded border border-isro-amber/30 flex items-start gap-4">
                 <div className="text-3xl">🎯</div>
                 <div>
                   <h3 className="text-base font-display font-bold text-white uppercase tracking-wider mb-1">
@@ -154,15 +154,15 @@ export default function ISROPitchModal({
                   Key Endorsements for ISRO Stakeholders:
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div className="p-2.5 rounded bg-[#0A1322] border border-line/60">
+                  <div className="p-2.5 rounded bg-[#0B1928] border border-line/60">
                     <b className="text-white block mb-1">URSC Bengaluru</b>
                     <span className="text-slate-400 text-[11px]">Direct integration with satellite EEE part qualification &amp; thermal-vacuum test logs.</span>
                   </div>
-                  <div className="p-2.5 rounded bg-[#0A1322] border border-line/60">
+                  <div className="p-2.5 rounded bg-[#0B1928] border border-line/60">
                     <b className="text-white block mb-1">VSSC Thiruvananthapuram</b>
                     <span className="text-slate-400 text-[11px]">Avionics package &amp; stage separation driver screening under high-vibration burn-in.</span>
                   </div>
-                  <div className="p-2.5 rounded bg-[#0A1322] border border-line/60">
+                  <div className="p-2.5 rounded bg-[#0B1928] border border-line/60">
                     <b className="text-white block mb-1">SAC Ahmedabad</b>
                     <span className="text-slate-400 text-[11px]">Payload optical sensor, Ka-band TWTA, and radar component qualification.</span>
                   </div>
@@ -175,7 +175,7 @@ export default function ISROPitchModal({
           {activeSlide === 1 && (
             <div className="space-y-6 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-[#0A1322] p-4 rounded border border-isro-amber/40">
+                <div className="bg-[#0B1928] p-4 rounded border border-isro-amber/40">
                   <div className="text-[11px] font-bold text-isro-amber uppercase mb-1">ENGINE 01</div>
                   <div className="text-white font-bold text-sm mb-2">Isolation Forest Outlier Detection</div>
                   <p className="text-slate-300 text-xs leading-relaxed">
@@ -183,7 +183,7 @@ export default function ISROPitchModal({
                   </p>
                 </div>
 
-                <div className="bg-[#0A1322] p-4 rounded border border-safe/40">
+                <div className="bg-[#0B1928] p-4 rounded border border-safe/40">
                   <div className="text-[11px] font-bold text-safe uppercase mb-1">ENGINE 02</div>
                   <div className="text-white font-bold text-sm mb-2">XGBoost Latent Drift Classifier</div>
                   <p className="text-slate-300 text-xs leading-relaxed">
@@ -191,7 +191,7 @@ export default function ISROPitchModal({
                   </p>
                 </div>
 
-                <div className="bg-[#0A1322] p-4 rounded border border-white/20">
+                <div className="bg-[#0B1928] p-4 rounded border border-white/20">
                   <div className="text-[11px] font-bold text-white uppercase mb-1">ENGINE 03</div>
                   <div className="text-white font-bold text-sm mb-2">Lot-Relative Robust Z-Score</div>
                   <p className="text-slate-300 text-xs leading-relaxed">
@@ -201,7 +201,7 @@ export default function ISROPitchModal({
               </div>
 
               {/* Mathematical Formulation Card */}
-              <div className="bg-[#070D18] p-4 rounded border border-line font-mono text-xs space-y-2">
+              <div className="bg-[#07111C] p-4 rounded border border-line font-mono text-xs space-y-2">
                 <div className="text-slate-200 font-bold uppercase tracking-wider text-[11px]">
                   MATHEMATICAL CRITERIA APPLIED IN REAL-TIME:
                 </div>
@@ -329,7 +329,7 @@ export default function ISROPitchModal({
                 {ISRO_MISSIONS.map((m) => (
                   <div
                     key={m.id}
-                    className="p-4 rounded bg-[#0A1322] border border-line hover:border-isro-amber transition-all flex flex-col justify-between group"
+                    className="p-4 rounded bg-[#0B1928] border border-line hover:border-isro-amber transition-all flex flex-col justify-between group"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-1.5">

@@ -102,7 +102,7 @@ export default function SatelliteEquipmentBoard({
   const activeSub = subsystems.find((s) => s.key === focusKey)
 
   return (
-    <div className="bg-[#0B1120] border border-slate-800 rounded-xl flex flex-col font-sans text-xs select-none shadow-md overflow-hidden">
+    <div className="bg-[#102337] border border-slate-800 rounded-xl flex flex-col font-sans text-xs select-none shadow-md overflow-hidden">
       {/* Action Notification Toast */}
       {actionNotif && (
         <div className="bg-white/10 border-b border-white/20 px-4 py-2 text-center text-white text-xs font-semibold animate-fade-in flex items-center justify-center gap-2">
@@ -112,7 +112,7 @@ export default function SatelliteEquipmentBoard({
       )}
 
       {/* Top Header Bar */}
-      <div className="px-4 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-[#0F172A]">
+      <div className="px-4 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-[#142B40]">
         <div className="flex items-center gap-2.5">
           <span className="w-2.5 h-2.5 rounded-full bg-white" />
           <h3 className="m-0 font-bold text-xs tracking-wide uppercase text-white">
@@ -293,7 +293,7 @@ export default function SatelliteEquipmentBoard({
                         ? 'bg-white/10 border-white shadow-md ring-1 ring-white/30'
                         : isIsolated
                         ? 'bg-rose-500/5 border-rose-500/40 opacity-75'
-                        : 'bg-[#0F172A] border-slate-800 hover:border-slate-700 hover:bg-[#131D33]'
+                        : 'bg-[#142B40] border-slate-800 hover:border-slate-700 hover:bg-[#131D33]'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-1.5">
@@ -328,7 +328,7 @@ export default function SatelliteEquipmentBoard({
                     </div>
 
                     {/* Operational Telemetry Metrics */}
-                    <div className="grid grid-cols-3 gap-1 bg-[#070D1A] p-2 rounded border border-slate-800 text-[10px]">
+                    <div className="grid grid-cols-3 gap-1 bg-[#0B1928] p-2 rounded border border-slate-800 text-[10px]">
                       <div>
                         <div className="text-slate-400 text-[9px]">Drift &Delta;</div>
                         <div
@@ -412,7 +412,7 @@ export default function SatelliteEquipmentBoard({
       {viewMode === 'lifecycle' && (
         <div className="p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* COLUMN 1: OPERATIONAL UNITS */}
-          <div className="bg-[#0F172A] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
+          <div className="bg-[#142B40] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
@@ -434,7 +434,7 @@ export default function SatelliteEquipmentBoard({
                 <div
                   key={item.component_id}
                   onClick={() => onSelectComponent(item.component_id)}
-                  className="p-2.5 rounded-lg bg-[#070D1A] border border-slate-800 hover:border-slate-700 cursor-pointer flex items-center justify-between text-xs transition-all"
+                  className="p-2.5 rounded-lg bg-[#0B1928] border border-slate-800 hover:border-slate-700 cursor-pointer flex items-center justify-between text-xs transition-all"
                 >
                   <div>
                     <div className="font-mono font-bold text-white text-xs">{item.component_id}</div>
@@ -457,7 +457,7 @@ export default function SatelliteEquipmentBoard({
           </div>
 
           {/* COLUMN 2: UNDER EXAMINATION */}
-          <div className="bg-[#0F172A] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
+          <div className="bg-[#142B40] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -484,7 +484,7 @@ export default function SatelliteEquipmentBoard({
                   <div
                     key={item.component_id}
                     onClick={() => onSelectComponent(item.component_id)}
-                    className="p-2.5 rounded-lg bg-[#070D1A] border border-amber-500/30 hover:border-amber-500/60 cursor-pointer flex flex-col gap-1 text-xs transition-all"
+                    className="p-2.5 rounded-lg bg-[#0B1928] border border-amber-500/30 hover:border-amber-500/60 cursor-pointer flex flex-col gap-1 text-xs transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-mono font-bold text-white text-xs">{item.component_id}</span>
@@ -506,7 +506,7 @@ export default function SatelliteEquipmentBoard({
           </div>
 
           {/* COLUMN 3: REPAIR & QUARANTINE SECTION */}
-          <div className="bg-[#0F172A] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
+          <div className="bg-[#142B40] border border-slate-700/80 rounded-xl p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
@@ -536,7 +536,7 @@ export default function SatelliteEquipmentBoard({
                   return (
                     <div
                       key={item.component_id}
-                      className="p-2.5 rounded-lg bg-[#070D1A] border border-rose-500/40 flex flex-col gap-2 text-xs"
+                      className="p-2.5 rounded-lg bg-[#0B1928] border border-rose-500/40 flex flex-col gap-2 text-xs"
                     >
                       <div
                         onClick={() => onSelectComponent(item.component_id)}

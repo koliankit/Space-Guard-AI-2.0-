@@ -56,7 +56,7 @@ export default function AuditLog({ entries }: { entries: AuditEntry[] }) {
       </div>
 
       {expanded && (
-        <div className="mt-2 text-[11px] max-h-[140px] overflow-y-auto space-y-1 bg-[#040812] p-2.5 rounded-lg border border-slate-800 animate-modalin">
+        <div className="mt-2 text-[11px] max-h-[140px] overflow-y-auto space-y-1 bg-[#07111C] p-2.5 rounded-lg border border-slate-800 animate-modalin">
           {entries.map((e, i) => (
             <div key={i} className="leading-relaxed flex items-start gap-2">
               <span className="text-isro-amber font-bold shrink-0">[{e.time}]</span>

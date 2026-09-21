@@ -48,7 +48,7 @@ export default function MissionReportView({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-full p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-mono select-none w-full">
+    <div className="flex flex-col flex-1 min-h-full p-3 md:p-5 bg-[#07111C] text-[#F1F5F9] font-mono select-none w-full">
       {/* Top Header & Actions Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-line mb-6 w-full">
         <div>
@@ -127,26 +127,26 @@ export default function MissionReportView({
 
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-          <div className="p-3 rounded bg-[#0A1322] border border-line">
+          <div className="p-3 rounded bg-[#0B1928] border border-line">
             <div className="text-2xl font-display font-black text-isro-amber">{health}%</div>
             <div className="text-[10px] text-slate-400 uppercase mt-0.5">Mission Health Score</div>
           </div>
-          <div className="p-3 rounded bg-[#0A1322] border border-line">
+          <div className="p-3 rounded bg-[#0B1928] border border-line">
             <div className="text-2xl font-display font-black text-safe">{safeCount}</div>
             <div className="text-[10px] text-slate-400 uppercase mt-0.5">Flight Approved (Safe)</div>
           </div>
-          <div className="p-3 rounded bg-[#0A1322] border border-line">
+          <div className="p-3 rounded bg-[#0B1928] border border-line">
             <div className="text-2xl font-display font-black text-monitor">{monitored.length}</div>
             <div className="text-[10px] text-slate-400 uppercase mt-0.5">Active Orbital Monitor</div>
           </div>
-          <div className="p-3 rounded bg-[#0A1322] border border-line">
+          <div className="p-3 rounded bg-[#0B1928] border border-line">
             <div className="text-2xl font-display font-black text-reject">{rejected.length}</div>
             <div className="text-[10px] text-slate-400 uppercase mt-0.5">Quarantined / Defects</div>
           </div>
         </div>
 
         {/* Executive Anomaly Prevention Summary */}
-        <div className="bg-[#0A1322] p-4 rounded border border-line space-y-2 text-xs leading-relaxed">
+        <div className="bg-[#0B1928] p-4 rounded border border-line space-y-2 text-xs leading-relaxed">
           <div className="text-isro-amber font-display font-bold uppercase tracking-wider text-xs flex items-center gap-1.5">
             <span>&gt;&gt;</span> Executive Reliability Finding &bull; Range Safety Directorate:
           </div>
@@ -230,7 +230,7 @@ export default function MissionReportView({
 
         {/* Quality Assurance Sign-Off Block */}
         <div className="pt-6 border-t border-line grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-mono">
-          <div className="p-3.5 rounded bg-[#0A1322] border border-line">
+          <div className="p-3.5 rounded bg-[#0B1928] border border-line">
             <div className="text-slate-400 uppercase text-[10px]">Lead Screening Engineer (SMU):</div>
             <div className="text-slate-100 font-bold text-sm mt-1">Dr. A. Rajesh Kumar, Ph.D.</div>
             <div className="text-slate-400 text-[10px]">ISTRAC Quality Assurance &bull; ISRO Bengaluru</div>
@@ -238,7 +238,7 @@ export default function MissionReportView({
               <span>&#10003;</span> DIGITAL SIGNATURE VERIFIED: SHA256-8F4C2E9A-ISTRAC
             </div>
           </div>
-          <div className="p-3.5 rounded bg-[#0A1322] border border-line">
+          <div className="p-3.5 rounded bg-[#0B1928] border border-line">
             <div className="text-slate-400 uppercase text-[10px]">Mission Reliability Director (OCO):</div>
             <div className="text-slate-100 font-bold text-sm mt-1">Dr. M. S. Suryanarayana, Distinguished Scientist</div>
             <div className="text-slate-400 text-[10px]">

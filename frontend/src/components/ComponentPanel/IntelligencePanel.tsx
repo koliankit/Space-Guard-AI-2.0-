@@ -4,7 +4,7 @@ import type { ComponentOut } from '../../types'
 export function ComponentOverviewCard({ component }: { component: ComponentOut | null }) {
   if (!component) {
     return (
-      <div className="bg-[#0B1120] p-5 rounded-xl border border-slate-800 flex flex-col justify-center items-center text-center font-sans h-full min-h-[460px]">
+      <div className="bg-[#102337] p-5 rounded-xl border border-slate-800 flex flex-col justify-center items-center text-center font-sans h-full min-h-[460px]">
         <h3 className="m-0 mb-3 text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2 font-display">
           <span className="w-2 h-2 rounded-full bg-amber-400" />
           Component Intelligence
@@ -22,7 +22,7 @@ export function ComponentOverviewCard({ component }: { component: ComponentOut |
   const bHealth = component.behavioral_health || (isReject ? 'CRITICAL' : isMonitor ? 'MONITOR' : 'NORMAL')
 
   return (
-    <div className="bg-[#0B1120] p-4 md:p-5 rounded-xl border border-slate-800 flex flex-col justify-between h-full font-sans text-xs shadow-md">
+    <div className="bg-[#102337] p-4 md:p-5 rounded-xl border border-slate-800 flex flex-col justify-between h-full font-sans text-xs shadow-md">
       <div>
         {/* Header */}
         <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 mb-3.5">
@@ -62,7 +62,7 @@ export function ComponentOverviewCard({ component }: { component: ComponentOut |
         </div>
 
         {/* Target Component Identifier Card */}
-        <div className="bg-[#070D1A] p-3.5 rounded-xl border border-slate-800 mb-3.5 shadow-sm">
+        <div className="bg-[#0B1928] p-3.5 rounded-xl border border-slate-800 mb-3.5 shadow-sm">
           <div className="flex items-baseline justify-between">
             <div className="text-base font-bold text-white font-mono tracking-wide">
               {component.component_id}
@@ -78,7 +78,7 @@ export function ComponentOverviewCard({ component }: { component: ComponentOut |
         </div>
 
         {/* Traditional vs AI Verdict Comparison Box */}
-        <div className="mb-3.5 p-3.5 rounded-xl bg-[#070D1A] border border-slate-800 text-xs space-y-2">
+        <div className="mb-3.5 p-3.5 rounded-xl bg-[#0B1928] border border-slate-800 text-xs space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-slate-400 font-medium">Traditional Spec Check:</span>
             <b className={`px-2.5 py-1 rounded font-mono text-xs ${component.traditional_decision === 'PASS' ? 'text-emerald-300 bg-emerald-500/15' : 'text-rose-300 bg-rose-500/15'}`}>
@@ -104,25 +104,25 @@ export function ComponentOverviewCard({ component }: { component: ComponentOut |
         </div>
 
         {/* Burn-In Measurements (0h, 24h, 96h, 168h) */}
-        <div className="p-3.5 rounded-xl bg-[#070D1A] border border-slate-800">
+        <div className="p-3.5 rounded-xl bg-[#0B1928] border border-slate-800">
           <div className="text-[10.5px] text-slate-400 uppercase font-semibold mb-2.5 flex items-center justify-between">
             <span className="font-bold tracking-wider">HTOL Burn-In Measurements</span>
             <span className="text-amber-400 text-[10px] font-mono font-bold">MIL-STD-883 M1005</span>
           </div>
           <div className="grid grid-cols-4 gap-2.5 text-center font-mono">
-            <div className="bg-[#0F172A] p-2.5 rounded-lg border border-slate-800">
+            <div className="bg-[#142B40] p-2.5 rounded-lg border border-slate-800">
               <div className="text-[10px] text-slate-400 uppercase font-semibold mb-0.5">0h</div>
               <div className="text-white font-bold text-sm">{component.v0.toFixed(2)}</div>
             </div>
-            <div className="bg-[#0F172A] p-2.5 rounded-lg border border-slate-800">
+            <div className="bg-[#142B40] p-2.5 rounded-lg border border-slate-800">
               <div className="text-[10px] text-slate-400 uppercase font-semibold mb-0.5">24h</div>
               <div className="text-white font-bold text-sm">{component.v24.toFixed(2)}</div>
             </div>
-            <div className="bg-[#0F172A] p-2.5 rounded-lg border border-slate-800">
+            <div className="bg-[#142B40] p-2.5 rounded-lg border border-slate-800">
               <div className="text-[10px] text-slate-400 uppercase font-semibold mb-0.5">96h</div>
               <div className="text-white font-bold text-sm">{component.v96 != null ? component.v96.toFixed(2) : '--'}</div>
             </div>
-            <div className="bg-[#0F172A] p-2.5 rounded-lg border border-slate-800">
+            <div className="bg-[#142B40] p-2.5 rounded-lg border border-slate-800">
               <div className="text-[10px] text-slate-400 uppercase font-semibold mb-0.5">168h</div>
               <div className={`font-bold text-sm ${isReject ? 'text-rose-400' : 'text-amber-400'}`}>{component.v168.toFixed(2)}</div>
             </div>
@@ -166,7 +166,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
       ]
 
   return (
-    <div className="bg-[#0B1120] p-4 md:p-5 rounded-xl border border-slate-800 flex flex-col gap-4 font-sans text-xs shadow-md w-full">
+    <div className="bg-[#102337] p-4 md:p-5 rounded-xl border border-slate-800 flex flex-col gap-4 font-sans text-xs shadow-md w-full">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800">
         <div className="flex items-center gap-2">
@@ -186,14 +186,14 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
       {/* 5-Column Grid for the 10 Mathematical Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         {/* Metric 1 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Datasheet Limit</span>
           <span className="font-mono text-base font-bold text-rose-400">{component.limit_ua.toFixed(0)} µA</span>
           <span className="text-[10px] text-slate-400">Standard spec ceiling</span>
         </div>
 
         {/* Metric 2 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Lot Median</span>
           <span className="font-mono text-base font-bold text-slate-100">
             {component.lot_median != null ? `${component.lot_median.toFixed(2)} µA` : component.lot_mean != null ? `${component.lot_mean.toFixed(2)} µA` : '--'}
@@ -204,7 +204,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         </div>
 
         {/* Metric 3 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Lot MAD</span>
           <span className="font-mono text-base font-bold text-slate-100">
             {component.lot_mad != null ? `±${component.lot_mad.toFixed(2)} µA` : component.lot_std != null ? `±${component.lot_std.toFixed(2)} µA` : '--'}
@@ -213,7 +213,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         </div>
 
         {/* Metric 4 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Lot z-Score</span>
           <span className={`font-mono text-base font-bold ${
             Math.abs(component.z168) >= 3 ? 'text-rose-400' : Math.abs(component.z168) >= 2 ? 'text-amber-400' : 'text-emerald-400'
@@ -224,7 +224,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         </div>
 
         {/* Metric 5 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Drift % (168h vs 0h)</span>
           <span className={`font-mono text-base font-bold ${
             Math.abs(component.pct_drift) >= 60 ? 'text-rose-400' : Math.abs(component.pct_drift) >= 40 ? 'text-amber-400' : 'text-slate-100'
@@ -235,14 +235,14 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         </div>
 
         {/* Metric 6 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Drift Slope</span>
           <span className="font-mono text-base font-bold text-amber-300">{component.slope.toFixed(4)} µA/hr</span>
           <span className="text-[10px] text-slate-400 truncate">{component.drift_trend || 'NOMINAL / STABLE'}</span>
         </div>
 
         {/* Metric 7 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Predicted 168h (Early)</span>
           <span className="font-mono text-base font-bold text-slate-100">{component.predicted168_from_early.toFixed(2)} µA</span>
           <span className="text-[10px] text-slate-400 truncate">
@@ -251,7 +251,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         </div>
 
         {/* Metric 8 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Projected Future (264h)</span>
           <span className={`font-mono text-base font-bold ${
             component.predicted_future > component.limit_ua ? 'text-rose-400' : 'text-emerald-400'
@@ -266,7 +266,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         </div>
 
         {/* Metric 9 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Anomaly Score</span>
           <span className="font-mono text-base font-bold text-purple-300">
             {component.lot_anomaly_score != null ? `${component.lot_anomaly_score.toFixed(1)}` : (component.iso_score * 100).toFixed(1)} / 100
@@ -275,7 +275,7 @@ export function MathematicalReadingsPanel({ component }: { component: ComponentO
         </div>
 
         {/* Metric 10 */}
-        <div className="p-3 rounded-xl bg-[#070D1A] border border-slate-800 flex flex-col justify-between gap-1">
+        <div className="p-3 rounded-xl bg-[#0B1928] border border-slate-800 flex flex-col justify-between gap-1">
           <span className="text-slate-400 text-[11px] uppercase font-semibold">Risk Score &amp; Decision</span>
           <span className={`font-mono text-base font-bold ${
             isReject ? 'text-rose-400' : isMonitor ? 'text-amber-400' : 'text-emerald-400'

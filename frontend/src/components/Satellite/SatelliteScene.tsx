@@ -128,7 +128,7 @@ function SpacecraftModel({
   const radiatorMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: '#0f172a',
+        color: '#142B40',
         emissive: '#334155',
         emissiveIntensity: 0.08,
         metalness: 0.88,
@@ -147,7 +147,7 @@ function SpacecraftModel({
     <group ref={groupRef}>
       {/* --- Central Avionics Structural Core Frame --- */}
       <lineSegments geometry={trussEdges}>
-        <lineBasicMaterial color="#F59E0B" transparent opacity={isXray ? 0.9 : 0.3} />
+        <lineBasicMaterial color="#0E88D3" transparent opacity={isXray ? 0.9 : 0.3} />
       </lineSegments>
 
       {/* --- Main Bus Octagonal Chassis (MLI Thermal Blanket) --- */}
@@ -262,12 +262,12 @@ function HologramFloor() {
 
   return (
     <group position={[0, -1.4, 0]}>
-      {/* Concentric Holographic Rings */}
+      {/* Concentric Holographic Rings in ISRO Blue */}
       {[1.2, 2.0, 2.8, 3.6].map((r, i) => (
         <mesh key={i} rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[r - 0.015, r, 64]} />
           <meshBasicMaterial
-            color={i % 2 === 0 ? '#F59E0B' : '#FFFFFF'}
+            color={i % 2 === 0 ? '#0E88D3' : '#1D3A52'}
             transparent
             opacity={0.25 - i * 0.04}
             side={THREE.DoubleSide}
@@ -275,15 +275,15 @@ function HologramFloor() {
         </mesh>
       ))}
 
-      {/* Rotating Radar Crosshairs in ISRO Amber */}
+      {/* Rotating Radar Crosshairs in ISRO Blue */}
       <group ref={radarRef}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <planeGeometry args={[7.4, 0.02]} />
-          <meshBasicMaterial color="#F59E0B" transparent opacity={0.25} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#0E88D3" transparent opacity={0.25} side={THREE.DoubleSide} />
         </mesh>
         <mesh rotation={[Math.PI / 2, 0, Math.PI / 2]}>
           <planeGeometry args={[7.4, 0.02]} />
-          <meshBasicMaterial color="#F59E0B" transparent opacity={0.25} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#0E88D3" transparent opacity={0.25} side={THREE.DoubleSide} />
         </mesh>
       </group>
     </group>
@@ -482,8 +482,8 @@ export default function SatelliteScene({
         {/* Earth Albedo Bounce Light (Crisp ambient reflection from below) */}
         <directionalLight position={[-3, -6, 2]} intensity={0.9} color="#E2E8F0" />
 
-        {/* ISRO Telemetry Amber Solar Specular Light */}
-        <pointLight position={[-5, 2, -4]} intensity={0.8} color="#F59E0B" />
+        {/* ISRO Telemetry Blue Solar Specular Light */}
+        <pointLight position={[-5, 2, -4]} intensity={0.8} color="#0E88D3" />
 
         {/* Deep Space Cosmic Starfield */}
         <Stars radius={110} depth={50} count={3400} factor={3.8} saturation={0.7} fade speed={0.8} />
@@ -561,14 +561,14 @@ class CanvasErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center h-full p-6 bg-[#060B16] text-center font-mono">
-          <div className="w-12 h-12 rounded-full border border-isro-amber/40 bg-isro-amber/10 flex items-center justify-center text-isro-amber mb-3 shadow-sm">
+        <div className="flex flex-col items-center justify-center h-full p-6 bg-[#07111C] text-center font-mono">
+          <div className="w-12 h-12 rounded-full border border-[#0E88D3]/40 bg-[#0E88D3]/10 flex items-center justify-center text-[#0E88D3] mb-3 shadow-sm">
             &#128752;
           </div>
-          <div className="text-isro-amber font-display font-bold text-xs uppercase tracking-wider mb-1">
+          <div className="text-[#0E88D3] font-display font-bold text-xs uppercase tracking-wider mb-1">
             3D Spacecraft Canvas (Fallback Telemetry Mode)
           </div>
-          <div className="text-slate-400 text-[10px] max-w-sm">
+          <div className="text-[#9AAFC0] text-[10px] max-w-sm">
             Hardware acceleration is inactive in this browser session. Spacecraft telemetry and subsystem diagnostics remain fully active.
           </div>
         </div>

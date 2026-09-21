@@ -96,7 +96,7 @@ export default function PropulsionDeck({
           color={isSelected ? '#F59E0B' : isHovered ? '#D97706' : '#1e293b'}
           metalness={0.9}
           roughness={0.2}
-          emissive={isSelected ? '#F59E0B' : '#0f172a'}
+          emissive={isSelected ? '#F59E0B' : '#142B40'}
           emissiveIntensity={isSelected ? 0.4 : 0.05}
           transparent={isXray}
           opacity={isXray ? 0.35 : 1.0}
@@ -158,7 +158,7 @@ export default function PropulsionDeck({
               color="#94a3b8"
               metalness={0.95}
               roughness={0.12}
-              emissive={isSelected ? '#F59E0B' : '#0f172a'}
+              emissive={isSelected ? '#F59E0B' : '#142B40'}
               emissiveIntensity={isSelected ? 0.35 : 0.05}
             />
           </mesh>

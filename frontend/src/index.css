@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-bg: #07111C;
+  --color-bg2: #0B1928;
+  --color-panel: #102337;
+  --color-panel2: #142B40;
+  --color-border: #1D3A52;
+  --color-line: #1D3A52;
+
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #9AAFC0;
+  --color-text-muted: #6F8495;
+
+  --color-isro-blue: #0E88D3;
+  --color-isro-orange: #F47216;
+
+  --color-status-safe: #22A06B;
+  --color-status-monitor: #F2B84B;
+  --color-status-reject: #E5484D;
+}
+
 @font-face {
   font-family: 'Sitka Small Semibold';
   src: local('Sitka Small Semibold'), local('Sitka Small-Semibold'), local('Sitka Small'), local('SitkaVF');
@@ -44,8 +64,8 @@ html, body, #root {
 }
 
 body {
-  background: #070D18;
-  color: #E8EDF2;
+  background: #07111C;
+  color: #F1F5F9;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
   font-variation-settings: 'opsz' 14, 'wght' 600;
@@ -57,28 +77,28 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Calm, Aerospace-Grade Scrollbars */
+/* Calm, Precision Aerospace Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #26384D;
+  background: #1D3A52;
   border-radius: 3px;
-  border: 1px solid #16253A;
+  border: 1px solid #142B40;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #C99A2E;
+  background: #0E88D3;
 }
 ::-webkit-scrollbar-track {
-  background: #070D18;
+  background: #07111C;
 }
 
 /* ==============================================================================
-   Calm Aerospace Motion & Telemetry Animations (No Rapid Flashing)
+   Calm Aerospace Motion & Telemetry Animations (No Jarring Flashing)
    ============================================================================== */
 
-/* 1. Very slow ambient grid movement: 18-second subtle loop */
+/* 1. Very slow ambient grid movement */
 @keyframes grid-drift {
   0% { background-position: 0 0; }
   100% { background-position: 32px 32px; }
@@ -91,13 +111,13 @@ body {
   z-index: 0;
   opacity: 0.28;
   background-image:
-    linear-gradient(rgba(38, 56, 77, 0.35) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(38, 56, 77, 0.35) 1px, transparent 1px);
+    linear-gradient(rgba(29, 58, 82, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 58, 82, 0.35) 1px, transparent 1px);
   background-size: 32px 32px;
   animation: grid-drift 18s linear infinite;
 }
 
-/* 2. Gentle Telemetry Pulse (2.5s calm breathing, replaces jarring fast blink) */
+/* 2. Gentle Telemetry Pulse (2.5s calm breathing) */
 @keyframes gentle-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.03); }
@@ -111,7 +131,7 @@ body {
   animation: gentle-pulse 2.5s ease-in-out infinite;
 }
 
-/* 3. Single-shot Alert Pulse: Pulses once on appearance, then remains static */
+/* 3. Single-shot Alert Pulse */
 @keyframes alert-once {
   0% { opacity: 0.4; transform: scale(0.99); }
   45% { opacity: 1; transform: scale(1.01); }
@@ -122,7 +142,7 @@ body {
   animation: alert-once 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* 4. Subtle Telemetry Line Signal Flow */
+/* 4. Telemetry Line Signal Flow */
 @keyframes signal-flow {
   0% { stroke-dashoffset: 48; }
   100% { stroke-dashoffset: 0; }
@@ -133,13 +153,13 @@ body {
   animation: signal-flow 2.8s linear infinite;
 }
 
-/* 5. TEE Subtle Boundary Signal (Calm perimeter signal, NO cyber glow) */
+/* 5. TEE Subtle Boundary Signal */
 @keyframes tee-subtle-signal {
   0%, 100% {
-    border-color: #26384D;
+    border-color: #1D3A52;
   }
   50% {
-    border-color: #3B82B6;
+    border-color: #0E88D3;
   }
 }
 
@@ -162,22 +182,22 @@ body {
    ============================================================================== */
 
 .hud-glass {
-  background: rgba(17, 30, 48, 0.92);
+  background: rgba(16, 35, 55, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid #26384D;
+  border: 1px solid #1D3A52;
 }
 
 .hud-glass-interactive {
-  background: rgba(17, 30, 48, 0.85);
+  background: rgba(16, 35, 55, 0.85);
   backdrop-filter: blur(8px);
-  border: 1px solid #26384D;
+  border: 1px solid #1D3A52;
   transition: all 0.2s ease;
 }
 
 .hud-glass-interactive:hover {
-  background: rgba(22, 37, 58, 0.95);
-  border-color: #3B82B6;
+  background: rgba(20, 43, 64, 0.95);
+  border-color: #0E88D3;
 }
 
 .hud-tag {
@@ -197,36 +217,46 @@ body {
   position: absolute;
   top: -1px; left: -1px;
   width: 6px; height: 6px;
-  border-top: 1.5px solid #C99A2E;
-  border-left: 1.5px solid #C99A2E;
+  border-top: 1.5px solid #0E88D3;
+  border-left: 1.5px solid #0E88D3;
 }
 .reticle-corner::after {
   content: '';
   position: absolute;
   bottom: -1px; right: -1px;
   width: 6px; height: 6px;
-  border-bottom: 1.5px solid #C99A2E;
-  border-right: 1.5px solid #C99A2E;
+  border-bottom: 1.5px solid #0E88D3;
+  border-right: 1.5px solid #0E88D3;
+}
+
+/* Reticle Corners - Orange (Attention / Key Mission) */
+.reticle-corner-orange::before {
+  border-top: 1.5px solid #F47216;
+  border-left: 1.5px solid #F47216;
+}
+.reticle-corner-orange::after {
+  border-bottom: 1.5px solid #F47216;
+  border-right: 1.5px solid #F47216;
 }
 
 /* Reticle Corners - Green (Safe) */
 .reticle-corner-green::before {
-  border-top: 1.5px solid #3FA66B;
-  border-left: 1.5px solid #3FA66B;
+  border-top: 1.5px solid #22A06B;
+  border-left: 1.5px solid #22A06B;
 }
 .reticle-corner-green::after {
-  border-bottom: 1.5px solid #3FA66B;
-  border-right: 1.5px solid #3FA66B;
+  border-bottom: 1.5px solid #22A06B;
+  border-right: 1.5px solid #22A06B;
 }
 
 /* Reticle Corners - Red (Reject / Alert) */
 .reticle-corner-red::before {
-  border-top: 1.5px solid #D94B5B;
-  border-left: 1.5px solid #D94B5B;
+  border-top: 1.5px solid #E5484D;
+  border-left: 1.5px solid #E5484D;
 }
 .reticle-corner-red::after {
-  border-bottom: 1.5px solid #D94B5B;
-  border-right: 1.5px solid #D94B5B;
+  border-bottom: 1.5px solid #E5484D;
+  border-right: 1.5px solid #E5484D;
 }
 
 /* Subtle Radar Sweep */
@@ -241,11 +271,11 @@ body {
 
 /* Card & Console Shadows */
 .shadow-isro {
-  box-shadow: 0 2px 10px rgba(201, 154, 46, 0.15);
+  box-shadow: 0 2px 10px rgba(14, 136, 211, 0.15);
 }
-.shadow-telemetry {
-  box-shadow: 0 2px 10px rgba(59, 130, 182, 0.15);
+.shadow-orange {
+  box-shadow: 0 2px 10px rgba(244, 114, 22, 0.15);
 }
 .shadow-alert {
-  box-shadow: 0 2px 10px rgba(217, 75, 91, 0.2);
+  box-shadow: 0 2px 10px rgba(229, 72, 77, 0.2);
 }
