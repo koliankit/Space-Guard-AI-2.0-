@@ -29,7 +29,7 @@ export default function DiagnosticsView({
     null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1 min-h-full">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
         <div>
@@ -85,7 +85,7 @@ export default function DiagnosticsView({
 
       {/* View Content */}
       {activeTab === 'prescriptive' ? (
-        <div className="flex flex-col gap-5 w-full">
+        <div className="flex flex-col gap-5 w-full flex-1 min-h-0">
           {/* AI Recommendation & Prescriptive Actions */}
           <AIRecommendationSystem
             component={worstPart}
@@ -98,7 +98,7 @@ export default function DiagnosticsView({
           />
         </div>
       ) : (
-        <div className="w-full">
+        <div className="w-full flex-1 min-h-0 flex flex-col">
           <SubsystemsView
             subsystems={subsystems}
             components={components}

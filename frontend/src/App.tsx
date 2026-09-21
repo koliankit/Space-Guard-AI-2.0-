@@ -336,7 +336,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen text-slate-100 flex flex-col bg-bg">
+    <div className="h-screen w-screen overflow-hidden text-slate-100 flex flex-col bg-bg">
       <div className="grid-overlay" />
       <Header
         streamActive={batchId !== null}
@@ -400,7 +400,7 @@ export default function App() {
       {running && <PipelineOverlay onDone={onPipelineDone} />}
 
       {/* Main Single Application Frame: LEFT NAVIGATION + RIGHT FULL WORKSPACE */}
-      <div className="flex-1 flex flex-row w-full overflow-hidden relative">
+      <div className="flex-1 min-h-0 flex flex-row w-full overflow-hidden relative">
         {/* Left Navigation Sidebar */}
         <SidebarNav
           activeTab={activeTab}
@@ -421,7 +421,7 @@ export default function App() {
         />
 
         {/* Right Full Dashboard Workspace */}
-        <main className="flex-1 min-w-0 overflow-y-auto bg-[#070D18] flex flex-col">
+        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#070D18] flex flex-col">
           {/* OVERVIEW */}
           {(activeTab === 'overview' || activeTab === 'wall') && (
             <MultiScreenWall

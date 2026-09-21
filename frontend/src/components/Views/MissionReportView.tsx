@@ -48,7 +48,7 @@ export default function MissionReportView({
   }
 
   return (
-    <div className="flex flex-col flex-1 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-mono select-none overflow-y-auto w-full min-h-screen">
+    <div className="flex flex-col flex-1 min-h-full p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-mono select-none w-full">
       {/* Top Header & Actions Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-line mb-6 w-full">
         <div>

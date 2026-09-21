@@ -238,9 +238,9 @@ export default function SidebarNav({
         />
       )}
 
-      {/* Main Sidebar Frame: full-height sticky left navigation column */}
+      {/* Main Sidebar Frame: full-height left navigation column docked seamlessly */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-72 xl:w-80 bg-[#070D18] border-r border-[#26384D] z-50 flex flex-col justify-between flex-shrink-0 transition-transform duration-200 ease-in-out ${
+        className={`fixed lg:relative top-0 left-0 h-screen lg:h-full w-72 xl:w-80 bg-[#070D18] border-r border-[#26384D] z-40 lg:z-auto flex flex-col justify-between flex-shrink-0 min-h-0 transition-transform duration-200 ease-in-out ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >

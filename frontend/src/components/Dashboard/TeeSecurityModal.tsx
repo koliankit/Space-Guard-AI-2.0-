@@ -28,7 +28,7 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070D18]/85 backdrop-blur-sm p-4 overflow-y-auto font-sans animate-fadein">
-      <div className="relative w-full max-w-2xl rounded-2xl border border-[#26384D] bg-[#111E30] text-[#E8EDF2] shadow-2xl overflow-hidden flex flex-col my-8">
+      <div className="relative w-full max-w-3xl max-h-[90vh] rounded-2xl border border-[#26384D] bg-[#111E30] text-[#E8EDF2] shadow-2xl overflow-hidden flex flex-col my-4">
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-[#26384D] bg-[#0D1726] flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -63,7 +63,7 @@ export default function TeeSecurityModal({ isOpen, onClose, status }: TeeSecurit
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 flex flex-col gap-5 text-xs md:text-sm font-sans">
+        <div className="p-6 flex flex-col gap-5 text-xs md:text-sm font-sans flex-1 overflow-y-auto">
           {/* Status & Mode Banners */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Status Card */}

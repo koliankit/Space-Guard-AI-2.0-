@@ -112,7 +112,7 @@ export default function RiskEngineView({
   const totalCount = components.length || 1
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1 min-h-full">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
         <div>
@@ -249,11 +249,11 @@ export default function RiskEngineView({
         </select>
       </div>
 
-      {/* Row 3: Selected Component Risk Breakdown */}
+      {/* Row 3: Selected Component Risk Breakdown - Stretches to fill remaining workspace */}
       {targetPart ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch flex-1 min-h-0">
           {/* Left Column: Overall Risk Gauge & Decision Card */}
-          <div className={`p-5 rounded-xl border flex flex-col justify-between gap-4 ${
+          <div className={`p-5 rounded-xl border flex flex-col justify-between gap-4 h-full ${
             targetPart.status === 'reject'
               ? 'bg-[#28131D] border-[#D94B5B]/60'
               : targetPart.status === 'monitor'

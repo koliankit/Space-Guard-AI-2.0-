@@ -112,7 +112,7 @@ export default function CsvIntakeView({
   const hasData = rawParts.length > 0 || uploadMeta !== null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1 min-h-full">
       {/* View Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
         <div>
@@ -300,8 +300,8 @@ export default function CsvIntakeView({
         </div>
       </div>
 
-      {/* Dataset Preview Section */}
-      <div className="p-4 md:p-5 rounded-xl bg-[#111E30] border border-[#26384D] flex flex-col gap-4">
+      {/* Dataset Preview Section - Flexes to fill remaining viewport height */}
+      <div className="p-4 md:p-5 rounded-xl bg-[#111E30] border border-[#26384D] flex flex-col gap-4 flex-1 min-h-[360px]">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#26384D] pb-3">
           <div className="flex items-center gap-3">
             <span className="text-sm font-mono font-bold text-[#E8EDF2] uppercase tracking-wide">
@@ -331,18 +331,19 @@ export default function CsvIntakeView({
                 setPageSize(Number(e.target.value))
                 setTablePage(0)
               }}
-              className="bg-[#070D18] border border-[#26384D] text-[#91A0B2] text-xs font-mono rounded-lg px-2.5 py-1.5 focus:outline-none"
+              className="bg-[#070D18] border border-[#26384D] text-[#91A0B2] text-xs font-mono rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
             >
               <option value={10}>10 rows</option>
               <option value={15}>15 rows</option>
               <option value={25}>25 rows</option>
               <option value={50}>50 rows</option>
+              <option value={100}>100 rows</option>
             </select>
           </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto rounded-lg border border-[#26384D]">
+        <div className="overflow-x-auto overflow-y-auto rounded-lg border border-[#26384D] flex-1 min-h-0">
           <table className="w-full text-xs font-mono text-left border-collapse">
             <thead>
               <tr className="bg-[#0D1726] text-[#91A0B2] uppercase tracking-wider border-b border-[#26384D]">

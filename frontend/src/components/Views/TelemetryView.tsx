@@ -31,7 +31,7 @@ export default function TelemetryView({
     null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1 min-h-full">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
         <div>
@@ -60,9 +60,9 @@ export default function TelemetryView({
       </div>
 
       {/* Main Content Layout: Pinned Sidebar Component Monitor + Full Telemetry Chart */}
-      <div className="flex flex-col xl:flex-row gap-5 items-start w-full">
+      <div className="flex flex-col xl:flex-row gap-5 items-stretch flex-1 min-h-0 w-full">
         {/* Component Monitor Selector */}
-        <div className="w-full xl:w-[360px] 2xl:w-[400px] flex-shrink-0 xl:sticky xl:top-4 flex flex-col rounded-xl overflow-hidden border border-[#26384D] bg-[#111E30] shadow-md">
+        <div className="w-full xl:w-[360px] 2xl:w-[400px] flex-shrink-0 flex flex-col rounded-xl overflow-hidden border border-[#26384D] bg-[#111E30] shadow-md h-full">
           <ComponentMonitor
             subsystems={subsystems}
             components={components}
@@ -77,8 +77,8 @@ export default function TelemetryView({
 
         {/* Right Flow: Oscilloscope Waveforms + Mathematical Readings Panel */}
         <div className="flex-1 min-w-0 flex flex-col gap-5 w-full">
-          {/* Waveform Telemetry Chart */}
-          <div className="w-full">
+          {/* Waveform Telemetry Chart - Dynamically expands to fill available height */}
+          <div className="w-full flex-1 min-h-[380px] flex flex-col">
             <TelemetryChart component={targetPart} />
           </div>
 

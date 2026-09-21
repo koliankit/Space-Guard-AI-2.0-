@@ -194,8 +194,8 @@ export default function ModuleBFutureDriftPanel({
           </div>
         )}
 
-        {/* Module B Dedicated Graph: Predictive Extrapolation Canvas */}
-        <div className="mt-0.5 flex flex-col h-[260px] md:h-[280px] min-h-[240px] w-full">
+        {/* Module B Dedicated Graph: Predictive Extrapolation Canvas - Dynamically occupies full remaining height */}
+        <div className="mt-0.5 flex flex-col flex-1 min-h-[280px] w-full">
           <ModuleBFutureDriftGraph component={selected} onSimUpdate={setSimData} />
         </div>
       </div>

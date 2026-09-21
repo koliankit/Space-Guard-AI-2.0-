@@ -44,7 +44,7 @@ export default function ISROPitchModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md font-mono animate-fadeIn">
       {/* Modal Container */}
-      <div className="w-full max-w-5xl max-h-[92vh] bg-[#060B16] border-2 border-isro-amber/80 rounded-lg shadow-[0_0_50px_rgba(245,158,11,0.2)] flex flex-col overflow-hidden relative reticle-corner">
+      <div className="w-[94vw] max-w-6xl h-[90vh] bg-[#060B16] border-2 border-isro-amber/80 rounded-lg shadow-[0_0_50px_rgba(245,158,11,0.2)] flex flex-col overflow-hidden relative reticle-corner">
         
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-line bg-gradient-to-r from-[#0E1726] via-[#091120] to-[#0A1A17] flex items-center justify-between">

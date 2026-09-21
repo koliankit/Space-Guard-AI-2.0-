@@ -153,7 +153,7 @@ export default function SubsystemsView({
   }, [components])
 
   return (
-    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#060B16] font-mono select-none overflow-y-auto text-slate-100 w-full">
+    <div className="flex flex-col flex-1 min-h-full p-4 sm:p-5 bg-[#060B16] font-mono select-none overflow-y-auto text-slate-100 w-full">
       {/* View Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-4">
         <div>

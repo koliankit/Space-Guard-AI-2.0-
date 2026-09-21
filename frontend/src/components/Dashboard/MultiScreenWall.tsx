@@ -143,7 +143,7 @@ export default function MultiScreenWall({
   const subsystems: SubsystemStatus[] = mission?.subsystems ?? DEFAULT_SUBSYSTEMS
 
   return (
-    <div className="flex flex-col flex-1 bg-[#070D18] text-[#E8EDF2] font-sans select-none overflow-x-auto min-h-[calc(100vh-140px)] w-full">
+    <div className="flex flex-col flex-1 min-h-0 bg-[#070D18] text-[#E8EDF2] font-sans select-none w-full">
       {/* Wall Header Banner: ISRO Sriharikota Mission Control Display Wall */}
       <div className="bg-[#0D1726] border-b border-[#26384D] px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 w-full">
         <div className="flex items-center gap-3">

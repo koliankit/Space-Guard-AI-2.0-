@@ -42,7 +42,7 @@ export default function OrbitalTrackingView() {
   }, [])
 
   return (
-    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#060B16] font-mono select-none overflow-y-auto text-slate-100 w-full">
+    <div className="flex flex-col flex-1 p-4 sm:p-5 bg-[#060B16] font-mono select-none overflow-y-auto text-slate-100 w-full min-h-full">
       {/* View Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-4">
         <div>
@@ -79,9 +79,9 @@ export default function OrbitalTrackingView() {
       </div>
 
       {/* Grid: Orbital Map (2/3) + Real-Time Telemetry Stream (1/3) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 flex-1 min-h-0">
         {/* Large Global Ground Track Radar */}
-        <div className="lg:col-span-2 bg-[#0A1020] p-4 rounded-xl border border-slate-800 shadow-md flex flex-col">
+        <div className="lg:col-span-2 bg-[#0A1020] p-4 rounded-xl border border-slate-800 shadow-md flex flex-col flex-1 min-h-[360px]">
           <div className="flex items-center justify-between mb-3">
             <div className="text-xs font-display font-bold text-amber-400 tracking-wider uppercase flex items-center gap-2">
               <span className="text-amber-400">&gt;&gt;</span> Global Ground Station Footprint &amp; Sub-Satellite Track
@@ -92,7 +92,7 @@ export default function OrbitalTrackingView() {
             </div>
           </div>
 
-          <div className="relative h-[290px] bg-[#060B16] rounded-lg border border-slate-800 overflow-hidden flex items-center justify-center">
+          <div className="relative flex-1 min-h-[290px] bg-[#060B16] rounded-lg border border-slate-800 overflow-hidden flex items-center justify-center">
             {/* World Map SVG Canvas */}
             <svg viewBox="0 0 720 360" className="w-full h-full block">
               {/* Latitude & Longitude Gridlines */}
@@ -271,7 +271,7 @@ export default function OrbitalTrackingView() {
         </div>
 
         {/* Real-time Telemetry Stream & Doppler Parameters */}
-        <div className="bg-[#0A1020] p-4 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
+        <div className="bg-[#0A1020] p-4 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between flex-1 min-h-[360px]">
           <div>
             <div className="text-xs font-display font-bold text-amber-400 tracking-wider uppercase mb-3 flex items-center gap-2">
               <span className="text-amber-400">&gt;&gt;</span> Orbital Mechanics Telemetry

@@ -333,7 +333,7 @@ export default function AIRecommendationSystem({
   }
 
   return (
-    <div className="bg-[#0B1120] border border-slate-700/80 rounded-xl p-5 md:p-6 font-sans text-xs select-none shadow-xl flex flex-col gap-4 w-full">
+    <div className="bg-[#0B1120] border border-slate-700/80 rounded-xl p-5 md:p-6 font-sans text-xs select-none shadow-xl flex flex-col gap-4 w-full flex-1 min-h-0">
       {/* ================= HEADER BANNER ================= */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 bg-[#0F172A] -m-5 md:-m-6 p-5 md:p-6 mb-0 rounded-t-xl">
         <div className="flex items-center gap-3.5">

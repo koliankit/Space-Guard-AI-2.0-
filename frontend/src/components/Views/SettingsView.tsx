@@ -41,7 +41,7 @@ export default function SettingsView({
   }
 
   return (
-    <div className="flex flex-col flex-1 p-4 md:p-6 bg-[#070D18] text-[#E8EDF2] font-sans select-none overflow-y-auto w-full min-h-screen">
+    <div className="flex flex-col flex-1 p-4 md:p-6 bg-[#070D18] text-[#E8EDF2] font-sans select-none overflow-y-auto w-full min-h-full">
       {/* Top Section Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#26384D] mb-6">
         <div>
@@ -66,9 +66,9 @@ export default function SettingsView({
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch flex-1 min-h-0">
         {/* Card 1: Confidential Computing & TEE Security Enclave */}
-        <div className="bg-[#111E30] border border-[#26384D] rounded-xl p-5 flex flex-col gap-4 shadow-sm">
+        <div className="bg-[#111E30] border border-[#26384D] rounded-xl p-5 flex flex-col justify-between gap-4 shadow-sm h-full">
           <div className="flex items-center justify-between border-b border-[#26384D] pb-3">
             <div className="flex items-center gap-2">
               <span className="text-lg">🛡️</span>
@@ -124,7 +124,7 @@ export default function SettingsView({
         </div>
 
         {/* Card 2: Space Qualification Screening Thresholds */}
-        <form onSubmit={handleSave} className="bg-[#111E30] border border-[#26384D] rounded-xl p-5 flex flex-col gap-4 shadow-sm">
+        <form onSubmit={handleSave} className="bg-[#111E30] border border-[#26384D] rounded-xl p-5 flex flex-col justify-between gap-4 shadow-sm h-full">
           <div className="flex items-center justify-between border-b border-[#26384D] pb-3">
             <div className="flex items-center gap-2">
               <span className="text-lg">⚖️</span>
@@ -210,7 +210,7 @@ export default function SettingsView({
         </form>
 
         {/* Card 3: Active Mission Spacecraft Profile */}
-        <div className="bg-[#111E30] border border-[#26384D] rounded-xl p-5 flex flex-col gap-4 shadow-sm">
+        <div className="bg-[#111E30] border border-[#26384D] rounded-xl p-5 flex flex-col justify-between gap-4 shadow-sm h-full">
           <div className="flex items-center justify-between border-b border-[#26384D] pb-3">
             <div className="flex items-center gap-2">
               <span className="text-lg">🛰️</span>
@@ -259,7 +259,7 @@ export default function SettingsView({
         </div>
 
         {/* Card 4: Audio Feedback, Telemetry Reset & System Controls */}
-        <div className="bg-[#111E30] border border-[#26384D] rounded-xl p-5 flex flex-col gap-4 shadow-sm">
+        <div className="bg-[#111E30] border border-[#26384D] rounded-xl p-5 flex flex-col justify-between gap-4 shadow-sm h-full">
           <div className="flex items-center justify-between border-b border-[#26384D] pb-3">
             <div className="flex items-center gap-2">
               <span className="text-lg">🎛️</span>

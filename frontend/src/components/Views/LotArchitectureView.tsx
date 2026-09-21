@@ -210,7 +210,7 @@ export default function LotArchitectureView({
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-[#070D18] text-[#E8EDF2] font-sans p-3 md:p-5 gap-4 select-none min-h-screen w-full overflow-y-auto">
+    <div className="flex flex-col flex-1 bg-[#070D18] text-[#E8EDF2] font-sans p-3 md:p-5 gap-4 select-none min-h-full w-full">
       {/* Top Banner: Header and Key Metrics */}
       <div className="bg-[#0B1120] border border-slate-800 rounded-xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -282,10 +282,10 @@ export default function LotArchitectureView({
         </div>
       </div>
 
-      {/* Main Work Area - Left Lot Sidebar (28%) + Right Wide Component Table (72%) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-start w-full">
+      {/* Main Work Area - Left Lot Sidebar + Right Wide Component Table */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 min-h-0 items-stretch w-full">
         {/* Left Column: Qualification Lots Grid + AI Recommendation System */}
-        <div className="flex flex-col gap-4 w-full lg:col-span-4 xl:col-span-3.5">
+        <div className="flex flex-col gap-4 w-full lg:col-span-4 xl:col-span-4 h-full">
           <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
             <div className="bg-[#0F172A] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-200 font-display flex items-center gap-2">
@@ -294,7 +294,7 @@ export default function LotArchitectureView({
               <span className="text-[10px] text-slate-400 font-mono">Click lot to select &amp; inspect</span>
             </div>
 
-            <div className="p-3 overflow-y-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[320px]">
+            <div className="p-3 overflow-y-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-h-[240px] max-h-[460px]">
               {lotGroups.length === 0 ? (
                 <div className="p-8 text-center text-slate-400 text-xs italic">
                   No qualification lots loaded. Upload a CSV file or load an ISRO flight batch to inspect.
@@ -423,8 +423,8 @@ export default function LotArchitectureView({
           </div>
         </div>
 
-        {/* Right Column: Selected Lot Deep Dive & Component Location Table (Expanded ~72%) */}
-        <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg lg:col-span-8 xl:col-span-8.5 w-full">
+        {/* Right Column: Selected Lot Deep Dive & Component Location Table */}
+        <div className="flex flex-col bg-[#090F1E] border border-slate-800 rounded-xl overflow-hidden shadow-lg lg:col-span-8 xl:col-span-8 w-full h-full">
           {activeLot ? (
             <>
               {/* Active Lot Header & Location Allocation Summary */}
@@ -561,8 +561,8 @@ export default function LotArchitectureView({
                 </div>
               </div>
 
-              {/* Components Table with Full Satellite Location Columns */}
-              <div className="overflow-y-auto overflow-x-auto max-h-[280px] xl:max-h-[320px] border-b border-slate-800">
+              {/* Components Table with Full Satellite Location Columns - Stretches to fill available space */}
+              <div className="overflow-y-auto overflow-x-auto flex-1 min-h-[280px] border-b border-slate-800">
                 <table className="w-full min-w-[700px] text-left border-collapse text-xs font-mono">
                   <thead className="bg-[#070D1A] text-[10px] text-slate-400 uppercase tracking-wider sticky top-0 z-10 border-b border-slate-800">
                     <tr>

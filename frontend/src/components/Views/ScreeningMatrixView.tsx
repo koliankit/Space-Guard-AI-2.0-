@@ -221,7 +221,7 @@ export default function ScreeningMatrixView({
   }
 
   return (
-    <div className="flex flex-col flex-1 p-3 md:p-5 bg-[#070D18] font-mono select-none overflow-y-auto text-[#E8EDF2] w-full min-h-screen">
+    <div className="flex flex-col flex-1 min-h-full p-3 md:p-5 bg-[#070D18] font-mono select-none text-[#E8EDF2] w-full">
       {/* Top Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-3">
         <div>
@@ -489,7 +489,7 @@ export default function ScreeningMatrixView({
 
       {/* High-Density Data Display: Either Lot-Grouped Accordions or Flat Table */}
       {viewGrouping === 'lot_grouped' ? (
-        <div className="flex-1 overflow-auto space-y-3 pr-1">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1">
           {lotGroupsForDisplay.length === 0 ? (
             <div className="py-12 text-center text-slate-500 bg-[#070D1A] rounded-xl border border-slate-800">
               No qualification lots found matching current criteria.
@@ -674,7 +674,7 @@ export default function ScreeningMatrixView({
         </div>
       ) : (
         /* High-Density Flat Data Table */
-        <div className="flex-1 overflow-auto rounded-xl border border-slate-800 bg-[#070D1A] shadow-lg">
+        <div className="flex-1 min-h-0 overflow-auto rounded-xl border border-slate-800 bg-[#070D1A] shadow-lg">
           <table className="w-full text-left text-[11px] font-mono border-collapse">
             <thead className="sticky top-0 bg-[#0B1528] border-b border-slate-800 z-10 text-[10px] uppercase text-slate-400 tracking-wider">
               <tr>

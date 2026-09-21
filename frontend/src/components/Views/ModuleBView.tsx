@@ -40,7 +40,7 @@ export default function ModuleBView({
   const isScreened = mission !== null
 
   return (
-    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1">
+    <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-[#070D18] text-[#E8EDF2] font-sans flex-1 min-h-full">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26384D] pb-3 bg-[#0D1726]/60 p-3 md:p-4 rounded-xl">
         <div>
@@ -138,7 +138,7 @@ export default function ModuleBView({
       </div>
 
       {/* Complete Module B Dashboard Workspace */}
-      <div className="w-full flex-1">
+      <div className="w-full flex-1 min-h-0 flex flex-col">
         <ModuleBFutureDriftPanel
           components={components}
           selected={selected}
