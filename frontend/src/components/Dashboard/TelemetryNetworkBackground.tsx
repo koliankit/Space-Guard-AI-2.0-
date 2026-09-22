@@ -184,16 +184,16 @@ export default function TelemetryNetworkBackground({
         ctx.clearRect(0, 0, width, height)
 
         // =========================================================================
-        // SUBSYSTEM 1: Subtle Cosmic Light Current on Light Aerospace Canvas
+        // SUBSYSTEM 1: Subtle Cosmic Light Current on Deep Navy Canvas
         // =========================================================================
         const atmosphericPhase = globalTime * 0.18 // ~35s cycle
         const atmGlowX = width * (0.35 + 0.12 * Math.sin(atmosphericPhase))
         const atmGlowY = height * (0.42 + 0.10 * Math.cos(atmosphericPhase * 0.8))
 
         const atmGrad = ctx.createRadialGradient(atmGlowX, atmGlowY, 20, atmGlowX, atmGlowY, width * 0.45)
-        atmGrad.addColorStop(0, 'rgba(0, 90, 156, 0.035)')
-        atmGrad.addColorStop(0.55, 'rgba(11, 30, 54, 0.015)')
-        atmGrad.addColorStop(1, 'rgba(244, 247, 251, 0)')
+        atmGrad.addColorStop(0, 'rgba(37, 99, 235, 0.07)')
+        atmGrad.addColorStop(0.55, 'rgba(20, 184, 166, 0.03)')
+        atmGrad.addColorStop(1, 'rgba(11, 23, 38, 0)')
         ctx.fillStyle = atmGrad
         ctx.fillRect(0, 0, width, height)
 
@@ -204,7 +204,7 @@ export default function TelemetryNetworkBackground({
         const orbitSlowAngle = globalTime * 0.012 // slow continuous drift
 
         // Arc 1: Geostationary Transfer Orbit (GTO Arc)
-        ctx.strokeStyle = 'rgba(0, 90, 156, 0.10)'
+        ctx.strokeStyle = 'rgba(37, 99, 235, 0.20)'
         ctx.lineWidth = 1.0
         ctx.setLineDash([6, 16])
         ctx.beginPath()
@@ -217,7 +217,7 @@ export default function TelemetryNetworkBackground({
         ctx.stroke()
 
         // Arc 2: Low Earth Polar Orbit (LEO Arc)
-        ctx.strokeStyle = 'rgba(0, 90, 156, 0.08)'
+        ctx.strokeStyle = 'rgba(20, 184, 166, 0.16)'
         ctx.setLineDash([4, 14])
         ctx.beginPath()
         const arc2CenterX = width * 0.28
@@ -235,7 +235,7 @@ export default function TelemetryNetworkBackground({
         const s1Y = arc1CenterY + arc1RadiusX * Math.cos(sat1Theta) * Math.sin(arc1Rot) + arc1RadiusY * Math.sin(sat1Theta) * Math.cos(arc1Rot)
         ctx.beginPath()
         ctx.arc(s1X, s1Y, 2.0, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(0, 90, 156, 0.75)'
+        ctx.fillStyle = 'rgba(34, 211, 238, 0.85)'
         ctx.fill()
 
         const sat2Theta = -globalTime * 0.038
@@ -243,7 +243,7 @@ export default function TelemetryNetworkBackground({
         const s2Y = arc2CenterY + arc2RadiusX * Math.cos(sat2Theta) * Math.sin(arc2Rot) + arc2RadiusY * Math.sin(sat2Theta) * Math.cos(arc2Rot)
         ctx.beginPath()
         ctx.arc(s2X, s2Y, 1.8, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(244, 114, 22, 0.75)'
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.85)'
         ctx.fill()
 
         ctx.restore()
@@ -384,7 +384,7 @@ export default function TelemetryNetworkBackground({
               ctx.beginPath()
               ctx.moveTo(nodes[i].x, nodes[i].y)
               ctx.lineTo(nodes[j].x, nodes[j].y)
-              ctx.strokeStyle = `rgba(0, 90, 156, ${Math.max(0.025, alpha)})`
+              ctx.strokeStyle = `rgba(37, 99, 235, ${Math.max(0.04, alpha * 0.9)})`
               ctx.lineWidth = 0.8
               ctx.stroke()
 
@@ -402,13 +402,13 @@ export default function TelemetryNetworkBackground({
           nextPulseDelay = 2200 + Math.random() * 1800 // ~2.2 - 4.0s spawn cycle
           const [fromNode, toNode] = activeConnections[Math.floor(Math.random() * activeConnections.length)]
           const duration = 3.0 + Math.random() * 2.2 // 3.0 - 5.2s slow graceful hop
-          const isOrange = Math.random() < 0.22 // occasional ISRO telemetry orange
+          const isCyan = Math.random() < 0.45
           pulses.push({
             fromNode,
             toNode,
             progress: 0,
             duration,
-            color: isOrange ? 'rgba(244, 114, 22, 0.95)' : 'rgba(0, 90, 156, 0.90)',
+            color: isCyan ? 'rgba(34, 211, 238, 0.95)' : 'rgba(37, 99, 235, 0.90)',
           })
         }
 

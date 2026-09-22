@@ -4,159 +4,166 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ISRO Aerospace Light Engineering Background System
-        bg: '#F4F7FB',              // Main Application Canvas
-        bg2: '#EEF3F8',             // Secondary Section Background & Sub-panels
-        panel: '#FFFFFF',           // Card Background - Clean White
-        panel2: '#F8FAFD',          // Elevated Card Surface
-        card: '#F8FAFD',            // Cool-gray Card
-        hover: '#E8F0F8',           // Hover State
-        'panel-critical': '#FEF2F2', // Critical Alert Panel Light Red Tint
+        // ASTRA VIGIL Medium-Dark Navy + Blue-Gray Reference Palette
+        bg: '#0B1726',              // Primary Background - Deep Navy
+        bg2: '#102337',             // Secondary Background - Dark Navy
+        panel: '#162B40',           // Application Surface / Panels - Blue-Gray
+        panel2: '#1B3445',          // Secondary Panel
+        card: '#1B3445',            // Primary Card Surface
+        card2: '#1B344B',           // Alternate Card Surface
+        elevated: '#203C55',        // Elevated Surface / Hover
+        hover: '#203C55',           // Hover State
+        'panel-critical': 'rgba(239, 68, 68, 0.08)',
 
-        // Deep Navy / ISRO Blue Mission Accents
+        // Deep Navy & Aerospace Blues
         navy: {
-          DEFAULT: '#0B1E36',
-          900: '#071526',
-          800: '#0B1E36',
-          700: '#0F2A4A',
-          600: '#143860',
-          light: '#1B4775',
+          DEFAULT: '#0B1726',
+          950: '#07101B',
+          900: '#0B1726',
+          800: '#102337',
+          700: '#162B40',
+          600: '#1B3445',
+          500: '#203C55',
+          light: '#284867',
         },
 
-        // Text Hierarchy (Deep Navy Headings, Dark Charcoal Body)
-        'text-primary': '#17212B',   // Primary Body Text - Dark Charcoal
-        'text-secondary': '#334E68', // Secondary Text - Dark Blue-Gray
-        muted: '#64748B',           // Muted Text
-        dim: '#64748B',
-        heading: '#0B1E36',         // Headings - Deep Navy
-        label: '#475569',           // Labels - Dark Blue-Gray
-        'table-text': '#1F2D38',    // Table Text
-        'input-text': '#17212B',    // Input Text
-        'input-placeholder': '#64748B', // Input Placeholder
+        // Typography Hierarchy
+        'text-primary': '#F1F5F9',   // Primary Text - High Contrast White
+        'text-secondary': '#A8B6C5', // Secondary Text - Cool Blue-Gray
+        muted: '#718398',           // Muted Text
+        dim: '#718398',
+        heading: '#F1F5F9',         // Headings
+        label: '#A8B6C5',           // Labels
+        'table-text': '#E2E8F0',
+        'input-text': '#F1F5F9',
+        'input-placeholder': '#718398',
 
-        // Borders & Dividers - Thin visible boundaries
-        border: '#D7E0EA',          // Visible Technical Border
-        'border-strong': '#CBD5E1', // Strong Card Border
-        line: '#D7E0EA',
+        // Borders & Dividers
+        border: '#2D4963',          // Subtle Border
+        'border-strong': '#3E6182', // Strong Border
+        line: '#2D4963',
 
-        // Primary Colors: ISRO Blue (#005A9C / #0E88D3)
+        // Brand Accents: Primary Blue (#2563EB) & Teal (#14B8A6) / Cyan (#22D3EE)
+        blue: {
+          DEFAULT: '#2563EB',
+          deep: '#1E3A8A',
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6',
+          600: '#2563EB',
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A8A',
+        },
+        primary: {
+          DEFAULT: '#2563EB',
+          deep: '#1E3A8A',
+          hover: '#1D4ED8',
+        },
+        teal: {
+          DEFAULT: '#14B8A6',
+          light: '#2DD4BF',
+          dark: '#0F766E',
+          hover: '#0D9488',
+        },
+        cyan: {
+          DEFAULT: '#22D3EE',
+          light: '#67E8F9',
+          dark: '#0891B2',
+        },
+        accent: '#14B8A6',
+
+        // ISRO / Legacy Alias
         'isro-blue': {
-          DEFAULT: '#005A9C',
-          light: '#0E88D3',
-          hover: '#00477D',
-          dark: '#00365F',
-          muted: 'rgba(0, 90, 156, 0.10)',
+          DEFAULT: '#2563EB',
+          light: '#3B82F6',
+          hover: '#1D4ED8',
+          dark: '#1E3A8A',
+          muted: 'rgba(37, 99, 235, 0.15)',
         },
         'tech-blue': {
-          DEFAULT: '#005A9C',
-          hover: '#00477D',
-          dark: '#00365F',
-          muted: 'rgba(0, 90, 156, 0.10)',
-        },
-        blue: {
-          DEFAULT: '#005A9C',
-          50: '#F0F7FC',
-          100: '#E1EFF8',
-          200: '#BAE0F3',
-          300: '#7CC4EB',
-          400: '#38A5DE',
-          500: '#0E88D3',
-          600: '#005A9C',
-          700: '#00477D',
-          800: '#00365F',
-          900: '#0B1E36',
-        },
-        cyan: '#0E88D3',
-
-        // Primary Accent: Mission Orange (#F47216)
-        'isro-orange': {
-          DEFAULT: '#F47216',
-          hover: '#DE610D',
-          dark: '#BE5006',
-          muted: 'rgba(244, 114, 22, 0.12)',
-        },
-        accent: '#F47216',
-        gold: {
-          DEFAULT: '#F47216',
-          hover: '#DE610D',
-          dark: '#BE5006',
-          muted: 'rgba(244, 114, 22, 0.12)',
-        },
-        isro: {
-          DEFAULT: '#005A9C',
-          blue: '#005A9C',
-          orange: '#F47216',
-          amber: '#F47216',
-          saffron: '#F47216',
-          gold: '#F47216',
+          DEFAULT: '#2563EB',
+          hover: '#1D4ED8',
+          dark: '#1E3A8A',
+          muted: 'rgba(37, 99, 235, 0.15)',
         },
 
-        // Status Colors
-        // SAFE: Controlled Green (#168A5B)
+        // Status Colors: Consistent Across Application
+        // SAFE: Controlled Emerald/Green (#10B981)
         safe: {
-          DEFAULT: '#168A5B',
-          hover: '#1B9D68',
-          dark: '#065F46',
-          bg: '#ECFDF5',
-          border: '#A7F3D0',
-          muted: 'rgba(22, 138, 91, 0.12)',
+          DEFAULT: '#10B981',
+          hover: '#059669',
+          dark: '#047857',
+          bg: 'rgba(16, 185, 129, 0.12)',
+          border: 'rgba(16, 185, 129, 0.3)',
+          muted: 'rgba(16, 185, 129, 0.12)',
         },
         emerald: {
-          DEFAULT: '#168A5B',
-          300: '#34D399',
-          400: '#1B9D68',
-          500: '#168A5B',
-          600: '#116B46',
-          700: '#065F46',
+          DEFAULT: '#10B981',
+          300: '#6EE7B7',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
         },
         green: {
-          DEFAULT: '#168A5B',
-          400: '#1B9D68',
-          500: '#168A5B',
-          600: '#116B46',
+          DEFAULT: '#10B981',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
         },
 
-        // MONITOR: Amber / Orange (#C58A00 / #D97706)
+        // MONITOR: Warm Amber (#F59E0B)
         monitor: {
-          DEFAULT: '#C58A00',
-          hover: '#B45309',
-          dark: '#92400E',
-          bg: '#FFFBEB',
-          border: '#FDE68A',
-          muted: 'rgba(197, 138, 0, 0.12)',
+          DEFAULT: '#F59E0B',
+          hover: '#D97706',
+          dark: '#B45309',
+          bg: 'rgba(245, 158, 11, 0.12)',
+          border: 'rgba(245, 158, 11, 0.3)',
+          muted: 'rgba(245, 158, 11, 0.12)',
         },
         amber: {
-          DEFAULT: '#C58A00',
+          DEFAULT: '#F59E0B',
           200: '#FDE68A',
-          300: '#F5C76E',
-          400: '#DB9B05',
-          500: '#C58A00',
-          600: '#B45309',
-          700: '#92400E',
+          300: '#FCD34D',
+          400: '#FBBF24',
+          500: '#F59E0B',
+          600: '#D97706',
+          700: '#B45309',
         },
 
-        // REJECT: Red (#D9363E / #DC2626)
+        // REJECT: High-Reliability Red (#EF4444)
         reject: {
-          DEFAULT: '#D9363E',
-          hover: '#C52B33',
-          dark: '#991B1B',
-          bg: '#FEF2F2',
-          border: '#FECACA',
-          muted: 'rgba(217, 54, 62, 0.12)',
+          DEFAULT: '#EF4444',
+          hover: '#DC2626',
+          dark: '#B91C1C',
+          bg: 'rgba(239, 68, 68, 0.12)',
+          border: 'rgba(239, 68, 68, 0.3)',
+          muted: 'rgba(239, 68, 68, 0.12)',
         },
         rose: {
-          DEFAULT: '#D9363E',
-          300: '#FDA4AF',
-          400: '#E8454D',
-          500: '#D9363E',
-          600: '#B0262D',
-          700: '#991B1B',
+          DEFAULT: '#EF4444',
+          300: '#FCA5A5',
+          400: '#F87171',
+          500: '#EF4444',
+          600: '#DC2626',
+          700: '#B91C1C',
         },
         red: {
-          DEFAULT: '#D9363E',
-          400: '#E8454D',
-          500: '#D9363E',
-          600: '#B0262D',
+          DEFAULT: '#EF4444',
+          400: '#F87171',
+          500: '#EF4444',
+          600: '#DC2626',
+        },
+
+        // Warning (#F97316)
+        warning: {
+          DEFAULT: '#F97316',
+          hover: '#EA580C',
+          dark: '#C2410C',
         },
 
         // Slate Theme Tokens
