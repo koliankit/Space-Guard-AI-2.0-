@@ -102,46 +102,46 @@ export default function SatelliteEquipmentBoard({
   const activeSub = subsystems.find((s) => s.key === focusKey)
 
   return (
-    <div className="bg-[#FFFFFF] border border-[#D9E2EA] rounded-xl flex flex-col font-sans text-xs select-none shadow-md overflow-hidden">
+    <div className="bg-[#FFFFFF] border border-[#D7E0EA] rounded-xl flex flex-col font-sans text-xs select-none shadow-sm overflow-hidden">
       {/* Action Notification Toast */}
       {actionNotif && (
-        <div className="bg-white/10 border-b border-white/20 px-4 py-2 text-center text-[#17212B] text-xs font-semibold animate-fade-in flex items-center justify-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-white" />
+        <div className="bg-[#005A9C]/10 border-b border-[#005A9C]/20 px-4 py-2 text-center text-[#0B1E36] text-xs font-semibold animate-fade-in flex items-center justify-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[#005A9C]" />
           <span dangerouslySetInnerHTML={{ __html: actionNotif }} />
         </div>
       )}
 
       {/* Top Header Bar */}
-      <div className="px-4 py-3 border-b border-[#D9E2EA] flex flex-wrap items-center justify-between gap-2 bg-[#F8FAFC]">
+      <div className="px-4 py-3 border-b border-[#D7E0EA] flex flex-wrap items-center justify-between gap-2 bg-[#F8FAFD]">
         <div className="flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-white" />
-          <h3 className="m-0 font-bold text-xs tracking-wide uppercase text-[#17212B]">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#005A9C]" />
+          <h3 className="m-0 font-bold text-xs tracking-wide uppercase text-[#0B1E36]">
             Spacecraft Subsystem Hardware &amp; Command Console
           </h3>
           {filterCategory === 'lot' ? (
-            <span className="font-mono text-[11px] text-[#17212B] bg-white/10 px-2.5 py-0.5 rounded border border-white/20 font-medium">
+            <span className="font-mono text-[11px] text-[#005A9C] bg-[#EBF5FB] px-2.5 py-0.5 rounded border border-[#BFD8E8] font-semibold">
               LOT CLASSIFICATION: {selectedLot || 'ALL FLIGHT LOTS'}
             </span>
           ) : activeSub ? (
-            <span className="font-mono text-[11px] text-[#17212B] bg-white/10 px-2.5 py-0.5 rounded border border-white/20 font-medium">
+            <span className="font-mono text-[11px] text-[#005A9C] bg-[#EBF5FB] px-2.5 py-0.5 rounded border border-[#BFD8E8] font-semibold">
               FILTER: [{activeSub.key}] {activeSub.name}
             </span>
           ) : (
-            <span className="font-mono text-[10px] text-[#5B6B7A] bg-[#F8FAFC] px-2 py-0.5 rounded border border-[#D9E2EA]">
+            <span className="font-mono text-[10px] text-[#475569] bg-[#FFFFFF] px-2 py-0.5 rounded border border-[#D7E0EA] font-medium">
               ALL 11 SUBSYSTEMS REGISTERED
             </span>
           )}
         </div>
 
         {/* View Mode Toggle Buttons */}
-        <div className="flex items-center gap-1 bg-[#080D1A] p-1 rounded-lg border border-[#D9E2EA]">
+        <div className="flex items-center gap-1 bg-[#F1F5F9] p-1 rounded-lg border border-[#D7E0EA]">
           <button
             type="button"
             onClick={() => setViewMode('components')}
-            className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${
+            className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
               viewMode === 'components'
-                ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-[#5B6B7A] hover:text-[#17212B]'
+                ? 'bg-[#FFFFFF] text-[#0B1E36] font-bold shadow-xs border border-[#CBD5E1]'
+                : 'text-[#475569] hover:text-[#0B1E36]'
             }`}
           >
             Components ({displayedComponents.length})
@@ -149,15 +149,15 @@ export default function SatelliteEquipmentBoard({
           <button
             type="button"
             onClick={() => setViewMode('lifecycle')}
-            className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1.5 ${
               viewMode === 'lifecycle'
-                ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-[#5B6B7A] hover:text-[#17212B]'
+                ? 'bg-[#FFFFFF] text-[#0B1E36] font-bold shadow-xs border border-[#CBD5E1]'
+                : 'text-[#475569] hover:text-[#0B1E36]'
             }`}
           >
             Operational Lifecycle
             {repairList.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-[#17212B] text-[9.5px] font-bold font-mono">
+              <span className="px-1.5 py-0.2 rounded-full bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA] text-[9.5px] font-bold font-mono">
                 {repairList.length}
               </span>
             )}
@@ -166,16 +166,16 @@ export default function SatelliteEquipmentBoard({
       </div>
 
       {/* Classification Mode & Filter Pills Row */}
-      <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 bg-[#080D1A] border-b border-[#D9E2EA]/80 text-xs">
+      <div className="flex items-center gap-2 overflow-x-auto px-4 py-2 bg-[#F8FAFD] border-b border-[#D7E0EA] text-xs">
         {/* Classification Selector: Subsystems vs Lots */}
-        <div className="flex items-center bg-[#FFFFFF] border border-[#D9E2EA]/80 rounded-md p-0.5 mr-1 flex-shrink-0">
+        <div className="flex items-center bg-[#FFFFFF] border border-[#D7E0EA] rounded-md p-0.5 mr-1 flex-shrink-0">
           <button
             type="button"
             onClick={() => setFilterCategory('subsystem')}
             className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
               filterCategory === 'subsystem'
-                ? 'bg-white text-slate-900 shadow-sm font-bold'
-                : 'text-[#5B6B7A] hover:text-[#17212B]'
+                ? 'bg-[#005A9C] text-[#FFFFFF] shadow-xs font-bold'
+                : 'text-[#475569] hover:text-[#0B1E36]'
             }`}
           >
             Subsystems
@@ -185,8 +185,8 @@ export default function SatelliteEquipmentBoard({
             onClick={() => setFilterCategory('lot')}
             className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold transition-all ${
               filterCategory === 'lot'
-                ? 'bg-white text-slate-900 shadow-sm font-bold'
-                : 'text-[#5B6B7A] hover:text-[#17212B]'
+                ? 'bg-[#005A9C] text-[#FFFFFF] shadow-xs font-bold'
+                : 'text-[#475569] hover:text-[#0B1E36]'
             }`}
           >
             Lots ({lotList.length})
@@ -200,8 +200,8 @@ export default function SatelliteEquipmentBoard({
               onClick={() => onSelectSubsystem('')}
               className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
                 !focusKey
-                  ? 'bg-white border-white text-slate-900 font-bold'
-                  : 'border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
+                  ? 'bg-[#0B1E36] border-[#0B1E36] text-[#FFFFFF] font-bold shadow-xs'
+                  : 'border-[#D7E0EA] bg-[#FFFFFF] text-[#475569] hover:text-[#0B1E36] hover:bg-[#F1F5F9]'
               }`}
             >
               ALL
@@ -213,15 +213,17 @@ export default function SatelliteEquipmentBoard({
                 onClick={() => onSelectSubsystem(s.key)}
                 className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap flex items-center gap-1.5 text-[11px] font-medium border ${
                   focusKey === s.key
-                    ? 'bg-white border-white text-slate-900 font-bold'
+                    ? 'bg-[#0B1E36] border-[#0B1E36] text-[#FFFFFF] font-bold shadow-xs'
                     : s.status === 'reject'
-                    ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
-                    : 'border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
+                    ? 'border-[#FECACA] text-[#991B1B] bg-[#FEF2F2] hover:bg-[#FEE2E2]'
+                    : s.status === 'monitor'
+                    ? 'border-[#FDE68A] text-[#92400E] bg-[#FFFBEB] hover:bg-[#FEF3C7]'
+                    : 'border-[#D7E0EA] bg-[#FFFFFF] text-[#475569] hover:text-[#0B1E36] hover:bg-[#F1F5F9]'
                 }`}
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
-                    s.status === 'reject' ? 'bg-rose-500' : s.status === 'monitor' ? 'bg-amber-400' : 'bg-emerald-400'
+                    s.status === 'reject' ? 'bg-[#D9363E]' : s.status === 'monitor' ? 'bg-[#D97706]' : 'bg-[#168A5B]'
                   }`}
                 />
                 <span>{s.key}</span>
@@ -235,8 +237,8 @@ export default function SatelliteEquipmentBoard({
               onClick={() => setSelectedLot(null)}
               className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap text-[11px] font-medium border ${
                 !selectedLot
-                  ? 'bg-white border-white text-slate-900 font-bold'
-                  : 'border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
+                  ? 'bg-[#0B1E36] border-[#0B1E36] text-[#FFFFFF] font-bold shadow-xs'
+                  : 'border-[#D7E0EA] bg-[#FFFFFF] text-[#475569] hover:text-[#0B1E36] hover:bg-[#F1F5F9]'
               }`}
             >
               ALL LOTS
@@ -248,16 +250,18 @@ export default function SatelliteEquipmentBoard({
                 onClick={() => setSelectedLot(lot.lot_id === selectedLot ? null : lot.lot_id)}
                 className={`px-2.5 py-1 rounded-md transition-all whitespace-nowrap flex items-center gap-1.5 text-[11px] font-mono border ${
                   selectedLot === lot.lot_id
-                    ? 'bg-white border-white text-slate-900 font-bold shadow-sm'
+                    ? 'bg-[#0B1E36] border-[#0B1E36] text-[#FFFFFF] font-bold shadow-xs'
                     : lot.status === 'reject'
-                    ? 'border-rose-500/40 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20'
-                    : 'border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
+                    ? 'border-[#FECACA] text-[#991B1B] bg-[#FEF2F2] hover:bg-[#FEE2E2]'
+                    : lot.status === 'monitor'
+                    ? 'border-[#FDE68A] text-[#92400E] bg-[#FFFBEB] hover:bg-[#FEF3C7]'
+                    : 'border-[#D7E0EA] bg-[#FFFFFF] text-[#475569] hover:text-[#0B1E36] hover:bg-[#F1F5F9]'
                 }`}
                 title={`Filter components to lot ${lot.lot_id} (${lot.count} components)`}
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
-                    lot.status === 'reject' ? 'bg-rose-500' : lot.status === 'monitor' ? 'bg-amber-400' : 'bg-emerald-400'
+                    lot.status === 'reject' ? 'bg-[#D9363E]' : lot.status === 'monitor' ? 'bg-[#D97706]' : 'bg-[#168A5B]'
                   }`}
                 />
                 <span>{lot.lot_id}</span>
@@ -290,10 +294,10 @@ export default function SatelliteEquipmentBoard({
                     onClick={() => onSelectComponent(c.component_id)}
                     className={`p-3 rounded-lg border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                       isSelected
-                        ? 'bg-white/10 border-white shadow-md ring-1 ring-white/30'
+                        ? 'bg-[#EBF5FB] border-[#005A9C] shadow-sm ring-1 ring-[#005A9C]/30'
                         : isIsolated
-                        ? 'bg-rose-500/5 border-rose-500/40 opacity-75'
-                        : 'bg-[#F8FAFC] border-[#D9E2EA] hover:border-[#D9E2EA] hover:bg-[#131D33]'
+                        ? 'bg-[#FEF2F2] border-[#FECACA] opacity-80'
+                        : 'bg-[#FFFFFF] border-[#D7E0EA] hover:border-[#005A9C] hover:bg-[#F8FAFD] shadow-xs'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-1.5">
@@ -301,26 +305,26 @@ export default function SatelliteEquipmentBoard({
                         <div className="flex items-center gap-2">
                           <span
                             className={`w-2 h-2 rounded-full ${
-                              isRej ? 'bg-rose-500' : isMon ? 'bg-amber-400' : 'bg-emerald-400'
+                              isRej ? 'bg-[#D9363E]' : isMon ? 'bg-[#D97706]' : 'bg-[#168A5B]'
                             }`}
                           />
-                          <span className="font-mono font-bold text-[#17212B] tracking-tight text-xs">
+                          <span className="font-mono font-bold text-[#0B1E36] tracking-tight text-xs">
                             {c.component_id}
                           </span>
                         </div>
-                        <div className="text-[10px] text-[#5B6B7A] mt-0.5">
-                          Lot: <span className="text-[#5B6B7A] font-mono">{c.lot_id}</span> &bull;{' '}
-                          <span className="text-[#5B6B7A] font-medium">{c.subsystem}</span>
+                        <div className="text-[10px] text-[#475569] mt-0.5">
+                          Lot: <span className="text-[#334E68] font-mono font-medium">{c.lot_id}</span> &bull;{' '}
+                          <span className="text-[#475569] font-medium">{c.subsystem}</span>
                         </div>
                       </div>
 
                       <span
                         className={`text-[9.5px] font-bold px-2 py-0.5 rounded border uppercase ${
                           isRej
-                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                            ? 'bg-[#FEF2F2] text-[#991B1B] border-[#FECACA]'
                             : isMon
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                            ? 'bg-[#FFFBEB] text-[#92400E] border-[#FDE68A]'
+                            : 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]'
                         }`}
                       >
                         {c.status}
@@ -328,12 +332,12 @@ export default function SatelliteEquipmentBoard({
                     </div>
 
                     {/* Operational Telemetry Metrics */}
-                    <div className="grid grid-cols-3 gap-1 bg-[#FFFFFF] p-2 rounded border border-[#D9E2EA] text-[10px]">
+                    <div className="grid grid-cols-3 gap-1 bg-[#F8FAFD] p-2 rounded border border-[#E2E8F0] text-[10px]">
                       <div>
-                        <div className="text-[#5B6B7A] text-[9px]">Drift &Delta;</div>
+                        <div className="text-[#475569] text-[9px] font-medium">Drift &Delta;</div>
                         <div
                           className={`font-mono font-bold ${
-                            Math.abs(c.pct_drift ?? 0) > 15 ? 'text-rose-400' : 'text-emerald-400'
+                            Math.abs(c.pct_drift ?? 0) > 15 ? 'text-[#991B1B]' : 'text-[#065F46]'
                           }`}
                         >
                           {(c.pct_drift ?? 0) > 0 ? '+' : ''}
@@ -341,16 +345,16 @@ export default function SatelliteEquipmentBoard({
                         </div>
                       </div>
                       <div>
-                        <div className="text-[#5B6B7A] text-[9px]">Measured</div>
-                        <div className="font-mono font-bold text-[#17212B]">
+                        <div className="text-[#475569] text-[9px] font-medium">Measured</div>
+                        <div className="font-mono font-bold text-[#0B1E36]">
                           {c.v168.toFixed(1)} &mu;A
                         </div>
                       </div>
                       <div>
-                        <div className="text-[#5B6B7A] text-[9px]">Risk Score</div>
+                        <div className="text-[#475569] text-[9px] font-medium">Risk Score</div>
                         <div
                           className={`font-mono font-bold ${
-                            c.risk_score > 60 ? 'text-rose-400' : c.risk_score > 35 ? 'text-amber-400' : 'text-emerald-400'
+                            c.risk_score > 60 ? 'text-[#991B1B]' : c.risk_score > 35 ? 'text-[#92400E]' : 'text-[#065F46]'
                           }`}
                         >
                           {Math.round(c.risk_score)}/100
@@ -359,20 +363,20 @@ export default function SatelliteEquipmentBoard({
                     </div>
 
                     {/* State Badges & Inspect Action */}
-                    <div className="flex items-center justify-between text-[10px] pt-1 border-t border-[#D9E2EA]/80">
+                    <div className="flex items-center justify-between text-[10px] pt-1 border-t border-[#E2E8F0]">
                       <div>
                         {isIsolated && (
-                          <span className="text-rose-300 font-medium text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/40">
+                          <span className="text-[#991B1B] font-medium text-[9px] px-1.5 py-0.5 rounded bg-[#FEF2F2] border border-[#FECACA]">
                             Bus Isolated
                           </span>
                         )}
                         {isFailover && (
-                          <span className="text-[#17212B] font-medium text-[9px] px-1.5 py-0.5 rounded bg-white/15 border border-white/30 ml-1">
+                          <span className="text-[#005A9C] font-medium text-[9px] px-1.5 py-0.5 rounded bg-[#EBF5FB] border border-[#BFD8E8] ml-1">
                             Spare B Active
                           </span>
                         )}
                         {!isIsolated && !isFailover && (
-                          <span className="text-[#81909D] text-[9.5px]">Link Nominal</span>
+                          <span className="text-[#64748B] text-[9.5px]">Link Nominal</span>
                         )}
                       </div>
 
@@ -382,7 +386,7 @@ export default function SatelliteEquipmentBoard({
                           e.stopPropagation()
                           onSelectComponent(c.component_id)
                         }}
-                        className="text-[#17212B] hover:text-[#17212B] font-medium text-[10px] hover:underline"
+                        className="text-[#005A9C] hover:text-[#0B1E36] font-semibold text-[10px] hover:underline"
                       >
                         Inspect &rarr;
                       </button>
@@ -412,20 +416,20 @@ export default function SatelliteEquipmentBoard({
       {viewMode === 'lifecycle' && (
         <div className="p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* COLUMN 1: OPERATIONAL UNITS */}
-          <div className="bg-[#F8FAFC] border border-[#D9E2EA]/80 rounded-xl p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between pb-2.5 border-b border-[#D9E2EA]">
+          <div className="bg-[#FFFFFF] border border-[#D7E0EA] rounded-xl p-4 flex flex-col gap-3 shadow-xs">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#E2E8F0]">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                <h4 className="m-0 font-bold text-xs uppercase text-[#17212B]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#168A5B]" />
+                <h4 className="m-0 font-bold text-xs uppercase text-[#0B1E36]">
                   Operational Flight Units
                 </h4>
               </div>
-              <span className="bg-emerald-500/15 text-emerald-300 text-[10px] font-semibold px-2 py-0.5 rounded border border-emerald-500/30">
+              <span className="bg-[#ECFDF5] text-[#065F46] text-[10px] font-bold px-2 py-0.5 rounded border border-[#A7F3D0]">
                 {operationalList.length} Units
               </span>
             </div>
 
-            <div className="text-[11px] text-[#5B6B7A] leading-relaxed">
+            <div className="text-[11px] text-[#475569] leading-relaxed">
               Flight equipment operating nominally within qualified tolerance limits. All channels verified.
             </div>
 
@@ -434,22 +438,22 @@ export default function SatelliteEquipmentBoard({
                 <div
                   key={item.component_id}
                   onClick={() => onSelectComponent(item.component_id)}
-                  className="p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] hover:border-[#D9E2EA] cursor-pointer flex items-center justify-between text-xs transition-all"
+                  className="p-2.5 rounded-lg bg-[#F8FAFD] border border-[#E2E8F0] hover:border-[#005A9C] hover:bg-[#FFFFFF] cursor-pointer flex items-center justify-between text-xs transition-all shadow-xs"
                 >
                   <div>
-                    <div className="font-mono font-bold text-[#17212B] text-xs">{item.component_id}</div>
-                    <div className="text-[10px] text-[#5B6B7A] mt-0.5">
+                    <div className="font-mono font-bold text-[#0B1E36] text-xs">{item.component_id}</div>
+                    <div className="text-[10px] text-[#475569] mt-0.5 font-medium">
                       {item.subsystem} &bull; Lot {item.lot_id}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-mono text-emerald-400 font-bold">{item.v168.toFixed(1)} &mu;A</div>
-                    <div className="text-[9.5px] text-[#5B6B7A]">99.8% HEALTH</div>
+                    <div className="font-mono text-[#065F46] font-bold">{item.v168.toFixed(1)} &mu;A</div>
+                    <div className="text-[9.5px] text-[#64748B] font-semibold">99.8% HEALTH</div>
                   </div>
                 </div>
               ))}
               {operationalList.length > 10 && (
-                <div className="text-center text-[#81909D] text-[10px] py-1 font-medium">
+                <div className="text-center text-[#64748B] text-[10px] py-1 font-medium">
                   +{operationalList.length - 10} additional nominal flight units
                 </div>
               )}
@@ -457,26 +461,26 @@ export default function SatelliteEquipmentBoard({
           </div>
 
           {/* COLUMN 2: UNDER EXAMINATION */}
-          <div className="bg-[#F8FAFC] border border-[#D9E2EA]/80 rounded-xl p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between pb-2.5 border-b border-[#D9E2EA]">
+          <div className="bg-[#FFFFFF] border border-[#D7E0EA] rounded-xl p-4 flex flex-col gap-3 shadow-xs">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#E2E8F0]">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                <h4 className="m-0 font-bold text-xs uppercase text-[#17212B]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" />
+                <h4 className="m-0 font-bold text-xs uppercase text-[#0B1E36]">
                   Under Examination
                 </h4>
               </div>
-              <span className="bg-amber-500/15 text-amber-300 text-[10px] font-semibold px-2 py-0.5 rounded border border-amber-500/30">
+              <span className="bg-[#FFFBEB] text-[#92400E] text-[10px] font-bold px-2 py-0.5 rounded border border-[#FDE68A]">
                 {examinationList.length} Monitoring
               </span>
             </div>
 
-            <div className="text-[11px] text-[#5B6B7A] leading-relaxed">
+            <div className="text-[11px] text-[#475569] leading-relaxed">
               Components undergoing MIL-STD-883 HTOL burn-in evaluation or exhibiting subtle drift trends.
             </div>
 
             <div className="flex flex-col gap-2 max-h-[280px] overflow-y-auto pr-1">
               {examinationList.length === 0 ? (
-                <div className="p-4 text-center text-[#81909D] text-xs border border-dashed border-[#D9E2EA] rounded-lg">
+                <div className="p-4 text-center text-[#64748B] text-xs border border-dashed border-[#D7E0EA] rounded-lg">
                   No components currently flagged for examination.
                 </div>
               ) : (
@@ -484,20 +488,20 @@ export default function SatelliteEquipmentBoard({
                   <div
                     key={item.component_id}
                     onClick={() => onSelectComponent(item.component_id)}
-                    className="p-2.5 rounded-lg bg-[#FFFFFF] border border-amber-500/30 hover:border-amber-500/60 cursor-pointer flex flex-col gap-1 text-xs transition-all"
+                    className="p-2.5 rounded-lg bg-[#FFFBEB]/40 border border-[#FDE68A] hover:border-[#D97706] cursor-pointer flex flex-col gap-1 text-xs transition-all shadow-xs"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono font-bold text-[#17212B] text-xs">{item.component_id}</span>
-                      <span className="font-mono text-amber-400 font-bold">
+                      <span className="font-mono font-bold text-[#0B1E36] text-xs">{item.component_id}</span>
+                      <span className="font-mono text-[#92400E] font-bold">
                         &Delta; {(item.pct_drift ?? 0) > 0 ? '+' : ''}
                         {(item.pct_drift ?? 0).toFixed(1)}%
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-[10px] text-[#5B6B7A]">
-                      <span>
+                    <div className="flex items-center justify-between text-[10px] text-[#475569]">
+                      <span className="font-medium">
                         {item.subsystem} &bull; Lot {item.lot_id}
                       </span>
-                      <span className="font-mono font-semibold text-[#5B6B7A]">Risk {Math.round(item.risk_score)}/100</span>
+                      <span className="font-mono font-bold text-[#92400E]">Risk {Math.round(item.risk_score)}/100</span>
                     </div>
                   </div>
                 ))
@@ -506,26 +510,26 @@ export default function SatelliteEquipmentBoard({
           </div>
 
           {/* COLUMN 3: REPAIR & QUARANTINE SECTION */}
-          <div className="bg-[#F8FAFC] border border-[#D9E2EA]/80 rounded-xl p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between pb-2.5 border-b border-[#D9E2EA]">
+          <div className="bg-[#FFFFFF] border border-[#D7E0EA] rounded-xl p-4 flex flex-col gap-3 shadow-xs">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#E2E8F0]">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                <h4 className="m-0 font-bold text-xs uppercase text-[#17212B]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#D9363E]" />
+                <h4 className="m-0 font-bold text-xs uppercase text-[#0B1E36]">
                   Quarantine &amp; Mitigation
                 </h4>
               </div>
-              <span className="bg-rose-500/15 text-rose-300 text-[10px] font-semibold px-2 py-0.5 rounded border border-rose-500/30">
+              <span className="bg-[#FEF2F2] text-[#991B1B] text-[10px] font-bold px-2 py-0.5 rounded border border-[#FECACA]">
                 {repairList.length} Critical
               </span>
             </div>
 
-            <div className="text-[11px] text-[#5B6B7A] leading-relaxed">
+            <div className="text-[11px] text-[#475569] leading-relaxed">
               Components flagged with anomalous defect risk. Operators can execute bus isolation or cold spare failover.
             </div>
 
             <div className="flex flex-col gap-2 max-h-[280px] overflow-y-auto pr-1">
               {repairList.length === 0 ? (
-                <div className="p-4 text-center text-emerald-400 text-xs border border-dashed border-emerald-500/30 rounded-lg">
+                <div className="p-4 text-center text-[#065F46] bg-[#ECFDF5] text-xs border border-dashed border-[#A7F3D0] rounded-lg font-medium">
                   &#10003; Spacecraft Nominal &mdash; Zero quarantined defects.
                 </div>
               ) : (
@@ -536,38 +540,38 @@ export default function SatelliteEquipmentBoard({
                   return (
                     <div
                       key={item.component_id}
-                      className="p-2.5 rounded-lg bg-[#FFFFFF] border border-rose-500/40 flex flex-col gap-2 text-xs"
+                      className="p-2.5 rounded-lg bg-[#FEF2F2]/40 border border-[#FECACA] flex flex-col gap-2 text-xs shadow-xs"
                     >
                       <div
                         onClick={() => onSelectComponent(item.component_id)}
                         className="cursor-pointer flex items-center justify-between"
                       >
                         <div>
-                          <div className="font-mono font-bold text-[#17212B] flex items-center gap-2 text-xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                          <div className="font-mono font-bold text-[#0B1E36] flex items-center gap-2 text-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#D9363E]" />
                             {item.component_id}
                           </div>
-                          <div className="text-[10px] text-rose-300 mt-0.5">
+                          <div className="text-[10px] text-[#991B1B] mt-0.5 font-medium">
                             {item.subsystem} &bull; {item.reason || 'Critical parametric drift'}
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-rose-400 font-bold font-mono text-xs">
+                          <div className="text-[#991B1B] font-bold font-mono text-xs">
                             Risk {Math.round(item.risk_score)}
                           </div>
-                          <div className="text-[9.5px] text-rose-400/80 uppercase font-medium">Quarantined</div>
+                          <div className="text-[9.5px] text-[#991B1B] uppercase font-bold">Quarantined</div>
                         </div>
                       </div>
 
                       {/* Mitigation Actions */}
-                      <div className="flex items-center gap-2 pt-2 border-t border-[#D9E2EA]">
+                      <div className="flex items-center gap-2 pt-2 border-t border-[#FECACA]/60">
                         <button
                           type="button"
                           onClick={() => handleToggleIsolate(item.component_id)}
                           className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border cursor-pointer ${
                             isIsolated
-                              ? 'bg-[#D9363E] text-white border-[#D9363E] font-bold shadow-sm'
-                              : 'bg-[#FEF2F2] text-[#D9363E] border-[#D9363E]/40 hover:bg-[#D9363E] hover:text-white'
+                              ? 'bg-[#D9363E] text-white border-[#D9363E] font-bold shadow-xs'
+                              : 'bg-[#FEF2F2] text-[#991B1B] border-[#FECACA] hover:bg-[#D9363E] hover:text-white'
                           }`}
                         >
                           {isIsolated ? '✓ Bus Isolated' : 'Isolate Bus'}
@@ -578,8 +582,8 @@ export default function SatelliteEquipmentBoard({
                           onClick={() => handleToggleFailover(item.component_id)}
                           className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-semibold transition-all border cursor-pointer ${
                             isFailover
-                              ? 'bg-[#0E88D3] text-white border-[#0E88D3] font-bold shadow-sm'
-                              : 'bg-[#F8FAFC] text-[#17212B] border-[#D5DEE7] hover:bg-[#E8F0F6]'
+                              ? 'bg-[#005A9C] text-white border-[#005A9C] font-bold shadow-xs'
+                              : 'bg-[#FFFFFF] text-[#0B1E36] border-[#D7E0EA] hover:bg-[#F1F5F9]'
                           }`}
                         >
                           {isFailover ? '✓ Spare B Active' : 'Failover Spare'}

@@ -3,71 +3,71 @@
 @tailwind utilities;
 
 :root {
-  /* FINAL SPACEGUARD AI — LIGHT SPACE TELEMETRY COLOR SYSTEM (SECTION 30) */
-  --bg-main: #07131F;
-  --bg-secondary: #E6F1F8;
+  /* ISRO-INSPIRED AEROSPACE MISSION CONTROL LIGHT THEME */
+  --bg-main: #F4F7FB;
+  --bg-secondary: #EEF3F8;
   --bg-panel: #FFFFFF;
-  --bg-elevated: #F8FBFD;
-  --border: #D5E2EA;
-  --border-subtle: #E6EEF5;
-  --hover: #E6F1F8;
+  --bg-elevated: #F8FAFD;
+  --border: #D7E0EA;
+  --border-subtle: #E2E8F0;
+  --hover: #E8F0F8;
 
   --text-primary: #17212B;
-  --text-secondary: #4F6170;
-  --text-muted: #718292;
-  --text-heading: #142331;
-  --text-label: #34495A;
+  --text-secondary: #334E68;
+  --text-muted: #64748B;
+  --text-heading: #0B1E36;
+  --text-label: #475569;
   --text-table: #1F2D38;
 
-  --primary-blue: #0E88D3;
-  --primary-dark-blue: #075B8C;
+  --primary-blue: #005A9C;
+  --primary-dark-blue: #0B1E36;
   --primary-orange: #F47216;
 
   --status-safe: #168A5B;
   --status-monitor: #C58A00;
   --status-critical: #D9363E;
 
-  --space-blue-glow: rgba(14, 136, 211, 0.08);
-  --telemetry-line: rgba(14, 136, 211, 0.12);
-  --telemetry-dot: rgba(14, 136, 211, 0.35);
-  --card-shadow: 0 4px 18px rgba(14, 50, 80, 0.06);
+  --space-blue-glow: rgba(0, 90, 156, 0.08);
+  --telemetry-line: rgba(0, 90, 156, 0.12);
+  --telemetry-dot: rgba(0, 90, 156, 0.35);
+  --card-shadow: 0 1px 3px rgba(11, 30, 54, 0.05), 0 4px 12px rgba(11, 30, 54, 0.03);
 
   /* Legacy variable mappings for backward compatibility */
-  --color-bg: #07131F;
-  --color-bg2: #E6F1F8;
+  --color-bg: #F4F7FB;
+  --color-bg2: #EEF3F8;
   --color-panel: #FFFFFF;
-  --color-panel2: #F8FBFD;
-  --color-border: #D5E2EA;
-  --color-line: #D5E2EA;
+  --color-panel2: #F8FAFD;
+  --color-border: #D7E0EA;
+  --color-line: #D7E0EA;
 
   --color-text-primary: #17212B;
-  --color-text-secondary: #4F6170;
-  --color-text-muted: #718292;
+  --color-text-secondary: #334E68;
+  --color-text-muted: #64748B;
 
-  --color-isro-blue: #0E88D3;
+  --color-isro-blue: #005A9C;
   --color-isro-orange: #F47216;
 
   --color-status-safe: #168A5B;
   --color-status-monitor: #C58A00;
   --color-status-reject: #D9363E;
 
-  /* PART 21/22 — DARK TECHNICAL VISUALIZATION THEME */
-  --tech-bg: #07111C;
-  --tech-panel: #0B1928;
-  --tech-card: #102337;
-  --tech-border: #1D3A52;
-  --tech-border-subtle: #162E42;
-  --tech-text-primary: #F1F5F9;
-  --tech-text-secondary: #9AAFC0;
-  --tech-text-muted: #7F93A5;
-  --tech-blue: #0E88D3;
+  /* TECHNICAL VISUALIZATION THEME (SCIENTIFIC LIGHT) */
+  --tech-bg: #F8FAFD;
+  --tech-panel: #FFFFFF;
+  --tech-card: #F8FAFD;
+  --tech-border: #D7E0EA;
+  --tech-border-subtle: #E2E8F0;
+  --tech-text-primary: #17212B;
+  --tech-text-secondary: #334E68;
+  --tech-text-muted: #64748B;
+  --tech-blue: #005A9C;
   --tech-orange: #F47216;
 }
 
 .tech-instrument-panel {
-  background-color: #07111C;
-  border-color: #1D3A52;
-  color: #F1F5F9;
+  background-color: #F8FAFD;
+  border-color: #D7E0EA;
+  color: #17212B;
 }
 
 @font-face {
@@ -112,7 +112,7 @@ html, body, #root {
 }
 
 body {
-  background: #07131F;
+  background: #F4F7FB;
   color: #17212B;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
@@ -131,15 +131,15 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #18304B;
+  background: #CBD5E1;
   border-radius: 3px;
-  border: 1px solid #23456B;
+  border: 1px solid #94A3B8;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #0E88D3;
+  background: #005A9C;
 }
 ::-webkit-scrollbar-track {
-  background: #07131F;
+  background: #EEF3F8;
 }
 
 /* ==============================================================================
@@ -157,12 +157,12 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.12;
+  opacity: 0.45;
   background-image:
-    linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(0, 90, 156, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 90, 156, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
-  animation: grid-drift 24s linear infinite;
+  animation: grid-drift 32s linear infinite;
 }
 
 /* 2. Gentle Telemetry Pulse (2.5s calm breathing) */
@@ -204,10 +204,10 @@ body {
 /* 5. TEE Subtle Boundary Signal */
 @keyframes tee-subtle-signal {
   0%, 100% {
-    border-color: #D9E2EA;
+    border-color: #D7E0EA;
   }
   50% {
-    border-color: #0E88D3;
+    border-color: #005A9C;
   }
 }
 
@@ -231,21 +231,21 @@ body {
 
 .hud-glass {
   background: #FFFFFF;
-  border: 1px solid #D9E2EA;
-  box-shadow: 0 1px 3px rgba(23, 33, 43, 0.05);
+  border: 1px solid #D7E0EA;
+  box-shadow: 0 1px 3px rgba(11, 30, 54, 0.05), 0 4px 12px rgba(11, 30, 54, 0.03);
 }
 
 .hud-glass-interactive {
-  background: #FFFFFF;
-  border: 1px solid #D9E2EA;
+  background: #F8FAFD;
+  border: 1px solid #D7E0EA;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(23, 33, 43, 0.04);
+  box-shadow: 0 1px 3px rgba(11, 30, 54, 0.04);
 }
 
 .hud-glass-interactive:hover {
-  background: #F8FAFC;
-  border-color: #0E88D3;
-  box-shadow: 0 2px 6px rgba(14, 136, 211, 0.1);
+  background: #FFFFFF;
+  border-color: #005A9C;
+  box-shadow: 0 4px 12px rgba(0, 90, 156, 0.10);
 }
 
 .hud-tag {

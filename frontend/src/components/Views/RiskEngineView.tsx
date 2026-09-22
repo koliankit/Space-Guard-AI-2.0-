@@ -114,20 +114,20 @@ export default function RiskEngineView({
   return (
     <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-transparent text-[#17212B] font-sans flex-1 min-h-full">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#D9E2EA] pb-3 bg-[#FFFFFF]/60 p-3 md:p-4 rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#D7E0EA] pb-3 bg-[#FFFFFF] p-3 md:p-4 rounded-xl shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded bg-[#0E88D3]/15 text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold text-xs uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded bg-[#005A9C] text-[#FFFFFF] font-mono font-bold text-xs uppercase tracking-wider shadow-sm">
               ANALYSIS ENGINE
             </span>
-            <span className="text-xs font-mono text-[#5B6B7A]">
+            <span className="text-xs font-mono text-[#475569] font-bold">
               BAYESIAN MULTI-FACTOR RISK SCORING &amp; QUALIFICATION GATES
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-mono font-black text-[#17212B] tracking-wide mt-1">
+          <h1 className="text-xl md:text-2xl font-mono font-bold text-[#0B1E36] tracking-wide mt-1">
             Risk Engine Dashboard &amp; Decision Synthesis
           </h1>
-          <p className="text-xs text-[#5B6B7A] mt-0.5 max-w-3xl">
+          <p className="text-xs text-[#475569] mt-0.5 max-w-3xl">
             Fuses absolute datasheet limits, lot-relative statistical deviations, Arrhenius temporal drift,
             and machine-learning defect evidence into calibrated 0–100 risk scores and qualification gates.
           </p>
@@ -135,78 +135,120 @@ export default function RiskEngineView({
 
         {/* Global Risk Distribution Summary */}
         <div className="flex items-center gap-2 text-xs font-mono">
-          <div className="bg-[#FFFFFF] border border-[#168A5B]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#168A5B]" />
-            <span className="text-[#168A5B] font-bold">{safeCount} SAFE</span>
+          <div className="bg-[#ECFDF5] border border-[#A7F3D0] px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-xs">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#168A5B]" />
+            <span className="text-[#065F46] font-bold">{safeCount} SAFE</span>
           </div>
-          <div className="bg-[#FFFFFF] border border-[#C58A00]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#C58A00]" />
-            <span className="text-[#C58A00] font-bold">{monitorCount} MONITOR</span>
+          <div className="bg-[#FFFBEB] border border-[#FDE68A] px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-xs">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" />
+            <span className="text-[#92400E] font-bold">{monitorCount} MONITOR</span>
           </div>
-          <div className="bg-[#FFFFFF] border border-[#D9363E]/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#D9363E]" />
-            <span className="text-[#D9363E] font-bold">{rejectCount} REJECT</span>
+          <div className="bg-[#FEF2F2] border border-[#FECACA] px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-xs">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]" />
+            <span className="text-[#991B1B] font-bold">{rejectCount} REJECT</span>
           </div>
         </div>
       </div>
 
-      {/* Row 1: The 3-Step Decision Gate Architecture */}
-      <div className="p-4 md:p-5 rounded-xl bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col gap-4">
-        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5B6B7A]">
-          Decision Synthesis Pipeline
-        </span>
+      {/* Prominent Decision Pipeline Banner */}
+      <div className="p-4 md:p-5 rounded-xl bg-[#FFFFFF] border border-[#D7E0EA] flex flex-col gap-3 shadow-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#334E68]">
+            DECISION SYNTHESIS PIPELINE ARCHITECTURE
+          </span>
+          <span className="text-[10px] font-mono text-[#005A9C] bg-[#F8FAFD] border border-[#D7E0EA] px-2 py-0.5 rounded font-bold">
+            MIL-STD-883 / ISRO QUALIFICATION
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+        {/* Pipeline Formula Flow Strip */}
+        <div className="p-3 bg-[#F8FAFD] border border-[#D7E0EA] rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2.5 py-1 rounded bg-[#FFFFFF] border border-[#D7E0EA] text-[#0B1E36] font-bold shadow-xs">
+              DATASHEET LIMITS (35%)
+            </span>
+            <span className="text-[#005A9C] font-bold">+</span>
+            <span className="px-2.5 py-1 rounded bg-[#FFFFFF] border border-[#D7E0EA] text-[#0B1E36] font-bold shadow-xs">
+              LOT BEHAVIOUR (25%)
+            </span>
+            <span className="text-[#005A9C] font-bold">+</span>
+            <span className="px-2.5 py-1 rounded bg-[#FFFFFF] border border-[#D7E0EA] text-[#0B1E36] font-bold shadow-xs">
+              PREDICTED DRIFT (25%)
+            </span>
+            <span className="text-[#005A9C] font-bold">+</span>
+            <span className="px-2.5 py-1 rounded bg-[#FFFFFF] border border-[#D7E0EA] text-[#0B1E36] font-bold shadow-xs">
+              ML DEFECT (15%)
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[#005A9C] font-bold text-sm">&rarr;</span>
+            <span className="px-3 py-1 rounded bg-[#005A9C] text-[#FFFFFF] font-bold shadow-xs">
+              RISK ENGINE (0-100)
+            </span>
+            <span className="text-[#005A9C] font-bold text-sm">&rarr;</span>
+            <span className="px-3 py-1 rounded bg-[#0B1E36] text-[#FFFFFF] font-bold shadow-xs">
+              DECISION VERDICT
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono pt-1">
           {/* Step 1: Input Evidence */}
-          <div className="p-3.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col gap-2">
-            <div className="text-[#0E88D3] font-bold flex items-center gap-1.5">
+          <div className="p-3.5 rounded-lg bg-[#F8FAFD] border border-[#D7E0EA] flex flex-col gap-2">
+            <div className="text-[#005A9C] font-bold flex items-center gap-1.5">
               <span>①</span> EVIDENCE ACQUISITION
             </div>
-            <ul className="text-[#5B6B7A] text-[11px] space-y-1 font-sans">
-              <li>&bull; <b className="text-[#17212B]">Datasheet Limits:</b> 50 µA max reverse leakage</li>
-              <li>&bull; <b className="text-[#17212B]">Lot Baseline:</b> Median / MAD z-score tracking</li>
-              <li>&bull; <b className="text-[#17212B]">Degradation Drift:</b> Arrhenius polynomial slope</li>
-              <li>&bull; <b className="text-[#17212B]">Machine Learning:</b> Isolation Forest anomaly trees</li>
+            <ul className="text-[#475569] text-[11px] space-y-1 font-sans">
+              <li>&bull; <b className="text-[#0B1E36]">Datasheet Limits:</b> 50 µA max reverse leakage ceiling</li>
+              <li>&bull; <b className="text-[#0B1E36]">Lot Baseline:</b> Median / MAD z-score tracking</li>
+              <li>&bull; <b className="text-[#0B1E36]">Degradation Drift:</b> Arrhenius polynomial slope (+96h)</li>
+              <li>&bull; <b className="text-[#0B1E36]">Machine Learning:</b> Isolation Forest anomaly trees</li>
             </ul>
           </div>
 
           {/* Step 2: Calibrated Bayesian Scoring */}
-          <div className="p-3.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col gap-2">
-            <div className="text-[#0E88D3] font-bold flex items-center gap-1.5">
+          <div className="p-3.5 rounded-lg bg-[#F8FAFD] border border-[#D7E0EA] flex flex-col gap-2">
+            <div className="text-[#005A9C] font-bold flex items-center gap-1.5">
               <span>②</span> CALIBRATED RISK SCORING
             </div>
-            <div className="text-xl font-bold text-[#17212B] font-mono">
+            <div className="text-xl font-bold text-[#0B1E36] font-mono">
               Risk = &sum; (w<sub>i</sub> &times; Factor<sub>i</sub>)
             </div>
-            <p className="text-[#5B6B7A] text-[11px] font-sans">
-              Weighted multi-evidence synthesis produces normalized 0 to 100 mission risk index.
+            <p className="text-[#475569] text-[11px] font-sans">
+              Weighted multi-evidence synthesis produces calibrated 0 to 100 mission risk index.
             </p>
           </div>
 
           {/* Step 3: Screening Verdict Gates */}
-          <div className="p-3.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col gap-2">
-            <div className="text-[#168A5B] font-bold flex items-center gap-1.5">
+          <div className="p-3.5 rounded-lg bg-[#F8FAFD] border border-[#D7E0EA] flex flex-col gap-2">
+            <div className="text-[#0B1E36] font-bold flex items-center gap-1.5">
               <span>③</span> MIL-STD-883 VERDICT GATES
             </div>
-            <div className="space-y-1 text-[11px] font-mono">
-              <div className="text-[#168A5B]">SAFE (0-39): Flight Approved</div>
-              <div className="text-[#C58A00]">MONITOR (40-69): In-Situ Telemetry Polling</div>
-              <div className="text-[#D9363E]">REJECT (&ge;70 or Limit Breach): Quarantined</div>
+            <div className="space-y-1.5 text-[11px] font-mono">
+              <div className="px-2 py-0.5 rounded bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0] font-bold">
+                SAFE (0-39): Flight Approved
+              </div>
+              <div className="px-2 py-0.5 rounded bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A] font-bold">
+                MONITOR (40-69): In-Situ Telemetry Polling
+              </div>
+              <div className="px-2 py-0.5 rounded bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA] font-bold">
+                REJECT (&ge;70 or Limit Breach): Quarantined
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Row 2: Component Selector Bar */}
-      <div className="p-3 rounded-xl bg-[#FFFFFF] border border-[#D9E2EA] flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="p-3 rounded-xl bg-[#FFFFFF] border border-[#D7E0EA] flex flex-wrap items-center justify-between gap-3 text-xs shadow-sm">
         <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-[320px]">
-          <span className="text-[#5B6B7A] font-mono text-[11px]">INSPECT COMPONENT:</span>
+          <span className="text-[#475569] font-mono text-[11px] font-bold">INSPECT COMPONENT:</span>
           <input
             type="text"
             placeholder="Search Component ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#F4F7FA] border border-[#D9E2EA] rounded-lg px-2.5 py-1 text-xs text-[#17212B] font-mono placeholder:text-[#81909D] focus:outline-none focus:border-[#0E88D3]"
+            className="w-full bg-[#F8FAFD] border border-[#D7E0EA] rounded-lg px-2.5 py-1 text-xs text-[#0B1E36] font-mono placeholder:text-[#81909D] focus:outline-none focus:border-[#005A9C]"
           />
         </div>
 
@@ -216,16 +258,16 @@ export default function RiskEngineView({
               key={filter}
               type="button"
               onClick={() => setStatusFilter(filter)}
-              className={`px-2 py-0.5 rounded transition-colors uppercase ${
+              className={`px-2.5 py-1 rounded font-bold uppercase transition-all cursor-pointer ${
                 statusFilter === filter
                   ? filter === 'reject'
-                    ? 'bg-[#D9363E] text-[#17212B] font-bold'
+                    ? 'bg-[#DC2626] text-white shadow-sm'
                     : filter === 'monitor'
-                    ? 'bg-[#C58A00] text-[#17212B] font-bold'
+                    ? 'bg-[#C58A00] text-white shadow-sm'
                     : filter === 'safe'
-                    ? 'bg-[#168A5B] text-[#17212B] font-bold'
-                    : 'bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/50 font-bold'
-                  : 'text-[#5B6B7A] hover:text-[#17212B] bg-[#F4F7FA] border border-[#D9E2EA]'
+                    ? 'bg-[#168A5B] text-white shadow-sm'
+                    : 'bg-[#005A9C] text-white shadow-sm'
+                  : 'bg-[#F8FAFD] text-[#334E68] hover:text-[#0B1E36] border border-[#D7E0EA]'
               }`}
             >
               {filter}
@@ -238,7 +280,7 @@ export default function RiskEngineView({
           onChange={(e) => {
             if (e.target.value) onSelectComponent(e.target.value)
           }}
-          className="bg-[#F4F7FA] border border-[#D9E2EA] text-[#17212B] text-xs font-mono rounded-lg px-3 py-1.5 max-w-[240px] focus:outline-none focus:border-[#0E88D3]"
+          className="bg-[#F8FAFD] border border-[#D7E0EA] text-[#0B1E36] text-xs font-mono font-bold rounded-lg px-3 py-1.5 max-w-[260px] focus:outline-none focus:border-[#005A9C] cursor-pointer"
         >
           <option value="" disabled>Select Component ({filteredComponents.length})</option>
           {filteredComponents.slice(0, 100).map((c) => (
@@ -253,56 +295,56 @@ export default function RiskEngineView({
       {targetPart ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch flex-1 min-h-0">
           {/* Left Column: Overall Risk Gauge & Decision Card */}
-          <div className={`p-5 rounded-xl border flex flex-col justify-between gap-4 h-full ${
+          <div className={`p-5 rounded-xl border flex flex-col justify-between gap-4 h-full shadow-sm ${
             targetPart.status === 'reject'
-              ? 'bg-[#FEF2F2] border-[#D9363E]/60'
+              ? 'bg-[#FEF2F2] border-[#FECACA]'
               : targetPart.status === 'monitor'
-              ? 'bg-[#FFFFFF] border-[#C58A00]/60'
-              : 'bg-[#FFFFFF] border-[#168A5B]/60'
+              ? 'bg-[#FFFBEB] border-[#FDE68A]'
+              : 'bg-[#ECFDF5] border-[#A7F3D0]'
           }`}>
             <div>
-              <div className="flex items-center justify-between border-b border-[#D9E2EA] pb-3">
-                <span className="text-xs font-mono uppercase text-[#5B6B7A]">
+              <div className="flex items-center justify-between border-b border-[#D7E0EA] pb-3">
+                <span className="text-xs font-mono uppercase text-[#334E68] font-bold">
                   Qualification Decision
                 </span>
-                <span className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase ${
+                <span className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase border ${
                   targetPart.status === 'reject'
-                    ? 'bg-[#D9363E] text-white'
+                    ? 'bg-[#FEF2F2] text-[#991B1B] border-[#FECACA]'
                     : targetPart.status === 'monitor'
-                    ? 'bg-[#C58A00] text-slate-900'
-                    : 'bg-[#168A5B] text-white'
+                    ? 'bg-[#FFFBEB] text-[#92400E] border-[#FDE68A]'
+                    : 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]'
                 }`}>
                   {(targetPart.status || 'safe').toUpperCase()}
                 </span>
               </div>
 
               <div className="py-6 flex flex-col items-center justify-center text-center">
-                <div className="text-xs font-mono uppercase text-[#5B6B7A] mb-1">
+                <div className="text-xs font-mono uppercase text-[#475569] font-bold mb-1">
                   CALIBRATED RISK SCORE
                 </div>
                 <div className={`text-6xl font-mono font-black tabular-nums tracking-tight ${
                   targetPart.status === 'reject'
-                    ? 'text-[#D9363E]'
+                    ? 'text-[#DC2626]'
                     : targetPart.status === 'monitor'
-                    ? 'text-[#C58A00]'
+                    ? 'text-[#D97706]'
                     : 'text-[#168A5B]'
                 }`}>
                   {riskScore}
-                  <span className="text-2xl font-light text-[#81909D]">/100</span>
+                  <span className="text-2xl font-light text-[#64748B]">/100</span>
                 </div>
-                <div className="text-xs font-mono text-[#5B6B7A] mt-2">
-                  Component: <b className="text-[#17212B]">{targetPart.component_id}</b> ({targetPart.lot_id})
+                <div className="text-xs font-mono text-[#475569] mt-2 font-medium">
+                  Component: <b className="text-[#0B1E36]">{targetPart.component_id}</b> ({targetPart.lot_id})
                 </div>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-[#F4F7FA] h-2.5 rounded-full overflow-hidden border border-[#D9E2EA]">
+              <div className="w-full bg-[#E2E8F0] h-2.5 rounded-full overflow-hidden border border-[#CBD5E1]">
                 <div
                   className={`h-full transition-all duration-500 ${
                     targetPart.status === 'reject'
-                      ? 'bg-[#D9363E]'
+                      ? 'bg-[#DC2626]'
                       : targetPart.status === 'monitor'
-                      ? 'bg-[#C58A00]'
+                      ? 'bg-[#D97706]'
                       : 'bg-[#168A5B]'
                   }`}
                   style={{ width: `${Math.min(100, riskScore)}%` }}
@@ -311,27 +353,27 @@ export default function RiskEngineView({
             </div>
 
             {/* Subsystem & Location Details */}
-            <div className="pt-3 border-t border-[#D9E2EA] text-xs font-mono space-y-1.5">
+            <div className="pt-3 border-t border-[#D7E0EA] text-xs font-mono space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-[#5B6B7A]">Subsystem:</span>
-                <span className="text-[#0E88D3] font-bold">[{targetPart.subsystem}] {loc?.name}</span>
+                <span className="text-[#475569]">Subsystem:</span>
+                <span className="text-[#005A9C] font-bold">[{targetPart.subsystem}] {loc?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#5B6B7A]">Equipment Bay:</span>
-                <span className="text-[#17212B]">{loc?.bay || 'Main Payload Deck'}</span>
+                <span className="text-[#475569]">Equipment Bay:</span>
+                <span className="text-[#0B1E36] font-semibold">{loc?.bay || 'Main Payload Deck'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#5B6B7A]">Traditional Spec Verdict:</span>
-                <span className={targetPart.v168 > limitVal ? 'text-[#D9363E] font-bold' : 'text-[#168A5B] font-bold'}>
-                  {targetPart.v168 > limitVal ? 'FAIL' : 'PASS'}
+                <span className="text-[#475569]">Traditional Spec Verdict:</span>
+                <span className={targetPart.v168 > limitVal ? 'text-[#DC2626] font-bold' : 'text-[#168A5B] font-bold'}>
+                  {targetPart.v168 > limitVal ? 'FAIL SPEC' : 'PASS SPEC'}
                 </span>
               </div>
             </div>
           </div>
 
           {/* Right Column (Span 2): Multi-Factor Risk Breakdown Table */}
-          <div className="lg:col-span-2 p-5 rounded-xl bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col gap-4">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5B6B7A]">
+          <div className="lg:col-span-2 p-5 rounded-xl bg-[#FFFFFF] border border-[#D7E0EA] flex flex-col gap-4 shadow-sm">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#334E68]">
               Risk Factor Evidence Breakdown
             </span>
 
@@ -339,36 +381,36 @@ export default function RiskEngineView({
               {factors.map((f, i) => (
                 <div
                   key={i}
-                  className="p-3 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col gap-2"
+                  className="p-3 rounded-lg bg-[#F8FAFD] border border-[#D7E0EA] flex flex-col gap-2"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
                     <div className="flex items-center gap-2">
-                      <span className="text-[#0E88D3] font-bold">{f.code}</span>
+                      <span className="text-[#005A9C] font-bold">{f.code}</span>
                       <span className="text-[#81909D]">&bull;</span>
-                      <span className="text-[#5B6B7A]">Weight: {f.weight}</span>
+                      <span className="text-[#475569] font-medium">Weight: {f.weight}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="text-[#5B6B7A]">Score:</span>
+                      <span className="text-[#475569]">Score:</span>
                       <span className={`font-bold tabular-nums ${
                         f.severity === 'critical'
-                          ? 'text-[#D9363E]'
+                          ? 'text-[#DC2626]'
                           : f.severity === 'warning'
-                          ? 'text-[#C58A00]'
+                          ? 'text-[#D97706]'
                           : 'text-[#168A5B]'
                       }`}>
                         {f.score}/100
                       </span>
-                      <span className="text-[#81909D]">(&rarr; +{f.contribution} pts)</span>
+                      <span className="text-[#64748B] font-semibold">(&rarr; +{f.contribution} pts)</span>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-                    <span className="text-[#17212B] font-semibold">{f.name}</span>
-                    <span className="text-[#0E88D3]">{f.raw}</span>
+                    <span className="text-[#0B1E36] font-bold">{f.name}</span>
+                    <span className="text-[#005A9C] font-bold">{f.raw}</span>
                   </div>
 
-                  <p className="text-[11px] text-[#5B6B7A] font-sans">
+                  <p className="text-[11px] text-[#475569] font-sans">
                     {f.description}
                   </p>
                 </div>
@@ -377,11 +419,11 @@ export default function RiskEngineView({
 
             {/* AI Diagnostics & Failure Physics */}
             {targetPart.reason && (
-              <div className="p-3 rounded-lg bg-[#F4F7FA] border border-[#D9E2EA] text-xs flex items-start gap-2">
-                <span className="text-[#0E88D3] font-mono font-bold uppercase whitespace-nowrap">
+              <div className="p-3 rounded-lg bg-[#F8FAFD] border border-[#D7E0EA] text-xs flex items-start gap-2">
+                <span className="text-[#005A9C] font-mono font-bold uppercase whitespace-nowrap">
                   Physics Explanation:
                 </span>
-                <span className="text-[#17212B] font-sans">
+                <span className="text-[#17212B] font-sans font-medium">
                   {targetPart.reason}
                 </span>
               </div>
@@ -389,7 +431,7 @@ export default function RiskEngineView({
           </div>
         </div>
       ) : (
-        <div className="p-10 text-center text-xs text-[#5B6B7A] bg-[#FFFFFF] rounded-xl border border-[#D9E2EA]">
+        <div className="p-10 text-center text-xs text-[#475569] bg-[#FFFFFF] rounded-xl border border-[#D7E0EA]">
           No components available. Please ingest data to synthesize Bayesian risk evaluations.
         </div>
       )}

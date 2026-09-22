@@ -31,20 +31,20 @@ export default function SatelliteView({
   return (
     <div className="w-full flex flex-col gap-4 p-3 md:p-5 bg-transparent text-[#17212B] font-sans flex-1 min-h-full">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#D9E2EA] pb-3 bg-[#FFFFFF]/60 p-3 md:p-4 rounded-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border border-[#D7E0EA] pb-3 bg-[#FFFFFF] p-3 md:p-4 rounded-xl shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/40 font-mono font-bold text-xs uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded bg-[#005A9C] text-[#FFFFFF] font-mono font-bold text-xs uppercase tracking-wider shadow-xs">
               HARDWARE VISUALIZATION
             </span>
-            <span className="text-xs font-mono text-[#5B6B7A]">
+            <span className="text-xs font-mono text-[#334E68] font-semibold">
               THREE.JS 3D SATELLITE CAD &amp; SUBSYSTEM LOCALIZATION
             </span>
           </div>
-          <h1 className="text-xl md:text-2xl font-mono font-black text-[#17212B] tracking-wide mt-1">
+          <h1 className="text-xl md:text-2xl font-mono font-black text-[#0B1E36] tracking-wide mt-1">
             3D Satellite &amp; Spacecraft Component Localization
           </h1>
-          <p className="text-xs text-[#5B6B7A] mt-0.5 max-w-3xl">
+          <p className="text-xs text-[#475569] mt-0.5 max-w-3xl">
             Interactive 3D model of the spacecraft with real-time MIL-STD-883 qualification status.
             Decks light up GREEN (Safe), AMBER (Monitor), or RED (Reject). Click parts or decks to locate hardware bays.
           </p>
@@ -52,17 +52,17 @@ export default function SatelliteView({
 
         {/* Legend */}
         <div className="flex items-center gap-3 text-xs font-mono">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-[#ECFDF5] border border-[#A7F3D0]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#168A5B]" />
-            <span className="text-[#5B6B7A]">SAFE</span>
+            <span className="text-[#065F46] font-bold">SAFE</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#C58A00]" />
-            <span className="text-[#5B6B7A]">MONITOR</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-[#FFFBEB] border border-[#FDE68A]">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" />
+            <span className="text-[#92400E] font-bold">MONITOR</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-[#FEF2F2] border border-[#FECACA]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#D9363E] animate-gentle-pulse" />
-            <span className="text-[#5B6B7A]">REJECT</span>
+            <span className="text-[#991B1B] font-bold">REJECT</span>
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@ export default function SatelliteView({
         </div>
 
         {/* Right: 3D Interactive Satellite Viewport */}
-        <div className="relative min-h-[500px] lg:min-h-[560px] rounded-xl border border-[#BFD8E8] bg-[linear-gradient(180deg,#EAF4FB_0%,#F4F8FB_50%,#DCECF7_100%)] overflow-hidden shadow-md flex flex-col flex-1 h-full ring-1 ring-[#0E88D3]/10">
+        <div className="relative min-h-[500px] lg:min-h-[560px] rounded-xl border border-[#D7E0EA] bg-[linear-gradient(180deg,#F8FAFD_0%,#EDF3FA_50%,#E2ECF7_100%)] overflow-hidden shadow-sm flex flex-col flex-1 h-full ring-1 ring-[#005A9C]/10">
           <SatelliteScene
             subsystems={subsystems}
             onSelect={onSelectSubsystem}
