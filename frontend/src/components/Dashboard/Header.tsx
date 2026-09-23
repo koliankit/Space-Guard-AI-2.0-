@@ -1,27 +1,25 @@
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { sounds } from '../../utils/soundEffects'
 import type { TeeSecurityStatus } from '../../types'
 
 export type DashboardTab =
   | 'overview'
-  | 'matrix'
-  | 'burn_in_data'
-  | 'ai_analysis'
-  | 'risk_engine'
-  | 'satellite'
-  | 'report'
-  | 'settings'
   | 'csv_intake'
   | 'validation'
   | 'module_a'
   | 'module_b'
+  | 'risk_engine'
+  | 'matrix'
   | 'diagnostics'
+  | 'satellite'
   | 'telemetry'
   | 'locations'
+  | 'report'
   | 'wall'
   | 'lots'
   | 'subsystems'
   | 'orbital'
+  | 'settings'
 
 interface HeaderProps {
   streamActive: boolean
@@ -38,128 +36,140 @@ interface HeaderProps {
   onOpenTeeModal?: () => void
   onToggleSidebar?: () => void
   onRunScreening?: () => void
-  onOpenLoginModal?: () => void
   running?: boolean
   isScreened?: boolean
 }
 
 export default function Header({
-  streamActive: _streamActive,
-  activeTab,
-  onSelectTab,
+  streamActive,
+  activeTab: _activeTab,
+  onSelectTab: _onSelectTab,
   totalComponents = 0,
   rejectCount = 0,
-  onOpenPitchModal: _onOpenPitchModal,
+  onOpenPitchModal,
   onOpenIngestModal: _onOpenIngestModal,
-  activeMissionName: _activeMissionName = 'Gaganyaan H1',
-  onResetWorkflow: _onResetWorkflow,
+  activeMissionName = 'Gaganyaan H1 Crew Module',
+  onResetWorkflow,
   onOpenOnboarding: _onOpenOnboarding,
-  teeStatus: _teeStatus,
-  onOpenTeeModal: _onOpenTeeModal,
+  teeStatus,
+  onOpenTeeModal,
   onToggleSidebar,
   onRunScreening,
-  onOpenLoginModal,
   running = false,
   isScreened = false,
 }: HeaderProps) {
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
-  const [notificationsOpen, setNotificationsOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const [istTime, setIstTime] = useState('')
+  const [metSeconds, setMetSeconds] = useState(14820)
+  const [soundOn, setSoundOn] = useState(() => sounds.isEnabled())
 
-  // Close dropdown on outside click
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setProfileDropdownOpen(false)
-        setNotificationsOpen(false)
-      }
+    const updateTimes = () => {
+      const now = new Date()
+      setIstTime(
+        now.toLocaleTimeString('en-GB', {
+          timeZone: 'Asia/Kolkata',
+          hour12: false,
+        })
+      )
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+
+    updateTimes()
+    const timer = setInterval(() => {
+      updateTimes()
+      setMetSeconds((s) => s + 1)
+    }, 1000)
+
+    return () => clearInterval(timer)
   }, [])
 
-  // Workflow steps
-  const workflowSteps = [
-    { label: 'DETECT', tab: 'burn_in_data' },
-    { label: 'UNDERSTAND', tab: 'ai_analysis' },
-    { label: 'PREDICT', tab: 'ai_analysis' },
-    { label: 'LOCALIZE', tab: 'satellite' },
-    { label: 'DECIDE', tab: 'risk_engine' },
-  ]
-
-  // Sample notifications
-  const recentNotifications = [
-    { id: 1, title: 'Lot Deviation Alert', desc: 'C-1045 exceeded +3.8σ lot variance threshold', time: '12m ago', type: 'reject' },
-    { id: 2, title: 'HTOL Burn-in Drift', desc: 'C-0872 positive parametric drift at 168h', time: '45m ago', type: 'monitor' },
-    { id: 3, title: 'Lot Ingestion Completed', desc: '1,232 parts parsed across 18 lots', time: '2h ago', type: 'safe' },
-  ]
+  const formatMet = (sec: number) => {
+    const h = String(Math.floor(sec / 3600)).padStart(2, '0')
+    const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0')
+    const s = String(sec % 60).padStart(2, '0')
+    return `T+${h}:${m}:${s}`
+  }
 
   return (
-    <header className="border-b border-[#2D4963] bg-[#162B40] sticky top-0 z-40 font-sans select-none flex-shrink-0 shadow-sm">
-      <div className="flex items-center justify-between px-3 md:px-5 py-2.5 gap-3 w-full">
-        {/* Left Section: Mobile Menu, ASTRA VIGIL Logo */}
+    <header className="border-b border-[#D5DEE7] bg-[#FFFFFF] sticky top-0 z-40 font-sans select-none flex-shrink-0 shadow-sm">
+      <div className="flex items-center justify-between px-3 md:px-5 py-2 gap-2.5 w-full">
+        {/* Left Section: Mobile Menu, ISRO Crest & SpaceGuard AI Brand */}
         <div className="flex items-center gap-3 min-w-0">
           {onToggleSidebar && (
             <button
               type="button"
               onClick={onToggleSidebar}
-              className="lg:hidden p-1.5 rounded-lg bg-[#1B3445] border border-[#2D4963] text-[#F1F5F9] hover:text-[#22D3EE] hover:border-[#22D3EE] transition-colors flex-shrink-0 cursor-pointer"
+              className="lg:hidden p-1.5 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7] text-[#17212B] hover:text-[#0E88D3] hover:border-[#0E88D3] transition-colors flex-shrink-0 cursor-pointer"
               title="Toggle Navigation Menu"
             >
               <span className="text-sm">☰</span>
             </button>
           )}
 
-          <div className="flex items-center gap-2.5">
-            {/* Aerospace Badge */}
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1E3A8A] to-[#1B3445] border border-[#2563EB]/70 flex items-center justify-center text-[#22D3EE] text-sm shadow-[0_0_10px_rgba(37,99,235,0.30)] flex-shrink-0 font-bold">
-              ✦
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm md:text-base font-mono font-black tracking-widest text-[#F1F5F9] uppercase leading-none">
-                ASTRA VIGIL
+          <div className="w-8 h-8 rounded-lg border border-[#F47216]/60 bg-gradient-to-br from-[#F47216]/10 to-[#0E88D3]/10 flex flex-col items-center justify-center text-white font-display font-bold text-xs shadow-orange flex-shrink-0">
+            <span className="tracking-tight text-[11px] text-[#F47216] font-black leading-none">ISRO</span>
+            <span className="text-[7.5px] text-[#4F6170] font-mono tracking-widest leading-none mt-0.5">MOX</span>
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm md:text-base font-display font-black tracking-wider text-[#17212B] uppercase truncate">
+                SpaceGuard <span className="text-[#F47216]">AI</span>
               </span>
-              <span className="text-[9px] text-[#A8B6C5] font-mono tracking-wider uppercase mt-1 hidden sm:block">
-                AI-POWERED COMPONENT RELIABILITY
+              <span className="text-[10px] px-2 py-0.5 rounded bg-[#F8FAFC] text-[#4F6170] border border-[#D5DEE7] font-mono font-medium hidden sm:inline-block">
+                SDSC SHAR // LCC-01
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-[#0E88D3]/10 text-[#0E88D3] border border-[#0E88D3]/30 font-mono font-bold truncate max-w-[160px] md:max-w-xs hidden md:inline-block">
+                {activeMissionName}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Center Section: Core Workflow (DETECT → UNDERSTAND → PREDICT → LOCALIZE → DECIDE) */}
-        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#102337] border border-[#2D4963] text-xs font-mono">
-          {workflowSteps.map((step, idx) => {
-            const isLast = idx === workflowSteps.length - 1
-            const isHighlighted =
-              (step.label === 'DETECT' && (activeTab === 'burn_in_data' || activeTab === 'csv_intake' || activeTab === 'validation')) ||
-              (step.label === 'UNDERSTAND' && (activeTab === 'ai_analysis' || activeTab === 'module_a')) ||
-              (step.label === 'PREDICT' && (activeTab === 'ai_analysis' || activeTab === 'module_b')) ||
-              (step.label === 'LOCALIZE' && (activeTab === 'satellite' || activeTab === 'telemetry')) ||
-              (step.label === 'DECIDE' && (activeTab === 'risk_engine' || activeTab === 'matrix'))
+        {/* Center Section: Telemetry Clocks & Ground Station */}
+        <div className="hidden md:flex items-center gap-2 text-xs font-mono flex-shrink-0">
+          {/* Subtle LIVE Status Indicator */}
+          <div className="px-2.5 py-1 rounded-lg bg-[#F0FDF4] border border-[#168A5B]/30 flex items-center gap-1.5 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#168A5B] animate-pulse" />
+            <span className="text-[10px] text-[#168A5B] uppercase font-bold tracking-wide">LIVE</span>
+          </div>
 
-            return (
-              <div key={step.label} className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => onSelectTab(step.tab as DashboardTab)}
-                  className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
-                    isHighlighted
-                      ? 'bg-[#2563EB] text-[#F1F5F9] shadow-[0_0_8px_rgba(37,99,235,0.40)] font-bold'
-                      : 'text-[#A8B6C5] hover:text-[#F1F5F9] hover:bg-[#1B3445]'
-                  }`}
-                  title={`Navigate to ${step.label} workflow step`}
-                >
-                  {step.label}
-                </button>
-                {!isLast && <span className="text-[#718398] text-[10px]">→</span>}
-              </div>
-            )
-          })}
+          <div className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7] flex items-center gap-1.5 shadow-sm">
+            <span className="text-[10px] text-[#4F6170] uppercase font-semibold">IST</span>
+            <span className="font-bold text-[#17212B] tabular-nums text-xs">{istTime || '16:15:00'}</span>
+          </div>
+
+          <div className="px-2.5 py-1 rounded-lg bg-[#0E88D3]/10 border border-[#0E88D3]/30 flex items-center gap-1.5 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#0E88D3] animate-pulse" />
+            <span className="text-[10px] text-[#0E88D3] uppercase font-bold">MET</span>
+            <span className="font-bold text-[#0E88D3] tabular-nums text-xs">{formatMet(metSeconds)}</span>
+          </div>
+
+          <div className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7] items-center gap-1.5 hidden xl:flex shadow-sm">
+            <span className={`w-2 h-2 rounded-full ${streamActive ? 'bg-[#168A5B] animate-pulse' : 'bg-[#718292]'}`} />
+            <span className="text-[10px] text-[#4F6170] font-semibold">BYL-32 DSN</span>
+            <span className={`text-xs font-bold ${streamActive ? 'text-[#168A5B]' : 'text-[#718292]'}`}>
+              {streamActive ? 'CARRIER LOCK' : 'STANDBY'}
+            </span>
+          </div>
         </div>
 
-        {/* Right Section: System Online, Notifications, User/Profile Dropdown */}
-        <div className="flex items-center gap-2.5 text-xs font-mono flex-shrink-0" ref={dropdownRef}>
-          {/* Quick Trigger Run Screening button if components loaded */}
+        {/* Right Section: Global Action Controls */}
+        <div className="flex items-center gap-2 text-xs font-mono flex-shrink-0">
+          {/* Active Dataset Status & Run Button */}
+          {totalComponents > 0 && (
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#D5DEE7]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#168A5B]" />
+              <span className="text-[#17212B] font-bold">{totalComponents}</span>
+              <span className="text-[#4F6170] text-[10.5px]">PARTS</span>
+              {rejectCount > 0 && (
+                <span className="ml-1 px-1.5 py-0.2 rounded bg-[#D9363E] text-white text-[10px] font-black">
+                  {rejectCount} REJ
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Quick Trigger Run Screening if not run yet */}
           {totalComponents > 0 && onRunScreening && !isScreened && (
             <button
               type="button"
@@ -168,124 +178,104 @@ export default function Header({
                 onRunScreening()
               }}
               disabled={running}
-              className="px-3 py-1.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
-              title="Run AI Screening"
+              className="px-3 py-1.5 rounded-lg bg-[#F47216] hover:bg-[#DE610D] text-white font-display font-black text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-orange disabled:opacity-50"
+              title="Execute SpaceGuard AI Silicon Screening Pipeline"
             >
               <span>{running ? '⏳' : '⚡'}</span>
-              <span className="hidden sm:inline">{running ? 'Screening...' : 'Run Screening'}</span>
+              <span className="hidden sm:inline">{running ? 'SCREENING...' : 'RUN AI SCREENING'}</span>
             </button>
           )}
 
-          {/* System Online Indicator */}
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#102337] border border-[#2D4963] text-xs">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981] animate-pulse" />
-            <span className="text-[#F1F5F9] font-medium text-[11px]">System Online</span>
-          </div>
+          {/* TEE Security Enclave Badge */}
+          <button
+            type="button"
+            onClick={() => {
+              sounds.playClick()
+              if (onOpenTeeModal) onOpenTeeModal()
+            }}
+            className={`px-2.5 py-1 rounded-lg border transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm select-none ${
+              !teeStatus?.enabled
+                ? 'border-[#D5DEE7] bg-[#F8FAFC] text-[#4F6170] hover:border-[#0E88D3] hover:text-[#17212B]'
+                : teeStatus.mode === 'simulation'
+                ? 'border-[#0E88D3]/40 bg-[#0E88D3]/10 text-[#0E88D3] hover:bg-[#0E88D3]/15'
+                : 'border-[#0E88D3]/40 bg-[#0E88D3]/15 text-[#0E88D3] hover:bg-[#0E88D3]/20'
+            }`}
+            title="Inspect TEE Security Enclave Status & Cryptographic Attestation"
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                !teeStatus?.enabled
+                  ? 'border border-[#718292] bg-transparent'
+                  : 'bg-[#0E88D3] animate-pulse'
+              }`}
+            />
+            <span className="text-[11px] font-mono font-bold tracking-wide">
+              TEE {(teeStatus?.mode || 'SIM').toUpperCase()}
+            </span>
+          </button>
 
-          {/* Notification Icon */}
-          <div className="relative">
+          {/* ISRO Briefing Deck Modal Shortcut */}
+          {onOpenPitchModal && (
+            <button
+              type="button"
+              onClick={() => {
+                sounds.playPing()
+                onOpenPitchModal()
+              }}
+              className="text-xs font-sans font-semibold px-2.5 py-1 rounded-lg border border-[#D5DEE7] bg-[#F8FAFC] text-[#17212B] hover:border-[#0E88D3] hover:text-[#0E88D3] transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+              title="View Official ISRO Briefing Deck (Press 'P')"
+            >
+              <span>📑</span>
+              <span className="hidden sm:inline">Briefing</span>
+            </button>
+          )}
+
+          {/* Reset Ingest */}
+          {onResetWorkflow && (
             <button
               type="button"
               onClick={() => {
                 sounds.playClick()
-                setNotificationsOpen((prev) => !prev)
-                setProfileDropdownOpen(false)
+                onResetWorkflow()
               }}
-              className="p-1.5 rounded-lg bg-[#102337] border border-[#2D4963] text-[#A8B6C5] hover:text-[#F1F5F9] hover:border-[#3E6182] transition-colors relative cursor-pointer"
-              title="Notifications"
+              className="text-xs font-mono font-bold px-2 py-1 rounded-lg border border-[#D9363E]/30 bg-[#D9363E]/10 text-[#D9363E] hover:bg-[#D9363E]/20 transition-colors flex items-center gap-1 cursor-pointer shadow-sm"
+              title="Reset flight telemetry data"
             >
-              <span className="text-sm">🔔</span>
-              {rejectCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-white text-[9px] font-black flex items-center justify-center shadow-xs">
-                  {rejectCount}
-                </span>
-              )}
+              <span>🔄</span>
+              <span className="hidden lg:inline">RESET</span>
+            </button>
+          )}
+
+          {/* Audio & Fullscreen Quick Toggles */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                const newState = sounds.toggle()
+                setSoundOn(newState)
+                if (newState) sounds.playPing()
+              }}
+              className="p-1.5 rounded-lg border border-[#D9E2EA] bg-[#F8FAFC] text-[#5B6B7A] hover:text-[#17212B] hover:border-[#0E88D3] text-xs flex items-center justify-center transition-colors cursor-pointer"
+              title="Toggle Audio Feedback"
+            >
+              <span>{soundOn ? '🔊' : '🔇'}</span>
             </button>
 
-            {/* Notifications Menu */}
-            {notificationsOpen && (
-              <div className="absolute right-0 mt-2 w-72 rounded-xl bg-[#162B40] border border-[#2D4963] shadow-lg p-2.5 z-50 text-xs animate-fade-in">
-                <div className="flex items-center justify-between pb-2 border-b border-[#2D4963] mb-2">
-                  <span className="font-bold text-[#F1F5F9]">System Notifications</span>
-                  <span className="text-[10px] text-[#22D3EE] font-medium">3 Unread</span>
-                </div>
-                <div className="space-y-1.5">
-                  {recentNotifications.map((notif) => (
-                    <div
-                      key={notif.id}
-                      className="p-2 rounded-lg bg-[#1B3445] hover:bg-[#203C55] transition-colors cursor-pointer border border-transparent hover:border-[#2D4963]"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`font-semibold ${
-                            notif.type === 'reject'
-                              ? 'text-[#EF4444]'
-                              : notif.type === 'monitor'
-                              ? 'text-[#F59E0B]'
-                              : 'text-[#10B981]'
-                          }`}
-                        >
-                          {notif.title}
-                        </span>
-                        <span className="text-[9px] text-[#718398]">{notif.time}</span>
-                      </div>
-                      <p className="text-[10.5px] text-[#A8B6C5] mt-0.5 leading-snug">{notif.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* User Profile Dropdown */}
-          <div className="relative">
             <button
               type="button"
               onClick={() => {
                 sounds.playClick()
-                setProfileDropdownOpen((prev) => !prev)
-                setNotificationsOpen(false)
+                if (!document.fullscreenElement) {
+                  document.documentElement.requestFullscreen().catch(() => {})
+                } else {
+                  document.exitFullscreen().catch(() => {})
+                }
               }}
-              className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#102337] border border-[#2D4963] hover:border-[#3E6182] text-[#F1F5F9] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#D9E2EA] bg-[#F8FAFC] text-[#5B6B7A] hover:text-[#17212B] hover:border-[#0E88D3] text-xs flex items-center justify-center transition-colors cursor-pointer"
+              title="Toggle Fullscreen"
             >
-              <div className="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-[10px]">
-                RE
-              </div>
-              <span className="hidden md:inline font-semibold text-[11px] text-[#F1F5F9]">Engineer</span>
-              <span className="text-[9px] text-[#718398]">▼</span>
+              <span>⛶</span>
             </button>
-
-            {/* Dropdown Menu */}
-            {profileDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 rounded-xl bg-[#162B40] border border-[#2D4963] shadow-lg p-2 z-50 text-xs animate-fade-in">
-                <div className="px-2.5 py-2 border-b border-[#2D4963] mb-1">
-                  <div className="font-bold text-[#F1F5F9]">Mission Reliability Engineer</div>
-                  <div className="text-[10px] text-[#718398]">ID: RE-883-QUAL &bull; Level-S</div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProfileDropdownOpen(false)
-                    onSelectTab('settings')
-                  }}
-                  className="w-full text-left px-2.5 py-1.5 rounded-lg text-[#A8B6C5] hover:text-[#F1F5F9] hover:bg-[#1B3445] transition-colors flex items-center gap-2 cursor-pointer"
-                >
-                  <span>⚙️</span> Platform Settings
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProfileDropdownOpen(false)
-                    if (onOpenLoginModal) onOpenLoginModal()
-                  }}
-                  className="w-full text-left px-2.5 py-1.5 rounded-lg text-[#22D3EE] hover:bg-[#1B3445] transition-colors flex items-center gap-2 cursor-pointer mt-0.5"
-                >
-                  <span>🔒</span> Lock Console / Login
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>

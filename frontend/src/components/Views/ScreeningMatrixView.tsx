@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import type { ComponentOut } from '../../types'
-import { sounds } from '../../utils/soundEffects'
 
 interface ScreeningMatrixViewProps {
   components: ComponentOut[]
@@ -44,20 +43,20 @@ export default function ScreeningMatrixView({
   // Status counts
   const counts = useMemo(() => {
     return {
-      all: components.length || 1232,
-      reject: components.filter((c) => c.status === 'reject').length || 92,
-      monitor: components.filter((c) => c.status === 'monitor').length || 298,
-      safe: components.filter((c) => c.status === 'safe').length || 842,
+      all: components.length,
+      reject: components.filter((c) => c.status === 'reject').length,
+      monitor: components.filter((c) => c.status === 'monitor').length,
+      safe: components.filter((c) => c.status === 'safe').length,
       degrading: components.filter(
         (c) => c.behavioral_health === 'DEGRADING' || c.drift_trend === 'ACCELERATING POSITIVE DRIFT'
-      ).length || 64,
+      ).length,
       abnormal_within_spec: components.filter(
         (c) => c.anomaly_category === 'abnormal_within_spec' || (c.traditional_decision === 'PASS' && c.status !== 'safe'),
-      ).length || 78,
+      ).length,
     }
   }, [components])
 
-  // Real Evaluation Metrics
+  // Real Evaluation Metrics (SIH26170 Requirement 10)
   const metrics = useMemo(() => {
     if (components.length === 0) return null
     const errs = components.map((c) => c.prediction_error_168 ?? Math.abs(c.v168 - c.predicted168_from_early))
@@ -73,12 +72,14 @@ export default function ScreeningMatrixView({
       const precision = tp + fp > 0 ? tp / (tp + fp) : 0
       const recall = tp + fn > 0 ? tp / (tp + fn) : 0
       const f1 = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0
-      return { hasGt: true, precision, recall, f1, mae, rmse, count: labeled.length }
+      const fpr = fp + tn > 0 ? fp / (fp + tn) : 0
+      const fnr = fn + tp > 0 ? fn / (fn + tp) : 0
+      return { hasGt: true, precision, recall, f1, fpr, fnr, mae, rmse, count: labeled.length, status_message: undefined as string | undefined }
     }
-    return { hasGt: false, mae, rmse, count: components.length }
+    return { hasGt: false, mae, rmse, count: components.length, status_message: 'Evaluation pending dataset • Unsupervised lot-relative screening active' }
   }, [components])
 
-  // Filter & Search
+  // Filter & Search (including selectedLotFilter)
   const filtered = useMemo(() => {
     return components.filter((c) => {
       let matchesFilter = true
@@ -97,22 +98,19 @@ export default function ScreeningMatrixView({
       const matchesSearch =
         !searchTerm ||
         c.component_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (c.subsystem && c.subsystem.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (c.lot_id && c.lot_id.toLowerCase().includes(searchTerm.toLowerCase()))
-
+        c.lot_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.subsystem.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.subsystem_name && c.subsystem_name.toLowerCase().includes(searchTerm.toLowerCase()))
       return matchesFilter && matchesSearch
     })
   }, [components, filterMode, selectedLotFilter, searchTerm])
 
-  // Sort components
+  // Sort
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
-      let vA = 0
-      let vB = 0
-      if (sortBy === 'risk') {
-        vA = a.risk_score
-        vB = b.risk_score
-      } else if (sortBy === 'z168') {
+      let vA: any = a.risk_score
+      let vB: any = b.risk_score
+      if (sortBy === 'z168') {
         vA = Math.abs(a.z168)
         vB = Math.abs(b.z168)
       } else if (sortBy === 'slope') {
@@ -125,7 +123,8 @@ export default function ScreeningMatrixView({
         vA = a.predicted168_from_early
         vB = b.predicted168_from_early
       } else if (sortBy === 'id') {
-        return sortAsc ? a.component_id.localeCompare(b.component_id) : b.component_id.localeCompare(a.component_id)
+        vA = a.component_id
+        vB = b.component_id
       }
       if (vA < vB) return sortAsc ? -1 : 1
       if (vA > vB) return sortAsc ? 1 : -1
@@ -133,7 +132,7 @@ export default function ScreeningMatrixView({
     })
   }, [filtered, sortBy, sortAsc])
 
-  // Grouped by lot
+  // Components grouped by lot for lot-wise classification view
   const lotGroupsForDisplay = useMemo(() => {
     const map = new Map<string, ComponentOut[]>()
     sorted.forEach((c) => {
@@ -158,12 +157,14 @@ export default function ScreeningMatrixView({
     })
   }, [sorted])
 
+  // Export CSV
   const handleExportCSV = () => {
     if (components.length === 0) return
     const headers = [
       'component_id',
       'subsystem',
       'lot_id',
+      'parameter',
       'v0_uA',
       'v24_uA',
       'v96_uA',
@@ -171,10 +172,16 @@ export default function ScreeningMatrixView({
       'limit_uA',
       'lot_mean_uA',
       'lot_z_score',
-      'drift_slope',
+      'drift_slope_uA_hr',
+      'predicted168_early_uA',
+      'prediction_error_uA',
+      'predicted_future_uA',
+      'lot_anomaly_score',
       'risk_score',
       'status',
       'traditional_decision',
+      'anomaly_category',
+      'screening_reason',
     ]
     const csvRows = [headers.join(',')]
     sorted.forEach((c) => {
@@ -183,6 +190,7 @@ export default function ScreeningMatrixView({
           `"${c.component_id}"`,
           `"${c.subsystem}"`,
           `"${c.lot_id}"`,
+          `"${c.parameter || 'Leakage Current (µA)'}"`,
           c.v0,
           c.v24,
           c.v96 ?? '',
@@ -191,9 +199,15 @@ export default function ScreeningMatrixView({
           c.lot_mean ?? '',
           c.z168.toFixed(3),
           c.slope.toFixed(5),
+          c.predicted168_from_early.toFixed(2),
+          c.prediction_error_168 != null ? c.prediction_error_168.toFixed(2) : '',
+          c.predicted_future.toFixed(2),
+          c.lot_anomaly_score != null ? c.lot_anomaly_score.toFixed(1) : (c.iso_score * 100).toFixed(1),
           c.risk_score,
           `"${c.status}"`,
           `"${c.traditional_decision}"`,
+          `"${c.anomaly_category || ''}"`,
+          `"${(c.reason || '').replace(/"/g, '""')}"`,
         ].join(','),
       )
     })
@@ -201,315 +215,741 @@ export default function ScreeningMatrixView({
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', `ASTRA_VIGIL_Component_Screening_Matrix_${new Date().toISOString().slice(0, 10)}.csv`)
+    link.setAttribute('download', `ISRO_SpaceGuard_Screening_Matrix_${new Date().toISOString().slice(0, 10)}.csv`)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-3 md:p-5 gap-3 font-sans text-xs select-none w-full">
-      {/* Top Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-[#162B40] border border-[#2D4963] shadow-md">
+    <div className="flex flex-col flex-1 min-h-0 p-2.5 md:p-4 bg-transparent font-mono select-none text-[#17212B] w-full">
+      {/* Top Header & Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-[#D9E2EA] mb-2">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded bg-[#2563EB] text-[#F1F5F9] font-mono font-bold text-[11px] uppercase tracking-wider">
-              COMPONENT MATRIX
-            </span>
-            <span className="text-xs font-mono text-[#A8B6C5] font-semibold">
-              MIL-STD-883 METHOD 1005 HTOL LEDGER
+            <span className="w-2 h-2 rounded-full bg-[#0E88D3]" />
+            <h2 className="m-0 text-sm font-display font-black tracking-widest text-[#17212B] uppercase">
+              ISRO COMPONENT SCREENING MATRIX &amp; ANOMALY LEDGER
+            </h2>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-[#0E88D3]/15 text-[#0E88D3] border border-[#0E88D3]/40 font-bold">
+              MIL-STD-883 METHOD 1005 HTOL
             </span>
           </div>
-          <h1 className="text-lg md:text-xl font-mono font-black text-[#F1F5F9] tracking-wide mt-1">
-            Component Screening Matrix &amp; Reliability Ledger
-          </h1>
-          <p className="text-xs text-[#A8B6C5] mt-0.5">
-            Real-time multi-point burn-in telemetry (0h, 24h, 96h, 168h), lot-relative deviations, and calibrated risk scores.
-          </p>
+          <div className="text-[10px] text-[#5B6B7A] tracking-wider mt-0.5">
+            Dynamic Lot-Relative Anomaly Detection &bull; 0h+24h &rarr; 168h Drift Extrapolation &bull; Latent Silicon Breakdown Prevention
+          </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleExportCSV}
-          className="px-3.5 py-1.5 rounded-lg bg-[#1B3445] hover:bg-[#203C55] text-[#22D3EE] border border-[#2D4963] font-mono font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm"
-        >
-          <span>📥</span> Export CSV Ledger
-        </button>
-      </div>
-
-      {/* Paradigm Principle & AI Metrics Callout */}
-      <div className="p-3 rounded-xl bg-[#162B40] border border-[#2D4963] flex flex-wrap items-center justify-between gap-2.5">
+        {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/40">
-            PARADIGM SHIFT
-          </span>
-          <span className="text-xs text-[#F1F5F9] font-semibold">
-            “Within Limit ≠ Always Healthy” &mdash; AI detects latent lot-relative anomalies invisible to fixed 50 µA limits.
-          </span>
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            disabled={components.length === 0}
+            className="px-3 py-1.5 rounded border border-[#D9E2EA] bg-[#FFFFFF] text-[#0E88D3] hover:border-[#0E88D3] hover:bg-[#F8FAFC] hover:text-[#17212B] text-xs flex items-center gap-1.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed font-medium"
+          >
+            <span>&#8681;</span> EXPORT CSV LEDGER
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={() => setShowParadigmComparison((prev) => !prev)}
-          className="text-xs font-mono text-[#22D3EE] hover:text-[#F1F5F9] transition-colors"
-        >
-          {showParadigmComparison ? '▲ Hide Comparison' : '▼ Compare Traditional vs AI'}
-        </button>
       </div>
 
-      {showParadigmComparison && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3.5 rounded-xl bg-[#102337] border border-[#2D4963] text-xs">
-          <div className="p-3 rounded-lg bg-[#1B3445] border border-[#2D4963]">
-            <div className="text-[10px] font-mono font-bold text-[#EF4444] uppercase mb-1">
-              ✕ TRADITIONAL SCREENING (FIXED LIMITS):
+      {/* SIH26170 Requirement 11: Traditional vs AI Screening Paradigm Architecture */}
+      <div className="mb-2 px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] text-xs transition-all">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] uppercase font-display font-black px-1.5 py-0.5 rounded bg-[#0E88D3]/20 text-[#0E88D3] border border-[#0E88D3]/40">
+              ISRO ARCHITECTURE
+            </span>
+            <span className="text-[#17212B] text-[11px] font-medium">
+              AI detects abnormal drift, predicts 168h degradation, and localizes latent escapes under MIL-STD-883.
+            </span>
+            <span className="hidden xl:inline text-[10px] text-[#F47216] font-semibold">
+              &bull; WITHIN LIMIT &ne; ALWAYS HEALTHY
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowParadigmComparison((prev) => !prev)}
+            className="text-[10.5px] text-[#0E88D3] hover:text-[#17212B] px-2 py-0.5 rounded bg-[#F8FAFC] border border-[#D9E2EA] transition-colors flex items-center gap-1 font-semibold cursor-pointer"
+          >
+            <span>{showParadigmComparison ? '▲ Hide Paradigm Comparison' : '▼ Compare Traditional vs AI'}</span>
+          </button>
+        </div>
+
+        {showParadigmComparison && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-[11px] mt-2 pt-2 border-t border-[#D9E2EA]">
+            <div className="p-2.5 rounded-lg bg-[#F4F7FA] border border-[#D9E2EA]">
+              <div className="text-[10px] font-bold text-[#5B6B7A] uppercase mb-1 flex items-center gap-1">
+                <span className="text-[#D9363E]">&#10006;</span> TRADITIONAL AEROSPACE SCREENING:
+              </div>
+              <div className="font-mono text-[#17212B]">
+                Measurement &rarr; <span className="text-[#17212B] font-bold">Fixed Datasheet Limit (50 &micro;A)</span> &rarr; PASS/FAIL
+              </div>
+              <div className="text-[10px] text-[#81909D] mt-1 italic">
+                Critical Gap: A component with severe latent drift (e.g. 38.9 &micro;A vs 10 &micro;A lot baseline) PASSES if static limit is 50 &micro;A.
+              </div>
             </div>
-            <div className="font-mono text-[#F1F5F9]">
-              Component Measurement &le; Fixed Limit (50.0 µA) &rarr; <span className="text-[#10B981] font-bold">PASS</span>
+
+            <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#0E88D3]/40">
+              <div className="text-[10px] font-bold text-[#0E88D3] uppercase mb-1 flex items-center gap-1">
+                <span className="text-[#168A5B]">&#10003;</span> SPACEGUARD AI DECISION-SUPPORT LAYER:
+              </div>
+              <div className="font-mono text-[#0E88D3]">
+                Detect &rarr; <b className="text-[#17212B]">Understand</b> &rarr; <b className="text-[#17212B]">Predict (168h)</b> &rarr; <b className="text-[#17212B]">Localize (3D)</b> &rarr; <b className="text-[#D9363E]">Decide</b>
+              </div>
+              <div className="text-[10px] text-[#5B6B7A] mt-1">
+                Domain-specific integration of Z-score, Isolation Forest, and regression into an aerospace predictive screening pipeline to catch latent escapes.
+              </div>
             </div>
-            <p className="text-[11px] text-[#A8B6C5] mt-1">
-              Latent escape risk: A part leaking 42.1 µA against a lot median of 10.2 µA passes traditional gates despite carrying terminal oxide defects.
-            </p>
+          </div>
+        )}
+      </div>
+
+      {/* SIH26170 Requirement 10: Real Evaluation Metrics Strip */}
+      {metrics && (
+        <div className="mb-2 px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-[#D9E2EA] flex flex-wrap items-center justify-between gap-2.5 text-[11px]">
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded bg-[#168A5B]/20 text-[#168A5B] border border-[#168A5B]/40">
+              AI ENGINE METRICS
+            </span>
+            <span className="text-[#5B6B7A] text-xs">
+              0h+24h &rarr; 168h Extrapolation:
+            </span>
+            <span className="text-[#17212B] font-bold">
+              MAE: <span className="text-[#0E88D3] font-mono">{metrics.mae.toFixed(3)} µA</span> &bull; RMSE: <span className="text-[#0E88D3] font-mono">{metrics.rmse.toFixed(3)} µA</span>
+            </span>
           </div>
 
-          <div className="p-3 rounded-lg bg-[#1B3445] border border-[#2D4963]">
-            <div className="text-[10px] font-mono font-bold text-[#22D3EE] uppercase mb-1">
-              ✓ ASTRA VIGIL DECISION-SUPPORT:
-            </div>
-            <div className="font-mono text-[#22D3EE]">
-              Detect &rarr; Understand &rarr; Predict (168h) &rarr; Localize (3D) &rarr; <span className="text-[#EF4444] font-bold">Decide</span>
-            </div>
-            <p className="text-[11px] text-[#A8B6C5] mt-1">
-              Catches 4.12σ lot-relative outliers and extrapolates time-series drift before flight integration.
-            </p>
+          <div className="flex items-center gap-2">
+            {metrics.hasGt ? (
+              <div className="flex items-center gap-2 font-mono text-[10.5px]">
+                <span className="text-[#5B6B7A]">Precision: <b className="text-[#168A5B]">{(metrics.precision! * 100).toFixed(1)}%</b></span>
+                <span className="text-slate-600">|</span>
+                <span className="text-[#5B6B7A]">Recall: <b className="text-[#168A5B]">{(metrics.recall! * 100).toFixed(1)}%</b></span>
+                <span className="text-slate-600">|</span>
+                <span className="text-[#5B6B7A]" title="False Negative Rate - Critical metric for zero-defect space screening">
+                  FNR (Escapes): <b className={((1 - (metrics.recall ?? 1)) * 100) > 0 ? 'text-[#D9363E]' : 'text-[#168A5B]'}>{((1 - (metrics.recall ?? 1)) * 100).toFixed(1)}%</b>
+                </span>
+                <span className="text-slate-600">|</span>
+                <span className="text-[#5B6B7A]">F1: <b className="text-[#0E88D3]">{(metrics.f1! * 100).toFixed(1)}%</b></span>
+              </div>
+            ) : (
+              <span className="text-[10px] text-[#5B6B7A] italic">
+                {metrics.status_message || 'Evaluation pending dataset • Unsupervised lot-relative screening active'}
+              </span>
+            )}
           </div>
         </div>
       )}
 
       {/* Filter Tabs & Search Bar */}
-      <div className="p-3 rounded-xl bg-[#162B40] border border-[#2D4963] flex flex-wrap items-center justify-between gap-3">
-        {/* Verdict Filters */}
-        <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs">
+      <div className="flex flex-col gap-2 mb-2.5">
+        {/* Row 1: Verdict Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
             onClick={() => setFilterMode('ALL')}
-            className={`px-3 py-1 rounded-lg border transition-all ${
+            className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'ALL'
-                ? 'bg-[#2563EB] text-[#F1F5F9] border-[#2563EB] font-bold'
-                : 'bg-[#1B3445] text-[#A8B6C5] border-[#2D4963] hover:text-[#F1F5F9]'
+                ? 'bg-[#0E88D3]/20 border-[#0E88D3] text-[#0E88D3] font-bold shadow-sm'
+                : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
             }`}
           >
-            All [{counts.all}]
+            ALL [{counts.all}]
           </button>
           <button
             type="button"
             onClick={() => setFilterMode('reject')}
-            className={`px-3 py-1 rounded-lg border transition-all flex items-center gap-1.5 ${
+            className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'reject'
-                ? 'bg-[#EF4444] text-[#F1F5F9] border-[#EF4444] font-bold'
-                : 'bg-[#1B3445] text-[#EF4444] border-[#2D4963] hover:bg-[#EF4444]/20'
+                ? 'bg-[#D9363E]/25 border-[#D9363E] text-[#D9363E] font-bold shadow-alert-glow'
+                : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#D9363E]/80 hover:text-[#D9363E] hover:bg-[#F8FAFC]'
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-[#EF4444]" />
-            REJECT [{counts.reject}]
+            &#9888; REJECT [{counts.reject}]
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterMode('degrading')}
+            className={`text-xs px-3 py-1 rounded border transition-all ${
+              filterMode === 'degrading'
+                ? 'bg-[#F47216]/25 border-[#F47216] text-[#F47216] font-bold'
+                : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#F47216]/80 hover:text-[#F47216] hover:bg-[#F8FAFC]'
+            }`}
+          >
+            &#9650; DEGRADING [{counts.degrading}]
           </button>
           <button
             type="button"
             onClick={() => setFilterMode('monitor')}
-            className={`px-3 py-1 rounded-lg border transition-all flex items-center gap-1.5 ${
+            className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'monitor'
-                ? 'bg-[#F59E0B] text-[#102337] border-[#F59E0B] font-bold'
-                : 'bg-[#1B3445] text-[#F59E0B] border-[#2D4963] hover:bg-[#F59E0B]/20'
+                ? 'bg-[#C58A00]/25 border-[#C58A00] text-[#C58A00] font-bold'
+                : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#C58A00]/80 hover:text-[#C58A00] hover:bg-[#F8FAFC]'
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-            MONITOR [{counts.monitor}]
+            &#9670; MONITOR [{counts.monitor}]
           </button>
           <button
             type="button"
             onClick={() => setFilterMode('safe')}
-            className={`px-3 py-1 rounded-lg border transition-all flex items-center gap-1.5 ${
+            className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'safe'
-                ? 'bg-[#10B981] text-[#F1F5F9] border-[#10B981] font-bold'
-                : 'bg-[#1B3445] text-[#10B981] border-[#2D4963] hover:bg-[#10B981]/20'
+                ? 'bg-[#168A5B]/25 border-[#168A5B] text-[#168A5B] font-bold'
+                : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#168A5B]/80 hover:text-[#168A5B] hover:bg-[#F8FAFC]'
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-            SAFE [{counts.safe}]
+            &#10003; SAFE [{counts.safe}]
           </button>
           <button
             type="button"
             onClick={() => setFilterMode('abnormal_within_spec')}
-            className={`px-3 py-1 rounded-lg border transition-all ${
+            className={`text-xs px-3 py-1 rounded border transition-all ${
               filterMode === 'abnormal_within_spec'
-                ? 'bg-[#22D3EE]/20 border-[#22D3EE] text-[#22D3EE] font-bold'
-                : 'bg-[#1B3445] text-[#A8B6C5] border-[#2D4963] hover:text-[#F1F5F9]'
+                ? 'bg-[#0E88D3]/25 border-[#0E88D3] text-[#17212B] font-bold shadow-sm'
+                : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
             }`}
+            title="Components that PASS fixed datasheet limit but are ABNORMAL relative to lot peers (Latent Defects)"
           >
-            Within Limit Anomalies [{counts.abnormal_within_spec}]
+            &#9881; WITHIN LIMIT &bull; ABNORMAL DRIFT [{counts.abnormal_within_spec}]
           </button>
         </div>
 
-        {/* Search & Lot dropdown */}
-        <div className="flex items-center gap-2">
-          <select
-            value={selectedLotFilter}
-            onChange={(e) => setSelectedLotFilter(e.target.value)}
-            className="bg-[#1B3445] border border-[#2D4963] text-[#F1F5F9] text-xs px-2.5 py-1.5 rounded-lg focus:outline-none font-mono cursor-pointer"
-          >
-            <option value="ALL">All Lots ({availableLots.length})</option>
-            {availableLots.map((l) => (
-              <option key={l.lot_id} value={l.lot_id} className="bg-[#162B40]">
-                {l.lot_id} ({l.count} parts) {l.status === 'reject' ? '⚠️' : ''}
-              </option>
-            ))}
-          </select>
+        {/* Row 2: Lot Selector, Grouping Toggle, and Search Input */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Lot Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-[#5B6B7A] uppercase font-bold">Lot:</span>
+              <select
+                value={selectedLotFilter}
+                onChange={(e) => setSelectedLotFilter(e.target.value)}
+                className="bg-[#FFFFFF] border border-[#D9E2EA] text-[#17212B] text-xs px-2.5 py-1.5 rounded focus:border-[#0E88D3] outline-none font-mono cursor-pointer"
+              >
+                <option value="ALL">📦 All Lots ({availableLots.length})</option>
+                {availableLots.map((l) => (
+                  <option key={l.lot_id} value={l.lot_id}>
+                    {l.lot_id} ({l.count} parts) {l.status === 'reject' ? '⚠️ REJECT' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <input
-            type="text"
-            placeholder="Search Part ID, Subsystem..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-[#1B3445] border border-[#2D4963] text-xs text-[#F1F5F9] placeholder-[#718398] px-3 py-1.5 rounded-lg focus:outline-none focus:border-[#2563EB] w-48 md:w-60"
-          />
+            {/* View Grouping Toggle */}
+            <div className="flex items-center bg-[#FFFFFF] border border-[#D9E2EA] rounded-md p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewGrouping('flat')}
+                className={`px-2.5 py-1 rounded text-[10.5px] uppercase font-bold transition-all ${
+                  viewGrouping === 'flat'
+                    ? 'bg-[#0E88D3]/20 border border-[#0E88D3]/40 text-[#0E88D3] shadow-sm'
+                    : 'text-[#5B6B7A] hover:text-[#17212B]'
+                }`}
+              >
+                📋 Flat View
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewGrouping('lot_grouped')}
+                className={`px-2.5 py-1 rounded text-[10.5px] uppercase font-bold transition-all ${
+                  viewGrouping === 'lot_grouped'
+                    ? 'bg-[#0E88D3]/20 border border-[#0E88D3]/40 text-[#0E88D3] shadow-sm'
+                    : 'text-[#5B6B7A] hover:text-[#17212B]'
+                }`}
+              >
+                📦 Group by Lot ({lotGroupsForDisplay.length})
+              </button>
+            </div>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative min-w-[260px] flex-1 max-w-md">
+            <input
+              type="text"
+              placeholder="Search Part ID, Subsystem, Lot..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-[#FFFFFF] border border-[#D9E2EA] text-[#17212B] text-xs px-3 py-1.5 rounded focus:border-[#0E88D3] focus:outline-none placeholder-[#81909D]"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#5B6B7A] hover:text-[#17212B] text-xs"
+              >
+                &times;
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Main Table */}
-      <div className="flex-1 min-h-[460px] overflow-auto rounded-xl border border-[#2D4963] bg-[#162B40] shadow-md">
-        <table className="w-full text-left font-mono text-[11px] border-collapse">
-          <thead className="sticky top-0 bg-[#102337] border-b border-[#2D4963] z-10 text-[10px] uppercase text-[#A8B6C5] tracking-wider">
-            <tr>
-              <th className="py-2.5 px-3">Verdict</th>
-              <th className="py-2.5 px-3">Paradigm</th>
-              <th className="py-2.5 px-3">Component ID</th>
-              <th className="py-2.5 px-3">Subsystem</th>
-              <th className="py-2.5 px-3">Lot ID</th>
-              <th className="py-2.5 px-3">0h (µA)</th>
-              <th className="py-2.5 px-3">24h (µA)</th>
-              <th className="py-2.5 px-3">96h (µA)</th>
-              <th className="py-2.5 px-3 text-[#F1F5F9]">168h (µA)</th>
-              <th className="py-2.5 px-3">Spec Limit</th>
-              <th className="py-2.5 px-3">Lot Median</th>
-              <th className="py-2.5 px-3">Lot Z-Score</th>
-              <th className="py-2.5 px-3">Drift Rate</th>
-              <th className="py-2.5 px-3">Risk Score</th>
-              <th className="py-2.5 px-3 text-right">3D Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#2D4963] bg-[#162B40]">
-            {sorted.slice(0, 100).map((c) => {
-              const isSelected = c.component_id === selectedId
-              const isReject = c.status === 'reject'
-              const isMonitor = c.status === 'monitor'
-              const isAbnormalInSpec = c.traditional_decision === 'PASS' && c.status !== 'safe'
+      {/* Selected Lot Active Indicator Banner */}
+      {selectedLotFilter !== 'ALL' && (
+        <div className="mb-3 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center justify-between text-xs">
+          <span className="font-mono text-amber-300">
+            Filtered by Qualification Lot: <b>{selectedLotFilter}</b> ({filtered.length} matching components)
+          </span>
+          <button
+            type="button"
+            onClick={() => setSelectedLotFilter('ALL')}
+            className="text-[#5B6B7A] hover:text-[#17212B] text-[11px] font-bold bg-[#F8FAFC] px-2 py-0.5 rounded"
+          >
+            Show All Lots &times;
+          </button>
+        </div>
+      )}
+
+      {/* High-Density Data Display: Either Lot-Grouped Accordions or Flat Table */}
+      {viewGrouping === 'lot_grouped' ? (
+        <div className="flex-1 min-h-[520px] md:min-h-[620px] overflow-y-auto space-y-2.5 pr-1">
+          {lotGroupsForDisplay.length === 0 ? (
+            <div className="py-12 text-center text-[#81909D] bg-[#FFFFFF] rounded-xl border border-[#D9E2EA]">
+              No qualification lots found matching current criteria.
+            </div>
+          ) : (
+            lotGroupsForDisplay.map((lot) => {
+              const isCollapsed = collapsedLots[lot.lot_id]
+              const isRej = lot.status === 'reject'
+              const isMon = lot.status === 'monitor'
 
               return (
-                <tr
-                  key={c.component_id}
-                  onClick={() => {
-                    sounds.playClick()
-                    onSelectComponent(c.component_id)
-                  }}
-                  className={`cursor-pointer transition-colors ${
-                    isSelected
-                      ? 'bg-[#2563EB]/20 border-l-2 border-[#2563EB]'
-                      : 'hover:bg-[#1B3445]'
+                <div
+                  key={lot.lot_id}
+                  className={`rounded-xl border transition-all overflow-hidden bg-[#FFFFFF] ${
+                    isRej
+                      ? 'border-rose-500/40 shadow-alert-glow'
+                      : isMon
+                      ? 'border-[#C58A00]/40'
+                      : 'border-[#D9E2EA] hover:border-[#0E88D3]/40'
                   }`}
                 >
-                  {/* Verdict Badge */}
-                  <td className="py-2 px-3 whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        isReject
-                          ? 'bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/40'
-                          : isMonitor
-                          ? 'bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/40'
-                          : 'bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/40'
-                      }`}
-                    >
+                  {/* Lot Card Header Bar */}
+                  <div
+                    onClick={() =>
+                      setCollapsedLots((prev) => ({ ...prev, [lot.lot_id]: !prev[lot.lot_id] }))
+                    }
+                    className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-[#F8FAFC] cursor-pointer select-none border-b border-[#D9E2EA] hover:bg-[#FFFFFF] transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-[#5B6B7A] font-mono text-xs">
+                        {isCollapsed ? '▶' : '▼'}
+                      </span>
                       <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          isReject ? 'bg-[#EF4444]' : isMonitor ? 'bg-[#F59E0B]' : 'bg-[#10B981]'
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400' : 'bg-emerald-400'
                         }`}
                       />
-                      {c.status}
-                    </span>
-                  </td>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-[#17212B] text-xs">
+                          {lot.lot_id}
+                        </span>
+                        <span className="text-[10px] bg-[#F4F7FA] text-[#5B6B7A] px-2 py-0.5 rounded font-mono border border-[#D9E2EA]">
+                          {lot.parts.length} components in this lot
+                        </span>
+                      </div>
+                    </div>
 
-                  {/* Paradigm Shift Pill */}
-                  <td className="py-2 px-3 whitespace-nowrap">
-                    {isAbnormalInSpec ? (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#22D3EE]/20 text-[#22D3EE] border border-[#22D3EE]/40 font-bold">
-                        PASS &rarr; REJECT AI
+                    <div className="flex items-center gap-3 font-mono text-xs">
+                      <span className="text-[#5B6B7A] text-[11px]">
+                        Lot Baseline &mu;: <b className="text-[#0E88D3]">{lot.mean.toFixed(2)} &micro;A</b>
                       </span>
-                    ) : (
-                      <span className="text-[#718398] text-[10px]">PASS (Nominal)</span>
-                    )}
-                  </td>
+                      {lot.rejects > 0 && (
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold">
+                          {lot.rejects} REJECT
+                        </span>
+                      )}
+                      {lot.monitors > 0 && (
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
+                          {lot.monitors} MONITOR
+                        </span>
+                      )}
+                      <span className="text-[#168A5B] text-[10.5px]">
+                        {lot.safe} Safe
+                      </span>
+                    </div>
+                  </div>
 
-                  {/* Component ID */}
-                  <td className="py-2 px-3 font-bold text-[#F1F5F9] whitespace-nowrap">
-                    {c.component_id}
-                  </td>
+                  {/* Lot Components Table */}
+                  {!isCollapsed && (
+                    <div className="overflow-x-auto max-h-[480px] overflow-y-auto border-t border-[#D9E2EA]">
+                      <table className="w-full text-left text-[11px] font-mono border-collapse">
+                        <thead className="sticky top-0 bg-[#FFFFFF] border-b border-[#D9E2EA] z-10 text-[10px] uppercase text-[#5B6B7A] tracking-wider">
+                          <tr>
+                            <th className="py-2 px-3">Verdict</th>
+                            <th className="py-2 px-3">Traditional vs AI</th>
+                            <th className="py-2 px-3">Component ID</th>
+                            <th className="py-2 px-3">Subsystem</th>
+                            <th className="py-2 px-3">0h (&micro;A)</th>
+                            <th className="py-2 px-3">24h (&micro;A)</th>
+                            <th className="py-2 px-3">96h (&micro;A)</th>
+                            <th className="py-2 px-3">168h (&micro;A)</th>
+                            <th className="py-2 px-3">Spec</th>
+                            <th className="py-2 px-3">Lot z-Score</th>
+                            <th className="py-2 px-3">Pred 168h</th>
+                            <th className="py-2 px-3">Proj (264h)</th>
+                            <th className="py-2 px-3">Risk</th>
+                            <th className="py-2 px-3 text-right">3D Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#D9E2EA]/60">
+                          {lot.parts.map((c) => {
+                            const isSelected = c.component_id === selectedId
+                            const isReject = c.status === 'reject'
+                            const isMonitor = c.status === 'monitor'
+                            const isAbnormalInSpec = c.traditional_decision === 'PASS' && c.status !== 'safe'
 
-                  {/* Subsystem */}
-                  <td className="py-2 px-3 text-[#22D3EE] whitespace-nowrap font-bold">
-                    [{c.subsystem}]
-                  </td>
-
-                  {/* Lot ID */}
-                  <td className="py-2 px-3 text-[#A8B6C5] whitespace-nowrap">
-                    {c.lot_id}
-                  </td>
-
-                  {/* Telemetry points */}
-                  <td className="py-2 px-3 text-[#718398]">{c.v0.toFixed(1)}</td>
-                  <td className="py-2 px-3 text-[#718398]">{c.v24.toFixed(1)}</td>
-                  <td className="py-2 px-3 text-[#718398]">{c.v96 ? c.v96.toFixed(1) : '--'}</td>
-                  <td className={`py-2 px-3 font-bold ${isReject ? 'text-[#EF4444]' : isMonitor ? 'text-[#F59E0B]' : 'text-[#F1F5F9]'}`}>
-                    {c.v168.toFixed(1)}
-                  </td>
-                  <td className="py-2 px-3 text-[#718398]">{c.limit_ua.toFixed(0)}</td>
-                  <td className="py-2 px-3 text-[#10B981]">{c.lot_mean?.toFixed(1) || '10.2'}</td>
-                  <td className={`py-2 px-3 font-bold ${Math.abs(c.z168) >= 3.0 ? 'text-[#EF4444]' : 'text-[#A8B6C5]'}`}>
-                    +{Math.abs(c.z168).toFixed(2)}σ
-                  </td>
-                  <td className="py-2 px-3 text-[#F59E0B]">
-                    +{c.slope.toFixed(3)}
-                  </td>
-
-                  {/* Risk Score */}
-                  <td className="py-2 px-3 whitespace-nowrap">
-                    <span className={`font-bold ${isReject ? 'text-[#EF4444]' : isMonitor ? 'text-[#F59E0B]' : 'text-[#10B981]'}`}>
-                      {c.risk_score}/100
-                    </span>
-                  </td>
-
-                  {/* 3D Action */}
-                  <td className="py-2 px-3 text-right whitespace-nowrap">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onFocusIn3D(c)
-                      }}
-                      className="px-2 py-0.5 rounded bg-[#1B3445] hover:bg-[#203C55] text-[#22D3EE] border border-[#2D4963] text-[10px] transition-all"
-                    >
-                      3D &rarr;
-                    </button>
+                            return (
+                              <tr
+                                key={c.component_id}
+                                onClick={() => onSelectComponent(c.component_id)}
+                                className={`cursor-pointer transition-colors ${
+                                  isSelected
+                                    ? 'bg-[#0E88D3]/15 text-[#17212B] font-semibold border-l-2 border-[#0E88D3]'
+                                    : isReject
+                                    ? 'hover:bg-[#D9363E]/10'
+                                    : isMonitor
+                                    ? 'hover:bg-[#C58A00]/10'
+                                    : 'hover:bg-[#F8FAFC]/50'
+                                }`}
+                              >
+                                <td className="py-1.5 px-3 whitespace-nowrap">
+                                  <span
+                                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold ${
+                                      isReject
+                                        ? 'bg-rose-500/20 text-[#D9363E] border border-rose-500/40'
+                                        : isMonitor
+                                        ? 'bg-amber-500/20 text-[#C58A00] border border-amber-500/40'
+                                        : 'bg-emerald-500/20 text-[#168A5B] border border-emerald-500/40'
+                                    }`}
+                                  >
+                                    <span
+                                      className={`w-1.5 h-1.5 rounded-full ${
+                                        isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
+                                      }`}
+                                    />
+                                    {(c.status || 'safe').toUpperCase()}
+                                  </span>
+                                </td>
+                                <td className="py-1.5 px-3 whitespace-nowrap">
+                                  {isAbnormalInSpec ? (
+                                    <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/50 font-bold">
+                                      <span>PASS</span> &rarr; <span className="text-[#D9363E]">REJECT AI</span>
+                                    </span>
+                                  ) : (
+                                    <span className="text-[9.5px] text-[#5B6B7A] font-mono">
+                                      {c.traditional_decision}
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-1.5 px-3 font-bold text-[#17212B] whitespace-nowrap">
+                                  {c.component_id}
+                                </td>
+                                <td className="py-1.5 px-3 text-[#0E88D3] whitespace-nowrap font-bold">
+                                  [{c.subsystem}]
+                                </td>
+                                <td className="py-1.5 px-3 text-[#5B6B7A]">{c.v0.toFixed(2)}</td>
+                                <td className="py-1.5 px-3 text-[#5B6B7A]">{c.v24.toFixed(2)}</td>
+                                <td className="py-1.5 px-3 text-[#5B6B7A]">{c.v96 != null ? c.v96.toFixed(2) : '--'}</td>
+                                <td className={`py-1.5 px-3 font-bold ${isReject ? 'text-[#D9363E]' : isMonitor ? 'text-[#C58A00]' : 'text-[#17212B]'}`}>
+                                  {c.v168.toFixed(2)}
+                                </td>
+                                <td className="py-1.5 px-3 text-[#5B6B7A]">{c.limit_ua.toFixed(0)}</td>
+                                <td className={`py-1.5 px-3 font-bold ${Math.abs(c.z168) >= 3.0 ? 'text-[#D9363E]' : Math.abs(c.z168) >= 2.0 ? 'text-[#C58A00]' : 'text-[#5B6B7A]'}`}>
+                                  {c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;
+                                </td>
+                                <td className="py-1.5 px-3 text-[#0E88D3] font-bold">{c.predicted168_from_early.toFixed(2)}</td>
+                                <td className="py-1.5 px-3 text-[#5B6B7A]">{c.predicted_future.toFixed(2)}</td>
+                                <td className="py-1.5 px-3 font-bold text-[#D9363E]">{c.risk_score}</td>
+                                <td className="py-1.5 px-3 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      onFocusIn3D(c)
+                                    }}
+                                    className="px-2 py-0.5 rounded border border-[#D9E2EA] bg-[#F8FAFC] text-[#0E88D3] hover:border-[#0E88D3] hover:text-[#17212B] text-[10px] transition-all"
+                                  >
+                                    3D &rarr;
+                                  </button>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )
+            })
+          )}
+        </div>
+      ) : (
+        /* High-Density Flat Data Table */
+        <div className="flex-1 min-h-[520px] md:min-h-[620px] overflow-auto rounded-xl border border-[#D9E2EA] bg-[#FFFFFF] shadow-lg">
+          <table className="w-full text-left text-[11px] font-mono border-collapse">
+            <thead className="sticky top-0 bg-[#F8FAFC] border-b border-[#D9E2EA] z-10 text-[10px] uppercase text-[#5B6B7A] tracking-wider">
+              <tr>
+                <th className="py-2.5 px-3">AI Verdict &amp; Health</th>
+                <th className="py-2.5 px-3">Traditional vs AI</th>
+                <th
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
+                  onClick={() => {
+                    if (sortBy === 'id') setSortAsc(!sortAsc)
+                    else {
+                      setSortBy('id')
+                      setSortAsc(true)
+                    }
+                  }}
+                >
+                  Component ID {sortBy === 'id' ? (sortAsc ? '\u25b2' : '\u25bc') : ''}
+                </th>
+                <th className="py-2.5 px-3">Subsystem</th>
+                <th className="py-2.5 px-3">Lot ID</th>
+                <th className="py-2.5 px-3">0h (&micro;A)</th>
+                <th className="py-2.5 px-3">24h (&micro;A)</th>
+                <th className="py-2.5 px-3">96h (&micro;A)</th>
+                <th
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
+                  onClick={() => {
+                    if (sortBy === 'v168') setSortAsc(!sortAsc)
+                    else {
+                      setSortBy('v168')
+                      setSortAsc(false)
+                    }
+                  }}
+                >
+                  168h {sortBy === 'v168' ? (sortAsc ? '\u25b2' : '\u25bc') : ''}
+                </th>
+                <th className="py-2.5 px-3">Spec Limit</th>
+                <th className="py-2.5 px-3">Lot Mean (&mu;)</th>
+                <th
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
+                  onClick={() => {
+                    if (sortBy === 'z168') setSortAsc(!sortAsc)
+                    else {
+                      setSortBy('z168')
+                      setSortAsc(false)
+                    }
+                  }}
+                >
+                  Lot z-Score {sortBy === 'z168' ? (sortAsc ? '\u25b2' : '\u25bc') : ''}
+                </th>
+                <th
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
+                  onClick={() => {
+                    if (sortBy === 'pred168') setSortAsc(!sortAsc)
+                    else {
+                      setSortBy('pred168')
+                      setSortAsc(false)
+                    }
+                  }}
+                  title="Value_0h + Value_24h -> Predicted Value_168h"
+                >
+                  Early Pred 168h {sortBy === 'pred168' ? (sortAsc ? '\u25b2' : '\u25bc') : ''}
+                </th>
+                <th className="py-2.5 px-3">Projected (264h)</th>
+                <th
+                  className="py-2.5 px-3 cursor-pointer hover:text-[#0E88D3]"
+                  onClick={() => {
+                    if (sortBy === 'risk') setSortAsc(!sortAsc)
+                    else {
+                      setSortBy('risk')
+                      setSortAsc(false)
+                    }
+                  }}
+                >
+                  Risk {sortBy === 'risk' ? (sortAsc ? '\u25b2' : '\u25bc') : ''}
+                </th>
+                <th className="py-2.5 px-3 text-right">3D Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {sorted.length === 0 ? (
+                <tr>
+                  <td colSpan={16} className="py-8 text-center text-[#81909D]">
+                    No components found matching current filter &bull; Run AI Screening to populate matrix.
                   </td>
                 </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                sorted.map((c) => {
+                  const isSelected = c.component_id === selectedId
+                  const isReject = c.status === 'reject'
+                  const isMonitor = c.status === 'monitor'
+                  const isAbnormalInSpec = c.traditional_decision === 'PASS' && c.status !== 'safe'
+
+                  return (
+                    <tr
+                      key={c.component_id}
+                      onClick={() => onSelectComponent(c.component_id)}
+                      className={`cursor-pointer transition-colors ${
+                        isSelected
+                          ? 'bg-[#0E88D3]/15 text-[#17212B] font-semibold border-l-2 border-[#0E88D3]'
+                          : isReject
+                          ? 'hover:bg-[#D9363E]/10'
+                          : isMonitor
+                          ? 'hover:bg-[#C58A00]/10'
+                          : 'hover:bg-[#F8FAFC]/50'
+                      }`}
+                    >
+                      {/* Status badge & Behavioral Health */}
+                      <td className="py-2 px-3 whitespace-nowrap">
+                        <div className="flex flex-col gap-1 items-start">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold ${
+                              isReject
+                                ? 'bg-rose-500/20 text-[#D9363E] border border-rose-500/40'
+                                : isMonitor
+                                ? 'bg-amber-500/20 text-[#C58A00] border border-amber-500/40'
+                                : 'bg-emerald-500/20 text-[#168A5B] border border-emerald-500/40'
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                isReject ? 'bg-rose-500 led' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
+                              }`}
+                            />
+                            {(c.status || 'safe').toUpperCase()}
+                          </span>
+                          {c.behavioral_health && (
+                            <span className={`text-[8.5px] font-bold tracking-wider px-1 py-0.5 rounded ${
+                              c.behavioral_health === 'CRITICAL' ? 'text-rose-300 bg-rose-950/50 border border-rose-800/60' :
+                              c.behavioral_health === 'DEGRADING' ? 'text-orange-300 bg-orange-950/50 border border-orange-800/60' :
+                              c.behavioral_health === 'MONITOR' ? 'text-amber-300 bg-amber-950/50 border border-amber-800/60' :
+                              'text-emerald-300 bg-emerald-950/50 border border-emerald-800/60'
+                            }`}>
+                              {c.behavioral_health === 'CRITICAL' ? '🔴 CRITICAL' :
+                               c.behavioral_health === 'DEGRADING' ? '🟠 DEGRADING' :
+                               c.behavioral_health === 'MONITOR' ? '🟡 MONITOR' : '🟢 NORMAL'}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Traditional vs AI Verdict */}
+                      <td className="py-2 px-3 whitespace-nowrap">
+                        {isAbnormalInSpec ? (
+                          <span className="inline-flex items-center gap-1 text-[9.5px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/50 font-bold">
+                            <span>PASS (Spec)</span>
+                            <span>&rarr;</span>
+                            <span className="text-[#D9363E]">{(c.status || 'safe').toUpperCase()} (AI)</span>
+                          </span>
+                        ) : c.traditional_decision === 'FAIL' ? (
+                          <span className="text-[9.5px] px-1.5 py-0.5 rounded bg-rose-500/20 text-[#D9363E] border border-rose-500/40 font-bold">
+                            FAIL (SPEC LIMIT)
+                          </span>
+                        ) : (
+                          <span className="text-[9.5px] text-[#5B6B7A] font-mono">
+                            PASS &bull; NOMINAL
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Component ID */}
+                      <td className="py-2 px-3 font-bold text-[#17212B] whitespace-nowrap">
+                        {c.component_id}
+                      </td>
+
+                      {/* Subsystem */}
+                      <td className="py-2 px-3 text-[#0E88D3] whitespace-nowrap font-bold">
+                        [{c.subsystem}]
+                      </td>
+
+                      {/* Lot ID */}
+                      <td className="py-2 px-3 text-[#5B6B7A] whitespace-nowrap">
+                        {c.lot_id}
+                      </td>
+
+                      {/* Readings */}
+                      <td className="py-2 px-3 text-[#5B6B7A]">{c.v0.toFixed(2)}</td>
+                      <td className="py-2 px-3 text-[#5B6B7A]">{c.v24.toFixed(2)}</td>
+                      <td className="py-2 px-3 text-[#5B6B7A]">{c.v96 != null ? c.v96.toFixed(2) : '--'}</td>
+                      <td className={`py-2 px-3 font-bold ${isReject ? 'text-[#D9363E]' : isMonitor ? 'text-[#C58A00]' : 'text-[#17212B]'}`}>
+                        {c.v168.toFixed(2)}
+                      </td>
+
+                      {/* Spec Limit */}
+                      <td className="py-2 px-3 text-[#5B6B7A]">{c.limit_ua.toFixed(0)}</td>
+
+                      {/* Lot Mean */}
+                      <td className="py-2 px-3 text-[#5B6B7A]">
+                        {c.lot_mean != null ? `${c.lot_mean.toFixed(2)}` : '--'}
+                      </td>
+
+                      {/* Lot z-Score */}
+                      <td className={`py-2 px-3 font-bold ${Math.abs(c.z168) >= 3.0 ? 'text-[#D9363E]' : Math.abs(c.z168) >= 2.0 ? 'text-[#C58A00]' : 'text-[#5B6B7A]'}`}>
+                        {c.z168 > 0 ? '+' : ''}{c.z168.toFixed(2)}&sigma;
+                      </td>
+
+                      {/* Early Pred 168h from 0h+24h */}
+                      <td className="py-2 px-3 text-[#0E88D3] font-bold" title={`Predicted from 0h+24h: ${c.predicted168_from_early.toFixed(2)} µA`}>
+                        {c.predicted168_from_early.toFixed(2)}
+                      </td>
+
+                      {/* Projected future */}
+                      <td className="py-2 px-3">
+                        <div className="flex flex-col">
+                          <span className={`font-mono ${c.future_limit_breach || c.predicted_future > c.limit_ua ? 'text-[#D9363E] font-bold' : 'text-[#5B6B7A]'}`}>
+                            {c.predicted_future.toFixed(2)}
+                          </span>
+                          {(c.future_limit_breach || c.predicted_future > c.limit_ua) && (
+                            <span className="text-[8px] text-[#D9363E] font-bold tracking-tight">
+                              &gt; LIMIT BREACH
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Composite risk */}
+                      <td className="py-2 px-3 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-1.5 rounded-full bg-[#F8FAFC] overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${
+                                isReject ? 'bg-rose-500' : isMonitor ? 'bg-amber-400' : 'bg-emerald-400'
+                              }`}
+                              style={{ width: `${c.risk_score}%` }}
+                            />
+                          </div>
+                          <span
+                            className={`font-bold ${
+                              isReject ? 'text-[#D9363E]' : isMonitor ? 'text-[#C58A00]' : 'text-[#168A5B]'
+                            }`}
+                          >
+                            {c.risk_score}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-2 px-3 text-right whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onFocusIn3D(c)
+                          }}
+                          className="px-2 py-0.5 rounded border border-[#D9E2EA] bg-[#F8FAFC] text-[#0E88D3] hover:border-[#0E88D3] hover:text-[#17212B] text-[10px] transition-all"
+                          title="Focus and highlight this component on the 3D Satellite Digital Twin"
+                        >
+                          3D SENSOR &rarr;
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Footer Info */}
-      <div className="flex items-center justify-between text-[11px] font-mono text-[#718398] pt-1">
+      <div className="flex items-center justify-between text-[10px] text-[#5B6B7A] pt-2 border-t border-[#D9E2EA] mt-2">
         <div>
-          Showing <span className="text-[#F1F5F9] font-bold">{sorted.length}</span> of{' '}
-          <span className="text-[#F1F5F9] font-bold">{components.length}</span> components
+          Showing <span className="text-[#17212B] font-bold">{sorted.length}</span> of{' '}
+          <span className="text-[#17212B] font-bold">{components.length}</span> screened components &bull; Traditional Spec Limit: 50 &micro;A
         </div>
         <div>
           MIL-STD-883 Method 1005 HTOL Compliant &bull; Decision-Support Intelligence Layer

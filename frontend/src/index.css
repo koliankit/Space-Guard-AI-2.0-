@@ -3,86 +3,120 @@
 @tailwind utilities;
 
 :root {
-  /* ASTRA VIGIL PREMIUM MEDIUM-DARK NAVY + BLUE-GRAY THEME */
-  --bg-main: #0B1726;
-  --bg-secondary: #102337;
-  --bg-panel: #162B40;
-  --bg-card: #1B3445;
-  --bg-elevated: #203C55;
-  --border: #2D4963;
-  --border-subtle: #203C55;
-  --hover: #203C55;
+  /* FINAL SPACEGUARD AI — LIGHT SPACE TELEMETRY COLOR SYSTEM (SECTION 30) */
+  --bg-main: #EEF4F8;
+  --bg-secondary: #E6F1F8;
+  --bg-panel: #FFFFFF;
+  --bg-elevated: #F8FBFD;
+  --border: #D5E2EA;
+  --border-subtle: #E6EEF5;
+  --hover: #E6F1F8;
 
-  --text-primary: #F1F5F9;
-  --text-secondary: #A8B6C5;
-  --text-muted: #718398;
-  --text-heading: #F1F5F9;
-  --text-label: #A8B6C5;
-  --text-table: #E2E8F0;
+  --text-primary: #17212B;
+  --text-secondary: #4F6170;
+  --text-muted: #718292;
+  --text-heading: #142331;
+  --text-label: #34495A;
+  --text-table: #1F2D38;
 
-  --primary-blue: #2563EB;
-  --primary-dark-blue: #1E3A8A;
-  --accent-teal: #14B8A6;
-  --accent-cyan: #22D3EE;
+  --primary-blue: #0E88D3;
+  --primary-dark-blue: #075B8C;
+  --primary-orange: #F47216;
 
-  --status-safe: #10B981;
-  --status-monitor: #F59E0B;
-  --status-critical: #EF4444;
+  --status-safe: #168A5B;
+  --status-monitor: #C58A00;
+  --status-critical: #D9363E;
 
-  --space-blue-glow: rgba(37, 99, 235, 0.20);
-  --telemetry-line: rgba(34, 211, 238, 0.15);
-  --telemetry-dot: rgba(34, 211, 238, 0.40);
-  --card-shadow: 0 2px 8px rgba(7, 16, 27, 0.40), 0 1px 2px rgba(7, 16, 27, 0.30);
+  --space-blue-glow: rgba(14, 136, 211, 0.08);
+  --telemetry-line: rgba(14, 136, 211, 0.12);
+  --telemetry-dot: rgba(14, 136, 211, 0.35);
+  --card-shadow: 0 4px 18px rgba(14, 50, 80, 0.06);
 
   /* Legacy variable mappings for backward compatibility */
-  --color-bg: #0B1726;
-  --color-bg2: #102337;
-  --color-panel: #162B40;
-  --color-panel2: #1B3445;
-  --color-border: #2D4963;
-  --color-line: #2D4963;
+  --color-bg: #EEF4F8;
+  --color-bg2: #E6F1F8;
+  --color-panel: #FFFFFF;
+  --color-panel2: #F8FBFD;
+  --color-border: #D5E2EA;
+  --color-line: #D5E2EA;
 
-  --color-text-primary: #F1F5F9;
-  --color-text-secondary: #A8B6C5;
-  --color-text-muted: #718398;
+  --color-text-primary: #17212B;
+  --color-text-secondary: #4F6170;
+  --color-text-muted: #718292;
 
-  --color-isro-blue: #2563EB;
-  --color-isro-orange: #F59E0B;
+  --color-isro-blue: #0E88D3;
+  --color-isro-orange: #F47216;
 
-  --color-status-safe: #10B981;
-  --color-status-monitor: #F59E0B;
-  --color-status-reject: #EF4444;
+  --color-status-safe: #168A5B;
+  --color-status-monitor: #C58A00;
+  --color-status-reject: #D9363E;
 
-  /* TECHNICAL VISUALIZATION THEME */
-  --tech-bg: #0B1726;
-  --tech-panel: #162B40;
-  --tech-card: #1B3445;
-  --tech-border: #2D4963;
-  --tech-border-subtle: #203C55;
+  /* PART 21/22 — DARK TECHNICAL VISUALIZATION THEME */
+  --tech-bg: #07111C;
+  --tech-panel: #0B1928;
+  --tech-card: #102337;
+  --tech-border: #1D3A52;
+  --tech-border-subtle: #162E42;
   --tech-text-primary: #F1F5F9;
-  --tech-text-secondary: #A8B6C5;
-  --tech-text-muted: #718398;
-  --tech-blue: #2563EB;
-  --tech-orange: #F59E0B;
+  --tech-text-secondary: #9AAFC0;
+  --tech-text-muted: #7F93A5;
+  --tech-blue: #0E88D3;
+  --tech-orange: #F47216;
 }
 
 .tech-instrument-panel {
-  background-color: #162B40;
-  border-color: #2D4963;
+  background-color: #07111C;
+  border-color: #1D3A52;
   color: #F1F5F9;
+}
+
+@font-face {
+  font-family: 'Sitka Small Semibold';
+  src: local('Sitka Small Semibold'), local('Sitka Small-Semibold'), local('Sitka Small'), local('SitkaVF');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sitka Small';
+  src: local('Sitka Small Semibold'), local('Sitka Small-Semibold'), local('Sitka Small'), local('SitkaVF');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after,
+html,
+body,
+#root,
+button,
+input,
+optgroup,
+select,
+textarea,
+pre,
+code,
+kbd,
+samp,
+svg,
+svg text {
+  font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
 }
 
 html, body, #root {
   height: 100%;
   margin: 0;
-  background-color: #0B1726;
 }
 
 body {
-  background-color: #0B1726;
-  color: #F1F5F9;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 'Space Grotesk', system-ui, sans-serif;
-  font-weight: 400;
+  background: #EEF4F8;
+  color: #17212B;
+  font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
+  font-weight: 600;
+  font-variation-settings: 'opsz' 14, 'wght' 600;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -97,15 +131,15 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2D4963;
+  background: #D5E2EA;
   border-radius: 3px;
-  border: 1px solid #162B40;
+  border: 1px solid #F8FBFD;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2563EB;
+  background: #0E88D3;
 }
 ::-webkit-scrollbar-track {
-  background: #0B1726;
+  background: #EEF4F8;
 }
 
 /* ==============================================================================
@@ -123,12 +157,12 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.45;
+  opacity: 0.35;
   background-image:
-    linear-gradient(rgba(0, 90, 156, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 90, 156, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(217, 226, 234, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 226, 234, 0.5) 1px, transparent 1px);
   background-size: 32px 32px;
-  animation: grid-drift 32s linear infinite;
+  animation: grid-drift 18s linear infinite;
 }
 
 /* 2. Gentle Telemetry Pulse (2.5s calm breathing) */
@@ -170,10 +204,10 @@ body {
 /* 5. TEE Subtle Boundary Signal */
 @keyframes tee-subtle-signal {
   0%, 100% {
-    border-color: #D7E0EA;
+    border-color: #D9E2EA;
   }
   50% {
-    border-color: #005A9C;
+    border-color: #0E88D3;
   }
 }
 
@@ -197,21 +231,21 @@ body {
 
 .hud-glass {
   background: #FFFFFF;
-  border: 1px solid #D7E0EA;
-  box-shadow: 0 1px 3px rgba(11, 30, 54, 0.05), 0 4px 12px rgba(11, 30, 54, 0.03);
+  border: 1px solid #D9E2EA;
+  box-shadow: 0 1px 3px rgba(23, 33, 43, 0.05);
 }
 
 .hud-glass-interactive {
-  background: #F8FAFD;
-  border: 1px solid #D7E0EA;
+  background: #FFFFFF;
+  border: 1px solid #D9E2EA;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 3px rgba(11, 30, 54, 0.04);
+  box-shadow: 0 1px 2px rgba(23, 33, 43, 0.04);
 }
 
 .hud-glass-interactive:hover {
-  background: #FFFFFF;
-  border-color: #005A9C;
-  box-shadow: 0 4px 12px rgba(0, 90, 156, 0.10);
+  background: #F8FAFC;
+  border-color: #0E88D3;
+  box-shadow: 0 2px 6px rgba(14, 136, 211, 0.1);
 }
 
 .hud-tag {

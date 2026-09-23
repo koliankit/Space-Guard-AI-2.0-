@@ -4,189 +4,156 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ASTRA VIGIL Medium-Dark Navy + Blue-Gray Reference Palette
-        bg: '#0B1726',              // Primary Background - Deep Navy
-        bg2: '#102337',             // Secondary Background - Dark Navy
-        panel: '#162B40',           // Application Surface / Panels - Blue-Gray
-        panel2: '#1B3445',          // Secondary Panel
-        card: '#1B3445',            // Primary Card Surface
-        card2: '#1B344B',           // Alternate Card Surface
-        elevated: '#203C55',        // Elevated Surface / Hover
-        hover: '#203C55',           // Hover State
-        'panel-critical': 'rgba(239, 68, 68, 0.08)',
+        // SpaceGuard AI Part 22 Light Engineering Background System
+        bg: '#EEF3F7',              // Main Application Background
+        bg2: '#F3F6F9',             // Secondary Section Background & Sub-panels
+        panel: '#FFFFFF',           // Card Background - Clean White
+        panel2: '#F8FAFC',          // Elevated Card
+        hover: '#E7EEF5',           // Hover State
+        'panel-critical': '#FEF2F2', // Critical Alert Panel Light Red Tint
 
-        // Deep Navy & Aerospace Blues
-        navy: {
-          DEFAULT: '#0B1726',
-          950: '#07101B',
-          900: '#0B1726',
-          800: '#102337',
-          700: '#162B40',
-          600: '#1B3445',
-          500: '#203C55',
-          light: '#284867',
-        },
-
-        // Typography Hierarchy
-        'text-primary': '#F1F5F9',   // Primary Text - High Contrast White
-        'text-secondary': '#A8B6C5', // Secondary Text - Cool Blue-Gray
-        muted: '#718398',           // Muted Text
-        dim: '#718398',
-        heading: '#F1F5F9',         // Headings
-        label: '#A8B6C5',           // Labels
-        'table-text': '#E2E8F0',
-        'input-text': '#F1F5F9',
-        'input-placeholder': '#718398',
+        // Text Hierarchy (Dark Engineering Colors)
+        'text-primary': '#17212B',   // Primary Text
+        'text-secondary': '#4F6170', // Secondary Text
+        muted: '#718292',           // Muted Text
+        dim: '#718292',
+        heading: '#142331',         // Headings
+        label: '#34495A',           // Labels
+        'table-text': '#1F2D38',    // Table Text
+        'input-text': '#17212B',    // Input Text
+        'input-placeholder': '#7A8996', // Input Placeholder
 
         // Borders & Dividers
-        border: '#2D4963',          // Subtle Border
-        'border-strong': '#3E6182', // Strong Border
-        line: '#2D4963',
+        border: '#D5DEE7',          // Border / Divider
+        line: '#D5DEE7',
 
-        // Brand Accents: Primary Blue (#2563EB) & Teal (#14B8A6) / Cyan (#22D3EE)
-        blue: {
-          DEFAULT: '#2563EB',
-          deep: '#1E3A8A',
-          50: '#EFF6FF',
-          100: '#DBEAFE',
-          200: '#BFDBFE',
-          300: '#93C5FD',
-          400: '#60A5FA',
-          500: '#3B82F6',
-          600: '#2563EB',
-          700: '#1D4ED8',
-          800: '#1E40AF',
-          900: '#1E3A8A',
-        },
-        primary: {
-          DEFAULT: '#2563EB',
-          deep: '#1E3A8A',
-          hover: '#1D4ED8',
-        },
-        teal: {
-          DEFAULT: '#14B8A6',
-          light: '#2DD4BF',
-          dark: '#0F766E',
-          hover: '#0D9488',
-        },
-        cyan: {
-          DEFAULT: '#22D3EE',
-          light: '#67E8F9',
-          dark: '#0891B2',
-        },
-        accent: '#14B8A6',
-
-        // ISRO / Legacy Alias
+        // Primary Colors: ISRO Blue (#0E88D3)
         'isro-blue': {
-          DEFAULT: '#2563EB',
-          light: '#3B82F6',
-          hover: '#1D4ED8',
-          dark: '#1E3A8A',
-          muted: 'rgba(37, 99, 235, 0.15)',
+          DEFAULT: '#0E88D3',
+          hover: '#0A73B5',
+          dark: '#085B90',
+          muted: 'rgba(14, 136, 211, 0.12)',
         },
         'tech-blue': {
-          DEFAULT: '#2563EB',
-          hover: '#1D4ED8',
-          dark: '#1E3A8A',
-          muted: 'rgba(37, 99, 235, 0.15)',
+          DEFAULT: '#0E88D3',
+          hover: '#0A73B5',
+          dark: '#085B90',
+          muted: 'rgba(14, 136, 211, 0.12)',
+        },
+        blue: {
+          DEFAULT: '#0E88D3',
+          400: '#249CE6',
+          500: '#0E88D3',
+          600: '#0A73B5',
+        },
+        cyan: '#0E88D3',
+
+        // Primary Accent: ISRO Orange (#F47216 - ~3% ratio)
+        'isro-orange': {
+          DEFAULT: '#F47216',
+          hover: '#DE610D',
+          dark: '#BE5006',
+          muted: 'rgba(244, 114, 22, 0.12)',
+        },
+        accent: '#F47216',
+        gold: {
+          DEFAULT: '#F47216',
+          hover: '#DE610D',
+          dark: '#BE5006',
+          muted: 'rgba(244, 114, 22, 0.12)',
+        },
+        isro: {
+          DEFAULT: '#0E88D3',
+          blue: '#0E88D3',
+          orange: '#F47216',
+          amber: '#F47216',
+          saffron: '#F47216',
+          gold: '#F47216',
         },
 
-        // Status Colors: Consistent Across Application
-        // SAFE: Controlled Emerald/Green (#10B981)
+        // Status Colors (Part 17 Engineering Status Colors)
+        // SAFE: Green (#168A5B)
         safe: {
-          DEFAULT: '#10B981',
-          hover: '#059669',
-          dark: '#047857',
-          bg: 'rgba(16, 185, 129, 0.12)',
-          border: 'rgba(16, 185, 129, 0.3)',
-          muted: 'rgba(16, 185, 129, 0.12)',
+          DEFAULT: '#168A5B',
+          hover: '#1B9D68',
+          dark: '#116B46',
+          muted: 'rgba(22, 138, 91, 0.12)',
         },
         emerald: {
-          DEFAULT: '#10B981',
-          300: '#6EE7B7',
-          400: '#34D399',
-          500: '#10B981',
-          600: '#059669',
-          700: '#047857',
+          DEFAULT: '#168A5B',
+          300: '#34D399',
+          400: '#1B9D68',
+          500: '#168A5B',
+          600: '#116B46',
+          700: '#0E5537',
         },
         green: {
-          DEFAULT: '#10B981',
-          400: '#34D399',
-          500: '#10B981',
-          600: '#059669',
+          DEFAULT: '#168A5B',
+          400: '#1B9D68',
+          500: '#168A5B',
+          600: '#116B46',
         },
 
-        // MONITOR: Warm Amber (#F59E0B)
+        // MONITOR: Amber (#C58A00)
         monitor: {
-          DEFAULT: '#F59E0B',
-          hover: '#D97706',
-          dark: '#B45309',
-          bg: 'rgba(245, 158, 11, 0.12)',
-          border: 'rgba(245, 158, 11, 0.3)',
-          muted: 'rgba(245, 158, 11, 0.12)',
+          DEFAULT: '#C58A00',
+          hover: '#DB9B05',
+          dark: '#996C00',
+          muted: 'rgba(197, 138, 0, 0.12)',
         },
         amber: {
-          DEFAULT: '#F59E0B',
+          DEFAULT: '#C58A00',
           200: '#FDE68A',
-          300: '#FCD34D',
-          400: '#FBBF24',
-          500: '#F59E0B',
-          600: '#D97706',
-          700: '#B45309',
+          300: '#F5C76E',
+          400: '#DB9B05',
+          500: '#C58A00',
+          600: '#996C00',
+          700: '#7A5600',
         },
 
-        // REJECT: High-Reliability Red (#EF4444)
+        // REJECT / CRITICAL: Red (#D9363E)
         reject: {
-          DEFAULT: '#EF4444',
-          hover: '#DC2626',
-          dark: '#B91C1C',
-          bg: 'rgba(239, 68, 68, 0.12)',
-          border: 'rgba(239, 68, 68, 0.3)',
-          muted: 'rgba(239, 68, 68, 0.12)',
+          DEFAULT: '#D9363E',
+          hover: '#E8454D',
+          dark: '#B0262D',
+          muted: 'rgba(217, 54, 62, 0.12)',
         },
         rose: {
-          DEFAULT: '#EF4444',
-          300: '#FCA5A5',
-          400: '#F87171',
-          500: '#EF4444',
-          600: '#DC2626',
-          700: '#B91C1C',
+          DEFAULT: '#D9363E',
+          300: '#FDA4AF',
+          400: '#E8454D',
+          500: '#D9363E',
+          600: '#B0262D',
+          700: '#8E1E23',
         },
         red: {
-          DEFAULT: '#EF4444',
-          400: '#F87171',
-          500: '#EF4444',
-          600: '#DC2626',
-        },
-
-        // Warning (#F97316)
-        warning: {
-          DEFAULT: '#F97316',
-          hover: '#EA580C',
-          dark: '#C2410C',
+          DEFAULT: '#D9363E',
+          400: '#E8454D',
+          500: '#D9363E',
+          600: '#B0262D',
         },
 
         // Slate Theme Tokens
         slate: {
-          950: '#0B1E36', // Deepest Navy
-          900: '#17212B', // Dark charcoal text
-          850: '#243B53',
-          800: '#334E68', // Secondary heading
-          700: '#475569', // Labels
-          600: '#64748B', // Muted text
-          500: '#78899A',
-          400: '#94A3B8',
-          300: '#CBD5E1', // Line / Strong border
-          200: '#D7E0EA', // Visible border
-          100: '#EEF3F8', // Elevated surface
-          50: '#F8FAFD',  // Very light cool surface
+          950: '#17212B', // Darkest navy text
+          900: '#233140', // Deep navy
+          850: '#344557',
+          800: '#465A6E',
+          700: '#5B6B7A', // Secondary text
+          600: '#6E8092',
+          500: '#81909D', // Muted text
+          400: '#9BA9B6',
+          300: '#CBD5E1',
+          200: '#D9E2EA', // Border
+          100: '#F1F5F9', // Elevated surface
+          50: '#F8FAFC',  // Very light surface
         },
 
         telemetry: {
           slate: '#17212B',
-          steel: '#334E68',
-          dark: '#64748B',
-          muted: '#64748B',
+          steel: '#5B6B7A',
+          dark: '#81909D',
+          muted: '#81909D',
         },
       },
       fontFamily: {
@@ -196,11 +163,10 @@ export default {
         mono: ["'Sitka Small Semibold'", "'Sitka Small'", "'Sitka Text'", "'Sitka'", 'Georgia', 'serif'],
       },
       boxShadow: {
-        'isro-blue': '0 2px 10px rgba(0, 90, 156, 0.15)',
-        'isro-orange': '0 2px 10px rgba(244, 114, 22, 0.18)',
-        'panel-card': '0 1px 3px rgba(11, 30, 54, 0.05), 0 4px 12px rgba(11, 30, 54, 0.03)',
-        'panel-subtle': '0 2px 8px rgba(11, 30, 54, 0.06)',
-        'alert-glow': '0 0 16px rgba(217, 54, 62, 0.20)',
+        'isro-blue': '0 0 14px rgba(14, 136, 211, 0.2)',
+        'isro-orange': '0 0 14px rgba(244, 114, 22, 0.2)',
+        'panel-subtle': '0 4px 20px rgba(7, 17, 28, 0.6)',
+        'alert-glow': '0 0 16px rgba(229, 72, 77, 0.25)',
       },
     },
   },
