@@ -4,28 +4,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // SpaceGuard AI Part 22 Light Engineering Background System
-        bg: '#EEF3F7',              // Main Application Background
-        bg2: '#F3F6F9',             // Secondary Section Background & Sub-panels
-        panel: '#FFFFFF',           // Card Background - Clean White
-        panel2: '#F8FAFC',          // Elevated Card
-        hover: '#E7EEF5',           // Hover State
-        'panel-critical': '#FEF2F2', // Critical Alert Panel Light Red Tint
+        // SpaceGuard AI Light Dark Blue (Aerospace Twilight Slate Navy)
+        bg: '#0E1D30',              // Main Application Background
+        bg2: '#12243D',             // Secondary Section Background & Sub-panels
+        panel: '#162C47',           // Card Background - Medium Slate Navy
+        panel2: '#1C375C',          // Elevated Card
+        hover: '#22436D',           // Hover State
+        'panel-critical': 'rgba(239, 68, 68, 0.15)', // Critical Alert Panel
 
-        // Text Hierarchy (Dark Engineering Colors)
-        'text-primary': '#17212B',   // Primary Text
-        'text-secondary': '#4F6170', // Secondary Text
-        muted: '#718292',           // Muted Text
-        dim: '#718292',
-        heading: '#142331',         // Headings
-        label: '#34495A',           // Labels
-        'table-text': '#1F2D38',    // Table Text
-        'input-text': '#17212B',    // Input Text
-        'input-placeholder': '#7A8996', // Input Placeholder
+        // Text Hierarchy (Crisp Ice White & Cool Slate)
+        'text-primary': '#F8FAFC',   // Primary Text
+        'text-secondary': '#CBD5E1', // Secondary Text
+        muted: '#8CA1B7',           // Muted Text
+        dim: '#64748B',
+        heading: '#FFFFFF',         // Headings
+        label: '#94A3B8',           // Labels
+        'table-text': '#E2E8F0',    // Table Text
+        'input-text': '#F8FAFC',    // Input Text
+        'input-placeholder': '#64748B', // Input Placeholder
 
         // Borders & Dividers
-        border: '#D5DEE7',          // Border / Divider
-        line: '#D5DEE7',
+        border: '#234670',          // Border / Divider
+        line: '#234670',
 
         // Primary Colors: ISRO Blue (#0E88D3)
         'isro-blue': {

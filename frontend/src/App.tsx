@@ -396,7 +396,7 @@ export default function App() {
 
 
   return (
-    <div className="h-screen w-screen overflow-hidden text-[#17212B] flex flex-col bg-[#EEF3F7]">
+    <div className="h-screen w-screen overflow-hidden text-[#F8FAFC] flex flex-col bg-[#0E1D30]">
       <div className="grid-overlay" />
       <Header
         streamActive={batchId !== null}
@@ -480,8 +480,8 @@ export default function App() {
           onCloseMobile={() => setMobileSidebarOpen(false)}
         />
 
-        {/* Right Full Dashboard Workspace with Subtle Telemetry Atmosphere */}
-        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#EEF4F8] flex flex-col relative">
+        {/* Right Full Dashboard Workspace with Dynamic Telemetry Atmosphere */}
+        <main className="flex-1 min-w-0 min-h-0 overflow-y-auto bg-[#0E1D30] flex flex-col relative">
           <TelemetryNetworkBackground />
           <div className="relative z-[1] flex-1 flex flex-col min-h-full">
           {/* OVERVIEW */}

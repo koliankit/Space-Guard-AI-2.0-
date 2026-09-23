@@ -3,65 +3,65 @@
 @tailwind utilities;
 
 :root {
-  /* FINAL SPACEGUARD AI — LIGHT SPACE TELEMETRY COLOR SYSTEM (SECTION 30) */
-  --bg-main: #EEF4F8;
-  --bg-secondary: #E6F1F8;
-  --bg-panel: #FFFFFF;
-  --bg-elevated: #F8FBFD;
-  --border: #D5E2EA;
-  --border-subtle: #E6EEF5;
-  --hover: #E6F1F8;
+  /* ASTRA VIGIL — LIGHT DARK BLUE (AEROSPACE TWILIGHT SLATE NAVY) */
+  --bg-main: #0E1D30;
+  --bg-secondary: #12243D;
+  --bg-panel: #162C47;
+  --bg-elevated: #1C375C;
+  --border: #234670;
+  --border-subtle: #1B385A;
+  --hover: #22436D;
 
-  --text-primary: #17212B;
-  --text-secondary: #4F6170;
-  --text-muted: #718292;
-  --text-heading: #142331;
-  --text-label: #34495A;
-  --text-table: #1F2D38;
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #8CA1B7;
+  --text-heading: #FFFFFF;
+  --text-label: #94A3B8;
+  --text-table: #E2E8F0;
 
-  --primary-blue: #0E88D3;
-  --primary-dark-blue: #075B8C;
-  --primary-orange: #F47216;
+  --primary-blue: #0EA5E9;
+  --primary-dark-blue: #0284C7;
+  --primary-orange: #F97316;
 
-  --status-safe: #168A5B;
-  --status-monitor: #C58A00;
-  --status-critical: #D9363E;
+  --status-safe: #10B981;
+  --status-monitor: #F59E0B;
+  --status-critical: #EF4444;
 
-  --space-blue-glow: rgba(14, 136, 211, 0.08);
-  --telemetry-line: rgba(14, 136, 211, 0.12);
-  --telemetry-dot: rgba(14, 136, 211, 0.35);
-  --card-shadow: 0 4px 18px rgba(14, 50, 80, 0.06);
+  --space-blue-glow: rgba(56, 189, 248, 0.18);
+  --telemetry-line: rgba(56, 189, 248, 0.22);
+  --telemetry-dot: rgba(56, 189, 248, 0.65);
+  --card-shadow: 0 4px 20px rgba(5, 14, 25, 0.40);
 
   /* Legacy variable mappings for backward compatibility */
-  --color-bg: #EEF4F8;
-  --color-bg2: #E6F1F8;
-  --color-panel: #FFFFFF;
-  --color-panel2: #F8FBFD;
-  --color-border: #D5E2EA;
-  --color-line: #D5E2EA;
+  --color-bg: #0E1D30;
+  --color-bg2: #12243D;
+  --color-panel: #162C47;
+  --color-panel2: #1C375C;
+  --color-border: #234670;
+  --color-line: #234670;
 
-  --color-text-primary: #17212B;
-  --color-text-secondary: #4F6170;
-  --color-text-muted: #718292;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #CBD5E1;
+  --color-text-muted: #8CA1B7;
 
-  --color-isro-blue: #0E88D3;
-  --color-isro-orange: #F47216;
+  --color-isro-blue: #0EA5E9;
+  --color-isro-orange: #F97316;
 
-  --color-status-safe: #168A5B;
-  --color-status-monitor: #C58A00;
-  --color-status-reject: #D9363E;
+  --color-status-safe: #10B981;
+  --color-status-monitor: #F59E0B;
+  --color-status-reject: #EF4444;
 
-  /* PART 21/22 — DARK TECHNICAL VISUALIZATION THEME */
-  --tech-bg: #07111C;
-  --tech-panel: #0B1928;
-  --tech-card: #102337;
-  --tech-border: #1D3A52;
-  --tech-border-subtle: #162E42;
-  --tech-text-primary: #F1F5F9;
-  --tech-text-secondary: #9AAFC0;
-  --tech-text-muted: #7F93A5;
-  --tech-blue: #0E88D3;
-  --tech-orange: #F47216;
+  /* TECHNICAL VISUALIZATION THEME */
+  --tech-bg: #0E1D30;
+  --tech-panel: #12243D;
+  --tech-card: #162C47;
+  --tech-border: #234670;
+  --tech-border-subtle: #1B385A;
+  --tech-text-primary: #F8FAFC;
+  --tech-text-secondary: #CBD5E1;
+  --tech-text-muted: #8CA1B7;
+  --tech-blue: #0EA5E9;
+  --tech-orange: #F97316;
 }
 
 .tech-instrument-panel {
@@ -112,8 +112,8 @@ html, body, #root {
 }
 
 body {
-  background: #EEF4F8;
-  color: #17212B;
+  background: #0E1D30;
+  color: #F8FAFC;
   font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
   font-weight: 600;
   font-variation-settings: 'opsz' 14, 'wght' 600;
@@ -131,22 +131,22 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D5E2EA;
+  background: #234670;
   border-radius: 3px;
-  border: 1px solid #F8FBFD;
+  border: 1px solid #162C47;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #0E88D3;
+  background: #38BDF8;
 }
 ::-webkit-scrollbar-track {
-  background: #EEF4F8;
+  background: #0E1D30;
 }
 
 /* ==============================================================================
    Calm Aerospace Motion & Telemetry Animations (No Jarring Flashing)
    ============================================================================== */
 
-/* 1. Very slow ambient grid movement */
+/* 1. Ambient grid movement */
 @keyframes grid-drift {
   0% { background-position: 0 0; }
   100% { background-position: 32px 32px; }
@@ -157,26 +157,26 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.35;
+  opacity: 0.45;
   background-image:
-    linear-gradient(rgba(217, 226, 234, 0.5) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(217, 226, 234, 0.5) 1px, transparent 1px);
+    linear-gradient(rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.07) 1px, transparent 1px);
   background-size: 32px 32px;
-  animation: grid-drift 18s linear infinite;
+  animation: grid-drift 22s linear infinite;
 }
 
 /* 2. Gentle Telemetry Pulse (2.5s calm breathing) */
 @keyframes gentle-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.03); }
+  50% { opacity: 0.55; transform: scale(1.05); }
 }
 
 .led {
-  animation: gentle-pulse 2.5s ease-in-out infinite;
+  animation: gentle-pulse 2.2s ease-in-out infinite;
 }
 
 .dot-pulse {
-  animation: gentle-pulse 2.5s ease-in-out infinite;
+  animation: gentle-pulse 2.2s ease-in-out infinite;
 }
 
 /* 3. Single-shot Alert Pulse */
@@ -204,10 +204,10 @@ body {
 /* 5. TEE Subtle Boundary Signal */
 @keyframes tee-subtle-signal {
   0%, 100% {
-    border-color: #D9E2EA;
+    border-color: #234670;
   }
   50% {
-    border-color: #0E88D3;
+    border-color: #38BDF8;
   }
 }
 
@@ -230,22 +230,26 @@ body {
    ============================================================================== */
 
 .hud-glass {
-  background: #FFFFFF;
-  border: 1px solid #D9E2EA;
-  box-shadow: 0 1px 3px rgba(23, 33, 43, 0.05);
+  background: rgba(22, 44, 71, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid #234670;
+  box-shadow: 0 4px 20px rgba(5, 14, 25, 0.35);
 }
 
 .hud-glass-interactive {
-  background: #FFFFFF;
-  border: 1px solid #D9E2EA;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(23, 33, 43, 0.04);
+  background: rgba(22, 44, 71, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid #234670;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(5, 14, 25, 0.3);
 }
 
 .hud-glass-interactive:hover {
-  background: #F8FAFC;
-  border-color: #0E88D3;
-  box-shadow: 0 2px 6px rgba(14, 136, 211, 0.1);
+  background: rgba(28, 55, 92, 0.95);
+  border-color: #38BDF8;
+  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.25);
 }
 
 .hud-tag {
@@ -319,11 +323,93 @@ body {
 
 /* Card & Console Shadows */
 .shadow-isro {
-  box-shadow: 0 2px 8px rgba(14, 136, 211, 0.12);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.22);
 }
 .shadow-orange {
-  box-shadow: 0 2px 8px rgba(244, 114, 22, 0.15);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.25);
 }
 .shadow-alert {
-  box-shadow: 0 2px 8px rgba(217, 54, 62, 0.15);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
+}
+
+/* ==============================================================================
+   Light Dark Blue Aerospace Palette Mapping
+   Seamlessly maps panels, surfaces, text, and borders to the twilight slate navy theme
+   ============================================================================== */
+.bg-\[\#EEF3F7\],
+.bg-\[\#EEF4F8\],
+.bg-\[\#E6F1F8\] {
+  background-color: #0E1D30 !important;
+}
+
+.bg-\[\#F4F8FB\],
+.bg-\[\#F3F6F9\],
+.bg-\[\#F8FAFC\],
+.bg-\[\#F4F7FA\] {
+  background-color: #12243D !important;
+}
+
+.bg-\[\#FFFFFF\] {
+  background-color: #162C47 !important;
+}
+
+/* Subtle cards & translucent panels */
+.bg-\[\#FFFFFF\]\/60,
+.bg-\[\#FFFFFF\]\/70,
+.bg-\[\#FFFFFF\]\/80,
+.bg-\[\#FFFFFF\]\/90 {
+  background-color: rgba(22, 44, 71, 0.88) !important;
+}
+
+/* Text adaptations for high contrast on light dark blue */
+.text-\[\#17212B\],
+.text-\[\#142331\] {
+  color: #F8FAFC !important;
+}
+
+.text-\[\#4F6170\],
+.text-\[\#5B6B7A\],
+.text-\[\#718292\],
+.text-\[\#81909D\] {
+  color: #94A3B8 !important;
+}
+
+.text-\[\#1F2D38\],
+.text-\[\#34495A\] {
+  color: #CBD5E1 !important;
+}
+
+/* Borders adaptations */
+.border-\[\#D9E2EA\],
+.border-\[\#D5E2EA\],
+.border-\[\#D5DEE7\],
+.border-\[\#E6EEF5\] {
+  border-color: #234670 !important;
+}
+
+/* Inputs on light dark blue */
+input.bg-\[\#F4F7FA\],
+input.bg-\[\#F8FAFC\],
+input.bg-\[\#FFFFFF\],
+select.bg-\[\#FFFFFF\],
+select.bg-\[\#F8FAFC\] {
+  background-color: #0E1E33 !important;
+  color: #F8FAFC !important;
+  border-color: #234670 !important;
+}
+input::placeholder {
+  color: #64748B !important;
+}
+
+/* Active buttons & tabs on light dark blue */
+button.bg-\[\#FFFFFF\],
+button.bg-\[\#F8FAFC\] {
+  background-color: #162C47 !important;
+  color: #F8FAFC !important;
+  border-color: #234670 !important;
+}
+button.bg-\[\#FFFFFF\]:hover,
+button.bg-\[\#F8FAFC\]:hover {
+  background-color: #1C375C !important;
+  border-color: #38BDF8 !important;
 }
