@@ -8,20 +8,19 @@
 ## 1. Overview
 ASTRA VIGIL is an aerospace-grade reliability screening platform designed for deployment within an organization's controlled, private, air-gapped infrastructure. It replaces traditional binary datasheet screening with dynamic lot-relative cohort intelligence and physics-based temporal burn-in drift analysis.
 
+![ASTRA VIGIL Technical Architecture Diagram](astra_vigil_architecture.jpg)
+
 ```mermaid
-flowchart TD
-    A[Raw Screening CSV] --> B[Data Validation & Preprocessing]
-    B --> C[Module A: Dynamic Lot-Relative Anomaly Detection]
-    B --> D[Module B: Burn-In Temporal Drift Analysis]
-    C --> E[Pure-NumPy Isolation Forest]
-    D --> F[Native XGBoost DMatrix Classifier]
-    E --> G[Centralized Unified Risk Engine 0-100]
-    F --> G
-    G --> H[Physics-Grounded Explainability Engine]
-    H --> I[Spacecraft Subsystem Spatial Localization]
-    I --> J[PostgreSQL / SQLite Storage]
-    J --> K[Interactive Mission Control Dashboard & 3D Satellite]
-    K --> L[Aerospace Qualification Reports & CSV Export]
+flowchart LR
+    CSV[CSV / Burn-In Data\n0h, 24h, 96h, 168h] --> PREP[Data Validation & Preprocessing\nSchema, Physics, Scaling]
+    PREP --> MOD_A[MODULE A\nDynamic Lot-Relative Anomaly Detection\nMedian Baseline & MAD Deviation]
+    PREP --> MOD_B[MODULE B\nTemporal Drift Analysis & Prediction\nTrajectory dV/dt & 264h+ Prediction]
+    MOD_A --> RISK[AI RISK ENGINE\nUnified Score 0-100\nSAFE | MONITOR | REJECT]
+    MOD_B --> RISK
+    RISK --> EXP[Explainability & Evidence]
+    RISK --> LOC[3D Component Localization]
+    RISK --> HITL[Engineer Review\nHuman-in-the-Loop]
+    RISK --> AUDIT[Audit & Decision History]
 ```
 
 ---
