@@ -13,3 +13,5 @@ dist/
 .DS_Store
 verify_ui.js
 scratch/
+*-MR_JOD_ANKIT*
+*-[A-Za-z0-9_][A-Za-z0-9_]*conflict*
