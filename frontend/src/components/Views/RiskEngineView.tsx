@@ -40,70 +40,83 @@ export default function RiskEngineView({
   const isoScore = targetPart?.lot_anomaly_score || targetPart?.iso_score || 0
   const riskScore = targetPart?.risk_score || 0
 
-  // Risk factor contributions
+  // Risk factor contributions: Directly consuming 5 orthogonal backend factor metrics
   const factors = useMemo(() => {
     if (!targetPart) return []
 
-    // 1. Datasheet limit proximity (weight: 35%)
-    const limitRatio = targetPart.v168 / limitVal
-    const limitScore = Math.min(100, Math.round(limitRatio * 100))
-    const limitContrib = Math.round(limitScore * 0.35)
+    // 1. Datasheet limit proximity (weight: 30%)
+    const dsScore = targetPart.datasheet_risk ?? (targetPart.v168 > limitVal ? 100 : Math.min(100, Math.round((targetPart.v168 / limitVal) * 80)))
+    const dsContrib = targetPart.datasheet_contrib ?? Math.round(dsScore * 0.30 * 10) / 10
 
-    // 2. Lot-relative anomaly (weight: 25%)
-    const lotScore = Math.min(100, Math.round((zScore / 3.0) * 100))
-    const lotContrib = Math.round(lotScore * 0.25)
+    // 2. Lot-relative anomaly (weight: 30%)
+    const lotScore = targetPart.lot_anomaly_risk ?? Math.min(100, Math.round(zScore * 25))
+    const lotContrib = targetPart.lot_anomaly_contrib ?? Math.round(lotScore * 0.30 * 10) / 10
 
-    // 3. Temporal drift velocity (weight: 25%)
-    const driftScore = Math.min(100, Math.round((Math.abs(driftRate) / 0.15) * 100))
-    const driftContrib = Math.round(driftScore * 0.25)
+    // 3. Temporal drift velocity (weight: 20%)
+    const driftScore = targetPart.drift_risk ?? Math.min(100, Math.round(Math.abs(driftRate) * 2000))
+    const driftContrib = targetPart.drift_contrib ?? Math.round(driftScore * 0.20 * 10) / 10
 
-    // 4. ML / Isolation Forest scoring (weight: 15%)
-    const mlScore = Math.min(100, Math.round(isoScore))
-    const mlContrib = Math.round(mlScore * 0.15)
+    // 4. In-flight prediction extrapolation (weight: 15%)
+    const predScore = targetPart.prediction_risk ?? (targetPart.future_limit_breach ? 100 : Math.min(100, Math.round(((targetPart.predicted_future || targetPart.v168) / limitVal) * 75)))
+    const predContrib = targetPart.prediction_contrib ?? Math.round(predScore * 0.15 * 10) / 10
+
+    // 5. Data quality integrity (weight: 5%)
+    const dqScore = targetPart.data_quality_risk ?? (targetPart.v96 == null ? 15 : 0)
+    const dqContrib = targetPart.data_quality_contrib ?? Math.round(dqScore * 0.05 * 10) / 10
 
     return [
       {
-        name: 'Datasheet Specification Limit Analysis',
-        code: 'PARAMETRIC LIMIT MARGIN',
-        weight: '35%',
-        raw: `${targetPart.v168.toFixed(2)} µA / ${limitVal.toFixed(1)} µA (${Math.round(limitRatio * 100)}%)`,
-        score: limitScore,
-        contribution: limitContrib,
-        description: 'Proximity of 168h current leakage to absolute MIL-STD-883 flight ceiling.',
-        severity: limitRatio > 0.9 ? 'critical' : limitRatio > 0.75 ? 'warning' : 'nominal',
+        name: 'Datasheet Specification Limit Compliance',
+        code: 'DATASHEET MARGIN (30%)',
+        weight: '30%',
+        raw: `${targetPart.v168.toFixed(2)} µA / ${limitVal.toFixed(1)} µA (${Math.round((targetPart.v168 / limitVal) * 100)}%)`,
+        score: dsScore,
+        contribution: dsContrib,
+        description: 'Static reverse leakage ceiling under MIL-STD-883 Method 1005 Class S specification.',
+        severity: targetPart.v168 > limitVal ? 'critical' : dsScore > 75 ? 'warning' : 'nominal',
       },
       {
         name: 'Lot-Relative Robust Statistical Divergence',
-        code: 'MEDIAN / MAD NORMALIZATION',
-        weight: '25%',
+        code: 'LOT ANOMALY (30%)',
+        weight: '30%',
         raw: `${zScore.toFixed(2)}σ from lot baseline (${targetPart.lot_mean?.toFixed(2) ?? '11.5'} µA)`,
         score: lotScore,
         contribution: lotContrib,
-        description: 'Deviation from wafer lot manufacturing median normalized by median absolute deviation.',
-        severity: zScore > 2.5 ? 'critical' : zScore > 1.8 ? 'warning' : 'nominal',
+        description: 'Peer divergence from wafer fabrication lot median normalized by Median Absolute Deviation (MAD).',
+        severity: lotScore >= 60 ? 'critical' : lotScore >= 35 ? 'warning' : 'nominal',
       },
       {
-        name: 'Temporal Drift Velocity & 264h Extrapolation',
-        code: 'ARRHENIUS ACCELERATION',
-        weight: '25%',
-        raw: `${driftRate > 0 ? '+' : ''}${driftRate.toFixed(4)} µA/hr (Proj: ${targetPart.predicted_future ? targetPart.predicted_future.toFixed(1) : '--'} µA)`,
+        name: 'Temporal Drift Velocity & Degradation Curvature',
+        code: 'DRIFT VELOCITY (20%)',
+        weight: '20%',
+        raw: `${driftRate > 0 ? '+' : ''}${(driftRate * 1000).toFixed(1)} nA/hr`,
         score: driftScore,
         contribution: driftContrib,
-        description: 'Empirical polynomial curvature and projected in-flight reading at T+264h.',
-        severity: targetPart.future_limit_breach ? 'critical' : driftScore > 60 ? 'warning' : 'nominal',
+        description: 'Empirical Arrhenius burn-in degradation velocity across 0h, 24h, 96h, and 168h intervals.',
+        severity: targetPart.safety_slope_exceeded ? 'critical' : driftScore >= 50 ? 'warning' : 'nominal',
       },
       {
-        name: 'High-Dimensional ML Defect Evidence',
-        code: 'ISOLATION FOREST & XGBOOST',
+        name: 'In-Flight 264h Prediction & Future Breach Headroom',
+        code: 'PREDICTION RISK (15%)',
         weight: '15%',
-        raw: `${isoScore.toFixed(1)}/100 Anomaly Confidence`,
-        score: mlScore,
-        contribution: mlContrib,
-        description: 'Multi-feature isolation tree ensemble detecting non-linear parametric defect clusters.',
-        severity: mlScore > 70 ? 'critical' : mlScore > 40 ? 'warning' : 'nominal',
+        raw: `Proj: ${targetPart.predicted_future ? targetPart.predicted_future.toFixed(1) : targetPart.v168.toFixed(1)} µA (Margin: ${targetPart.margin_future ? targetPart.margin_future.toFixed(1) : (limitVal - targetPart.v168).toFixed(1)} µA)`,
+        score: predScore,
+        contribution: predContrib,
+        description: 'Extrapolated operational trajectory at T+264h (+96h in-flight extension) relative to limit.',
+        severity: targetPart.future_limit_breach ? 'critical' : predScore >= 50 ? 'warning' : 'nominal',
+      },
+      {
+        name: 'Telemetry Data Completeness & Quality Integrity',
+        code: 'DATA QUALITY (5%)',
+        weight: '5%',
+        raw: targetPart.v96 != null ? 'Complete (All 4 Points)' : '96h Imputed (Minor Quality Risk)',
+        score: dqScore,
+        contribution: dqContrib,
+        description: 'Assesses missing burn-in measurements, sensor variance anomalies, and telemetry noise.',
+        severity: dqScore > 20 ? 'warning' : 'nominal',
       },
     ]
-  }, [targetPart, limitVal, zScore, driftRate, isoScore])
+  }, [targetPart, limitVal, zScore, driftRate])
 
   // Summary counts
   const safeCount = mission?.safe ?? components.filter((c) => c.status === 'safe').length

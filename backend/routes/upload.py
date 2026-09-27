@@ -81,21 +81,68 @@ async def upload_dataset(
 
     missing = preprocessing.missing_required(mapping)
     if missing:
+        missing_errors = [{
+            "id": f"err-missing-col-{col}",
+            "severity": "Critical",
+            "errorType": "MISSING_REQUIRED_COLUMN",
+            "group": "SCHEMA",
+            "stage": "SCHEMA",
+            "row": 1,
+            "column": col,
+            "detectedValue": "Missing from CSV headers",
+            "expectedValue": f"Column '{col}'",
+            "message": f"Required flight telemetry column '{col}' is missing.",
+            "impact": f"Downstream screening calculations depend on '{col}'. AI screening blocked.",
+            "recommendedFix": f"Add the '{col}' column to the CSV and upload the corrected file.",
+        } for col in missing]
+
+        report = {
+            "fileName": file.filename,
+            "status": "BLOCKED",
+            "totalRows": len(raw_df),
+            "validRows": 0,
+            "invalidRows": len(raw_df),
+            "errorCount": len(missing),
+            "criticalCount": len(missing),
+            "warningCount": 0,
+            "infoCount": 0,
+            "dataQualityScore": 0,
+            "errors": missing_errors,
+            "checks": {
+                "formatValid": True,
+                "schemaValid": False,
+                "requiredColumnsValid": False,
+                "rowValidationPassed": False,
+                "dataQualityAcceptable": False,
+            },
+        }
+
         return {
             "error": "column_mapping_required",
+            "message": f"Required flight telemetry columns missing: {', '.join(missing)}. AI screening blocked.",
             "detected_headers": raw_df.columns.tolist(),
             "auto_mapping": mapping,
             "missing_fields": missing,
+            "validation_report": report,
+            "validation_issues": [{
+                "row": None,
+                "column": col,
+                "message": f"Required column missing: '{col}'",
+                "severity": "error",
+            } for col in missing],
         }
 
     clean_df, meta = preprocessing.build_dataframe(raw_df, mapping)
 
     # If blocking validation errors were found
     if not meta.get("is_valid", True):
+        v_report = meta.get("validation_report", {})
+        v_report["fileName"] = file.filename
         return {
             "error": "validation_failed",
             "message": "Dataset validation failed. Please review the screening data integrity report below.",
             "validation_issues": meta.get("validation_issues", []),
+            "validation_report": v_report,
             "detected_headers": raw_df.columns.tolist(),
             "auto_mapping": mapping,
             "missing_fields": [],
@@ -106,6 +153,9 @@ async def upload_dataset(
 
     clean_df = satellite_mapper.add_subsystem(clean_df)
 
+    v_report = meta.get("validation_report", {})
+    v_report["fileName"] = file.filename
+
     batch = Batch(
         filename=file.filename,
         source="upload",
@@ -115,7 +165,7 @@ async def upload_dataset(
         lots=meta["lots"],
         has_ground_truth=meta["has_ground_truth"],
         analyzed=False,
-        validation_report=meta.get("validation_issues", []),
+        validation_report=v_report,
     )
     db.add(batch)
     db.commit()
@@ -152,6 +202,34 @@ async def upload_dataset(
         "missing": meta["missing"],
         "lots": meta["lots"],
         "has_ground_truth": meta["has_ground_truth"],
+        "data_quality_score": meta.get("data_quality_score", 100),
         "columns_detected": mapping,
         "validation_issues": meta.get("validation_issues", []),
+        "validation_report": v_report,
     }
+
+
+@router.post("/validation/export-errors")
+def export_validation_errors(issues: list[dict]):
+    import csv
+    from fastapi.responses import StreamingResponse
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["Severity", "Row", "Column", "Issue", "Detected Value", "Expected", "Recommended Fix"])
+    for iss in issues:
+        writer.writerow([
+            iss.get("severity", "Error").capitalize(),
+            iss.get("row") if iss.get("row") is not None else "All",
+            iss.get("column") or "General",
+            iss.get("error_type") or iss.get("message"),
+            iss.get("detected_value") or "--",
+            iss.get("expected_value") or "--",
+            iss.get("how_to_fix") or iss.get("recommendedFix") or iss.get("message"),
+        ])
+    buf.seek(0)
+    return StreamingResponse(
+        buf,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=validation_error_report.csv"},
+    )

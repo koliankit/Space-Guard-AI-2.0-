@@ -19,6 +19,8 @@ export type DashboardTab =
   | 'lots'
   | 'subsystems'
   | 'orbital'
+  | 'passport'
+  | 'qa_review'
   | 'settings'
 
 interface HeaderProps {

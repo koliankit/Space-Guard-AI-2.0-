@@ -80,6 +80,20 @@ class ComponentOut(BaseModel):
     z_slope: float
     iso_score: float
     ml_prob: Optional[float] = None
+    datasheet_risk: Optional[float] = 0.0
+    lot_anomaly_risk: Optional[float] = 0.0
+    drift_risk: Optional[float] = 0.0
+    prediction_risk: Optional[float] = 0.0
+    data_quality_risk: Optional[float] = 0.0
+    datasheet_contrib: Optional[int] = 0
+    lot_anomaly_contrib: Optional[int] = 0
+    drift_contrib: Optional[int] = 0
+    prediction_contrib: Optional[int] = 0
+    data_quality_contrib: Optional[int] = 0
+    qa_decision: Optional[str] = "PENDING"
+    qa_notes: Optional[str] = None
+    qa_reviewer: Optional[str] = None
+    qa_timestamp: Optional[str] = None
     risk_score: int
     risk_level: Optional[str] = "LOW"
     status: str
@@ -91,6 +105,12 @@ class ComponentOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class QAReviewRequest(BaseModel):
+    qa_decision: str  # PENDING | APPROVED | REJECTED | ESCALATED
+    qa_notes: Optional[str] = None
+    qa_reviewer: Optional[str] = "Lead QA Engineer"
 
 
 class LotDetail(BaseModel):

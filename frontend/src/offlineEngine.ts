@@ -345,16 +345,23 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
     const normDev = Math.sqrt(z168 * z168 + zSlope * zSlope + Math.pow(lotPctDev / 40, 2))
     const isoScore = Math.min(100, Math.round((1 - Math.exp(-normDev / 2.2)) * 100))
 
-    // Multi-factor Risk Engine (0-100 derived purely from data features)
-    const sLimit = Math.min(1.5, Math.max(0, p.v168 / p.limit_ua))
-    const sZ = Math.min(1.0, zMax / 4.0)
-    const sFuture = Math.min(1.5, Math.max(0, predictedFuture / p.limit_ua))
-    const sIso = isoScore / 100.0
-    const sSafetySlope = safetySlopeExceeded ? 1.0 : 0.0
+    // 5 Orthogonal Factor Risk Scores (0-100) matching backend risk engine exactly
+    const datasheet_risk = p.v168 > p.limit_ua ? 100 : Math.min(100, Math.round(Math.max(0, (p.v168 / p.limit_ua) * 80)))
+    const lot_anomaly_risk = Math.min(100, Math.round(Math.max(0, Math.abs(z168) * 25)))
+    const drift_risk = safetySlopeExceeded ? Math.min(100, Math.round(50 + (predictedDriftRate / safetySlope) * 30)) : Math.min(100, Math.round(Math.max(0, Math.abs(slope) * 2000)))
+    const prediction_risk = predictedFuture > p.limit_ua ? 100 : Math.min(100, Math.round(Math.max(0, (predictedFuture / p.limit_ua) * 75)))
+    const data_quality_risk = p.v96 == null ? 15 : 0
 
-    let calculatedRisk = Math.round(sZ * 35 + sFuture * 25 + sIso * 18 + sLimit * 12 + sSafetySlope * 10)
-    if (p.v168 > p.limit_ua) {
-      calculatedRisk = Math.min(100, Math.round(92 + ((p.v168 - p.limit_ua) / p.limit_ua) * 20))
+    // Exact discrete point contributions
+    const datasheet_contrib = Math.round(datasheet_risk * 0.30 * 10) / 10
+    const lot_anomaly_contrib = Math.round(lot_anomaly_risk * 0.30 * 10) / 10
+    const drift_contrib = Math.round(drift_risk * 0.20 * 10) / 10
+    const prediction_contrib = Math.round(prediction_risk * 0.15 * 10) / 10
+    const data_quality_contrib = Math.round(data_quality_risk * 0.05 * 10) / 10
+
+    let calculatedRisk = Math.round(datasheet_contrib + lot_anomaly_contrib + drift_contrib + prediction_contrib + data_quality_contrib)
+    if (p.v168 > p.limit_ua || p.v0 > p.limit_ua) {
+      calculatedRisk = Math.max(92, calculatedRisk)
     }
     const riskScore = Math.min(100, Math.max(0, calculatedRisk))
 
@@ -479,6 +486,20 @@ export function processAndScoreParts(rawParts: RawPart[]): ComponentOut[] {
       anomaly_category: anomalyCategory,
       reason,
       explanation_points: explanationPoints,
+      datasheet_risk,
+      lot_anomaly_risk,
+      drift_risk,
+      prediction_risk,
+      data_quality_risk,
+      datasheet_contrib,
+      lot_anomaly_contrib,
+      drift_contrib,
+      prediction_contrib,
+      data_quality_contrib,
+      qa_decision: 'PENDING',
+      qa_notes: null,
+      qa_reviewer: null,
+      qa_timestamp: null,
     }
   })
 }
@@ -1393,6 +1414,82 @@ class ClientISROEngine {
       this.analyze(this.currentBatchId)
     }
     return this.scoredParts.find((c) => c.component_id === componentId) || null
+  }
+
+  updateQAReview(componentId: string, decision: string, notes?: string, reviewer?: string): ComponentOut {
+    if (!this.analyzed || this.scoredParts.length === 0) {
+      this.analyze(this.currentBatchId)
+    }
+    const comp = this.scoredParts.find((c) => c.component_id === componentId)
+    if (!comp) throw new Error(`Component ${componentId} not found.`)
+    comp.qa_decision = decision.toUpperCase() as any
+    comp.qa_notes = notes || null
+    comp.qa_reviewer = reviewer || 'Quality Assurance Engineer'
+    comp.qa_timestamp = new Date().toISOString()
+    return comp
+  }
+
+  recalculateSafetySlope(componentId: string, newSlope: number): ComponentOut {
+    if (!this.analyzed || this.scoredParts.length === 0) {
+      this.analyze(this.currentBatchId)
+    }
+    const comp = this.scoredParts.find((c) => c.component_id === componentId)
+    if (!comp) throw new Error(`Component ${componentId} not found.`)
+    const safetySlope = Math.max(0.001, newSlope)
+    const earlyRate = comp.drift_rate_early ?? (comp.v24 - comp.v0) / 24
+    const safetySlopeExceeded = earlyRate > safetySlope
+    comp.safety_slope = safetySlope
+    comp.safety_slope_exceeded = safetySlopeExceeded
+
+    // Recalculate drift risk
+    const slopeRatio = earlyRate / safetySlope
+    const drift_risk = slopeRatio <= 1.0 ? Math.min(40, slopeRatio * 40) : Math.min(100, 40 + (slopeRatio - 1.0) * 60)
+    comp.drift_risk = Math.round(drift_risk * 10) / 10
+    comp.drift_contrib = Math.round(comp.drift_risk * 0.20 * 10) / 10
+
+    // Recalculate total risk from 5 factors
+    const dsC = comp.datasheet_contrib ?? 0
+    const lotC = comp.lot_anomaly_contrib ?? 0
+    const predC = comp.prediction_contrib ?? 0
+    const dqC = comp.data_quality_contrib ?? 0
+    let totalRisk = Math.round(dsC + lotC + comp.drift_contrib + predC + dqC)
+    if (comp.v168 > comp.limit_ua || comp.v0 > comp.limit_ua) {
+      totalRisk = Math.max(92, totalRisk)
+    }
+    comp.risk_score = Math.min(100, Math.max(0, totalRisk))
+
+    if (comp.risk_score >= 80) {
+      comp.status = 'reject'
+      comp.risk_level = comp.risk_score >= 90 ? 'CRITICAL' : 'HIGH'
+    } else if (comp.risk_score >= 50) {
+      comp.status = 'monitor'
+      comp.risk_level = 'MEDIUM'
+    } else {
+      comp.status = 'safe'
+      comp.risk_level = 'LOW'
+    }
+
+    // Dynamic explanation
+    const points: string[] = []
+    if (comp.v168 > comp.limit_ua) {
+      points.push(`Datasheet limit violation: 168h reading (${comp.v168.toFixed(2)} µA) exceeds specification limit (${comp.limit_ua} µA).`)
+    }
+    if (safetySlopeExceeded) {
+      points.push(`Early drift rate (+${(earlyRate * 1000).toFixed(1)} nA/hr) breaches safety slope threshold (+${(safetySlope * 1000).toFixed(1)} nA/hr).`)
+    }
+    if ((comp.lot_anomaly_risk ?? 0) >= 60) {
+      points.push(`Significant lot outlier divergence (${comp.z168.toFixed(2)}σ from lot baseline).`)
+    }
+    if (comp.predicted_future > comp.limit_ua) {
+      points.push(`Projected 264h reading (${comp.predicted_future.toFixed(2)} µA) exceeds datasheet limit.`)
+    }
+    if (points.length === 0) {
+      points.push('All measured temporal and lot-relative parameters are within flight envelopes.')
+    }
+    comp.explanation_points = points
+    comp.reason = points.join('; ')
+
+    return comp
   }
 
   generateMarkdownReport(): string {

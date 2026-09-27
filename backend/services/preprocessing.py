@@ -226,8 +226,32 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
     comp_col = mapping["component_id"]
     lot_col = mapping["lot_id"]
 
-    # 2. Duplicate Component IDs Check
+    # 2. Component ID Validations (missing, empty, wildcards/malformed, duplicate)
     comp_series = raw_df[comp_col].astype(str).str.strip()
+    
+    # Check for empty or malformed IDs (e.g. COMP-???, null, none, empty)
+    for idx, c_val in enumerate(raw_df[comp_col]):
+        s_val = str(c_val).strip()
+        if not s_val or s_val.lower() in ("nan", "none", "null") or "?" in s_val:
+            issues.append({
+                "id": f"err-malformed-component-id-{idx+1}",
+                "row": idx + 1,
+                "column": comp_col,
+                "severity": "error",
+                "error_type": "INVALID_COMPONENT_ID",
+                "group": "IDENTITY",
+                "message": f"Malformed or invalid component ID '{c_val}' at row #{idx+1}.",
+                "detected_value": str(c_val),
+                "expected_value": "Valid serialized component identifier (e.g. COMP-FC-03)",
+                "what": f"Component ID at row #{idx+1} is blank, contains wildcards ('?'), or is null.",
+                "why": "MIL-PRF-38535 Class V requires strict alphanumeric serialized identification.",
+                "impact": "Unidentified components cannot be tracked across spacecraft subsystems or passports.",
+                "how_to_fix": "Replace with an approved, unique alphanumeric component serial ID.",
+            })
+            if len([i for i in issues if i["error_type"] == "INVALID_COMPONENT_ID"]) >= 5:
+                break
+
+    # Duplicate Component IDs Check
     dupe_mask = comp_series.duplicated(keep=False)
     if dupe_mask.any():
         dupe_ids = comp_series[dupe_mask].unique().tolist()
@@ -249,7 +273,7 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
             "how_to_fix": "Assign unique component IDs or serial numbers to each component record before re-uploading.",
         })
 
-    # 3. Lot ID Validations
+    # 3. Lot ID Validations (missing, empty, wildcards, small cohorts)
     lot_series = raw_df[lot_col].astype(str).str.strip()
     empty_lot_mask = lot_series.isna() | (lot_series == "") | (lot_series.str.lower() == "nan")
     if empty_lot_mask.any():
@@ -261,7 +285,7 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
             "severity": "error",
             "error_type": "MISSING_VALUE",
             "group": "DATA",
-            "message": f"Found {empty_lot_mask.sum()} components with empty or invalid lot IDs (rows: {bad_rows}). Components must belong to a production lot for relative screening.",
+            "message": f"Found {empty_lot_mask.sum()} components with empty or invalid lot IDs (rows: {[r+1 for r in bad_rows]}). Components must belong to a production lot for relative screening.",
             "detected_value": "EMPTY / BLANK",
             "expected_value": "Valid qualification lot code (e.g. LOT-2026-A1)",
             "what": f"Component in row #{bad_rows[0] + 1} has an empty lot_id field.",
@@ -269,6 +293,70 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
             "impact": "Components without a lot ID cannot be grouped into wafer cohorts for drift analysis.",
             "how_to_fix": f"Provide a valid qualification lot code in column '{lot_col}' for all rows.",
         })
+
+    for idx, l_val in enumerate(raw_df[lot_col]):
+        s_val = str(l_val).strip()
+        if "?" in s_val or s_val.lower() in ("none", "null"):
+            issues.append({
+                "id": f"err-malformed-lot-id-{idx+1}",
+                "row": idx + 1,
+                "column": lot_col,
+                "severity": "error",
+                "error_type": "INVALID_LOT_ID",
+                "group": "IDENTITY",
+                "message": f"Malformed or wildcard lot ID '{l_val}' at row #{idx+1}.",
+                "detected_value": str(l_val),
+                "expected_value": "Valid production lot identifier (e.g. LOT-2026-A1)",
+                "what": f"Lot ID at row #{idx+1} contains wildcards ('?') or placeholder strings.",
+                "why": "Module A requires authentic production lot grouping for peer dispersion estimation.",
+                "impact": "Malformed lot codes corrupt cohort distributions and peer variance.",
+                "how_to_fix": "Provide a genuine production lot identifier.",
+            })
+            if len([i for i in issues if i["error_type"] == "INVALID_LOT_ID"]) >= 5:
+                break
+
+    # Inconsistent lot assignment check (same component_id assigned to multiple distinct lots)
+    comp_lot_df = raw_df[[comp_col, lot_col]].dropna().drop_duplicates()
+    dupe_comp_multi_lots = comp_lot_df[comp_lot_df[comp_col].duplicated(keep=False)]
+    if not dupe_comp_multi_lots.empty:
+        sample_comp = dupe_comp_multi_lots[comp_col].iloc[0]
+        associated_lots = dupe_comp_multi_lots[dupe_comp_multi_lots[comp_col] == sample_comp][lot_col].tolist()
+        issues.append({
+            "id": "err-inconsistent-lot-assignment",
+            "row": None,
+            "column": f"{comp_col} / {lot_col}",
+            "severity": "error",
+            "error_type": "INCONSISTENT_LOT_ASSIGNMENT",
+            "group": "IDENTITY",
+            "message": f"Component '{sample_comp}' is assigned to multiple conflicting lots ({', '.join(map(str, associated_lots))}).",
+            "detected_value": f"Conflicting lots: {', '.join(map(str, associated_lots))}",
+            "expected_value": "Single consistent production lot per component",
+            "what": f"Component ID '{sample_comp}' is associated with more than one lot ID.",
+            "why": "A physical silicon device originates from exactly one fabrication wafer lot.",
+            "impact": "Conflicting lot assignments break relative statistical baselines.",
+            "how_to_fix": "Ensure each component record references its unique physical production lot.",
+        })
+
+    # Small lot cohorts warning (< 3 components per lot)
+    valid_lots = lot_series[~empty_lot_mask]
+    lot_counts = valid_lots.value_counts()
+    for l_id, count in lot_counts.items():
+        if count < 3 and len(raw_df) >= 6:
+            issues.append({
+                "id": f"warn-small-lot-{l_id}",
+                "row": None,
+                "column": lot_col,
+                "severity": "warning",
+                "error_type": "INSUFFICIENT_LOT_DATA",
+                "group": "DATA",
+                "message": f"Lot cohort '{l_id}' contains only {count} component(s). Lot-relative statistics cannot be reliably calculated from insufficient lot data (minimum 3 recommended).",
+                "detected_value": f"{count} component(s) in lot {l_id}",
+                "expected_value": ">= 3 components per production lot",
+                "what": f"Lot cohort '{l_id}' has fewer than 3 components.",
+                "why": "Robust median and MAD estimation require sufficient cohort sample size to avoid skewed z-scores.",
+                "impact": "Module A will use fallback lot dispersion with widened confidence bounds.",
+                "how_to_fix": f"Include additional peer parts from lot '{l_id}' for full cohort screening.",
+            })
 
     # 4. Numeric Values Check on Burn-in Hours
     reading_cols = ["v0", "v24", "v168"]
@@ -337,7 +425,48 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
                 "how_to_fix": f"Record and supply the missing {col} burn-in readings in the CSV file.",
             })
 
-    # 5. Datasheet Min/Max Inversion Check
+    # 5. Unit Validation
+    if "unit" in mapping:
+        unit_col = mapping["unit"]
+        for idx, u_val in enumerate(raw_df[unit_col]):
+            s_u = str(u_val).strip().lower()
+            if s_u in ("µa", "ua", "microamp", "microamps", "micro-amp", "micro-amps", "micro amperes"):
+                continue
+            elif s_u in ("ma", "milliamp", "milliamps"):
+                issues.append({
+                    "id": f"info-unit-conversion-{idx+1}",
+                    "row": idx + 1,
+                    "column": unit_col,
+                    "severity": "warning",
+                    "error_type": "INVALID_UNIT",
+                    "group": "DATA",
+                    "message": f"Unit '{u_val}' at row #{idx+1} will be normalized to standard flight unit (µA).",
+                    "detected_value": str(u_val),
+                    "expected_value": "µA (microamps)",
+                    "what": f"Measurement unit '{u_val}' detected.",
+                    "why": "Standard SpaceGuard AI flight screening operates in microamps (µA).",
+                    "impact": "Values will be multiplied by 1000 for standard qualification analysis.",
+                    "how_to_fix": "Ensure measurements are entered directly in µA.",
+                })
+            else:
+                issues.append({
+                    "id": f"err-invalid-unit-{idx+1}",
+                    "row": idx + 1,
+                    "column": unit_col,
+                    "severity": "error",
+                    "error_type": "INVALID_UNIT",
+                    "group": "DATA",
+                    "message": f"Unsupported or invalid unit '{u_val}' at row #{idx+1}. Expected 'µA' (microamps).",
+                    "detected_value": str(u_val),
+                    "expected_value": "µA (or uA)",
+                    "what": f"Unit '{u_val}' does not match expected reverse leakage current units.",
+                    "why": "Reverse leakage screening requires current units (microamps) under MIL-STD-883 Method 1005.",
+                    "impact": "Calculations and static limits cannot be compared against specification ceilings.",
+                    "how_to_fix": "Convert values to µA and specify unit as 'µA' before uploading.",
+                })
+                break
+
+    # 6. Datasheet Min/Max Inversion Check
     has_min = "datasheet_min" in mapping
     has_max = "datasheet_max" in mapping
     if has_min and has_max:
@@ -364,7 +493,7 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
                 "how_to_fix": f"Ensure '{mapping['datasheet_min']}' is strictly less than '{mapping['datasheet_max']}'.",
             })
 
-    # 6. Temperature Check (if present)
+    # 7. Temperature Check (if present)
     if "temperature_c" in mapping:
         temp_col = mapping["temperature_c"]
         temps = pd.to_numeric(raw_df[temp_col], errors="coerce")
@@ -388,7 +517,7 @@ def validate_raw_dataset(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple
                 "how_to_fix": "Correct the chamber temperature to 125°C (or standard screening temperature).",
             })
 
-    # 7. Single component / small cohort warning
+    # 8. Single component / small cohort warning
     if len(raw_df) == 1:
         issues.append({
             "id": "warn-small-cohort",
@@ -435,25 +564,30 @@ def build_dataframe(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple[pd.D
     else:
         out["parameter"] = "Leakage Current (µA)"
 
+    unit_multiplier = 1.0
     if "unit" in mapping:
         out["unit"] = raw_df[mapping["unit"]].astype(str).str.strip()
+        first_unit = str(out["unit"].iloc[0]).lower() if len(out) else "µa"
+        if "ma" in first_unit and "µ" not in first_unit and "u" not in first_unit:
+            unit_multiplier = 1000.0
+            out["unit"] = "µA"
     else:
         out["unit"] = "µA"
 
-    # Burn-in readings
-    out["v0"] = pd.to_numeric(raw_df[mapping["v0"]], errors="coerce")
-    out["v24"] = pd.to_numeric(raw_df[mapping["v24"]], errors="coerce")
-    out["v96"] = pd.to_numeric(raw_df[mapping["v96"]], errors="coerce") if "v96" in mapping else np.nan
-    out["v168"] = pd.to_numeric(raw_df[mapping["v168"]], errors="coerce")
+    # Burn-in readings (with unit conversion if needed)
+    out["v0"] = pd.to_numeric(raw_df[mapping["v0"]], errors="coerce") * unit_multiplier
+    out["v24"] = pd.to_numeric(raw_df[mapping["v24"]], errors="coerce") * unit_multiplier
+    out["v96"] = (pd.to_numeric(raw_df[mapping["v96"]], errors="coerce") * unit_multiplier) if "v96" in mapping else np.nan
+    out["v168"] = pd.to_numeric(raw_df[mapping["v168"]], errors="coerce") * unit_multiplier
 
     # Datasheet limits
     if "datasheet_min" in mapping:
-        out["datasheet_min"] = pd.to_numeric(raw_df[mapping["datasheet_min"]], errors="coerce").fillna(0.0)
+        out["datasheet_min"] = pd.to_numeric(raw_df[mapping["datasheet_min"]], errors="coerce").fillna(0.0) * unit_multiplier
     else:
         out["datasheet_min"] = 0.0
 
     if "datasheet_max" in mapping:
-        out["datasheet_max"] = pd.to_numeric(raw_df[mapping["datasheet_max"]], errors="coerce").fillna(50.0)
+        out["datasheet_max"] = pd.to_numeric(raw_df[mapping["datasheet_max"]], errors="coerce").fillna(50.0) * unit_multiplier
     else:
         out["datasheet_max"] = 50.0
     out["limit"] = out["datasheet_max"]
@@ -483,14 +617,51 @@ def build_dataframe(raw_df: pd.DataFrame, mapping: Dict[str, str]) -> Tuple[pd.D
     # Drop duplicate component_ids if present (keep first) to prevent primary key / identity conflicts
     clean = clean.drop_duplicates(subset=["component_id"]).reset_index(drop=True)
 
+    total_rows = int(rows)
+    valid_count = int(len(clean))
+    missing_count = int(total_rows - valid_count)
+    critical_errors = sum(1 for i in issues if i.get("severity") == "error")
+    warning_count = sum(1 for i in issues if i.get("severity") == "warning")
+    info_count = sum(1 for i in issues if i.get("severity") == "info")
+
+    if total_rows == 0:
+        dq_score = 0
+    elif critical_errors > 0:
+        dq_score = max(0, int(round((valid_count / max(1, total_rows)) * 100 - min(50, critical_errors * 10))))
+    else:
+        dq_score = max(65, min(100, int(round(100 - warning_count * 3))))
+
+    validation_report = {
+        "fileName": "screening_dataset.csv",
+        "status": "PASSED" if is_valid else "BLOCKED",
+        "totalRows": total_rows,
+        "validRows": valid_count,
+        "invalidRows": missing_count,
+        "errorCount": len(issues),
+        "criticalCount": critical_errors,
+        "warningCount": warning_count,
+        "infoCount": info_count,
+        "dataQualityScore": dq_score,
+        "errors": issues,
+        "checks": {
+            "formatValid": True,
+            "schemaValid": not any(i.get("group") == "SCHEMA" and i.get("severity") == "error" for i in issues),
+            "requiredColumnsValid": not any(i.get("error_type") == "MISSING_REQUIRED_COLUMN" for i in issues),
+            "rowValidationPassed": is_valid,
+            "dataQualityAcceptable": dq_score >= 70,
+        },
+    }
+
     meta = {
-        "rows": int(rows),
-        "valid": int(len(clean)),
-        "missing": int(rows - len(clean)),
+        "rows": total_rows,
+        "valid": valid_count,
+        "missing": missing_count,
         "lots": int(clean["lot_id"].nunique()) if len(clean) else 0,
         "has_ground_truth": bool(clean["ground_truth"].notna().any()) if len(clean) else False,
         "is_valid": is_valid,
+        "data_quality_score": dq_score,
         "validation_issues": issues,
+        "validation_report": validation_report,
     }
 
     return clean, meta

@@ -77,47 +77,73 @@ def score_and_decide(
     s_breach_prob = breach_prob
 
     # Temperature thermal stress factor (if above standard 125C HTOL)
-    if "temperature_c" in df.columns:
-        temp = df["temperature_c"].to_numpy(dtype=float)
-        s_thermal = np.clip((temp - 125.0) / 25.0, 0.0, 1.0) * 0.05
-    else:
-        s_thermal = np.zeros(len(df))
-
-    # Multi-factor composite weighting (Total = 100 points)
-    if has_ml and "ml_prob" in df.columns and df["ml_prob"].notna().any():
-        ml_term = df["ml_prob"].fillna(0.0).to_numpy(dtype=float)
-        raw_risk = (
-            s_z * 28.0               # Lot-relative deviation weight
-            + s_future * 20.0        # Future projection weight
-            + s_iso * 15.0           # Unsupervised anomaly weight
-            + s_breach_prob * 12.0   # Probability of breach
-            + s_safety_slope * 10.0  # Early trajectory check
-            + ml_term * 15.0         # Supervised defect probability
-            + s_thermal * 100.0      # Temperature stress
-        )
-    else:
-        raw_risk = (
-            s_z * 34.0               # Lot-relative deviation weight
-            + s_future * 24.0        # Future projection weight
-            + s_iso * 18.0           # Unsupervised anomaly weight
-            + s_breach_prob * 14.0   # Probability of breach
-            + s_safety_slope * 10.0  # Early trajectory check
-            + s_thermal * 100.0      # Temperature stress
-        )
-
-    # Static limit violations guarantee critical severity (minimum 92/100)
+    # 1. Datasheet Limit Proximity & Violation Factor (0 - 100)
     static_fail = v168 > limit
     if "datasheet_min" in df.columns:
         ds_min = df["datasheet_min"].to_numpy(dtype=float)
         static_fail = static_fail | (v168 < ds_min)
+    else:
+        ds_min = np.zeros(len(df))
 
-    raw_risk = np.where(
+    ds_ratio = np.clip(v168 / np.maximum(1e-6, limit), 0.0, 2.0)
+    datasheet_risk = np.where(
         static_fail,
-        np.maximum(92.0, 90.0 + (np.maximum(0.0, v168 - limit) / limit) * 20.0),
-        raw_risk
+        100.0,
+        np.clip(ds_ratio * 80.0, 0.0, 85.0)
+    )
+    datasheet_risk = np.clip(datasheet_risk, 0.0, 100.0)
+
+    # 2. Lot-Relative Anomaly Factor (0 - 100)
+    lot_anomaly_risk = np.clip((z_max / 3.0) * 100.0, 0.0, 100.0)
+    if "iso_score" in df.columns:
+        iso_val = df["iso_score"].to_numpy(dtype=float)
+        lot_anomaly_risk = np.maximum(lot_anomaly_risk, np.clip(iso_val, 0.0, 100.0))
+
+    # 3. Temporal Drift Velocity Factor (0 - 100)
+    slope_val = np.abs(df["slope"].to_numpy(dtype=float)) if "slope" in df.columns else np.zeros(len(df))
+    drift_risk = np.clip((slope_val / 0.04) * 100.0, 0.0, 100.0)
+
+    # 4. Prediction Risk Factor (0 - 100)
+    fut_ratio = np.clip(pred_future / np.maximum(1e-6, limit), 0.0, 2.0)
+    prediction_risk = np.clip(
+        fut_ratio * 50.0 + breach_prob * 35.0 + (s_safety_slope * 25.0),
+        0.0,
+        100.0
     )
 
+    # 5. Data Quality Risk Factor (0 - 100)
+    dq_risk = np.where(df.get("v96_imputed", False), 10.0, 0.0)
+
+    # Composite Risk Weighting (0 - 100)
+    raw_risk = (
+        datasheet_risk * 0.30
+        + lot_anomaly_risk * 0.30
+        + drift_risk * 0.20
+        + prediction_risk * 0.15
+        + dq_risk * 0.05
+    )
+
+    # Static limit failures guarantee critical severity (>= 92)
+    raw_risk = np.where(static_fail, np.maximum(92.0, raw_risk), raw_risk)
     risk_scores = np.clip(np.round(raw_risk), 0, 100).astype(int)
+
+    # Exact Factor Contributions (Points out of 100)
+    ds_contrib = np.round(datasheet_risk * 0.30).astype(int)
+    lot_contrib = np.round(lot_anomaly_risk * 0.30).astype(int)
+    drift_contrib = np.round(drift_risk * 0.20).astype(int)
+    pred_contrib = np.round(prediction_risk * 0.15).astype(int)
+    dq_contrib = np.round(dq_risk * 0.05).astype(int)
+
+    df["datasheet_risk"] = np.round(datasheet_risk, 1)
+    df["lot_anomaly_risk"] = np.round(lot_anomaly_risk, 1)
+    df["drift_risk"] = np.round(drift_risk, 1)
+    df["prediction_risk"] = np.round(prediction_risk, 1)
+    df["data_quality_risk"] = np.round(dq_risk, 1)
+    df["datasheet_contrib"] = ds_contrib
+    df["lot_anomaly_contrib"] = lot_contrib
+    df["drift_contrib"] = drift_contrib
+    df["prediction_contrib"] = pred_contrib
+    df["data_quality_contrib"] = dq_contrib
     df["risk_score"] = risk_scores
     df["traditional_decision"] = np.where(static_fail, "FAIL", "PASS")
 

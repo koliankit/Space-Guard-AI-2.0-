@@ -33,6 +33,7 @@ export default function SatelliteHUD({
   subsystems,
   selectedKey,
   hoveredKey,
+  selectedComponent,
   isAutoRotate,
   isExploded,
   isXray,
@@ -195,6 +196,56 @@ export default function SatelliteHUD({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Target Component Telemetry Overlay (Section 30) */}
+      <div className="flex items-start justify-between gap-3 pointer-events-auto my-auto relative z-20">
+        {selectedComponent ? (
+          <div className="p-3 rounded-xl border border-[#0E88D3]/40 bg-[#FFFFFF]/92 backdrop-blur-md shadow-lg text-[#17212B] max-w-[280px]">
+            <div className="flex items-center justify-between gap-2 border-b border-[#D9E2EA] pb-1.5 mb-2">
+              <span className="text-[10px] text-[#5B6B7A] tracking-wider uppercase font-bold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: STATUS_COLOR[selectedComponent.status] ?? '#10B981' }} />
+                TARGET PART
+              </span>
+              <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase border ${
+                selectedComponent.status === 'reject' ? 'bg-[#D9363E]/15 text-[#D9363E] border-[#D9363E]/40' :
+                selectedComponent.status === 'monitor' ? 'bg-[#C58A00]/15 text-[#C58A00] border-[#C58A00]/40' :
+                'bg-[#168A5B]/15 text-[#168A5B] border-[#168A5B]/40'
+              }`}>
+                {selectedComponent.status}
+              </span>
+            </div>
+            <div className="font-mono font-black text-sm text-[#0E88D3] truncate">
+              {selectedComponent.component_id}
+            </div>
+            <div className="text-[11px] text-[#5B6B7A] flex items-center justify-between mt-1">
+              <span>Lot:</span>
+              <span className="font-semibold text-[#17212B]">{selectedComponent.lot_id}</span>
+            </div>
+            <div className="text-[11px] text-[#5B6B7A] flex items-center justify-between mt-0.5">
+              <span>Subsystem:</span>
+              <span className="font-semibold text-[#17212B]">{selectedComponent.subsystem_name || selectedComponent.subsystem}</span>
+            </div>
+            <div className="text-[11px] text-[#5B6B7A] flex items-center justify-between mt-0.5">
+              <span>Location:</span>
+              <span className="font-semibold text-[#0E88D3]">
+                {selectedComponent.subsystem ? `Bay Deck ${selectedComponent.subsystem}` : 'PHYSICAL LOCATION UNAVAILABLE'}
+              </span>
+            </div>
+            <div className="text-[11px] text-[#5B6B7A] flex items-center justify-between mt-0.5">
+              <span>Reliability Risk:</span>
+              <span className={`font-mono font-bold ${selectedComponent.risk_score >= 80 ? 'text-[#D9363E]' : selectedComponent.risk_score >= 50 ? 'text-[#C58A00]' : 'text-[#168A5B]'}`}>
+                {selectedComponent.risk_score}/100
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="p-2.5 rounded-lg border border-[#D9E2EA] bg-[#FFFFFF]/85 backdrop-blur-md shadow-sm text-[11px] text-[#5B6B7A] max-w-[240px]">
+            <div className="font-bold text-[#17212B] uppercase text-[10px] tracking-wider mb-0.5">TARGET PART</div>
+            NO COMPONENT SELECTED
+            <div className="text-[10px] text-[#81909D] mt-0.5">Select a component to view its physical location.</div>
+          </div>
+        )}
       </div>
 
       {/* Bottom Bar: Telemetry Equalizer + Subsystem Carousel */}

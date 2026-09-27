@@ -179,6 +179,20 @@ export interface ComponentOut {
   anomaly_category?: AnomalyCategory
   reason: string
   explanation_points?: string[]
+  datasheet_risk?: number
+  lot_anomaly_risk?: number
+  drift_risk?: number
+  prediction_risk?: number
+  data_quality_risk?: number
+  datasheet_contrib?: number
+  lot_anomaly_contrib?: number
+  drift_contrib?: number
+  prediction_contrib?: number
+  data_quality_contrib?: number
+  qa_decision?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'ESCALATED'
+  qa_notes?: string | null
+  qa_reviewer?: string | null
+  qa_timestamp?: string | null
 }
 
 export interface AnalyzeResult {

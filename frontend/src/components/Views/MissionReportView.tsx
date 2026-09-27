@@ -16,20 +16,29 @@ export default function MissionReportView({
   components,
   onDownloadReport,
 }: MissionReportViewProps) {
-  // Ensure we have active component data even on immediate report navigation
-  const activeComponents =
-    components && components.length > 0
-      ? components
-      : offlineISRO.listComponents(1, { limit: 500 }).components
+  if (!components || components.length === 0) {
+    return (
+      <div className="flex flex-col flex-1 min-h-full items-center justify-center p-8 bg-[#EEF3F7] text-[#17212B] font-mono text-center">
+        <div className="w-16 h-16 rounded-full bg-[#0E88D3]/10 border border-[#0E88D3]/30 flex items-center justify-center text-[#0E88D3] text-2xl font-bold mb-4 shadow-sm">
+          📄
+        </div>
+        <h2 className="text-xl font-black text-[#17212B] uppercase tracking-wider mb-2">
+          NO FLIGHT CLEARANCE EVIDENCE AVAILABLE
+        </h2>
+        <p className="text-xs text-[#5B6B7A] max-w-md font-sans mb-4">
+          Upload, validate, and execute AI screening on a flight telemetry dataset to generate official ISRO mission clearance evidence and PDF certificates.
+        </p>
+      </div>
+    )
+  }
 
+  const activeComponents = components
   const rejected = activeComponents.filter((c) => c.status === 'reject')
   const monitored = activeComponents.filter((c) => c.status === 'monitor')
   const safeCount = mission?.safe ?? activeComponents.filter((c) => c.status === 'safe').length
   const health =
     mission?.mission_health ??
-    (activeComponents.length > 0
-      ? Math.round(100 - activeComponents.reduce((s, c) => s + c.risk_score, 0) / activeComponents.length)
-      : 88)
+    Math.round(100 - activeComponents.reduce((s, c) => s + c.risk_score, 0) / activeComponents.length)
 
   const handleDownloadCertPdf = () => {
     generateCertificatePdf(mission, activeComponents)

@@ -118,6 +118,16 @@ def persist_components(db: Session, batch: Batch, df: pd.DataFrame, lot_summarie
             anomaly_category=str(row.get("anomaly_category", "normal_within_spec")),
             reason=str(row.get("reason", "")),
             explanation_points=row.get("explanation_points"),
+            datasheet_risk=float(row.get("datasheet_risk", 0.0)),
+            lot_anomaly_risk=float(row.get("lot_anomaly_risk", 0.0)),
+            drift_risk=float(row.get("drift_risk", 0.0)),
+            prediction_risk=float(row.get("prediction_risk", 0.0)),
+            data_quality_risk=float(row.get("data_quality_risk", 0.0)),
+            datasheet_contrib=float(row.get("datasheet_contrib", 0.0)),
+            lot_anomaly_contrib=float(row.get("lot_anomaly_contrib", 0.0)),
+            drift_contrib=float(row.get("drift_contrib", 0.0)),
+            prediction_contrib=float(row.get("prediction_contrib", 0.0)),
+            data_quality_contrib=float(row.get("data_quality_contrib", 0.0)),
         ))
 
     db.bulk_save_objects(records)

@@ -76,6 +76,22 @@ class ComponentRecord(Base):
     iso_score = Column(Float, nullable=True)
     ml_prob = Column(Float, nullable=True)
 
+    datasheet_risk = Column(Float, default=0.0, nullable=True)
+    lot_anomaly_risk = Column(Float, default=0.0, nullable=True)
+    drift_risk = Column(Float, default=0.0, nullable=True)
+    prediction_risk = Column(Float, default=0.0, nullable=True)
+    data_quality_risk = Column(Float, default=0.0, nullable=True)
+    datasheet_contrib = Column(Integer, default=0, nullable=True)
+    lot_anomaly_contrib = Column(Integer, default=0, nullable=True)
+    drift_contrib = Column(Integer, default=0, nullable=True)
+    prediction_contrib = Column(Integer, default=0, nullable=True)
+    data_quality_contrib = Column(Integer, default=0, nullable=True)
+
+    qa_decision = Column(String, default="PENDING", nullable=True)
+    qa_notes = Column(String, nullable=True)
+    qa_reviewer = Column(String, nullable=True)
+    qa_timestamp = Column(String, nullable=True)
+
     risk_score = Column(Integer, nullable=True)
     risk_level = Column(String, default="LOW", nullable=True)  # LOW | MEDIUM | HIGH | CRITICAL
     status = Column(String, nullable=True)  # safe | monitor | reject

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import type { ComponentOut } from '../../types'
 import ModuleBFutureDriftGraph from '../Charts/ModuleBFutureDriftGraph'
 import { getSubsystemLocation } from '../../utils/satelliteLocations'
+import * as api from '../../api'
 
 interface ModuleBFutureDriftPanelProps {
   components: ComponentOut[]
@@ -200,14 +201,46 @@ export default function ModuleBFutureDriftPanel({
 
               <div className="p-2.5 rounded bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Safety Slope</span>
-                  {isSim && <span className="w-1.5 h-1.5 rounded-full bg-[#0E88D3] led" />}
+                  <span className="text-[10px] text-[#5B6B7A] uppercase font-semibold">Safety Slope (What-If)</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${
+                    selected.safety_slope_exceeded
+                      ? 'bg-[#D9363E]/10 text-[#D9363E] border-[#D9363E]/30'
+                      : 'bg-[#168A5B]/10 text-[#168A5B] border-[#168A5B]/30'
+                  }`}>
+                    {selected.safety_slope_exceeded ? 'EXCEEDED' : 'SAFE'}
+                  </span>
                 </div>
-                <span className={`text-base font-bold mt-0.5 tabular-nums ${isAccelerating ? 'text-[#D9363E]' : 'text-[#168A5B]'}`}>
-                  {(slope * 1000).toFixed(2)} <span className="text-xs font-normal text-[#5B6B7A]">nA/hr</span>
-                </span>
-                <span className="text-[9px] text-[#81909D] font-mono mt-0.5">
-                  {isAccelerating ? 'Accelerating Positive Drift' : 'Linear Thermal Degradation'}
+                <div className="flex items-baseline justify-between mt-0.5">
+                  <span className={`text-base font-bold tabular-nums ${selected.safety_slope_exceeded ? 'text-[#D9363E]' : 'text-[#168A5B]'}`}>
+                    {((selected.safety_slope ?? 0.04) * 1000).toFixed(1)} <span className="text-xs font-normal text-[#5B6B7A]">nA/hr</span>
+                  </span>
+                  <span className="text-[10px] text-[#718292]">
+                    Early: {((selected.drift_rate_early ?? slope) * 1000).toFixed(1)} nA/hr
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="range"
+                    min="5"
+                    max="100"
+                    step="1"
+                    value={Math.round((selected.safety_slope ?? 0.04) * 1000)}
+                    onChange={async (e) => {
+                      const newSlope = parseFloat(e.target.value) / 1000.0
+                      try {
+                        const updated = await api.recalculateSafetySlope(selected.component_id, newSlope)
+                        Object.assign(selected, updated)
+                        setSimData((prev) => (prev ? { ...prev } : null))
+                      } catch (err) {
+                        console.error('Safety slope recalculate failed:', err)
+                      }
+                    }}
+                    className="w-full h-1.5 bg-[#E7EEF5] rounded-lg appearance-none cursor-pointer accent-[#0E88D3]"
+                    title="Slide to test what-if safety margin and risk recalculation"
+                  />
+                </div>
+                <span className="text-[9px] text-[#0E88D3] font-mono mt-0.5">
+                  Drag to test margin &amp; risk sensitivity
                 </span>
               </div>
             </div>

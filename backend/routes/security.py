@@ -10,6 +10,7 @@ import hmac
 import hashlib
 import json
 
+# pyrefly: ignore [missing-import]
 from security.tee_service import tee_service
 
 router = APIRouter(tags=["security"])

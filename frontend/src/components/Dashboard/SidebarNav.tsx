@@ -140,6 +140,18 @@ export default function SidebarNav({
           description: 'All-Component Decision Grid & Filters',
         },
         {
+          id: 'passport',
+          label: 'Component Passport',
+          icon: '📋',
+          description: 'Canonical Reliability Dossier & Records',
+        },
+        {
+          id: 'qa_review',
+          label: 'QA Review Board',
+          icon: '🛡️',
+          description: 'Human-in-the-Loop Flight Authorization',
+        },
+        {
           id: 'diagnostics',
           label: 'Diagnostics',
           icon: '🩺',

@@ -1,4 +1,6 @@
 from typing import Optional
+from datetime import datetime, timezone
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -59,6 +61,23 @@ def _to_dict(r: ComponentRecord):
         "anomaly_category": r.anomaly_category,
         "reason": r.reason,
         "explanation_points": getattr(r, "explanation_points", None),
+        "datasheet_risk": float(getattr(r, "datasheet_risk", 0.0) or 0.0),
+        "lot_anomaly_risk": float(getattr(r, "lot_anomaly_risk", 0.0) or 0.0),
+        "drift_risk": float(getattr(r, "drift_risk", 0.0) or 0.0),
+        "prediction_risk": float(getattr(r, "prediction_risk", 0.0) or 0.0),
+        "data_quality_risk": float(getattr(r, "data_quality_risk", 0.0) or 0.0),
+        "datasheet_contrib": float(getattr(r, "datasheet_contrib", 0.0) or 0.0),
+        "lot_anomaly_contrib": float(getattr(r, "lot_anomaly_contrib", 0.0) or 0.0),
+        "drift_contrib": float(getattr(r, "drift_contrib", 0.0) or 0.0),
+        "prediction_contrib": float(getattr(r, "prediction_contrib", 0.0) or 0.0),
+        "data_quality_contrib": float(getattr(r, "data_quality_contrib", 0.0) or 0.0),
+        "safety_slope": float(getattr(r, "safety_slope", 0.04) or 0.04),
+        "safety_slope_exceeded": bool(getattr(r, "safety_slope_exceeded", False)),
+        "predicted_drift_rate": float(getattr(r, "predicted_drift_rate", 0.0) or 0.0),
+        "qa_decision": getattr(r, "qa_decision", "PENDING") or "PENDING",
+        "qa_notes": getattr(r, "qa_notes", None),
+        "qa_reviewer": getattr(r, "qa_reviewer", None),
+        "qa_timestamp": getattr(r, "qa_timestamp", None),
     }
 
 
@@ -204,3 +223,127 @@ def get_metrics(batch_id: Optional[int] = None, db: Session = Depends(get_db)):
         "evaluation_metrics": eval_metrics,
         "lot_summaries": batch.lot_summary or ml_meta.get("lot_summaries", {}),
     }
+
+
+class QAReviewUpdate(BaseModel):
+    qa_decision: str  # PENDING | APPROVED | REJECTED | ESCALATED
+    qa_notes: Optional[str] = None
+    qa_reviewer: Optional[str] = "Quality Assurance Engineer"
+
+
+@router.post("/components/{batch_id}/{component_id}/qa-review")
+@router.post("/components/{component_id}/qa-review")
+def update_qa_review(
+    component_id: str,
+    payload: QAReviewUpdate,
+    batch_id: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
+    target_batch_id = _get_active_batch_id(batch_id, db)
+    row = (
+        db.query(ComponentRecord)
+        .filter(ComponentRecord.batch_id == target_batch_id, ComponentRecord.component_id == component_id)
+        .first()
+    )
+    if not row:
+        raise HTTPException(404, f"Component {component_id} not found in batch {target_batch_id}.")
+
+    row.qa_decision = payload.qa_decision.upper()
+    row.qa_notes = payload.qa_notes
+    row.qa_reviewer = payload.qa_reviewer or "Quality Assurance Engineer"
+    row.qa_timestamp = datetime.now(timezone.utc).isoformat()
+    db.commit()
+    db.refresh(row)
+    return _to_dict(row)
+
+
+class SafetySlopeRecalcRequest(BaseModel):
+    component_id: str
+    safety_slope: float = 0.04
+    batch_id: Optional[int] = None
+
+
+@router.post("/screening/recalculate-slope")
+def recalculate_safety_slope(payload: SafetySlopeRecalcRequest, db: Session = Depends(get_db)):
+    target_batch_id = _get_active_batch_id(payload.batch_id, db)
+    row = (
+        db.query(ComponentRecord)
+        .filter(ComponentRecord.batch_id == target_batch_id, ComponentRecord.component_id == payload.component_id)
+        .first()
+    )
+    if not row:
+        raise HTTPException(404, f"Component {payload.component_id} not found in batch {target_batch_id}.")
+
+    safety_slope = max(0.001, float(payload.safety_slope))
+    drift_rate_early = float(row.drift_rate_early or 0.0)
+    safety_slope_exceeded = drift_rate_early > safety_slope
+
+    # Recalculate drift risk
+    slope_ratio = drift_rate_early / safety_slope
+    if slope_ratio <= 1.0:
+        drift_risk = min(40.0, slope_ratio * 40.0)
+    else:
+        drift_risk = min(100.0, 40.0 + (slope_ratio - 1.0) * 60.0)
+
+    # Margin calculation
+    limit = float(row.limit_ua or 50.0)
+    pred_future = float(row.predicted_future or row.v168 or 0.0)
+    margin_future = round(limit - pred_future, 3)
+
+    # 5-factor recalculation
+    datasheet_risk = float(row.datasheet_risk or 0.0)
+    lot_anomaly_risk = float(row.lot_anomaly_risk or 0.0)
+    prediction_risk = float(row.prediction_risk or 0.0)
+    data_quality_risk = float(row.data_quality_risk or 0.0)
+
+    # Discrete factor contributions summing to risk score
+    c_datasheet = round(datasheet_risk * 0.30, 1)
+    c_lot = round(lot_anomaly_risk * 0.30, 1)
+    c_drift = round(drift_risk * 0.20, 1)
+    c_pred = round(prediction_risk * 0.15, 1)
+    c_dq = round(data_quality_risk * 0.05, 1)
+
+    raw_score = c_datasheet + c_lot + c_drift + c_pred + c_dq
+    final_score = int(round(min(100.0, max(0.0, raw_score))))
+
+    if (row.v168 and row.v168 > limit) or (row.v0 and row.v0 > limit):
+        final_score = max(final_score, 92)
+
+    if final_score >= 80:
+        status = "reject"
+        risk_level = "CRITICAL" if final_score >= 90 else "HIGH"
+    elif final_score >= 50:
+        status = "monitor"
+        risk_level = "MEDIUM"
+    else:
+        status = "safe"
+        risk_level = "LOW"
+
+    # Dynamic explanation
+    explanations = []
+    if row.v168 and row.v168 > limit:
+        explanations.append(f"Datasheet limit exceeded: {row.v168:.1f} µA > {limit:.1f} µA")
+    if safety_slope_exceeded:
+        explanations.append(f"Early drift rate ({drift_rate_early:.4f} µA/h) breaches safety slope threshold ({safety_slope:.4f} µA/h)")
+    if lot_anomaly_risk >= 60:
+        explanations.append(f"Significant lot outlier deviation (Z={row.z168 or 0.0:.2f})")
+    if pred_future > limit:
+        explanations.append(f"Projected 168h drift ({pred_future:.1f} µA) exceeds datasheet specification")
+    if not explanations:
+        explanations.append("All temporal and lot-relative parameters are within mission safety envelopes")
+
+    row.safety_slope = safety_slope
+    row.safety_slope_exceeded = safety_slope_exceeded
+    row.drift_risk = round(drift_risk, 1)
+    row.drift_contrib = c_drift
+    row.risk_score = final_score
+    row.risk_level = risk_level
+    row.status = status
+    row.margin_future = margin_future
+    row.explanation_points = explanations
+    row.reason = "; ".join(explanations)
+    db.commit()
+    db.refresh(row)
+
+    return _to_dict(row)
+

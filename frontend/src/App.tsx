@@ -31,6 +31,8 @@ import RiskEngineView from './components/Views/RiskEngineView'
 import DiagnosticsView from './components/Views/DiagnosticsView'
 import SatelliteView from './components/Views/SatelliteView'
 import TelemetryView from './components/Views/TelemetryView'
+import ComponentPassportView from './components/Views/ComponentPassportView'
+import QAReviewView from './components/Views/QAReviewView'
 import ISROPitchModal from './components/Dashboard/ISROPitchModal'
 import ISROOnboardingFlow from './components/Onboarding/ISROOnboardingFlow'
 import TeeSecurityModal from './components/Dashboard/TeeSecurityModal'
@@ -576,6 +578,29 @@ export default function App() {
               onSelectComponent={selectComponent}
               onFocusIn3D={focusIn3D}
               selectedId={selected?.component_id ?? null}
+            />
+          )}
+
+          {/* ANALYSIS: Component Reliability Passport */}
+          {activeTab === 'passport' && (
+            <ComponentPassportView
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              selected={selected}
+              onSelectComponent={selectComponent}
+              mission={mission}
+              onNavigateToTab={(tab) => setActiveTab(tab as DashboardTab)}
+            />
+          )}
+
+          {/* ANALYSIS: QA Review Board */}
+          {activeTab === 'qa_review' && (
+            <QAReviewView
+              components={allComponents.length > 0 ? allComponents : flaggedList}
+              selected={selected}
+              onSelectComponent={selectComponent}
+              mission={mission}
+              batchId={batchId}
+              onNavigateToTab={(tab) => setActiveTab(tab as DashboardTab)}
             />
           )}
 

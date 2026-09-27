@@ -325,3 +325,92 @@ export async function getTeeSecurityStatus(): Promise<TeeSecurityStatus> {
       'TEE provides an optional hardware-backed isolation layer for selected sensitive computations. In simulation mode, execution is emulated for local development and is not hardware-protected.',
   }
 }
+
+export async function updateQAReview(
+  componentId: string,
+  qaDecision: string,
+  qaNotes?: string,
+  qaReviewer?: string,
+  batchId?: number | null
+): Promise<ComponentOut> {
+  if (await isBackendAvailable()) {
+    try {
+      const url = batchId
+        ? `${API_BASE}/api/components/${batchId}/${componentId}/qa-review`
+        : `${API_BASE}/api/components/${componentId}/qa-review`
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          qa_decision: qaDecision,
+          qa_notes: qaNotes,
+          qa_reviewer: qaReviewer,
+        }),
+      })
+      return await asJson(res)
+    } catch (e) {
+      console.warn('Backend updateQAReview failed, falling back to client:', e)
+    }
+  }
+  return offlineISRO.updateQAReview(componentId, qaDecision, qaNotes, qaReviewer)
+}
+
+export async function recalculateSafetySlope(
+  componentId: string,
+  safetySlope: number,
+  batchId?: number | null
+): Promise<ComponentOut> {
+  if (await isBackendAvailable()) {
+    try {
+      const res = await fetch(`${API_BASE}/api/screening/recalculate-slope`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          component_id: componentId,
+          safety_slope: safetySlope,
+          batch_id: batchId,
+        }),
+      })
+      return await asJson(res)
+    } catch (e) {
+      console.warn('Backend recalculateSafetySlope failed, falling back to client:', e)
+    }
+  }
+  return offlineISRO.recalculateSafetySlope(componentId, safetySlope)
+}
+
+export function exportValidationReportCsv(report: any): void {
+  const headers = [
+    'Severity',
+    'Row',
+    'Column',
+    'Error Type',
+    'Detected Value',
+    'Expected Value',
+    'Message',
+    'Impact',
+    'Recommended Fix',
+  ]
+  const rows = (report.errors || []).map((e: any) => [
+    e.severity || 'Critical',
+    e.row ?? 'N/A',
+    `"${(e.column || '').replace(/"/g, '""')}"`,
+    e.errorType || e.error_type || 'VALIDATION_ERROR',
+    `"${(e.detectedValue || e.detected_value || '').replace(/"/g, '""')}"`,
+    `"${(e.expectedValue || e.expected_value || '').replace(/"/g, '""')}"`,
+    `"${(e.message || '').replace(/"/g, '""')}"`,
+    `"${(e.impact || '').replace(/"/g, '""')}"`,
+    `"${(e.recommendedFix || e.howToFix || e.how_to_fix || '').replace(/"/g, '""')}"`,
+  ])
+  const csvContent = [headers.join(','), ...rows.map((r: any) => r.join(','))].join('\n')
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.setAttribute('href', url)
+  link.setAttribute('download', `validation_error_report_${report.fileName || 'flight_batch'}.csv`)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+

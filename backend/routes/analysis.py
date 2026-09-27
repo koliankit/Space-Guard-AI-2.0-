@@ -97,6 +97,23 @@ def _build_analysis_response(batch: Batch, result_df: pd.DataFrame, ml_meta: dic
             "reason": top["reason"],
             "explanation_points": top.get("explanation_points"),
             "ground_truth": (None if pd.isna(top.get("ground_truth")) else int(top["ground_truth"])),
+            "datasheet_risk": float(top.get("datasheet_risk", 0.0) or 0.0),
+            "lot_anomaly_risk": float(top.get("lot_anomaly_risk", 0.0) or 0.0),
+            "drift_risk": float(top.get("drift_risk", 0.0) or 0.0),
+            "prediction_risk": float(top.get("prediction_risk", 0.0) or 0.0),
+            "data_quality_risk": float(top.get("data_quality_risk", 0.0) or 0.0),
+            "datasheet_contrib": float(top.get("datasheet_contrib", 0.0) or 0.0),
+            "lot_anomaly_contrib": float(top.get("lot_anomaly_contrib", 0.0) or 0.0),
+            "drift_contrib": float(top.get("drift_contrib", 0.0) or 0.0),
+            "prediction_contrib": float(top.get("prediction_contrib", 0.0) or 0.0),
+            "data_quality_contrib": float(top.get("data_quality_contrib", 0.0) or 0.0),
+            "safety_slope": float(top.get("safety_slope", 0.04) or 0.04),
+            "safety_slope_exceeded": bool(top.get("safety_slope_exceeded", False)),
+            "predicted_drift_rate": float(top.get("predicted_drift_rate", 0.0) or 0.0),
+            "qa_decision": str(top.get("qa_decision", "PENDING") or "PENDING"),
+            "qa_notes": top.get("qa_notes"),
+            "qa_reviewer": top.get("qa_reviewer"),
+            "qa_timestamp": top.get("qa_timestamp"),
         }
 
     from security.tee_service import tee_service
