@@ -298,7 +298,7 @@ export default function ModuleAAnomalyGraph({ component, onSimUpdate }: ModuleAA
       <div className="bg-[#07111C] border border-[#1D3A52] rounded-xl p-3.5 flex flex-col gap-2 flex-1 h-full min-h-[380px] md:min-h-[440px]">
         <div className="flex items-center justify-between text-xs">
           <span className="font-mono font-bold text-[#F1F5F9] flex items-center gap-1.5 text-[11px] uppercase">
-            <span className="w-2 h-2 rounded-full bg-[#0E88D3] led" />
+            <span className="w-2 h-2 rounded-full bg-[#0E88D3]" />
             Module A &bull; Parametric Waveform Telemetry
           </span>
           <span className="text-[10px] text-[#9AAFC0] font-mono">CHANNEL: 24-BIT SIGMA-DELTA ADC</span>

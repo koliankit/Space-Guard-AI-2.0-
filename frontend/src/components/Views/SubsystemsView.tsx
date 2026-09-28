@@ -153,34 +153,34 @@ export default function SubsystemsView({
   }, [components])
 
   return (
-    <div className="flex flex-col flex-1 min-h-full p-4 sm:p-5 bg-[#FFFFFF] font-mono select-none overflow-y-auto text-[#17212B] w-full">
+    <div className="flex flex-col flex-1 min-h-full p-4 sm:p-5 bg-[#FFFFFF] font-mono select-none overflow-y-auto text-[#0F1D2E] w-full">
       {/* View Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#D9E2EA] mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#D5DEE7] mb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400" />
-            <h2 className="m-0 text-sm font-display font-black tracking-widest text-[#17212B] uppercase">
+            <span className="w-2 h-2 rounded-full bg-[#0E88D3]" />
+            <h2 className="m-0 text-sm font-display font-black tracking-widest text-[#0F1D2E] uppercase">
               ISRO COMPONENT &amp; LOT DIAGNOSTIC CONSOLE
             </h2>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/40 font-bold">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-[#0E88D3]/10 text-[#0E88D3] border border-[#0E88D3]/30 font-bold">
               {viewMode === 'subsystems' ? '11 PHYSICAL ARCHITECTURES' : `${lots.length} QUALIFICATION LOTS`}
             </span>
           </div>
-          <div className="text-[10px] text-[#5B6B7A] tracking-wider mt-0.5">
+          <div className="text-[10px] text-[#64748B] tracking-wider mt-0.5">
             Spacecraft Subsystem Health &bull; Flight Qualification Lots &bull; Statistical Lot-Relative Drift &bull; Redundancy Allocation
           </div>
         </div>
 
         {/* Classification Mode Switcher */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-[#FFFFFF] border border-[#D9E2EA]/80 rounded-lg p-0.5">
+          <div className="flex items-center bg-[#FFFFFF] border border-[#D5DEE7] rounded-lg p-0.5">
             <button
               type="button"
               onClick={() => setViewMode('lots')}
-              className={`px-3 py-1 rounded text-xs font-bold uppercase transition-all flex items-center gap-1.5 font-display ${
+              className={`px-3 py-1 rounded text-xs font-bold uppercase transition-all flex items-center gap-1.5 font-display cursor-pointer ${
                 viewMode === 'lots'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm'
-                  : 'text-[#5B6B7A] hover:text-[#17212B]'
+                  ? 'bg-[#0E88D3] text-white shadow-sm'
+                  : 'text-[#64748B] hover:text-[#0F1D2E]'
               }`}
             >
               <span>📦</span>
@@ -189,10 +189,10 @@ export default function SubsystemsView({
             <button
               type="button"
               onClick={() => setViewMode('subsystems')}
-              className={`px-3 py-1 rounded text-xs font-bold uppercase transition-all flex items-center gap-1.5 font-display ${
+              className={`px-3 py-1 rounded text-xs font-bold uppercase transition-all flex items-center gap-1.5 font-display cursor-pointer ${
                 viewMode === 'subsystems'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm'
-                  : 'text-[#5B6B7A] hover:text-[#17212B]'
+                  ? 'bg-[#0E88D3] text-white shadow-sm'
+                  : 'text-[#64748B] hover:text-[#0F1D2E]'
               }`}
             >
               <span>🛰️</span>
@@ -200,9 +200,9 @@ export default function SubsystemsView({
             </button>
           </div>
 
-          <div className="text-xs text-[#5B6B7A] flex items-center gap-2">
+          <div className="text-xs text-[#64748B] flex items-center gap-2">
             <span>MISSION TOTAL:</span>
-            <span className="text-emerald-400 font-bold">{components.length} COMPONENTS</span>
+            <span className="text-[#168A5B] font-bold">{components.length} COMPONENTS</span>
           </div>
         </div>
       </div>
@@ -218,29 +218,29 @@ export default function SubsystemsView({
             return (
               <div
                 key={lot.lot_id}
-                className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between shadow-md ${
+                className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
                   isReject
-                    ? 'bg-[#FFFFFF] border-rose-500/60 shadow-alert-glow'
+                    ? 'bg-[#FFFFFF] border-rose-300'
                     : isMonitor
-                    ? 'bg-[#FFFFFF] border-amber-500/50'
-                    : 'bg-[#FFFFFF] border-[#D9E2EA] hover:border-amber-500/50'
+                    ? 'bg-[#FFFFFF] border-amber-300'
+                    : 'bg-[#FFFFFF] border-[#D5DEE7] hover:border-[#0E88D3]/50'
                 }`}
               >
                 <div>
                   {/* Header: Lot ID & Status */}
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-amber-400 font-mono font-bold text-xs truncate max-w-[170px]" title={lot.lot_id}>
+                      <span className="text-[#0F1D2E] font-mono font-bold text-xs truncate max-w-[170px]" title={lot.lot_id}>
                         {lot.lot_id}
                       </span>
                     </div>
                     <span
                       className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase whitespace-nowrap ${
                         isReject
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
                           : isMonitor
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                          : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                       }`}
                     >
                       {(lot.status || 'safe').toUpperCase()}
@@ -248,41 +248,41 @@ export default function SubsystemsView({
                   </div>
 
                   {/* Standard info */}
-                  <div className="text-[10px] text-[#5B6B7A] mb-2.5 leading-relaxed font-sans">
+                  <div className="text-[10px] text-[#64748B] mb-2.5 leading-relaxed font-sans">
                     MIL-STD-883 Method 1005 HTOL Burn-in &bull; 125&deg;C / 168h Thermal Stress Lot
                   </div>
 
                   {/* Lot Statistical Specs */}
-                  <div className="space-y-1 text-[10px] bg-[#FFFFFF] p-2 rounded-lg border border-[#D9E2EA]/80 mb-2.5 font-mono">
+                  <div className="space-y-1 text-[10px] bg-[#F8FAFC] p-2 rounded-lg border border-[#D5DEE7] mb-2.5 font-mono">
                     <div className="flex justify-between">
-                      <span className="text-[#5B6B7A] font-sans">Sample Size:</span>
-                      <span className="text-[#17212B] font-bold">{lot.parts.length} components</span>
+                      <span className="text-[#64748B] font-sans">Sample Size:</span>
+                      <span className="text-[#0F1D2E] font-bold">{lot.parts.length} components</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#5B6B7A] font-sans">Lot Baseline &mu;:</span>
-                      <span className="text-amber-300 font-bold">{lot.mean.toFixed(2)} &micro;A</span>
+                      <span className="text-[#64748B] font-sans">Lot Baseline &mu;:</span>
+                      <span className="text-[#0E88D3] font-bold">{lot.mean.toFixed(2)} &micro;A</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#5B6B7A] font-sans">Defect Quarantine:</span>
-                      <span className={`font-bold ${lot.rejects > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      <span className="text-[#64748B] font-sans">Defect Quarantine:</span>
+                      <span className={`font-bold ${lot.rejects > 0 ? 'text-rose-700' : 'text-[#168A5B]'}`}>
                         {lot.rejects} parts ({rejectRate}%)
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#5B6B7A] font-sans">Drift Monitor:</span>
-                      <span className="text-amber-400 font-bold">{lot.monitors} parts</span>
+                      <span className="text-[#64748B] font-sans">Drift Monitor:</span>
+                      <span className="text-amber-800 font-bold">{lot.monitors} parts</span>
                     </div>
                   </div>
 
                   {/* Visual Status Progress Bar */}
                   <div className="mb-3">
-                    <div className="flex justify-between text-[9px] text-[#5B6B7A] font-bold mb-1">
+                    <div className="flex justify-between text-[9px] text-[#64748B] font-bold mb-1">
                       <span>Lot Classification Breakdown</span>
-                      <span className="text-[#5B6B7A] font-mono">
+                      <span className="text-[#64748B] font-mono">
                         {lot.safe} Safe / {lot.monitors} Mon / {lot.rejects} Rej
                       </span>
                     </div>
-                    <div className="h-1.5 w-full rounded-full bg-[#F8FAFC] overflow-hidden flex">
+                    <div className="h-1.5 w-full rounded-full bg-[#E2E8F0] overflow-hidden flex">
                       <div
                         style={{ width: `${(lot.safe / (lot.parts.length || 1)) * 100}%` }}
                         className="bg-emerald-500 h-full"
@@ -303,9 +303,9 @@ export default function SubsystemsView({
 
                   {/* Component Chips list */}
                   <div className="mb-3">
-                    <div className="text-[9px] uppercase tracking-wider text-[#5B6B7A] font-bold mb-1 flex justify-between font-sans">
+                    <div className="text-[9px] uppercase tracking-wider text-[#64748B] font-bold mb-1 flex justify-between font-sans">
                       <span>Parts in Lot:</span>
-                      <span className="text-[#5B6B7A] font-mono text-[9px]">{lot.parts.length} total</span>
+                      <span className="text-[#64748B] font-mono text-[9px]">{lot.parts.length} total</span>
                     </div>
                     <div className="flex flex-wrap gap-1 max-h-[85px] overflow-y-auto pr-1">
                       {lot.parts.slice(0, 16).map((c) => (
@@ -313,12 +313,12 @@ export default function SubsystemsView({
                           key={c.component_id}
                           type="button"
                           onClick={() => onSelectComponent(c.component_id)}
-                          className={`text-[9px] px-1.5 py-0.5 rounded font-mono transition-all border ${
+                          className={`text-[9px] px-1.5 py-0.5 rounded font-mono transition-all border cursor-pointer ${
                             c.status === 'reject'
-                              ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/40 font-bold'
+                              ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 font-bold'
                               : c.status === 'monitor'
-                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/40'
-                              : 'bg-[#FFFFFF] text-[#5B6B7A] border-[#D9E2EA] hover:border-amber-500/60 hover:text-[#17212B]'
+                              ? 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+                              : 'bg-[#FFFFFF] text-[#64748B] border-[#D5DEE7] hover:border-[#0E88D3] hover:text-[#0F1D2E]'
                           }`}
                           title={`Click to inspect component ${c.component_id} [${c.subsystem}]`}
                         >
@@ -326,7 +326,7 @@ export default function SubsystemsView({
                         </button>
                       ))}
                       {lot.parts.length > 16 && (
-                        <span className="text-[8.5px] text-[#81909D] self-center font-mono">
+                        <span className="text-[8.5px] text-[#64748B] self-center font-mono">
                           +{lot.parts.length - 16} more
                         </span>
                       )}
@@ -335,7 +335,7 @@ export default function SubsystemsView({
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="pt-2 border-t border-[#D9E2EA] flex items-center justify-between gap-2">
+                <div className="pt-2 border-t border-[#D5DEE7] flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -345,7 +345,7 @@ export default function SubsystemsView({
                         onFocusSubsystem(firstComp.subsystem)
                       }
                     }}
-                    className="flex-1 hud-glass-interactive border-[#D9E2EA] text-amber-300 hover:border-amber-500/60 text-[10.5px] py-1 px-2 rounded-lg border transition-all font-bold flex items-center justify-center gap-1.5"
+                    className="flex-1 bg-[#F8FAFC] border-[#D5DEE7] text-[#0E88D3] hover:border-[#0E88D3] hover:text-[#0F1D2E] text-[10.5px] py-1 px-2 rounded-lg border transition-all font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>&#9678;</span> INSPECT LOT IN 3D
                   </button>
@@ -374,28 +374,28 @@ export default function SubsystemsView({
             return (
               <div
                 key={sub.key}
-                className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between shadow-md ${
+                className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
                   isReject
-                    ? 'bg-[#FFFFFF] border-rose-500/60 shadow-alert-glow'
+                    ? 'bg-[#FFFFFF] border-rose-300'
                     : isMonitor
-                    ? 'bg-[#FFFFFF] border-amber-500/50'
-                    : 'bg-[#FFFFFF] border-[#D9E2EA] hover:border-amber-500/50'
+                    ? 'bg-[#FFFFFF] border-amber-300'
+                    : 'bg-[#FFFFFF] border-[#D5DEE7] hover:border-[#0E88D3]/50'
                 }`}
               >
                 <div>
                   {/* Header: Key, Name & Status Pill */}
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-amber-400 font-display font-black text-sm">[{sub.key}]</span>
-                      <span className="text-[#17212B] font-bold text-xs">{sub.name}</span>
+                      <span className="text-[#0E88D3] font-display font-black text-sm">[{sub.key}]</span>
+                      <span className="text-[#0F1D2E] font-bold text-xs">{sub.name}</span>
                     </div>
                     <span
                       className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase whitespace-nowrap ${
                         isReject
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
                           : isMonitor
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                          : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                       }`}
                     >
                       {(sub.status || 'safe').toUpperCase()}
@@ -403,42 +403,42 @@ export default function SubsystemsView({
                   </div>
 
                   {/* Subsystem Description */}
-                  <div className="text-[10px] text-[#5B6B7A] mb-2.5 leading-relaxed font-sans">
+                  <div className="text-[10px] text-[#64748B] mb-2.5 leading-relaxed font-sans">
                     {details.description}
                   </div>
 
                   {/* Technical Specs */}
-                  <div className="space-y-1 text-[10px] bg-[#FFFFFF] p-2 rounded-lg border border-[#D9E2EA]/80 mb-2.5 font-mono">
+                  <div className="space-y-1 text-[10px] bg-[#F8FAFC] p-2 rounded-lg border border-[#D5DEE7] mb-2.5 font-mono">
                     <div className="flex justify-between">
-                      <span className="text-[#5B6B7A] font-sans">Redundancy:</span>
-                      <span className="text-[#17212B] font-semibold truncate max-w-[140px]" title={details.redundancy}>
+                      <span className="text-[#64748B] font-sans">Redundancy:</span>
+                      <span className="text-[#0F1D2E] font-semibold truncate max-w-[140px]" title={details.redundancy}>
                         {details.redundancy}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#5B6B7A] font-sans">Power Draw:</span>
-                      <span className="text-emerald-400 font-bold">{details.nominalPower}</span>
+                      <span className="text-[#64748B] font-sans">Power Draw:</span>
+                      <span className="text-[#168A5B] font-bold">{details.nominalPower}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#5B6B7A] font-sans">Operating Temp:</span>
-                      <span className="text-[#17212B]">{details.operatingTemp}</span>
+                      <span className="text-[#64748B] font-sans">Operating Temp:</span>
+                      <span className="text-[#0F1D2E]">{details.operatingTemp}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#5B6B7A] font-sans">Parts Inspected:</span>
-                      <span className="text-[#17212B] font-bold">
-                        {sub.count} parts {flaggedCount > 0 && <span className="text-rose-400 font-black">({flaggedCount} flagged)</span>}
+                      <span className="text-[#64748B] font-sans">Parts Inspected:</span>
+                      <span className="text-[#0F1D2E] font-bold">
+                        {sub.count} parts {flaggedCount > 0 && <span className="text-rose-700 font-bold">({flaggedCount} flagged)</span>}
                       </span>
                     </div>
                   </div>
 
                   {/* Sub-Assemblies List */}
                   <div className="mb-3">
-                    <div className="text-[9px] uppercase tracking-wider text-[#5B6B7A] font-bold mb-1 font-sans">
+                    <div className="text-[9px] uppercase tracking-wider text-[#64748B] font-bold mb-1 font-sans">
                       Key Assemblies:
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {details.subComponents.map((item, idx) => (
-                        <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-[#FFFFFF] text-[#5B6B7A] border border-[#D9E2EA] font-mono">
+                        <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-[#FFFFFF] text-[#64748B] border border-[#D5DEE7] font-mono">
                           {item}
                         </span>
                       ))}
@@ -447,11 +447,11 @@ export default function SubsystemsView({
                 </div>
 
                 {/* Bottom Actions: Focus 3D Model */}
-                <div className="pt-2 border-t border-[#D9E2EA] flex items-center justify-between gap-2">
+                <div className="pt-2 border-t border-[#D5DEE7] flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => onFocusSubsystem(sub.key)}
-                    className="flex-1 hud-glass-interactive border-[#D9E2EA] text-amber-300 hover:border-amber-500/60 text-[10.5px] py-1 px-2 rounded-lg border transition-all font-bold flex items-center justify-center gap-1.5 font-display"
+                    className="flex-1 bg-[#F8FAFC] border-[#D5DEE7] text-[#0E88D3] hover:border-[#0E88D3] hover:text-[#0F1D2E] text-[10.5px] py-1 px-2 rounded-lg border transition-all font-bold flex items-center justify-center gap-1.5 font-display cursor-pointer"
                   >
                     <span>&#9678;</span> FOCUS IN 3D SATELLITE
                   </button>

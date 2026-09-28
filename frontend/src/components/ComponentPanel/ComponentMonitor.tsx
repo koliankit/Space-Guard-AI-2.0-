@@ -5,7 +5,7 @@ const DOT_COLOR: Record<string, string> = {
   safe: 'bg-[#168A5B]',
   monitor: 'bg-[#C58A00]',
   reject: 'bg-[#D9363E]',
-  idle: 'bg-[#718292]',
+  idle: 'bg-[#64748B]',
 }
 
 export default function ComponentMonitor({
@@ -85,21 +85,23 @@ export default function ComponentMonitor({
   }, [components, selectedLot, selectedSubKey])
 
   return (
-    <div className="bg-[#FFFFFF] p-4 sm:p-5 flex flex-col h-full font-sans text-xs sm:text-sm min-h-[620px] select-none">
+    <div className="card-light bg-[#FFFFFF] p-4 sm:p-5 flex flex-col h-full font-sans text-xs sm:text-sm min-h-[620px] select-none border border-[#D5DEE7] rounded-xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-3.5">
-        <h3 className="m-0 text-sm sm:text-base font-bold uppercase tracking-wider text-[#17212B] flex items-center gap-2 font-display">
+        <h3 className="m-0 text-sm sm:text-base font-bold uppercase tracking-wider text-[#0F1D2E] flex items-center gap-2 font-display">
           <span className="w-2.5 h-2.5 rounded-full bg-[#0E88D3]" />
           Component Intelligence
         </h3>
-        <span className="text-xs font-mono text-[#4F6170] bg-[#F8FAFC] px-2.5 py-1 rounded-md border border-[#D5DEE7] font-semibold">ISRO-INSTR-01</span>
+        <span className="text-xs font-mono text-[#64748B] bg-[#F8FAFC] px-2.5 py-1 rounded-md border border-[#D5DEE7] font-semibold">
+          ISRO-INSTR-01
+        </span>
       </div>
 
       {/* Clean Search Input */}
       <div className="relative mb-3.5">
-        <span className="absolute left-3.5 top-3 text-[#718292] text-sm">🔍</span>
+        <span className="absolute left-3.5 top-3 text-[#64748B] text-sm">🔍</span>
         <input
-          className="w-full pl-9 pr-3.5 py-2.5 bg-[#F8FAFC] border border-[#D5DEE7] rounded-xl text-[#17212B] font-mono text-xs sm:text-sm focus:border-[#0E88D3] focus:bg-[#FFFFFF] outline-none transition-all placeholder:text-[#718292]"
+          className="w-full pl-9 pr-3.5 py-2 bg-[#F8FAFC] border border-[#D5DEE7] rounded-xl text-[#0F1D2E] font-mono text-xs sm:text-sm focus:border-[#0E88D3] focus:bg-[#FFFFFF] outline-none transition-colors placeholder:text-[#64748B]"
           placeholder="Search Component ID or Lot..."
           onChange={(e) => onSearch(e.target.value)}
         />
@@ -109,21 +111,14 @@ export default function ComponentMonitor({
       <div className="flex gap-2 mb-3.5">
         {['ALL', 'SAFE', 'MONITOR', 'REJECT'].map((f) => {
           const isActive = filter === f
-          const activeClass =
-            f === 'SAFE'
-              ? 'border-[#168A5B] bg-[#168A5B] text-white font-bold shadow-sm'
-              : f === 'REJECT'
-              ? 'border-[#D9363E] bg-[#D9363E] text-white font-bold shadow-sm'
-              : f === 'MONITOR'
-              ? 'border-[#C58A00] bg-[#C58A00] text-white font-bold shadow-sm'
-              : 'border-[#0E88D3] bg-[#0E88D3] text-white font-bold shadow-sm'
-
           return (
             <button
               key={f}
               type="button"
-              className={`flex-1 py-2 px-2 text-xs font-bold uppercase rounded-lg border transition-all cursor-pointer ${
-                isActive ? activeClass : 'border-[#D5DEE7] bg-[#F8FAFC] text-[#4F6170] hover:text-[#17212B] hover:border-[#0E88D3]'
+              className={`flex-1 py-1.5 px-2 text-xs font-bold uppercase rounded-lg border transition-colors cursor-pointer ${
+                isActive
+                  ? 'border-[#0E88D3] bg-[#0E88D3] text-white'
+                  : 'border-[#D5DEE7] bg-[#F8FAFC] text-[#64748B] hover:text-[#0F1D2E] hover:border-[#0E88D3]/50'
               }`}
               onClick={() => {
                 setFilter(f)
@@ -137,17 +132,17 @@ export default function ComponentMonitor({
       </div>
 
       {/* Classification Mode Switcher: LOTS vs SUBSYSTEMS */}
-      <div className="flex items-center justify-between gap-2 mb-3 p-1.5 bg-[#F4F7FA] border border-[#D5DEE7] rounded-xl">
+      <div className="flex items-center justify-between gap-2 mb-3 p-1 bg-[#F8FAFC] border border-[#D5DEE7] rounded-xl">
         <button
           type="button"
           onClick={() => {
             setClassificationMode('lots')
             setSelectedSubKey(null)
           }}
-          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 font-display cursor-pointer ${
+          className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold uppercase transition-colors flex items-center justify-center gap-1.5 font-display cursor-pointer ${
             classificationMode === 'lots'
-              ? 'bg-[#0E88D3] text-white shadow-sm'
-              : 'text-[#4F6170] hover:text-[#17212B]'
+              ? 'bg-[#0E88D3] text-white'
+              : 'text-[#64748B] hover:text-[#0F1D2E]'
           }`}
         >
           <span>📦</span>
@@ -159,10 +154,10 @@ export default function ComponentMonitor({
             setClassificationMode('subsystems')
             setSelectedLot(null)
           }}
-          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 font-display cursor-pointer ${
+          className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold uppercase transition-colors flex items-center justify-center gap-1.5 font-display cursor-pointer ${
             classificationMode === 'subsystems'
-              ? 'bg-[#0E88D3] text-white shadow-sm'
-              : 'text-[#4F6170] hover:text-[#17212B]'
+              ? 'bg-[#0E88D3] text-white'
+              : 'text-[#64748B] hover:text-[#0F1D2E]'
           }`}
         >
           <span>🛰️</span>
@@ -171,21 +166,21 @@ export default function ComponentMonitor({
       </div>
 
       {/* Classification Header Label */}
-      <div className="text-xs uppercase font-bold text-[#4F6170] tracking-wider mb-2 flex justify-between items-center">
+      <div className="text-xs uppercase font-bold text-[#64748B] tracking-wider mb-2 flex justify-between items-center">
         <span>
           {classificationMode === 'lots' ? 'Select Flight Lot' : 'Subsystems'}
         </span>
-        <span className="text-xs font-mono text-[#718292]">
+        <span className="text-xs font-mono text-[#64748B]">
           {classificationMode === 'lots' ? 'Lot-Wise Split' : 'Count'}
         </span>
       </div>
 
-      {/* Dynamic Classification List: Lots or Subsystems (Generous Height Box) */}
+      {/* Dynamic Classification List: Lots or Subsystems */}
       <div className="max-h-[380px] min-h-[160px] overflow-y-auto space-y-2 pr-1 mb-4">
         {classificationMode === 'lots' && (
           <>
             {lotGroups.length === 0 && (
-              <div className="text-[#718292] text-xs py-4 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
+              <div className="text-[#64748B] text-xs py-4 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
                 No lots registered
               </div>
             )}
@@ -194,14 +189,14 @@ export default function ComponentMonitor({
               return (
                 <div
                   key={lot.lot_id}
-                  className={`flex items-center justify-between py-3 px-4 rounded-xl cursor-pointer text-xs sm:text-sm transition-all border shadow-sm ${
+                  className={`flex items-center justify-between py-2.5 px-3.5 rounded-xl cursor-pointer text-xs sm:text-sm transition-colors border ${
                     isSelected
-                      ? 'border-[#0E88D3] bg-[#0E88D3]/10 text-[#17212B] font-bold ring-1 ring-[#0E88D3]'
+                      ? 'border-[#0E88D3] ring-1 ring-[#0E88D3] bg-[#FFFFFF] text-[#0F1D2E] font-bold'
                       : lot.rejectCount > 0
-                      ? 'border-[#D9363E]/40 bg-[#FFFFFF] hover:bg-[#FEF2F2]/60 text-[#17212B]'
+                      ? 'border-[#D9363E]/40 hover:border-[#D9363E] bg-[#FFFFFF] text-[#0F1D2E]'
                       : lot.monitorCount > 0
-                      ? 'border-[#C58A00]/40 bg-[#FFFFFF] hover:bg-[#FFFBEB]/60 text-[#17212B]'
-                      : 'border-[#D5DEE7] bg-[#FFFFFF] hover:bg-[#F8FAFC] hover:border-[#0E88D3]/50 text-[#17212B]'
+                      ? 'border-[#C58A00]/40 hover:border-[#C58A00] bg-[#FFFFFF] text-[#0F1D2E]'
+                      : 'border-[#D5DEE7] hover:border-[#0E88D3]/50 bg-[#FFFFFF] text-[#0F1D2E]'
                   }`}
                   onClick={() => {
                     if (selectedLot === lot.lot_id) {
@@ -212,27 +207,27 @@ export default function ComponentMonitor({
                   }}
                   title={`Click to inspect components in ${lot.lot_id}`}
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className={`w-3 h-3 rounded-full flex-shrink-0 ${DOT_COLOR[lot.status] ?? DOT_COLOR.idle}`} />
-                    <span className="font-mono text-xs sm:text-sm font-bold text-[#17212B] tracking-wide truncate">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${DOT_COLOR[lot.status] ?? DOT_COLOR.idle}`} />
+                    <span className="font-mono text-xs sm:text-sm font-bold text-[#0F1D2E] tracking-wide truncate">
                       {lot.lot_id}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {lot.rejectCount > 0 ? (
-                      <span className="font-mono text-[11px] bg-[#FEF2F2] text-[#D9363E] border border-[#D9363E]/50 px-2.5 py-1 rounded-md font-bold">
+                      <span className="font-mono text-[11px] bg-[#FEF2F2] text-[#D9363E] border border-[#D9363E]/30 px-2 py-0.5 rounded-md font-bold">
                         {lot.rejectCount} REJ
                       </span>
                     ) : lot.monitorCount > 0 ? (
-                      <span className="font-mono text-[11px] bg-[#FFFBEB] text-[#C58A00] border border-[#C58A00]/50 px-2.5 py-1 rounded-md font-bold">
+                      <span className="font-mono text-[11px] bg-[#FFFBEB] text-[#C58A00] border border-[#C58A00]/30 px-2 py-0.5 rounded-md font-bold">
                         {lot.monitorCount} MON
                       </span>
                     ) : (
-                      <span className="font-mono text-[11px] bg-[#F0FDF4] text-[#168A5B] border border-[#168A5B]/40 px-2.5 py-1 rounded-md font-bold">
+                      <span className="font-mono text-[11px] bg-[#F0FDF4] text-[#168A5B] border border-[#168A5B]/30 px-2 py-0.5 rounded-md font-bold">
                         NOM
                       </span>
                     )}
-                    <span className="font-mono text-[#4F6170] text-xs bg-[#F8FAFC] border border-[#D5DEE7] px-2.5 py-1 rounded-md font-semibold">
+                    <span className="font-mono text-[#64748B] text-xs bg-[#F8FAFC] border border-[#D5DEE7] px-2 py-0.5 rounded-md font-semibold">
                       {lot.count} pts
                     </span>
                   </div>
@@ -249,10 +244,10 @@ export default function ComponentMonitor({
               return (
                 <div
                   key={s.key}
-                  className={`flex items-center gap-2.5 py-2.5 px-3 rounded-xl cursor-pointer text-xs transition-all border ${
+                  className={`flex items-center gap-2.5 py-2.5 px-3 rounded-xl cursor-pointer text-xs transition-colors border ${
                     isSelected
-                      ? 'border-[#0E88D3] bg-[#0E88D3]/10 text-[#17212B] font-semibold ring-1 ring-[#0E88D3]'
-                      : 'border-[#D5DEE7] bg-[#FFFFFF] hover:bg-[#F8FAFC] hover:border-[#0E88D3]/50 text-[#17212B]'
+                      ? 'border-[#0E88D3] ring-1 ring-[#0E88D3] bg-[#FFFFFF] text-[#0F1D2E] font-semibold'
+                      : 'border-[#D5DEE7] hover:border-[#0E88D3]/50 bg-[#FFFFFF] text-[#0F1D2E]'
                   }`}
                   onClick={() => {
                     const next = selectedSubKey === s.key ? null : s.key
@@ -262,8 +257,8 @@ export default function ComponentMonitor({
                 >
                   <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${DOT_COLOR[s.status] ?? DOT_COLOR.idle}`} />
                   <span className="font-mono font-bold text-[#0E88D3] text-xs w-10">[{s.key}]</span>
-                  <span className="flex-1 text-[#17212B] truncate font-medium text-xs">{s.name}</span>
-                  <span className="font-mono text-[#4F6170] text-xs bg-[#F8FAFC] border border-[#D5DEE7] px-2 py-0.5 rounded font-semibold">{s.count}</span>
+                  <span className="flex-1 text-[#0F1D2E] truncate font-medium text-xs">{s.name}</span>
+                  <span className="font-mono text-[#64748B] text-xs bg-[#F8FAFC] border border-[#D5DEE7] px-2 py-0.5 rounded font-semibold">{s.count}</span>
                 </div>
               )
             })}
@@ -277,11 +272,11 @@ export default function ComponentMonitor({
           <span className="text-[#0E88D3] font-mono truncate">
             {selectedLot ? (
               <>
-                Filtered Lot: <b className="text-[#17212B]">{selectedLot}</b> ({displayedComponents.length} components)
+                Filtered Lot: <b className="text-[#0F1D2E]">{selectedLot}</b> ({displayedComponents.length} components)
               </>
             ) : (
               <>
-                Subsystem: <b className="text-[#17212B]">[{selectedSubKey}]</b> ({displayedComponents.length} components)
+                Subsystem: <b className="text-[#0F1D2E]">[{selectedSubKey}]</b> ({displayedComponents.length} components)
               </>
             )}
           </span>
@@ -291,16 +286,16 @@ export default function ComponentMonitor({
               setSelectedLot(null)
               setSelectedSubKey(null)
             }}
-            className="text-[#4F6170] hover:text-[#17212B] px-2 py-0.5 rounded-md text-xs bg-[#FFFFFF] border border-[#D5DEE7] hover:bg-[#F8FAFC] transition-colors ml-2 font-bold cursor-pointer"
+            className="text-[#64748B] hover:text-[#0F1D2E] px-2 py-0.5 rounded-md text-xs bg-[#FFFFFF] border border-[#D5DEE7] hover:border-[#0E88D3]/40 transition-colors ml-2 font-bold cursor-pointer"
           >
             Clear
           </button>
         </div>
       )}
 
-      {/* Flagged / Lot-Wise Components Feed (Generously Sized) */}
+      {/* Flagged / Lot-Wise Components Feed */}
       <div className="pt-3.5 border-t border-[#D5DEE7] flex-1 flex flex-col min-h-[280px]">
-        <div className="flex items-center justify-between text-xs uppercase font-bold text-[#4F6170] tracking-wider mb-2.5">
+        <div className="flex items-center justify-between text-xs uppercase font-bold text-[#64748B] tracking-wider mb-2.5">
           <span>{selectedLot ? 'Lot Components' : 'Component Feed'}</span>
           <span className="font-mono text-[#168A5B] font-bold text-xs bg-[#F0FDF4] px-2.5 py-1 rounded-md border border-[#168A5B]/30">
             {displayedComponents.length} parts
@@ -308,12 +303,12 @@ export default function ComponentMonitor({
         </div>
         <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[220px]">
           {!analysisRun && (
-            <div className="text-[#718292] text-xs sm:text-sm px-3 py-6 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
+            <div className="text-[#64748B] text-xs sm:text-sm px-3 py-6 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
               Awaiting AI Screening execution
             </div>
           )}
           {analysisRun && displayedComponents.length === 0 && (
-            <div className="text-[#718292] text-xs sm:text-sm px-3 py-6 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
+            <div className="text-[#64748B] text-xs sm:text-sm px-3 py-6 text-center bg-[#F8FAFC] rounded-xl border border-[#D5DEE7]">
               No matching components in this selection
             </div>
           )}
@@ -321,14 +316,14 @@ export default function ComponentMonitor({
             displayedComponents.map((c) => (
               <div
                 key={c.component_id}
-                className={`flex justify-between items-center py-3 px-3.5 rounded-xl cursor-pointer text-xs sm:text-sm transition-all border shadow-sm ${
+                className={`flex justify-between items-center py-2.5 px-3.5 rounded-xl cursor-pointer text-xs sm:text-sm transition-colors border ${
                   selectedId === c.component_id
-                    ? 'border-[#0E88D3] bg-[#0E88D3]/10 text-[#17212B] font-bold ring-1 ring-[#0E88D3]'
+                    ? 'border-[#0E88D3] ring-1 ring-[#0E88D3] bg-[#FFFFFF] text-[#0F1D2E] font-bold'
                     : c.status === 'reject'
-                    ? 'border-[#D9363E]/30 bg-[#FFFFFF] hover:border-[#D9363E] hover:bg-[#FEF2F2]/50 text-[#17212B]'
+                    ? 'border-[#D9363E]/30 hover:border-[#D9363E] bg-[#FFFFFF] text-[#0F1D2E]'
                     : c.status === 'monitor'
-                    ? 'border-[#C58A00]/30 bg-[#FFFFFF] hover:border-[#C58A00] hover:bg-[#FFFBEB]/50 text-[#17212B]'
-                    : 'border-[#D5DEE7] bg-[#FFFFFF] hover:border-[#0E88D3]/50 hover:bg-[#F8FAFC] text-[#17212B]'
+                    ? 'border-[#C58A00]/30 hover:border-[#C58A00] bg-[#FFFFFF] text-[#0F1D2E]'
+                    : 'border-[#D5DEE7] hover:border-[#0E88D3]/50 bg-[#FFFFFF] text-[#0F1D2E]'
                 }`}
                 onClick={() => onSelectComponent(c.component_id)}
               >
@@ -343,14 +338,14 @@ export default function ComponentMonitor({
                     }`}
                   />
                   <div>
-                    <span className="font-mono text-[#17212B] text-xs sm:text-sm font-bold block">{c.component_id}</span>
-                    <span className="text-xs font-mono text-[#4F6170] block truncate max-w-[170px]">
+                    <span className="font-mono text-[#0F1D2E] text-xs sm:text-sm font-bold block">{c.component_id}</span>
+                    <span className="text-xs font-mono text-[#64748B] block truncate max-w-[170px]">
                       {c.lot_id}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#0E88D3] font-mono font-bold bg-[#0E88D3]/10 px-2 py-0.5 rounded-md border border-[#0E88D3]/25">
+                  <span className="text-xs text-[#0E88D3] font-mono font-bold bg-[#F0F7FD] px-2 py-0.5 rounded-md border border-[#0E88D3]/25">
                     [{c.subsystem}]
                   </span>
                   <span
@@ -359,7 +354,7 @@ export default function ComponentMonitor({
                         ? 'text-[#168A5B] bg-[#F0FDF4] border border-[#168A5B]/30'
                         : c.status === 'monitor'
                         ? 'text-[#C58A00] bg-[#FFFBEB] border border-[#C58A00]/30'
-                        : 'text-[#D9363E] bg-[#FEF2F2] border border-[#D9363E]/40'
+                        : 'text-[#D9363E] bg-[#FEF2F2] border border-[#D9363E]/30'
                     }`}
                   >
                     {c.risk_score}

@@ -222,12 +222,12 @@ export default function LotClassificationModal({
       {/* Modal Container: Enlarged to utilize the full viewport */}
       <div className="bg-[#FFFFFF] border border-amber-500/50 rounded-xl w-[98vw] max-w-[1900px] h-[96vh] max-h-[96vh] flex flex-col shadow-2xl overflow-hidden reticle-corner">
         {/* Top Header Bar */}
-        <div className="px-6 py-3.5 border-b border-[#D9E2EA] bg-[#F8FAFC] flex items-center justify-between gap-4">
+        <div className="px-6 py-3.5 border-b border-[#D5DEE7] bg-[#F8FAFC] flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="w-3 h-3 rounded-full bg-isro-amber led shadow-sm" />
+            <span className="w-3 h-3 rounded-full bg-amber-500 shadow-sm" />
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="m-0 text-base md:text-lg font-bold text-[#17212B] tracking-wide uppercase font-mono flex items-center gap-2">
+                <h2 className="m-0 text-base md:text-lg font-bold text-[#0F1D2E] tracking-wide uppercase font-mono flex items-center gap-2">
                   <span>📦 FLIGHT QUALIFICATION LOTS CLASSIFICATION</span>
                 </h2>
                 <span className="text-xs font-mono px-2.5 py-0.5 rounded bg-isro-amber/20 text-isro-amber border border-isro-amber/40 font-bold">
@@ -424,10 +424,10 @@ export default function LotClassificationModal({
                           <div className="flex items-center gap-2 min-w-0">
                             <span
                               className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                                isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400 led' : 'bg-emerald-400'
+                                isRej ? 'bg-rose-500' : isMon ? 'bg-amber-400' : 'bg-emerald-400'
                               }`}
                             />
-                            <span className="font-mono font-bold text-sm text-[#17212B] truncate">
+                            <span className="font-mono font-bold text-sm text-[#0F1D2E] truncate">
                               {lot.lot_id}
                             </span>
                           </div>
@@ -662,10 +662,10 @@ export default function LotClassificationModal({
                                 isRej ? 'bg-rose-950/20' : isMon ? 'bg-amber-950/15' : ''
                               }`}
                             >
-                              <td className="py-2.5 px-4 font-bold text-[#17212B] flex items-center gap-2">
+                              <td className="py-2.5 px-4 font-bold text-[#0F1D2E] flex items-center gap-2">
                                 <span
                                   className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                                    isRej ? 'bg-rose-500 led' : isMon ? 'bg-amber-400 led' : 'bg-emerald-400'
+                                    isRej ? 'bg-rose-500' : isMon ? 'bg-amber-400' : 'bg-emerald-400'
                                   }`}
                                 />
                                 <span className="hover:text-amber-300 transition-colors font-bold">

@@ -87,17 +87,17 @@ export default function DataIngestModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in font-sans">
-      <div className="relative w-full max-w-2xl bg-[#F8FAFC] border border-[#D9E2EA] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
+      <div className="relative w-full max-w-2xl bg-[#F8FAFC] border border-[#D5DEE7] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#D9E2EA] bg-[#FFFFFF]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#D5DEE7] bg-[#FFFFFF]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-white" />
-              <h2 className="text-sm font-bold text-[#17212B] tracking-wide uppercase">
+              <span className="w-2 h-2 rounded-full bg-[#0E88D3]" />
+              <h2 className="text-sm font-bold text-[#0F1D2E] tracking-wide uppercase">
                 Data Ingestion &bull; SpaceGuard AI
               </h2>
             </div>
-            <p className="text-xs text-[#5B6B7A] mt-0.5">
+            <p className="text-xs text-[#64748B] mt-0.5">
               Satish Dhawan Space Centre SHAR &bull; Telemetry Ingestion Engine
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function DataIngestModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC] transition-colors text-sm"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#0F1D2E] hover:bg-[#F8FAFC] transition-colors text-sm cursor-pointer"
             title="Close"
           >
             ✕
@@ -113,14 +113,14 @@ export default function DataIngestModal({
         </div>
 
         {/* Method Switcher Tabs */}
-        <div className="grid grid-cols-3 bg-[#FFFFFF] border-b border-[#D9E2EA] p-1 text-xs font-mono">
+        <div className="grid grid-cols-3 bg-[#FFFFFF] border-b border-[#D5DEE7] p-1 text-xs font-mono">
           <button
             type="button"
             onClick={() => setActiveTab('upload')}
-            className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'upload'
-                ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
+                ? 'bg-[#0E88D3]/10 text-[#0E88D3] font-bold border border-[#0E88D3]/30'
+                : 'text-[#64748B] hover:text-[#0F1D2E] hover:bg-[#F8FAFC]'
             }`}
           >
             <span>📁</span>
@@ -129,10 +129,10 @@ export default function DataIngestModal({
           <button
             type="button"
             onClick={() => setActiveTab('paste')}
-            className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'paste'
-                ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
+                ? 'bg-[#0E88D3]/10 text-[#0E88D3] font-bold border border-[#0E88D3]/30'
+                : 'text-[#64748B] hover:text-[#0F1D2E] hover:bg-[#F8FAFC]'
             }`}
           >
             <span>📋</span>
@@ -141,10 +141,10 @@ export default function DataIngestModal({
           <button
             type="button"
             onClick={() => setActiveTab('preset')}
-            className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 px-3 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'preset'
-                ? 'bg-white text-slate-900 font-bold shadow-sm'
-                : 'text-[#5B6B7A] hover:text-[#17212B] hover:bg-[#F8FAFC]'
+                ? 'bg-[#0E88D3]/10 text-[#0E88D3] font-bold border border-[#0E88D3]/30'
+                : 'text-[#64748B] hover:text-[#0F1D2E] hover:bg-[#F8FAFC]'
             }`}
           >
             <span>🚀</span>
@@ -165,18 +165,18 @@ export default function DataIngestModal({
                 onClick={() => fileInputRef.current?.click()}
                 className={`p-8 rounded-xl border-2 border-dashed text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 ${
                   dragActive
-                    ? 'border-white bg-white/10'
-                    : 'border-[#D9E2EA] bg-[#FFFFFF] hover:border-slate-500 hover:bg-[#FFFFFF]'
+                    ? 'border-[#0E88D3] bg-[#0E88D3]/10'
+                    : 'border-[#D5DEE7] bg-[#FFFFFF] hover:border-[#0E88D3]/60 hover:bg-[#FFFFFF]'
                 }`}
               >
-                <div className="w-12 h-12 rounded-full bg-[#F8FAFC] flex items-center justify-center text-[#17212B] text-2xl">
+                <div className="w-12 h-12 rounded-full bg-[#F8FAFC] flex items-center justify-center text-[#0F1D2E] text-2xl">
                   📄
                 </div>
-                <div className="text-sm font-medium text-[#17212B]">
+                <div className="text-sm font-medium text-[#0F1D2E]">
                   Drag and drop your telemetry CSV here
                 </div>
-                <div className="text-xs text-[#5B6B7A]">
-                  or <span className="text-[#17212B] font-semibold underline">browse file from device</span>
+                <div className="text-xs text-[#64748B]">
+                  or <span className="text-[#0E88D3] font-semibold underline">browse file from device</span>
                 </div>
 
                 <input
@@ -187,8 +187,8 @@ export default function DataIngestModal({
                   className="hidden"
                 />
 
-                <div className="text-[11px] text-[#5B6B7A] mt-2">
-                  Required columns: <code className="text-[#5B6B7A] font-mono">component_id, lot_id, 0h, 24h, 168h</code>
+                <div className="text-[11px] text-[#64748B] mt-2">
+                  Required columns: <code className="text-[#64748B] font-mono">component_id, lot_id, 0h, 24h, 168h</code>
                 </div>
               </div>
             </div>
@@ -198,11 +198,11 @@ export default function DataIngestModal({
           {activeTab === 'paste' && (
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-[#5B6B7A] font-semibold">Paste raw CSV / TSV text below:</span>
+                <span className="text-[#64748B] font-semibold">Paste raw CSV / TSV text below:</span>
                 <button
                   type="button"
                   onClick={() => setPastedText(SAMPLE_CSV)}
-                  className="text-[#17212B] hover:text-[#17212B] underline text-[11px] font-mono"
+                  className="text-[#0E88D3] hover:text-[#0A6CA8] underline text-[11px] font-mono cursor-pointer"
                 >
                   [+] Insert Sample Dataset
                 </button>
@@ -213,14 +213,14 @@ export default function DataIngestModal({
                 onChange={(e) => setPastedText(e.target.value)}
                 placeholder="component_id,lot_id,subsystem,0h,24h,96h,168h,static_limit_ua&#10;FC-ASIC-088,LOT-01,FC,12.4,14.8,22.1,38.9,50.0&#10;..."
                 rows={10}
-                className="w-full bg-[#F4F7FA] border border-[#D9E2EA] rounded-xl p-3 text-xs font-mono text-[#17212B] placeholder:text-slate-600 focus:outline-none focus:border-white leading-relaxed"
+                className="w-full bg-[#FFFFFF] border border-[#D5DEE7] rounded-xl p-3 text-xs font-mono text-[#0F1D2E] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0E88D3] leading-relaxed"
               />
 
               <button
                 type="button"
                 disabled={!pastedText.trim()}
                 onClick={handlePastedSubmit}
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-[#17212B] font-bold text-xs uppercase transition-colors flex items-center justify-center gap-2 shadow-sm"
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs uppercase transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer"
               >
                 <span>⚡ Parse &amp; Ingest Pasted Telemetry</span>
               </button>
@@ -241,20 +241,20 @@ export default function DataIngestModal({
                         sounds.playClick()
                         setSelectedPreset(m.id)
                       }}
-                      className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1 ${
+                      className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1 cursor-pointer ${
                         isSelected
-                          ? 'bg-white/10 border-white text-[#17212B] shadow-sm ring-1 ring-white/30'
-                          : 'bg-[#FFFFFF] border-[#D9E2EA] text-[#5B6B7A] hover:border-[#D9E2EA] hover:bg-[#FFFFFF]'
+                          ? 'bg-[#FFFFFF] border-[#0E88D3] ring-1 ring-[#0E88D3] text-[#0F1D2E]'
+                          : 'bg-[#FFFFFF] border-[#D5DEE7] text-[#64748B] hover:border-[#0E88D3]/40'
                       }`}
                     >
-                      <div className="flex items-center gap-1.5 font-semibold text-xs text-[#17212B]">
+                      <div className="flex items-center gap-1.5 font-semibold text-xs text-[#0F1D2E]">
                         <span>{m.icon}</span>
                         <span>{m.name}</span>
                       </div>
-                      <div className="text-[10px] text-[#5B6B7A] truncate">
+                      <div className="text-[10px] text-[#64748B] truncate">
                         {m.description}
                       </div>
-                      <div className="text-[9px] text-[#5B6B7A] font-mono">
+                      <div className="text-[9px] text-[#64748B] font-mono">
                         {m.targetOrbit} &bull; {m.centre}
                       </div>
                     </button>
@@ -265,7 +265,7 @@ export default function DataIngestModal({
               <button
                 type="button"
                 onClick={handleLoadMission}
-                className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm mt-1"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#0E88D3] hover:bg-[#0A6CA8] text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm mt-1 cursor-pointer"
               >
                 <span>Load {currentMission.name} Telemetry Dataset &rarr;</span>
               </button>
@@ -274,12 +274,12 @@ export default function DataIngestModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-[#D9E2EA] bg-[#FFFFFF] flex items-center justify-between text-xs text-[#5B6B7A]">
+        <div className="px-6 py-3 border-t border-[#D5DEE7] bg-[#FFFFFF] flex items-center justify-between text-xs text-[#64748B]">
           <span>MIL-STD-883 Method 1005 Compliant</span>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#5B6B7A] hover:text-[#17212B] underline text-xs"
+            className="text-[#64748B] hover:text-[#0F1D2E] underline text-xs cursor-pointer"
           >
             Close
           </button>

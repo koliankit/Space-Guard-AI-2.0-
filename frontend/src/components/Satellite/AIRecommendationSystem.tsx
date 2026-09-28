@@ -603,13 +603,13 @@ export default function AIRecommendationSystem({
       )}
 
       {/* ================= INTERACTIVE ACTION EXECUTION BAR ================= */}
-      <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#D9E2EA] flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-xs md:text-sm text-[#17212B]">
+      <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#D5DEE7] flex flex-col gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs md:text-sm text-[#0F1D2E]">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 led" />
-            <span className="text-[#17212B] font-bold">Prescriptive Autonomous Execution:</span>
+            <span className="w-2 h-2 rounded-full bg-amber-500" />
+            <span className="text-[#0F1D2E] font-bold">Prescriptive Autonomous Execution:</span>
           </div>
-          <span className="text-[#5B6B7A] text-xs font-mono">ISRO Quality Protocol L-3</span>
+          <span className="text-[#64748B] text-xs font-mono">ISRO Quality Protocol L-3</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full font-mono text-xs">

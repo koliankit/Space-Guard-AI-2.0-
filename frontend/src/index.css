@@ -3,129 +3,66 @@
 @tailwind utilities;
 
 :root {
-  /* ASTRA VIGIL — LIGHT DARK BLUE (AEROSPACE TWILIGHT SLATE NAVY) */
-  --bg-main: #0E1D30;
-  --bg-secondary: #12243D;
-  --bg-panel: #162C47;
-  --bg-elevated: #1C375C;
-  --border: #234670;
-  --border-subtle: #1B385A;
-  --hover: #22436D;
+  /* ==============================================================================
+     SPACEGUARD AI — AEROSPACE TECHNICAL DESIGN SYSTEM
+     ============================================================================== */
+  /* Primary Canvas Background: Dark Navy */
+  --bg-primary: #0E1D30;
+  --bg-canvas: #0B1523;
+  --bg-secondary: #FFFFFF;
 
-  --text-primary: #F8FAFC;
-  --text-secondary: #CBD5E1;
-  --text-muted: #8CA1B7;
-  --text-heading: #FFFFFF;
-  --text-label: #94A3B8;
-  --text-table: #E2E8F0;
+  /* Dark Box Tokens */
+  --dark-box-bg: #122238;
+  --dark-box-subtle: #0E1A2B;
+  --dark-box-border: #1E385B;
+  --dark-heading: #FFFFFF;
+  --dark-body: #F1F5F9;
+  --dark-secondary: #94A3B8;
+  --dark-icon: #38BDF8;
 
-  --primary-blue: #0EA5E9;
-  --primary-dark-blue: #0284C7;
-  --primary-orange: #F97316;
+  /* Light Box Tokens */
+  --light-box-bg: #FFFFFF;
+  --light-box-subtle: #F8FAFC;
+  --light-box-border: #D5DEE7;
+  --light-heading: #0F1D2E;
+  --light-body: #1E293B;
+  --light-secondary: #64748B;
+  --light-icon: #0E88D3;
 
-  --status-safe: #10B981;
-  --status-monitor: #F59E0B;
-  --status-critical: #EF4444;
-
-  --space-blue-glow: rgba(56, 189, 248, 0.18);
-  --telemetry-line: rgba(56, 189, 248, 0.22);
-  --telemetry-dot: rgba(56, 189, 248, 0.65);
-  --card-shadow: 0 4px 20px rgba(5, 14, 25, 0.40);
+  /* Status Colors */
+  --status-safe: #168A5B;
+  --status-monitor: #C58A00;
+  --status-reject: #D9363E;
+  --status-accent: #0EA5E9;
 
   /* Legacy variable mappings for backward compatibility */
+  --bg-main: #0E1D30;
+  --bg-panel: #122238;
+  --border: #1E385B;
   --color-bg: #0E1D30;
-  --color-bg2: #12243D;
-  --color-panel: #162C47;
-  --color-panel2: #1C375C;
-  --color-border: #234670;
-  --color-line: #234670;
-
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #CBD5E1;
-  --color-text-muted: #8CA1B7;
-
-  --color-isro-blue: #0EA5E9;
-  --color-isro-orange: #F97316;
-
-  --color-status-safe: #10B981;
-  --color-status-monitor: #F59E0B;
-  --color-status-reject: #EF4444;
-
-  /* TECHNICAL VISUALIZATION THEME */
-  --tech-bg: #0E1D30;
-  --tech-panel: #12243D;
-  --tech-card: #162C47;
-  --tech-border: #234670;
-  --tech-border-subtle: #1B385A;
-  --tech-text-primary: #F8FAFC;
-  --tech-text-secondary: #CBD5E1;
-  --tech-text-muted: #8CA1B7;
-  --tech-blue: #0EA5E9;
-  --tech-orange: #F97316;
-}
-
-.tech-instrument-panel {
-  background-color: #07111C;
-  border-color: #1D3A52;
-  color: #F1F5F9;
-}
-
-@font-face {
-  font-family: 'Sitka Small Semibold';
-  src: local('Sitka Small Semibold'), local('Sitka Small-Semibold'), local('Sitka Small'), local('SitkaVF');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Sitka Small';
-  src: local('Sitka Small Semibold'), local('Sitka Small-Semibold'), local('Sitka Small'), local('SitkaVF');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-*,
-*::before,
-*::after,
-html,
-body,
-#root,
-button,
-input,
-optgroup,
-select,
-textarea,
-pre,
-code,
-kbd,
-samp,
-svg,
-svg text {
-  font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
+  --color-panel: #122238;
+  --color-border: #1E385B;
+  --color-status-safe: #168A5B;
+  --color-status-monitor: #C58A00;
+  --color-status-reject: #D9363E;
 }
 
 html, body, #root {
   height: 100%;
   margin: 0;
-}
-
-body {
-  background: #0E1D30;
-  color: #F8FAFC;
-  font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
-  font-weight: 600;
-  font-variation-settings: 'opsz' 14, 'wght' 600;
+  background-color: #0E1D30;
+  color: #F1F5F9;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Precision Tabular Numbers for Telemetry & Measurement Data */
+/* Tabular Numbers for Telemetry & Numerical Data */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Calm, Precision Aerospace Scrollbars */
+/* Clean, Minimal Aerospace Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -133,283 +70,263 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #234670;
   border-radius: 3px;
-  border: 1px solid #162C47;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #38BDF8;
 }
 ::-webkit-scrollbar-track {
-  background: #0E1D30;
+  background: transparent;
 }
 
 /* ==============================================================================
-   Calm Aerospace Motion & Telemetry Animations (No Jarring Flashing)
+   REUSABLE CARD & BOX STYLING SYSTEM
    ============================================================================== */
 
-/* 1. Ambient grid movement */
-@keyframes grid-drift {
-  0% { background-position: 0 0; }
-  100% { background-position: 32px 32px; }
+/* ------------------------------------------------------------------------------
+   1. DARK BOX
+   - Background: dark navy / charcoal
+   - Heading: white
+   - Body text: white or very light gray
+   - Secondary text: light gray
+   - Icons: white or subtle cyan
+   - Border: subtle dark navy border
+   ------------------------------------------------------------------------------ */
+.box-dark,
+.card-dark {
+  background-color: #122238;
+  border: 1px solid #1E385B;
+  color: #F1F5F9;
+  border-radius: 0.75rem;
 }
 
+.box-dark-subtle {
+  background-color: #0E1A2B;
+  border: 1px solid #1A3150;
+  color: #F1F5F9;
+  border-radius: 0.5rem;
+}
+
+/* Headings in Dark Box */
+.box-dark h1, .box-dark h2, .box-dark h3, .box-dark h4, .box-dark h5, .box-dark h6,
+.box-dark .card-heading, .box-dark .heading,
+.card-dark h1, .card-dark h2, .card-dark h3, .card-dark h4, .card-dark h5, .card-dark h6,
+.card-dark .card-heading, .card-dark .heading {
+  color: #FFFFFF !important;
+}
+
+/* Secondary Text in Dark Box */
+.box-dark .text-secondary, .box-dark .text-muted, .box-dark .subtext,
+.card-dark .text-secondary, .card-dark .text-muted, .card-dark .subtext {
+  color: #94A3B8 !important;
+}
+
+/* Icons in Dark Box */
+.box-dark .card-icon,
+.card-dark .card-icon {
+  color: #38BDF8 !important;
+}
+
+/* Critical Contrast Rule: Never allow dark text on dark box */
+.box-dark .text-\[\#17212B\], .box-dark .text-\[\#142331\], .box-dark .text-\[\#1F2D38\],
+.box-dark .text-\[\#34495A\], .box-dark .text-slate-900, .box-dark .text-slate-950,
+.box-dark .text-gray-900, .box-dark .text-gray-800, .box-dark .text-black,
+.card-dark .text-\[\#17212B\], .card-dark .text-\[\#142331\], .card-dark .text-\[\#1F2D38\],
+.card-dark .text-\[\#34495A\], .card-dark .text-slate-900, .card-dark .text-slate-950,
+.card-dark .text-gray-900, .card-dark .text-gray-800, .card-dark .text-black {
+  color: #F1F5F9 !important;
+}
+
+.box-dark .text-\[\#4F6170\], .box-dark .text-\[\#5B6B7A\], .box-dark .text-\[\#718292\],
+.box-dark .text-\[\#81909D\], .box-dark .text-slate-600, .box-dark .text-slate-700,
+.card-dark .text-\[\#4F6170\], .card-dark .text-\[\#5B6B7A\], .card-dark .text-\[\#718292\],
+.card-dark .text-\[\#81909D\], .card-dark .text-slate-600, .card-dark .text-slate-700 {
+  color: #94A3B8 !important;
+}
+
+.box-dark .border-\[\#D5DEE7\], .box-dark .border-\[\#D9E2EA\], .box-dark .border-\[\#E6EEF5\],
+.card-dark .border-\[\#D5DEE7\], .card-dark .border-\[\#D9E2EA\], .card-dark .border-\[\#E6EEF5\] {
+  border-color: #1E385B !important;
+}
+
+/* ------------------------------------------------------------------------------
+   2. LIGHT BOX
+   - Background: white / very light gray
+   - Heading: dark navy
+   - Body text: dark charcoal
+   - Secondary text: medium gray
+   - Icons: dark navy or subtle cyan
+   - Border: minimal subtle border
+   ------------------------------------------------------------------------------ */
+.box-light,
+.card-light {
+  background-color: #FFFFFF;
+  border: 1px solid #D5DEE7;
+  color: #1E293B;
+  border-radius: 0.75rem;
+}
+
+.box-light-subtle {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  color: #1E293B;
+  border-radius: 0.5rem;
+}
+
+/* Headings in Light Box */
+.box-light h1, .box-light h2, .box-light h3, .box-light h4, .box-light h5, .box-light h6,
+.box-light .card-heading, .box-light .heading,
+.card-light h1, .card-light h2, .card-light h3, .card-light h4, .card-light h5, .card-light h6,
+.card-light .card-heading, .card-light .heading {
+  color: #0F1D2E !important;
+}
+
+/* Secondary Text in Light Box */
+.box-light .text-secondary, .box-light .text-muted, .box-light .subtext,
+.card-light .text-secondary, .card-light .text-muted, .card-light .subtext {
+  color: #64748B !important;
+}
+
+/* Icons in Light Box */
+.box-light .card-icon,
+.card-light .card-icon {
+  color: #0E88D3 !important;
+}
+
+/* Critical Contrast Rule: In light boxes, text must be dark navy / charcoal and NEVER white */
+.box-light .text-\[\#17212B\], .box-light .text-\[\#142331\],
+.card-light .text-\[\#17212B\], .card-light .text-\[\#142331\] {
+  color: #0F1D2E !important;
+}
+
+.box-light .text-\[\#4F6170\], .box-light .text-\[\#5B6B7A\], .box-light .text-\[\#718292\],
+.card-light .text-\[\#4F6170\], .card-light .text-\[\#5B6B7A\], .card-light .text-\[\#718292\] {
+  color: #64748B !important;
+}
+
+/* ------------------------------------------------------------------------------
+   3. INTERACTION RULES (NO INVERSION, NO BACKGROUND SWAP)
+   - Clicking a card must NOT change its background color
+   - Clicking a card must NOT invert its text color
+   - Hover uses only a very subtle border change
+   - Selected / active state is simple and readable (border/ring only)
+   ------------------------------------------------------------------------------ */
+.card-interactive-light {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.card-interactive-light:hover {
+  border-color: #0E88D3;
+}
+.card-interactive-light.is-selected,
+.card-interactive-light[data-selected="true"] {
+  border-color: #0E88D3 !important;
+  box-shadow: 0 0 0 1px #0E88D3 !important;
+}
+
+.card-interactive-dark {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.card-interactive-dark:hover {
+  border-color: #38BDF8;
+}
+.card-interactive-dark.is-selected,
+.card-interactive-dark[data-selected="true"] {
+  border-color: #38BDF8 !important;
+  box-shadow: 0 0 0 1px #38BDF8 !important;
+}
+
+/* ------------------------------------------------------------------------------
+   4. STATUS BADGES & INDICATORS (CLEAN & NON-FLASHING)
+   ------------------------------------------------------------------------------ */
+.badge-safe-dark {
+  background-color: rgba(22, 138, 91, 0.18);
+  color: #34D399;
+  border: 1px solid rgba(22, 138, 91, 0.35);
+}
+.badge-safe-light {
+  background-color: #F0FDF4;
+  color: #168A5B;
+  border: 1px solid rgba(22, 138, 91, 0.3);
+}
+
+.badge-monitor-dark {
+  background-color: rgba(197, 138, 0, 0.18);
+  color: #FBBF24;
+  border: 1px solid rgba(197, 138, 0, 0.35);
+}
+.badge-monitor-light {
+  background-color: #FFFBEB;
+  color: #C58A00;
+  border: 1px solid rgba(197, 138, 0, 0.3);
+}
+
+.badge-reject-dark {
+  background-color: rgba(217, 54, 62, 0.18);
+  color: #F87171;
+  border: 1px solid rgba(217, 54, 62, 0.35);
+}
+.badge-reject-light {
+  background-color: #FEF2F2;
+  color: #D9363E;
+  border: 1px solid rgba(217, 54, 62, 0.3);
+}
+
+.badge-cyan-dark {
+  background-color: rgba(14, 136, 211, 0.18);
+  color: #38BDF8;
+  border: 1px solid rgba(14, 136, 211, 0.35);
+}
+.badge-cyan-light {
+  background-color: #F0F7FD;
+  color: #0E88D3;
+  border: 1px solid rgba(14, 136, 211, 0.3);
+}
+
+/* Steady status dot indicator (No flashing / pulsing) */
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Background overlay without animations */
 .grid-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.45;
+  opacity: 0.25;
   background-image:
-    linear-gradient(rgba(56, 189, 248, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.07) 1px, transparent 1px);
+    linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
-  animation: grid-drift 22s linear infinite;
 }
 
-/* 2. Gentle Telemetry Pulse (2.5s calm breathing) */
-@keyframes gentle-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.55; transform: scale(1.05); }
+/* Clean Form Inputs */
+input.clean-input-dark {
+  background-color: #0E1A2B;
+  color: #F1F5F9;
+  border: 1px solid #1E385B;
+  outline: none;
 }
-
-.led {
-  animation: gentle-pulse 2.2s ease-in-out infinite;
-}
-
-.dot-pulse {
-  animation: gentle-pulse 2.2s ease-in-out infinite;
-}
-
-/* 3. Single-shot Alert Pulse */
-@keyframes alert-once {
-  0% { opacity: 0.4; transform: scale(0.99); }
-  45% { opacity: 1; transform: scale(1.01); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.animate-alert-once {
-  animation: alert-once 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* 4. Telemetry Line Signal Flow */
-@keyframes signal-flow {
-  0% { stroke-dashoffset: 48; }
-  100% { stroke-dashoffset: 0; }
-}
-
-.telemetry-flow {
-  stroke-dasharray: 6 6;
-  animation: signal-flow 2.8s linear infinite;
-}
-
-/* 5. TEE Subtle Boundary Signal */
-@keyframes tee-subtle-signal {
-  0%, 100% {
-    border-color: #234670;
-  }
-  50% {
-    border-color: #38BDF8;
-  }
-}
-
-.tee-boundary-signal {
-  animation: tee-subtle-signal 3.5s ease-in-out infinite;
-}
-
-/* 6. Modal Ingress Animation */
-@keyframes modalin {
-  from { transform: scale(0.97); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.modal-anim {
-  animation: modalin 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ==============================================================================
-   Aerospace Panel Glass & Reticle Styling
-   ============================================================================== */
-
-.hud-glass {
-  background: rgba(22, 44, 71, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid #234670;
-  box-shadow: 0 4px 20px rgba(5, 14, 25, 0.35);
-}
-
-.hud-glass-interactive {
-  background: rgba(22, 44, 71, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid #234670;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 16px rgba(5, 14, 25, 0.3);
-}
-
-.hud-glass-interactive:hover {
-  background: rgba(28, 55, 92, 0.95);
+input.clean-input-dark:focus {
   border-color: #38BDF8;
-  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.25);
+}
+input.clean-input-dark::placeholder {
+  color: #64748B;
 }
 
-.hud-tag {
-  font-family: 'Sitka Small Semibold', 'Sitka Small', 'Sitka Text', 'Sitka', Georgia, serif !important;
-  font-weight: 600;
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+input.clean-input-light {
+  background-color: #F8FAFC;
+  color: #0F1D2E;
+  border: 1px solid #D5DEE7;
+  outline: none;
 }
-
-/* Tactical Precision Reticle Corners */
-.reticle-corner {
-  position: relative;
+input.clean-input-light:focus {
+  border-color: #0E88D3;
+  background-color: #FFFFFF;
 }
-.reticle-corner::before {
-  content: '';
-  position: absolute;
-  top: -1px; left: -1px;
-  width: 6px; height: 6px;
-  border-top: 1.5px solid #0E88D3;
-  border-left: 1.5px solid #0E88D3;
-}
-.reticle-corner::after {
-  content: '';
-  position: absolute;
-  bottom: -1px; right: -1px;
-  width: 6px; height: 6px;
-  border-bottom: 1.5px solid #0E88D3;
-  border-right: 1.5px solid #0E88D3;
-}
-
-/* Reticle Corners - Orange (Attention / Key Mission) */
-.reticle-corner-orange::before {
-  border-top: 1.5px solid #F47216;
-  border-left: 1.5px solid #F47216;
-}
-.reticle-corner-orange::after {
-  border-bottom: 1.5px solid #F47216;
-  border-right: 1.5px solid #F47216;
-}
-
-/* Reticle Corners - Green (Safe) */
-.reticle-corner-green::before {
-  border-top: 1.5px solid #168A5B;
-  border-left: 1.5px solid #168A5B;
-}
-.reticle-corner-green::after {
-  border-bottom: 1.5px solid #168A5B;
-  border-right: 1.5px solid #168A5B;
-}
-
-/* Reticle Corners - Red (Reject / Alert) */
-.reticle-corner-red::before {
-  border-top: 1.5px solid #D9363E;
-  border-left: 1.5px solid #D9363E;
-}
-.reticle-corner-red::after {
-  border-bottom: 1.5px solid #D9363E;
-  border-right: 1.5px solid #D9363E;
-}
-
-/* Subtle Radar Sweep */
-@keyframes radar-sweep {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.radar-spinner {
-  animation: radar-sweep 8s linear infinite;
-}
-
-/* Card & Console Shadows */
-.shadow-isro {
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.22);
-}
-.shadow-orange {
-  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.25);
-}
-.shadow-alert {
-  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
-}
-
-/* ==============================================================================
-   Light Dark Blue Aerospace Palette Mapping
-   Seamlessly maps panels, surfaces, text, and borders to the twilight slate navy theme
-   ============================================================================== */
-.bg-\[\#EEF3F7\],
-.bg-\[\#EEF4F8\],
-.bg-\[\#E6F1F8\] {
-  background-color: #0E1D30 !important;
-}
-
-.bg-\[\#F4F8FB\],
-.bg-\[\#F3F6F9\],
-.bg-\[\#F8FAFC\],
-.bg-\[\#F4F7FA\] {
-  background-color: #12243D !important;
-}
-
-.bg-\[\#FFFFFF\] {
-  background-color: #162C47 !important;
-}
-
-/* Subtle cards & translucent panels */
-.bg-\[\#FFFFFF\]\/60,
-.bg-\[\#FFFFFF\]\/70,
-.bg-\[\#FFFFFF\]\/80,
-.bg-\[\#FFFFFF\]\/90 {
-  background-color: rgba(22, 44, 71, 0.88) !important;
-}
-
-/* Text adaptations for high contrast on light dark blue */
-.text-\[\#17212B\],
-.text-\[\#142331\] {
-  color: #F8FAFC !important;
-}
-
-.text-\[\#4F6170\],
-.text-\[\#5B6B7A\],
-.text-\[\#718292\],
-.text-\[\#81909D\] {
-  color: #94A3B8 !important;
-}
-
-.text-\[\#1F2D38\],
-.text-\[\#34495A\] {
-  color: #CBD5E1 !important;
-}
-
-/* Borders adaptations */
-.border-\[\#D9E2EA\],
-.border-\[\#D5E2EA\],
-.border-\[\#D5DEE7\],
-.border-\[\#E6EEF5\] {
-  border-color: #234670 !important;
-}
-
-/* Inputs on light dark blue */
-input.bg-\[\#F4F7FA\],
-input.bg-\[\#F8FAFC\],
-input.bg-\[\#FFFFFF\],
-select.bg-\[\#FFFFFF\],
-select.bg-\[\#F8FAFC\] {
-  background-color: #0E1E33 !important;
-  color: #F8FAFC !important;
-  border-color: #234670 !important;
-}
-input::placeholder {
-  color: #64748B !important;
-}
-
-/* Active buttons & tabs on light dark blue */
-button.bg-\[\#FFFFFF\],
-button.bg-\[\#F8FAFC\] {
-  background-color: #162C47 !important;
-  color: #F8FAFC !important;
-  border-color: #234670 !important;
-}
-button.bg-\[\#FFFFFF\]:hover,
-button.bg-\[\#F8FAFC\]:hover {
-  background-color: #1C375C !important;
-  border-color: #38BDF8 !important;
+input.clean-input-light::placeholder {
+  color: #64748B;
 }
